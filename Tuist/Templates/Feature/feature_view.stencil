@@ -1,0 +1,24 @@
+//
+//  {{ feature }}View.swift
+//
+//  {{ feature }}
+//
+//  Created by {{ author }}
+//
+
+import SwiftUI
+import ComposableArchitecture
+
+public struct {{ feature }}View: View {
+  @Bindable var store: StoreOf<{{ feature }}Reducer>
+
+  public init(store: StoreOf<{{ feature }}Reducer>) {
+    self.store = store
+  }
+
+  public var body: some View {
+    EmptyView()
+  }
+}
+
+

@@ -1,0 +1,22 @@
+//
+//  {{ feature }}UseCaseImpl.swift
+//
+//  {{ feature }}Domain
+//
+//  Created by {{ author }}
+//
+
+import Foundation
+import {{ feature }}DomainInterface
+
+public struct {{ feature }}UseCaseImpl: {{ feature }}UseCase {
+  private let repository: {{ feature }}Repository
+
+  public init(
+    repository: {{ feature }}Repository
+  ) {
+    self.repository = repository
+  }
+
+  public func execute() async throws { }
+}

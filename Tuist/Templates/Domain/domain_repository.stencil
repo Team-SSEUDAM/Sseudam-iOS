@@ -1,0 +1,13 @@
+//
+//  {{ feature }}Repository.swift
+//
+//  {{ feature }}DomainInterface
+//
+//  Created by {{ author }}
+//
+
+import Foundation
+
+public protocol {{ feature }}Repository {
+  func fetchData() async throws
+}

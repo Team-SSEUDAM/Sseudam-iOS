@@ -1,0 +1,13 @@
+//
+//  {{ feature }}UseCase.swift
+//
+//  {{ feature }}DomainInterface
+//
+//  Created by {{ author }}
+//
+
+import Foundation
+
+public protocol {{ feature }}UseCase {
+  func execute() async throws
+}

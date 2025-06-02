@@ -1,0 +1,12 @@
+//
+//  {{ feature }}Dto.swift
+//
+//  {{ feature }}
+//
+//  Created by {{ author }}
+//
+
+import Foundation
+import {{ feature }}DomainInterface
+
+

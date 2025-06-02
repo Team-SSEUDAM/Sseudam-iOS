@@ -17,12 +17,12 @@ public struct {{ feature }}Reducer {
   }
   
   @ObservableState
-  public struct State: BindableAction, Equatable {
+  public struct State: Equatable {
     
     public init() {}
   }
 
-  public enum Action: Equatable {
+  public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
   }
 

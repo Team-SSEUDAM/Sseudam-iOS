@@ -1,5 +1,5 @@
 //
-//  {{ feature }}Repository.swift
+//  {{ feature }}DependencyKey.swift
 //
 //  {{ feature }}DomainInterface
 //
@@ -15,7 +15,7 @@ public enum {{ feature }}UseCaseKey: DependencyKey {
   public static var testValue: {{ feature }}UseCase { {{ feature }}UseCaseProvider() }
 }
 
-var {{ feature }}UseCaseProvider: () -> {{ feature }}UseCase = {
+private var {{ feature }}UseCaseProvider: () -> {{ feature }}UseCase = {
   fatalError("{{ feature }}UseCase Dependency not configured")
 }
 

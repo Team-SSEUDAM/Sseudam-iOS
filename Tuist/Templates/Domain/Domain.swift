@@ -12,7 +12,7 @@ fileprivate let name: Template.Attribute = .required("feature")
 fileprivate let author: Template.Attribute = .required("author")
 
 /// 파일 경로
-fileprivate let DomainPath: String = "Projects/Domain/\(name)/"
+fileprivate let DomainPath: String = "Projects/Domain/\(name)"
 
 let domainTemplate = Template(
   description: "Domain Project Template",

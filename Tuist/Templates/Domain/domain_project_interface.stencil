@@ -1,0 +1,15 @@
+//
+//  {{ feature }}Project.swift
+//
+//  {{ feature }}DomainInterface
+//
+//  Created by {{ author }}
+//
+
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+let project = Project.makeDynamicFrameworkProject(
+  for: Domain.{{ feature }},
+  dependencies: []
+)

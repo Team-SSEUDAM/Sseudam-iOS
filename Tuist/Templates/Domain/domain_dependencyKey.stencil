@@ -1,0 +1,33 @@
+//
+//  {{ feature }}DependencyKey.swift
+//
+//  {{ feature }}DomainInterface
+//
+//  Created by {{ author }}
+//
+
+import Foundation
+import Dependencies
+
+public enum {{ feature }}UseCaseKey: DependencyKey {
+  public static var liveValue: {{ feature }}UseCase { {{ feature }}UseCaseProvider() }
+  public static var previewValue: {{ feature }}UseCase { {{ feature }}UseCaseProvider() }
+  public static var testValue: {{ feature }}UseCase { {{ feature }}UseCaseProvider() }
+}
+
+private var {{ feature }}UseCaseProvider: () -> {{ feature }}UseCase = {
+  fatalError("{{ feature }}UseCase Dependency not configured")
+}
+
+public func {{ feature }}UseCaseRegister(
+  provider: @escaping () -> {{ feature }}UseCase
+) {
+  {{ feature }}UseCaseProvider = provider
+}
+
+extension DependencyValues {
+  public var {{ feature }}UseCase: {{ feature }}UseCase {
+    get { self[{{ feature }}UseCaseKey.self] }
+    set { self[{{ feature }}UseCaseKey.self] = newValue }
+  }
+}

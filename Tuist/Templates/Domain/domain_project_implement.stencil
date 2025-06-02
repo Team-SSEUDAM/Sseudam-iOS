@@ -1,0 +1,18 @@
+//
+//  {{ feature }}Project.swift
+//
+//  {{ feature }}Domain
+//
+//  Created by {{ author }}
+//
+
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+let project = Project.makeStaticLibraryProject(
+  for: Domain.{{ feature }},
+  dependencies: [
+    .Domain.{{ feature }}.Interface
+  ]
+)
+

@@ -1,0 +1,31 @@
+//
+//  {{ feature }}DataTests.swift
+//
+//  {{ feature }}
+//
+//  Created by {{ author }}
+//
+
+import XCTest
+import Dependencies
+@testable import {{ feature }}DataInterface
+@testable import {{ feature }}DomainInterface
+@testable import Core
+
+final class {{ feature }}RepositoryTests: XCTestCase {
+
+  func testFetchData() async throws {
+    let networker = MockNetworker()
+    let repository = {{ feature }}RepositoryImpl(networker: networker)
+
+    let result = try await repository.requestMockData()
+    XCTAssertEqual(result, "Mocked API Data")
+  }
+}
+
+final class {{ feature }}RepositoryImpl: {{ feature }}Repository {
+  func requestMockData() async throws -> String {
+    return "Mocked API Data"
+  }
+}
+

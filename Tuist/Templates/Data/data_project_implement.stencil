@@ -1,0 +1,19 @@
+//
+//  {{ feature }}Project.swift
+//
+//  {{ feature }}Data
+//
+//  Created by {{ author }}
+//
+
+import ProjectDescription
+import ProjectDescriptionHelpers
+
+let project = Project.makeStaticLibraryProject(
+  for: Data.{{ feature }},
+  dependencies: [
+    .Data.{{ feature }}.Interface,
+  ]
+)
+
+

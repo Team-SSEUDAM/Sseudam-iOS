@@ -1,0 +1,25 @@
+//
+//  {{ feature }}DemoApp.swift
+//
+//  {{ feature }}
+//
+//  Created by {{ author }}
+//
+
+import SwiftUI
+import ComposableArchitecture
+
+@main
+struct {{ feature }}DemoApp: App {
+  let store = Store(initialState: {{ feature }}Reducer.State(), reducer: {
+    {{ feature }}Reducer()
+  })
+
+  var body: some Scene {
+    WindowGroup {
+      {{ feature }}View(store: store)
+    }
+  }
+}
+
+

@@ -1,0 +1,19 @@
+//
+//  {{ feature }}Reducer.swift
+//
+//  {{ feature }}
+//
+//  Created by {{ author }}
+//
+
+import {{ feature }}FeatureInterface
+import ComposableArchitecture
+
+extension {{ feature }}Reducer {
+  public static let {{ feature }}Reducer = Reduce<State, Action> { state, action in
+    switch action {
+    default:
+      return .none
+    }
+  }
+}

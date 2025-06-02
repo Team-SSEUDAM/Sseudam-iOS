@@ -1,0 +1,29 @@
+//
+//  {{ feature }}UseCaseTest.swift
+//
+//  {{ feature }}DomainTesting
+//
+//  Created by {{ author }}
+//
+
+import XCTest
+import Dependencies
+@testable import {{ feature }}Domain
+
+final class {{ feature }}UseCaseTests: XCTestCase {
+  
+  func testExecute() async throws {
+    let repository = Mock{{ feature }}Repository()
+    let useCase = {{ feature }}UseCaseImpl(repository: repository)
+
+    let result = try await useCase.execute()
+    XCTAssertEqual(result, "Mocked Data")
+  }
+}
+
+final class Mock{{ feature }}Repository: {{ feature }}Repository {
+  func fetchData() async throws -> String {
+    return "Mocked Data"
+  }
+}
+

@@ -1,0 +1,22 @@
+//
+//  {{ feature }}RepositoryImpl.swift
+//
+//  {{ feature }}
+//
+//  Created by {{ author }}
+//
+
+import Foundation
+import {{ feature }}DomainInterface
+import {{ feature }}DataInterface
+import Core
+
+public struct {{ feature }}RepositoryImpl: {{ feature }}Repository {
+  private let networker: NetworkProtocol
+  
+  public init(networker: NetworkProtocol) {
+    self.networker = networker
+  }
+  public func fetchData() async throws -> Void {}
+  
+}

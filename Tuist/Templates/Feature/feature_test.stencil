@@ -1,0 +1,35 @@
+//
+//  {{ feature }}XCTest.swift
+//
+//  {{ feature }}
+//
+//  Created by {{ author }}
+//
+
+import XCTest
+import ComposableArchitecture
+@testable import {{ feature }}Interface
+
+final class {{ feature }}UnitTests: XCTestCase {
+    
+  func testIncrement() {
+    let store = TestStore(initialState: {{ feature }}Reducer.State()) {
+      {{ feature }}Reducer()
+    }
+
+    store.send(.increment) {
+      $0.count = 1
+    }
+  }
+
+  func testDecrement() {
+    let store = TestStore(initialState: {{ feature }}Reducer.State()) {
+      {{ feature }}Reducer()
+    }
+
+    store.send(.decrement) {
+      $0.count = -1
+    }
+  }
+}
+

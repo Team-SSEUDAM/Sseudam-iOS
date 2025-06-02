@@ -49,7 +49,7 @@ let domainTemplate = Template(
     // implement project
     .file(
       path: "\(DomainPath)/\(name)Domain/Project.swift",
-      templatePath: "domain_usecase_implement.stencil"
+      templatePath: "domain_project_implement.stencil"
     ),
     // usecase implement
     .file(

@@ -17,6 +17,6 @@ public struct {{ feature }}RepositoryImpl: {{ feature }}Repository {
   public init(networker: NetworkProtocol) {
     self.networker = networker
   }
-  public func fetchData() async throws {}
+  public func fetchData() async throws -> Void {}
   
 }

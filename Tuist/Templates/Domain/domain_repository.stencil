@@ -9,5 +9,5 @@
 import Foundation
 
 public protocol {{ feature }}Repository {
-  func fetchData() async throws
+  func fetchData() async throws -> Void
 }

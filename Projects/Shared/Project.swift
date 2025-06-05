@@ -8,10 +8,22 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-let project = Project.makeInternalLibraryProject(
-  for: InternalLibrary.Shared,
-  dependencies: [
-    .Shared.ThirdParty
+let project = Project(
+  name: "Shared",
+  organizationName: "Sseudam.a2bo.ios",
+  options: .default,
+  settings: .default,
+  targets: [
+    .target(
+      name: "ThirdParty",
+      destinations: .iOS,
+      product: .staticLibrary,
+      bundleId: "Sseudam.a2bo.ios.Shared",
+      deploymentTargets: .iOS("17.0"),
+      infoPlist: .extendingDefault(with: [:]),
+      dependencies: [
+        .SPM.TCA
+      ]
+    )
   ]
 )
-

@@ -11,8 +11,6 @@ import ProjectDescriptionHelpers
 
 let project = Project.makeStaticLibraryProject(
   for: Domain.{{ feature }},
-  dependencies: [
-    .InternalLibrary.Core
-  ],
+  dependencies: [],
   nameSuffix: "Interface"
 )

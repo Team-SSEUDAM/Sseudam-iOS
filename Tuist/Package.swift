@@ -33,6 +33,6 @@ let packageSettings = PackageSettings(
 let package = Package(
   name: "tuist-template", /// 패키지 이름
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.18.0"),
+    .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.20.1"),
   ]
 )

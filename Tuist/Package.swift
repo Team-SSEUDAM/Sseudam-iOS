@@ -6,24 +6,7 @@ import PackageDescription
 #if TUIST
 import struct ProjectDescription.PackageSettings
 let packageSettings = PackageSettings(
-  productTypes: [
-    "ComposableArchitecture": .framework,
-    "Dependencies": .framework,
-    "Clocks": .framework,
-    "ConcurrencyExtras": .framework,
-    "CombineSchedulers": .framework,
-    "IdentifiedCollections": .framework,
-    "OrderedCollections": .framework,
-    "_CollectionsUtilities": .framework,
-    "DependenciesMacros": .framework,
-    "SwiftUINavigationCore": .framework,
-    "Perception": .framework,
-    "IssueReporting": .framework,
-    "CasePaths": .framework,
-    "CustomDump": .framework,
-    "XCTestDynamicOverlay": .framework,
-    "PerceptionCore": .framework
-  ]
+  productTypes: [:]
 )
 #endif
 
@@ -33,6 +16,6 @@ let packageSettings = PackageSettings(
 let package = Package(
   name: "tuist-template", /// 패키지 이름
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.18.0"),
+    .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.20.1"),
   ]
 )

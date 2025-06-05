@@ -17,7 +17,6 @@ public enum Module {
   case domain(Domain, isInterface: Bool = false)
   case data(Data, isInterface: Bool = false)
   case core(Core)
-  case internalLibrary(InternalLibrary)
   case shared(Shared)
   case spm(SPM)
 }
@@ -35,12 +34,6 @@ public enum Domain: String, ModuleRepresentable {
 public enum Data: String, ModuleRepresentable {
   case Sample
   public var typePath: String { "Data" }
-}
-
-public enum InternalLibrary: String, ModuleRepresentable {
-  case Core
-  case Shared
-  public var typePath: String { "Internal" }
 }
 
 public enum Core: String, ModuleRepresentable {
@@ -63,12 +56,11 @@ protocol TargetDependencyDelegate { }
 extension TargetDependencyDelegate {
   public static func project(_ module: Module) -> TargetDependency {
     switch module {
-    case let .feature(feature, isInterface): return makeProjectDependency(for: feature, isInterface: isInterface)
+    case let .feature(feature, isInterface): return makeProjectDependency(for: feature, isInterface: isInterface, removeAddPath: true)
     case let .domain(domain, isInterface): return makeProjectDependency(for: domain, isInterface: isInterface)
     case let .data(data, isInterface): return makeProjectDependency(for: data, isInterface: isInterface)
-    case let .internalLibrary(internalLibrary): return makeInternalDependency(for: internalLibrary)
-    case let .core(core): return makeInternalDependency(for: core)
-    case let .shared(shared): return makeInternalDependency(for: shared)
+    case let .core(core): return makeProjectDependency(for: core)
+    case let .shared(shared): return makeProjectDependency(for: shared)
     case let .spm(spm): return makeSPMDependency(for: spm)
     }
   }
@@ -77,24 +69,24 @@ extension TargetDependencyDelegate {
   /// Domain이라면 `Projects/Domain/Sample/SampleDomainInterface` 또는 `Projects/Domain/Sample/SampleDomain`
   private static func makeProjectDependency<T: ModuleRepresentable>(
     for target: T,
-    isInterface: Bool = false
+    isInterface: Bool = false,
+    removeAddPath: Bool = false
   ) -> TargetDependency {
     let suffix = isInterface ? "Interface" : ""
     let targetName = target.rawValue + target.typePath + suffix
-    let addPath = target is Feature ? "" : "/\(targetName)"
+    let addPath = removeAddPath ? "" : "/\(targetName)"
     return .project(
       target: targetName,
-      path: .relativeToRoot("./Projects/\(target.typePath)/\(target)/\(addPath)")
+      path: .relativeToRoot("./Projects/\(target.typePath)/\(target)" + addPath)
     )
   }
   
-  private static func makeInternalDependency<T: ModuleRepresentable>(
+  /// Core나 Shared는 `Projects/Core/DesignKit` 또는 `Projects/Shared/ThirdParty`와 같이 경로가 단순합니다.
+  private static func makeProjectDependency<T: ModuleRepresentable>(
     for target: T
   ) -> TargetDependency {
-    let targetName = target.rawValue + target.typePath
-   
     return .project(
-      target: targetName,
+      target: "\(target)",
       path: .relativeToRoot("./Projects/\(target.typePath)/\(target)")
     )
   }
@@ -124,11 +116,6 @@ extension TargetDependency {
       public static let Interface = Self.project(.data(.Sample, isInterface: true))
       public static let Implement = Self.project(.data(.Sample))
     }
-  }
-  
-  public struct InternalLibrary: TargetDependencyDelegate {
-    public static let Shared = Self.project(.internalLibrary(.Core))
-    public static let Core = Self.project(.internalLibrary(.Shared))
   }
   
   public struct Core: TargetDependencyDelegate {

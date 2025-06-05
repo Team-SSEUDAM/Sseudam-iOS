@@ -58,19 +58,46 @@ extension TargetDependencyDelegate {
     }
   }
   
+  /// Feature라면 `Projects/Feature/Sample`
+  /// Domain이라면 `Projects/Domain/Sample/SampleDomainInterface` 또는 `Projects/Domain/Sample/SampleDomain`
   private static func makeProjectDependency<T: ModuleRepresentable>(
     for target: T,
     isInterface: Bool = false
   ) -> TargetDependency {
     let suffix = isInterface ? "Interface" : ""
+    let targetName = target.rawValue + target.typePath + suffix
+    let addPath = target is Feature ? "" : "/\(targetName)"
     return .project(
-      target: "\(target.rawValue)\(suffix)",
-      path: .relativeToRoot("./Projects/\(target.typePath)/\(target.rawValue)")
+      target: targetName,
+      path: .relativeToRoot("./Projects/\(target.typePath)/\(target)/\(addPath)")
     )
   }
   
   public static func makeSPMDependency(for target: SPM) -> TargetDependency {
     return .external(name: target.rawValue)
+  }
+}
+
+extension TargetDependency {
+  public struct Features: TargetDependencyDelegate {
+    public struct Sample: TargetDependencyDelegate {
+      public static let Interface = Self.project(.feature(.Sample, isInterface: true))
+      public static let Implement = Self.project(.feature(.Sample))
+    }
+  }
+  
+  public struct Domain: TargetDependencyDelegate {
+    public struct Sample: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Sample, isInterface: true))
+      public static let Implement = Self.project(.domain(.Sample))
+    }
+  }
+  
+  public struct Data: TargetDependencyDelegate {
+    public struct Sample: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Sample, isInterface: true))
+      public static let Implement = Self.project(.data(.Sample))
+    }
   }
 }
 

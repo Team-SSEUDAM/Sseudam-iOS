@@ -75,20 +75,17 @@ public extension Target {
   ///
   /// - Parameters:
   ///   - module: 모듈을 나타내는 `ModuleRepresentable` 타입
-  ///   - isInterface: Interface Target인지 여부 (기본값: false)
   ///   - dependencies: Target이 의존하는 다른 Target들의 목록 (기본값: [])
-  ///
-  /// - `nameSuffix`가 `Interface`인 경우, `Interface Target`으로 설정
-  /// - `nameSuffix`가 `빈 문자열`인 경우, `일반 Dynamic Framework Target`으로 설정
+  ///   - nameSuffix: Target 이름에 추가할 접미사 (기본값: "")
   static func makeDynamicFrameworkTarget<T: ModuleRepresentable>(
     for module: T,
-    isInterface: Bool = false,
-    dependencies: [TargetDependency] = []
+    dependencies: [TargetDependency] = [],
+    nameSuffix: String = ""
   ) -> Target {
     makeModuleTarget(
       for: module,
       product: .framework,
-      nameSuffix: isInterface ? "Interface" : "",
+      nameSuffix: nameSuffix,
       dependencies: dependencies
     )
   }
@@ -98,13 +95,16 @@ public extension Target {
   /// - Parameters:
   ///   - module: 모듈을 나타내는 `ModuleRepresentable` 타입
   ///   - dependencies: Target이 의존하는 다른 Target들의 목록 (기본값: [])
+  ///   - nameSuffix: Target 이름에 추가할 접미사 (기본값: "")
   static func makeStaticLibraryTarget<T: ModuleRepresentable>(
     for module: T,
-    dependencies: [TargetDependency] = []
+    dependencies: [TargetDependency] = [],
+    nameSuffix: String = ""
   ) -> Target {
     makeModuleTarget(
       for: module,
       product: .staticLibrary,
+      nameSuffix: nameSuffix,
       dependencies: dependencies
     )
   }
@@ -140,8 +140,8 @@ public extension Target {
     infoPlist: [String: Plist.Value] = [:],
     dependencies: [TargetDependency] = []
   ) -> Target {
-    let baseName = module.rawValue + module.typePath /// Sample + Feature
-    let targetName = baseName + nameSuffix /// SampleFeature + Interface
+    let targetName = module.rawValue + module.typePath + nameSuffix
+    let sourcesPath = module is Feature ? "./\(targetName)/Sources/**" : "./Sources/**"
     return target(
       name: targetName,
       destinations: .iOS,
@@ -149,7 +149,7 @@ public extension Target {
       bundleId: "\(organization).\(targetName)",
       deploymentTargets: .iOS("17.0"),
       infoPlist: infoPlist == [:] ? .default : .extendingDefault(with: infoPlist),
-      sources: ["Sources/**"],
+      sources: ["\(sourcesPath)"],
       dependencies: dependencies
     )
   }

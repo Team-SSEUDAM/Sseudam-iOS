@@ -13,7 +13,8 @@ let project = Project.makeStaticLibraryProject(
   for: Data.{{ feature }},
   dependencies: [
     .Domain.{{ feature }}.Interface
-  ]
+  ],
+  nameSuffix: "Interface"
 )
 
 

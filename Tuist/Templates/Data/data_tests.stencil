@@ -12,6 +12,12 @@ import Dependencies
 @testable import {{ feature }}DomainInterface
 @testable import Core
 
+extension MockNetworker: NetworkProtocol {
+  func request<T: Decodable>(_ request: URLRequest) async throws -> T {
+    return "Mocked API Data" as! T // Mock response
+  }
+}
+
 final class {{ feature }}RepositoryTests: XCTestCase {
 
   func testFetchData() async throws {

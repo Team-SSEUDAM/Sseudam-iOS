@@ -12,47 +12,47 @@ public extension Project {
   ///
   /// - Parameters:
   ///   - module: 모듈을 나타내는 `ModuleRepresentable` 타입
-  ///   - isInterface: Interface Target인지 여부 (기본값: false)
   ///   - dependencies: Target이 의존하는 다른 Target들의 목록 (기본값: [])
   static func makeDynamicFrameworkProject<T: ModuleRepresentable>(
     for module: T,
-    isInterface: Bool = false,
-    dependencies: [TargetDependency] = []
+    dependencies: [TargetDependency] = [],
+    nameSuffix: String = ""
   ) -> Project {
-    let suffix = isInterface ? "Interface" : ""
-    let name = name(for: module, suffix: suffix)
+    let name = name(for: module, suffix: nameSuffix)
     
     let framework = Target.makeDynamicFrameworkTarget(
       for: module,
-      isInterface: isInterface,
-      dependencies: dependencies
-    )
-    let tests = Target.makeTestingTarget(
-      for: module,
-      dependencies: [.target(name: name)]
+      dependencies: dependencies,
+      nameSuffix: nameSuffix
     )
     
-    return baseProject(
-      name: name,
-      targets: [framework, tests]
-    )
+    return baseProject(name: name, targets: [framework])
   }
   
   /// Static Library Project를 생성하는 메서드
   ///
   /// - Parameters:
   ///   - module: 모듈을 나타내는 `ModuleRepresentable` 타입
-  ///   - dependencies: Target이 의존하는 다른 Target들의 목록 (`Implement`의 경우, 외부에서 반드시 `Interface`를 의존해야 함)
+  ///   - dependencies: Target이 의존하는 다른 Target들의 목록
   static func makeStaticLibraryProject<T: ModuleRepresentable>(
     for module: T,
-    dependencies: [TargetDependency] = []
+    dependencies: [TargetDependency] = [],
+    nameSuffix: String = ""
   ) -> Project {
-    let name = name(for: module)
-    let impl = Target.makeStaticLibraryTarget(
+    let name = name(for: module, suffix: nameSuffix)
+    
+    let library = Target.makeStaticLibraryTarget(
       for: module,
-      dependencies: dependencies
+      dependencies: dependencies,
+      nameSuffix: nameSuffix
     )
-    return baseProject(name: name, targets: [impl])
+    
+    let tests = Target.makeTestingTarget(
+      for: module,
+      dependencies: [.target(name: name)]
+    )
+    
+    return baseProject(name: name, targets: [library, tests])
   }
   
   /// Feature 모듈을 위한 `Demo`, `Feature`, `Feature Unit Test`, `Feature Interface` Target들을 생성하는 메서드
@@ -73,7 +73,7 @@ public extension Project {
       for: module,
       dependencies: [.target(name: name(for: module))]
     )
-    let feature = Target.makeStaticLibraryTarget(
+    let feature = Target.makeDynamicFrameworkTarget(
       for: module,
       dependencies: [.target(name: name(for: module, suffix: "Interface"))]
     )
@@ -81,10 +81,10 @@ public extension Project {
       for: module,
       dependencies: [.target(name: name(for: module, suffix: "Interface"))]
     )
-    let featureInterface = Target.makeDynamicFrameworkTarget(
+    let featureInterface = Target.makeStaticLibraryTarget(
       for: module,
-      isInterface: true,
-      dependencies: dependencies
+      dependencies: dependencies,
+      nameSuffix: "Interface"
     )
     return baseProject(
       name: name(for: module),
@@ -127,7 +127,7 @@ public extension Project {
     for module: T,
     suffix: String = ""
   ) -> String {
-    return module.rawValue + module.typePath + suffix
+    return module.rawValue + module.typePath + suffix /// 예: `Sample`+ `Feature` + `Interface`
   }
   
   /// 공통 Project 초기화

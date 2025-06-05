@@ -49,16 +49,16 @@ let featureTemplate = Template(
     ),
     // demo
     .file(
-      path: "\(FeaturePath)/\(name)Demo/Sources/\(name)DemoApp.swift",
+      path: "\(FeaturePath)/\(name)FeatureDemo/Sources/\(name)DemoApp.swift",
       templatePath: "feature_demo_app.stencil"
     ),
     // resources
     .file(
-      path: "\(FeaturePath)/\(name)Demo/Resources/Assets.xcassets/Contents.json",
+      path: "\(FeaturePath)/\(name)FeatureDemo/Resources/Assets.xcassets/Contents.json",
       templatePath: "feature_resources_contents.stencil"
     ),
     .file(
-      path: "\(FeaturePath)/\(name)Demo/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json",
+      path: "\(FeaturePath)/\(name)FeatureDemo/Resources/Assets.xcassets/AppIcon.appiconset/Contents.json",
       templatePath: "feature_resources_appicon.stencil"
     )
   ]

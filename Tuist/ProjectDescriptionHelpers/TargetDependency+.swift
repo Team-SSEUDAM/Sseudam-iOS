@@ -17,6 +17,8 @@ public enum Module {
   case domain(Domain, isInterface: Bool = false)
   case data(Data, isInterface: Bool = false)
   case core(Core)
+  case internalLibrary(InternalLibrary)
+  case shared(Shared)
   case spm(SPM)
 }
 
@@ -35,9 +37,20 @@ public enum Data: String, ModuleRepresentable {
   public var typePath: String { "Data" }
 }
 
+public enum InternalLibrary: String, ModuleRepresentable {
+  case Core
+  case Shared
+  public var typePath: String { "Internal" }
+}
+
 public enum Core: String, ModuleRepresentable {
   case DesignKit
   public var typePath: String { "Core" }
+}
+
+public enum Shared: String, ModuleRepresentable {
+  case ThirdParty
+  public var typePath: String { "Shared" }
 }
 
 public enum SPM: String, ModuleRepresentable {
@@ -53,7 +66,9 @@ extension TargetDependencyDelegate {
     case let .feature(feature, isInterface): return makeProjectDependency(for: feature, isInterface: isInterface)
     case let .domain(domain, isInterface): return makeProjectDependency(for: domain, isInterface: isInterface)
     case let .data(data, isInterface): return makeProjectDependency(for: data, isInterface: isInterface)
-    case let .core(core): return makeProjectDependency(for: core)
+    case let .internalLibrary(internalLibrary): return makeInternalDependency(for: internalLibrary)
+    case let .core(core): return makeInternalDependency(for: core)
+    case let .shared(shared): return makeInternalDependency(for: shared)
     case let .spm(spm): return makeSPMDependency(for: spm)
     }
   }
@@ -70,6 +85,17 @@ extension TargetDependencyDelegate {
     return .project(
       target: targetName,
       path: .relativeToRoot("./Projects/\(target.typePath)/\(target)/\(addPath)")
+    )
+  }
+  
+  private static func makeInternalDependency<T: ModuleRepresentable>(
+    for target: T
+  ) -> TargetDependency {
+    let targetName = target.rawValue + target.typePath
+   
+    return .project(
+      target: targetName,
+      path: .relativeToRoot("./Projects/\(target.typePath)/\(target)")
     )
   }
   
@@ -98,6 +124,23 @@ extension TargetDependency {
       public static let Interface = Self.project(.data(.Sample, isInterface: true))
       public static let Implement = Self.project(.data(.Sample))
     }
+  }
+  
+  public struct InternalLibrary: TargetDependencyDelegate {
+    public static let Shared = Self.project(.internalLibrary(.Core))
+    public static let Core = Self.project(.internalLibrary(.Shared))
+  }
+  
+  public struct Core: TargetDependencyDelegate {
+    public static let DesignKit = Self.project(.core(.DesignKit))
+  }
+  
+  public struct Shared: TargetDependencyDelegate {
+    public static let ThirdParty = Self.project(.shared(.ThirdParty))
+  }
+  
+  public struct SPM: TargetDependencyDelegate {
+    public static let TCA = Self.project(.spm(.TCA))
   }
 }
 

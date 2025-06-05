@@ -55,6 +55,19 @@ public extension Project {
     return baseProject(name: name, targets: [library, tests])
   }
   
+  static func makeInternalLibraryProject<T: ModuleRepresentable>(
+    for module: T,
+    dependencies: [TargetDependency] = []
+  ) -> Project {
+    let name = module.rawValue
+    
+    let library = Target.makeStaticLibraryTarget(
+      for: module,
+      dependencies: dependencies
+    )
+    return baseProject(name: name, targets: [library])
+  }
+  
   /// Feature 모듈을 위한 `Demo`, `Feature`, `Feature Unit Test`, `Feature Interface` Target들을 생성하는 메서드
   ///
   /// - Parameters:

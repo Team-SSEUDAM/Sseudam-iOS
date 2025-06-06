@@ -21,11 +21,11 @@ struct SseudamView: View {
       Group {
         switch store.selectedTab {
         case .home:
-          SampleView(color: .blue)
+          EmptyView()
         case .search:
-          SampleView(color: .brown)
+          EmptyView()
         case .profile:
-          SampleView(color: .pink)
+          EmptyView()
         }
       }
       Spacer()
@@ -37,13 +37,6 @@ struct SseudamView: View {
   }
 }
 
-struct SampleView: View {
-  let color: Color
-  var body: some View {
-    color
-      .ignoresSafeArea()
-  }
-}
 #Preview {
   SseudamView()
 }

@@ -18,15 +18,13 @@ struct SseudamView: View {
   
   var body: some View {
     VStack {
-      Group {
-        switch store.selectedTab {
-        case .home:
-          EmptyView()
-        case .search:
-          EmptyView()
-        case .profile:
-          EmptyView()
-        }
+      switch store.selectedTab {
+      case .home:
+        EmptyView()
+      case .search:
+        EmptyView()
+      case .profile:
+        EmptyView()
       }
       Spacer()
       CustomTabBar(selectedTab: store.selectedTab)

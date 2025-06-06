@@ -7,13 +7,44 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 struct SseudamView: View {
+  @Bindable var store: StoreOf<SseudamReducer> = Store(
+    initialState: SseudamReducer.State()
+  ) {
+    SseudamReducer()
+  }
+  
   var body: some View {
-    Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+    VStack {
+      Group {
+        switch store.selectedTab {
+        case .home:
+          SampleView(color: .blue)
+        case .search:
+          SampleView(color: .brown)
+        case .profile:
+          SampleView(color: .pink)
+        }
+      }
+      Spacer()
+      CustomTabBar(selectedTab: store.selectedTab)
+        .tabSelected { tab in
+          store.send(.selectTab(tab))
+        }
+    }
   }
 }
 
+struct SampleView: View {
+  let color: Color
+  var body: some View {
+    color
+      .ignoresSafeArea()
+  }
+}
 #Preview {
   SseudamView()
 }
+

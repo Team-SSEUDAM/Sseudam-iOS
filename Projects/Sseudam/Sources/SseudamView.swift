@@ -10,10 +10,10 @@ import SwiftUI
 import ComposableArchitecture
 
 struct SseudamView: View {
-  @Bindable var store: StoreOf<SseudamReducer> = Store(
-    initialState: SseudamReducer.State()
+  @Bindable var store: StoreOf<SseudamFeature> = Store(
+    initialState: SseudamFeature.State()
   ) {
-    SseudamReducer()
+    SseudamFeature()
   }
   
   var body: some View {

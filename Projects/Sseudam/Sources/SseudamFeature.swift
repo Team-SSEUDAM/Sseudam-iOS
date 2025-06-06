@@ -1,5 +1,5 @@
 //
-//  SseudamReducer.swift
+//  SseudamFeature.swift
 //  Sseudam
 //
 //  Created by Jiyeon on 6/6/25.
@@ -10,7 +10,7 @@ import Foundation
 import ComposableArchitecture
 
 @Reducer
-struct SseudamReducer {
+struct SseudamFeature {
   
   @ObservableState
   struct State {

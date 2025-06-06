@@ -24,6 +24,6 @@ let project = Project.makeApp(
     ],
   ],
   dependencies: [
-    
+    .SPM.TCA
   ]
 )

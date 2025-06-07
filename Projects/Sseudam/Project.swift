@@ -24,6 +24,8 @@ let project = Project.makeApp(
     ],
   ],
   dependencies: [
-    .SPM.TCA
+    .Features.Home.Implement,
+    .Domain.Home.Implement,
+    .Data.Home.Implement
   ]
 )

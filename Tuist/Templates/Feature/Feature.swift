@@ -29,7 +29,7 @@ let featureTemplate = Template(
     ),
     // SwiftUI View
     .file(
-      path: "\(FeaturePath)/\(name)Feature/Sources/\(name)View.swift",
+      path: "\(FeaturePath)/\(name)FeatureInterface/Sources/\(name)View.swift",
       templatePath: "feature_view.stencil"
     ),
     // Reducer Interface

@@ -12,7 +12,7 @@ import SwiftUI
 struct SseudamApp: App {
   var body: some Scene {
     WindowGroup {
-      EmptyView()
+      SseudamView()
     }
   }
 }

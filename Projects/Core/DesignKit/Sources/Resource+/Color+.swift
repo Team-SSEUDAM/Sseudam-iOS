@@ -50,7 +50,6 @@ extension DesignKitAsset {
     
     public struct SubColor: Sendable {
       public static let red = DesignKitAsset.Colors.red.swiftUIColor
-      public static let backdrop = DesignKitAsset.Colors.backDrop.swiftUIColor
     }
     
     public struct Orange: Sendable {

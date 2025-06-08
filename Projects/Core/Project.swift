@@ -18,22 +18,24 @@ let project = Project(
       name: "DesignKit",
       destinations: .iOS,
       product: .staticLibrary,
-      bundleId: "Sseudam.a2bo.ios.Core",
+      bundleId: "Sseudam.a2bo.ios.core.designKit",
       deploymentTargets: .iOS("17.0"),
       infoPlist: .extendingDefault(with: [:]),
-      sources: ["./DesignKit/Sources/**"]
-//      dependencies: [
-//        .Core.ResourceKit
-//      ]
+      sources: ["./DesignKit/Sources/**"],
+      resources: ["./DesignKit/Resources/**"]
     )
 //    .target(
-//      name: "ResourceKit",
+//      name: "Cache",
 //      destinations: .iOS,
-//      product: .bundle,
-//      bundleId: "Sseudam.a2bo.ios.ResourceKit",
+//      product: .staticLibrary,
+//      bundleId: "Sseudam.a2bo.ios.core.cache",
 //      deploymentTargets: .iOS("17.0"),
 //      infoPlist: .extendingDefault(with: [:]),
-//      resources: ["./Resources/**"]
+//      sources: ["./DesignKit/Sources/**"]
 //    )
+  ],
+  resourceSynthesizers: [
+    .assets(),
+    .fonts()
   ]
 )

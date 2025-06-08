@@ -15,7 +15,6 @@ public enum SchemeType: String {
   case release = "Release"
   
   var entitlements: String { "Config/\(rawValue).entitlements" }
-  var config: String { "Config/\(rawValue).xcconfig" }
   var bundleId: String { "Sseudam.a2bo.ios.\(rawValue)" }
   
 }
@@ -30,9 +29,6 @@ public extension Target {
     script: [TargetScript] = [],
     dependencies: [TargetDependency] = []
   ) -> Target {
-    let config: Configuration = env == .develop
-    ? .debug(name: .debug, xcconfig: .relativeToRoot(env.config))
-    : .release(name: .release, xcconfig: .relativeToRoot(env.config))
     return target(
       name: name,
       destinations: [.iPhone],
@@ -45,9 +41,7 @@ public extension Target {
       entitlements: .file(path: .relativeToRoot(env.entitlements)),
       scripts: script,
       dependencies: dependencies,
-      settings: .settings(
-        configurations: [config]
-      )
+      settings: .default
     )
   }
   

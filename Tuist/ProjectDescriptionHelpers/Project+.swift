@@ -111,7 +111,7 @@ public extension Project {
       dependencies: dependencies
     )
     let debugApp = Target.makeApp(
-      name: "Sseudam_Develop",
+      name: "Sseudam_develop",
       env: .develop,
       infoPlist: infoPlist,
       dependencies: dependencies

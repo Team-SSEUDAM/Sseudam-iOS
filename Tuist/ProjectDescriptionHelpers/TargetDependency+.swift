@@ -87,7 +87,7 @@ extension TargetDependencyDelegate {
   ) -> TargetDependency {
     return .project(
       target: "\(target)",
-      path: .relativeToRoot("./Projects/\(target.typePath)/\(target)")
+      path: .relativeToRoot("./Projects/\(target.typePath)")
     )
   }
   

@@ -24,6 +24,7 @@ let project = Project.makeApp(
     ],
   ],
   dependencies: [
-    .SPM.TCA
+    .SPM.TCA,
+    .Core.DesignKit
   ]
 )

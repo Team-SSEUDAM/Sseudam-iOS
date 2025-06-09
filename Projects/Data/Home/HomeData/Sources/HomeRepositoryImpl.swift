@@ -9,14 +9,13 @@
 import Foundation
 import HomeDomainInterface
 import HomeDataInterface
-import Core
 
 public struct HomeRepositoryImpl: HomeRepository {
-  private let networker: NetworkProtocol
+//  private let networker: NetworkProtocol
   
-  public init(networker: NetworkProtocol) {
-    self.networker = networker
-  }
+//  public init(networker: NetworkProtocol) {
+//    self.networker = networker
+//  }
   public func fetchData() async throws -> Void {}
   
 }

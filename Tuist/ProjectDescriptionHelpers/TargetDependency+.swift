@@ -99,10 +99,7 @@ extension TargetDependencyDelegate {
 
 extension TargetDependency {
   public struct Features: TargetDependencyDelegate {
-    public struct Home: TargetDependencyDelegate {
-      public static let Interface = Self.project(.feature(.Home, isInterface: true))
-      public static let Implement = Self.project(.feature(.Home))
-    }
+    public static let Home = Self.project(.feature(.Home))
   }
   
   public struct Domain: TargetDependencyDelegate {

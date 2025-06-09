@@ -8,7 +8,7 @@
 
 import XCTest
 import ComposableArchitecture
-@testable import HomeInterface
+@testable import HomeFeature
 
 final class HomeUnitTests: XCTestCase {
     

@@ -1,9 +1,9 @@
 //
 //  HomeView.swift
+//  HomeFeature
 //
-//  Home
-//
-//  Created by JiYeon
+//  Created by Jiyeon on 6/9/25.
+//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
 import SwiftUI
@@ -15,9 +15,11 @@ public struct HomeView: View {
   public init(store: StoreOf<HomeReducer>) {
     self.store = store
   }
-
+  
   public var body: some View {
-    EmptyView()
+    VStack {
+      Text("hello")
+    }
   }
 }
 

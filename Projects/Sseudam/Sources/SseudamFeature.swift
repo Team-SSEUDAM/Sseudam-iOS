@@ -9,17 +9,21 @@
 import Foundation
 import ComposableArchitecture
 
+import HomeFeature
+
 @Reducer
 struct SseudamFeature {
   
   @ObservableState
   struct State {
     var selectedTab: TabItem = .home
+    var home: HomeReducer.State = HomeReducer.State()
   }
   
-  enum Action: BindableAction {
+  enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case selectTab(TabItem)
+    case home(HomeReducer.Action)
   }
   
   var body: some ReducerOf<Self> {
@@ -34,6 +38,7 @@ struct SseudamFeature {
       default: return .none
       }
     }
+    
   }
   
 }

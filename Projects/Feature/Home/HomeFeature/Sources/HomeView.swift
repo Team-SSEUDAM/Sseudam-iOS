@@ -17,9 +17,8 @@ public struct HomeView: View {
   }
   
   public var body: some View {
-    VStack {
-      Text("hello")
-    }
+    MapViewRepresentable()
+      .ignoresSafeArea()
   }
 }
 

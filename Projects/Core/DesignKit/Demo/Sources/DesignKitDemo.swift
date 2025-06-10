@@ -31,7 +31,7 @@ struct DesignKitDemo: View {
     @ViewBuilder
     var detailView: some View {
       switch self {
-      case .button_primary: PrimaryButton()
+      case .button_primary: PrimaryButtonDemo()
       case .button_secondary: SecondaryButton()
       case .icon_button: IconButton()
       case .touch_area: TouchArea()

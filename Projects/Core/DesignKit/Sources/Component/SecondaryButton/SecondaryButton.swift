@@ -94,9 +94,11 @@ public struct SecondaryButton<Icon: View>: View {
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, size.padding.vertical)
-    .background(
+    .padding(.horizontal, size.padding.horizonal)
+    .overlay(
       RoundedRectangle(cornerRadius: size.cornerRadius)
-        .fill(state.backgroundColor)
+        .inset(by: 0.5)
+        .stroke(ColorSet.Border.Primary, lineWidth: 1)
     )
     .overlay {
       if isPressed {

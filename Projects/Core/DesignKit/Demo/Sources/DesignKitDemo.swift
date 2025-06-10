@@ -16,7 +16,7 @@ struct DesignKitDemo: View {
     case icon_button
     case touch_area
     case navigation_bar
-    case dialog
+    case alert
     case pin
     case badge
     case text_field
@@ -36,7 +36,7 @@ struct DesignKitDemo: View {
       case .icon_button: IconButtonDemo()
       case .touch_area: TouchAreaDemo()
       case .navigation_bar: NavigationBarDemo()
-      case .dialog: Dialog()
+      case .alert: AlertDemo()
       case .pin: Pin()
       case .badge: Badge()
       case .text_field: TextField()

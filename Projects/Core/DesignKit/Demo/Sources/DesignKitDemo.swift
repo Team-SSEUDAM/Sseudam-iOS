@@ -34,7 +34,7 @@ struct DesignKitDemo: View {
       case .button_primary: PrimaryButtonDemo()
       case .button_secondary: SecondaryButtonDemo()
       case .icon_button: IconButtonDemo()
-      case .touch_area: TouchArea()
+      case .touch_area: TouchAreaDemo()
       case .navigation_bar: NavigationBar()
       case .dialog: Dialog()
       case .pin: Pin()

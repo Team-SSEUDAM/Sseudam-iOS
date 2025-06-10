@@ -1,0 +1,28 @@
+//
+//  FontStyle.swift
+//  DesignKit
+//
+//  Created by 조용인 on 6/10/25.
+//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
+//
+
+import SwiftUI
+
+fileprivate struct FontStyleModifier: ViewModifier {
+  var font: FontInfo
+  init(font: FontInfo) {
+    self.font = font
+  }
+  
+  func body(content: Content) -> some View {
+    content
+      .font(font.font)
+  }
+}
+
+extension View {
+  public func font(_ font: FontInfo) -> some View {
+    self.modifier(FontStyleModifier(font: font))
+  }
+}
+

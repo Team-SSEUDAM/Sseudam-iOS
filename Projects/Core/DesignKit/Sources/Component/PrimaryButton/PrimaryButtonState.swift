@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-public enum ButtonState {
+public enum PrimaryButtonState {
   case normal, disabled, error
   
   public var backgroundColor: Color {

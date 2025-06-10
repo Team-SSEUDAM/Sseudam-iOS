@@ -11,7 +11,7 @@ import DesignKit
 
 struct PrimaryButtonDemo: View {
   
-  @State private var buttonState: ButtonState = .normal
+  @State private var buttonState: PrimaryButtonState = .normal
   
   var body: some View {
     List {

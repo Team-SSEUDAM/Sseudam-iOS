@@ -41,14 +41,14 @@ public struct PrimaryButton<Icon: View>: View {
   
   public var action: (() async -> Void)? = nil
   
-  @Binding public var state: ButtonState
+  @Binding public var state: PrimaryButtonState
   @State private var isPressed: Bool = false
   
   public init(
     icon: (() -> Icon)?,
     title: String,
     size: PrimaryButtonSize = .large,
-    state: Binding<ButtonState> = .constant(.normal),
+    state: Binding<PrimaryButtonState> = .constant(.normal),
     _ action: (() async -> Void)? = nil
   ) {
     self.title = title
@@ -61,7 +61,7 @@ public struct PrimaryButton<Icon: View>: View {
   public init(
     title: String,
     size: PrimaryButtonSize = .large,
-    state: Binding<ButtonState> = .constant(.normal),
+    state: Binding<PrimaryButtonState> = .constant(.normal),
     _ action: (() async -> Void)? = nil
   ) where Icon == EmptyView {
     self.title = title

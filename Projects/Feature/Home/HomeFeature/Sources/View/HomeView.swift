@@ -19,9 +19,13 @@ public struct HomeView: View {
   public var body: some View {
     ZStack {
       MapViewRepresentable(
-        userLocation: $store.location.point
+        userLocation: $store.location.point,
+        requestMapBounds: $store.requestMapBounds
       )
-        .ignoresSafeArea()
+      .onReceiveMapBounds {
+        store.send(.fetchTrashItems($0))
+      }
+      .ignoresSafeArea()
     }
     .onAppear {
       store.send(.onAppear)

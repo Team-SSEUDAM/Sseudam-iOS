@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import HomeDomainInterface
 
 @Reducer
 public struct HomeFeature {
@@ -17,7 +18,7 @@ public struct HomeFeature {
   public struct State: Equatable {
     
     public var location: LocationFeature.State = .init()
-    
+    public var requestMapBounds: Bool = false
     public init() {}
   }
 
@@ -25,6 +26,8 @@ public struct HomeFeature {
     case binding(BindingAction<State>)
     case location(LocationFeature.Action)
     
+    case requestMapBounds(Bool)
+    case fetchTrashItems([MapPoint])
     case onAppear
   }
 
@@ -36,8 +39,22 @@ public struct HomeFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
-        return .send(.location(.fetchUserLocation))
+        return .run { send in
+          await MainActor.run {
+            send(.location(.fetchUserLocation))
+            send(.requestMapBounds(true))
+          }
+        }
       
+      case let .requestMapBounds(isRequest):
+        state.requestMapBounds = isRequest
+        // TODO: - 현위치 재검색 버튼 비활성화
+        return .none
+        
+      case let .fetchTrashItems(points):
+        // TODO: - trash spot API 연결
+        dump(points)
+        return .none
         
       default: return .none
       }

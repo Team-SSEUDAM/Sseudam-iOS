@@ -10,16 +10,29 @@ import SwiftUI
 import ComposableArchitecture
 
 public struct HomeView: View {
-  @Bindable var store: StoreOf<HomeReducer>
+  @Bindable var store: StoreOf<HomeFeature>
 
-  public init(store: StoreOf<HomeReducer>) {
+  public init(store: StoreOf<HomeFeature>) {
     self.store = store
   }
   
   public var body: some View {
-    MapViewRepresentable()
-      .ignoresSafeArea()
+    ZStack {
+      MapViewRepresentable(
+        userLocation: $store.location.point
+      )
+        .ignoresSafeArea()
+    }
+    .onAppear {
+      store.send(.onAppear)
+    }
+    .task {
+      for await _ in LocationService.shared.userLocationStream {
+        store.send(.location(.moveUserLocation))
+      }
+    }
   }
+  
 }
 
 

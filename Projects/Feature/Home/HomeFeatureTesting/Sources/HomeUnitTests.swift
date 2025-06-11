@@ -13,8 +13,8 @@ import ComposableArchitecture
 final class HomeUnitTests: XCTestCase {
     
   func testIncrement() {
-    let store = TestStore(initialState: HomeReducer.State()) {
-      HomeReducer()
+    let store = TestStore(initialState: HomeFeature.State()) {
+      HomeFeature()
     }
 
     store.send(.increment) {
@@ -23,8 +23,8 @@ final class HomeUnitTests: XCTestCase {
   }
 
   func testDecrement() {
-    let store = TestStore(initialState: HomeReducer.State()) {
-      HomeReducer()
+    let store = TestStore(initialState: HomeFeature.State()) {
+      HomeFeature()
     }
 
     store.send(.decrement) {

@@ -17,18 +17,20 @@ struct SseudamFeature {
   @ObservableState
   struct State {
     var selectedTab: TabItem = .home
-    var home: HomeReducer.State = HomeReducer.State()
+    var home: HomeFeature.State = HomeFeature.State()
   }
   
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case selectTab(TabItem)
-    case home(HomeReducer.Action)
+    case home(HomeFeature.Action)
   }
   
   var body: some ReducerOf<Self> {
     BindingReducer()
-    
+    Scope(state: \.home, action: \.home) {
+      HomeFeature()
+    }
     Reduce { state, action in
       switch action {
       case let .selectTab(tab):

@@ -16,20 +16,28 @@ public struct HomeFeature {
   @ObservableState
   public struct State: Equatable {
     
-    public var location: LocationState = .init()
+    public var location: LocationFeature.State = .init()
     
     public init() {}
   }
 
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
-    case location(LocationAction)
+    case location(LocationFeature.Action)
+    
+    case onAppear
   }
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
+    Scope(state: \.location, action: \.location) {
+      LocationFeature()
+    }
     Reduce { state, action in
       switch action {
+      case .onAppear:
+        return .send(.location(.fetchUserLocation))
+      
         
       default: return .none
       }

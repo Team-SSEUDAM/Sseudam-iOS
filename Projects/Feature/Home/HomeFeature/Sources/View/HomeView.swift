@@ -20,7 +20,8 @@ public struct HomeView: View {
     ZStack {
       MapViewRepresentable(
         userLocation: $store.location.point,
-        requestMapBounds: $store.requestMapBounds
+        requestMapBounds: $store.requestMapBounds,
+        trashItems: $store.trashItems
       )
       .onReceiveMapBounds {
         store.send(.fetchTrashItems($0))

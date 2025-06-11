@@ -18,6 +18,8 @@ struct MapViewRepresentable: UIViewRepresentable {
   /// 현재 지도 범위 요청 플래그
   @Binding var requestMapBounds: Bool
   
+  @Binding var trashItems: [TrashItem]
+  
   /// 지도 범위 전달 클로저
   var mapBounds: (([MapPoint]) -> Void)? = nil
   /// 초기 위치
@@ -53,11 +55,19 @@ struct MapViewRepresentable: UIViewRepresentable {
       
     }
     
+    if context.coordinator.trashItems != trashItems {
+      print("마커 새로 그리기")
+      deleteDrawMarker(context: context)
+      if !trashItems.isEmpty {
+        presentMarkers(uiView, items: trashItems, context: context)
+      }
+    }
   }
   
   func makeCoordinator() -> Coordinator {
     Coordinator(self)
   }
+  
   
   /// 카메라 이동 메서드
   private func moveCamera(_ view: NMFNaverMapView, to point: MapPoint?, zoomLevel: Double = 14) {
@@ -102,40 +112,76 @@ struct MapViewRepresentable: UIViewRepresentable {
       mapBounds([southWest, northEast])
     }
   }
-}
-
-
-
-extension MapViewRepresentable {
-  class Coordinator: NSObject, NMFMapViewTouchDelegate, NMFMapViewCameraDelegate {
-    var parent: MapViewRepresentable
+  
+  /// 지도에 마커 보여주기
+  private func presentMarkers(_ view: NMFNaverMapView, items: [TrashItem], context: Context) {
+    print(#function)
     
-    var lastCameraPoint: MapPoint?
     
-    var isInitialBounds: Bool = true
-    
-    init(_ parent: MapViewRepresentable) {
-      self.parent = parent
+    if context.coordinator.trashItems != items {
+      deleteDrawMarker(context: context)
     }
+    // 카메라 이동
+    let mid = averageCenter(of: items.map { $0.point })
+    moveCamera(view, to: mid, zoomLevel: view.mapView.cameraPosition.zoom)
     
-    func mapViewCameraIdle(_ mapView: NMFMapView) {
-      // 앱 처음 진입 시 카메라 이동 완료 후 지도 범위 값 가져오도록 처리
-      if isInitialBounds, parent.requestMapBounds {
-        parent.currentVisibleBounds(on: mapView)
-        parent.requestMapBounds = false
-        isInitialBounds = false
+    // 그리기
+    let markers: [NMFMarker] = items.map { item in
+      let point = NMGLatLng(lat: item.point.latitude, lng: item.point.longitude)
+      let marker = NMFMarker(position: point)
+      marker.mapView = view.mapView
+      // TODO: - 마커 이미지 설정 후 적용하기
+      //drawMarker(view, to: point, icon: item.type.inactiveImage)
+      
+      // TODO: - 마커 탭 이벤트 등록
+      marker.touchHandler = { (overlay: NMFOverlay) -> Bool in
+        guard let marker = overlay as? NMFMarker else { return true }
+//        markerTapEvent(to: marker, data: item, context: context)
+        moveCamera(view, to: item.point)
+        return true
       }
+      return marker
+    }
+    print("그린 마커 수: \(items.count)")
+    // 저장
+    context.coordinator.drawMarker(items: items, markers: markers)
+  }
+  
+  /// 여러 마커의 중간지점 찾는 메서드
+  private func averageCenter(of points: [MapPoint]) -> MapPoint? {
+    guard !points.isEmpty else { return nil }
+
+    let total = points.reduce((lat: 0.0, lon: 0.0)) { result, point in
+      (result.lat + point.latitude, result.lon + point.longitude)
+    }
+
+    let count = Double(points.count)
+    return MapPoint(
+      latitude: total.lat / count,
+      longitude: total.lon / count
+    )
+  }
+  
+  /// 그려져있는 마커 지우기
+  func deleteDrawMarker(context: Context) {
+    if !context.coordinator.markers.isEmpty {
+      context.coordinator.deleteAllMarkers()
+      
     }
   }
-}
-
-
-public extension Double {
-  /// 지정한 소수점 자리수까지 반올림
-  ///
-  /// - Parameters: places: 반올림 할 소수점 자리수
-  func rounded(to places: Int) -> Double {
-    let multiplier = pow(10.0, Double(places))
-    return (self * multiplier).rounded() / multiplier
+  
+  /// 지도에 마커 하나 그리기
+  private func drawMarker(
+    _ view: NMFNaverMapView,
+    to point: NMGLatLng,
+    icon: NMFOverlayImage,
+    anchor: CGPoint = CGPoint(x: 0.5, y: 1)
+  ) -> NMFMarker{
+    let marker = NMFMarker(position: point, iconImage: icon)
+    marker.isHideCollidedSymbols = true
+    marker.anchor = anchor
+    marker.mapView = view.mapView
+    
+    return marker
   }
 }

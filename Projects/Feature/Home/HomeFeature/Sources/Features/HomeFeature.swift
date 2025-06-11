@@ -19,6 +19,7 @@ public struct HomeFeature {
     
     public var location: LocationFeature.State = .init()
     public var requestMapBounds: Bool = false
+    public var trashItems: [TrashItem] = []
     public init() {}
   }
 
@@ -28,6 +29,7 @@ public struct HomeFeature {
     
     case requestMapBounds(Bool)
     case fetchTrashItems([MapPoint])
+    case storeTrashItems([TrashItem])
     case onAppear
   }
 
@@ -54,6 +56,11 @@ public struct HomeFeature {
       case let .fetchTrashItems(points):
         // TODO: - trash spot API 연결
         dump(points)
+        return .send(.storeTrashItems(sampleData))
+        
+      case let .storeTrashItems(items):
+        state.trashItems.removeAll()
+        state.trashItems = items
         return .none
         
       default: return .none

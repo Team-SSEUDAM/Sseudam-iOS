@@ -26,6 +26,9 @@ public struct HomeView: View {
       .onReceiveMapBounds {
         store.send(.fetchTrashItems($0))
       }
+      .markerTapped { id in
+        print("marker tapped: \(id)")
+      }
       .ignoresSafeArea()
     }
     .onAppear {

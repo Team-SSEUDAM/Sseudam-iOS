@@ -38,6 +38,23 @@ extension MapViewRepresentable {
       }
     }
     
+    /// 마커 활성화 설정
+    func markerTapEvent(marker: NMFMarker, data: TrashItem) {
+      resetActiveMarker()
+      self.activeMarker = marker
+      self.activeData = data
+    }
+    
+    /// 활성화 되어있는 마커 해제
+    private func resetActiveMarker() {
+      if let activeMarker = self.activeMarker, let data = activeData {
+        // TODO: - 아이콘 inactive로 바꾸기
+        self.activeMarker = nil
+        self.activeData = nil
+      }
+    }
+    
+    /// 지도에 나타나는 마커 리스트 저장
     func drawMarker(items: [TrashItem], markers: [NMFMarker]) {
       print("마커 저장하기: \(markers.count)")
       self.trashItems = items

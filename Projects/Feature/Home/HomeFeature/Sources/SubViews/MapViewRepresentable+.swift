@@ -17,5 +17,10 @@ extension MapViewRepresentable {
     map.mapBounds = action
     return map
   }
+  func markerTapped(_ action: @escaping (Int?) -> Void) -> Self {
+    var map = self
+    map.onMarkerTapped = action
+    return map
+  }
 }
 

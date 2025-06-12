@@ -22,6 +22,8 @@ struct MapViewRepresentable: UIViewRepresentable {
   
   /// 지도 범위 전달 클로저
   var mapBounds: (([MapPoint]) -> Void)? = nil
+  /// 마커 탭 시 id값을 전달하기 위한 클로저
+  var onMarkerTapped: ((Int?) -> Void)? = nil
   /// 초기 위치
   private let defaultPoint: MapPoint = .init(latitude: 37.50545, longitude: 127.10143)
   
@@ -70,7 +72,7 @@ struct MapViewRepresentable: UIViewRepresentable {
   
   
   /// 카메라 이동 메서드
-  private func moveCamera(_ view: NMFNaverMapView, to point: MapPoint?, zoomLevel: Double = 14) {
+  private func moveCamera(_ view: NMFNaverMapView, to point: MapPoint?, zoomLevel: Double = 16) {
     if let point = point {
       let coord = NMGLatLng(lat: point.latitude, lng: point.longitude)
       let cameraUpdate = NMFCameraUpdate(scrollTo: coord, zoomTo: zoomLevel)
@@ -130,13 +132,13 @@ struct MapViewRepresentable: UIViewRepresentable {
       let point = NMGLatLng(lat: item.point.latitude, lng: item.point.longitude)
       let marker = NMFMarker(position: point)
       marker.mapView = view.mapView
+      
       // TODO: - 마커 이미지 설정 후 적용하기
       //drawMarker(view, to: point, icon: item.type.inactiveImage)
       
-      // TODO: - 마커 탭 이벤트 등록
       marker.touchHandler = { (overlay: NMFOverlay) -> Bool in
         guard let marker = overlay as? NMFMarker else { return true }
-//        markerTapEvent(to: marker, data: item, context: context)
+        markerTapEvent(to: marker, data: item, context: context)
         moveCamera(view, to: item.point)
         return true
       }
@@ -145,6 +147,17 @@ struct MapViewRepresentable: UIViewRepresentable {
     print("그린 마커 수: \(items.count)")
     // 저장
     context.coordinator.drawMarker(items: items, markers: markers)
+  }
+  
+  
+  private func markerTapEvent(to marker: NMFMarker, data: TrashItem, context: Context) {
+    if marker == context.coordinator.activeMarker { return }
+    
+    // TODO: - Active 마커로 이미지 변경
+    context.coordinator.markerTapEvent(marker: marker, data: data)
+    if let onMarkerTapped = onMarkerTapped {
+      onMarkerTapped(data.id)
+    }
   }
   
   /// 여러 마커의 중간지점 찾는 메서드

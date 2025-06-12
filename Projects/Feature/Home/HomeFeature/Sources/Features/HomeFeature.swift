@@ -20,6 +20,7 @@ public struct HomeFeature {
     public var location: LocationFeature.State = .init()
     public var requestMapBounds: Bool = false
     public var trashItems: [TrashItem] = []
+    public var trashFilterType: TrashType? = nil
     public init() {}
   }
 
@@ -50,7 +51,7 @@ public struct HomeFeature {
       
       case let .requestMapBounds(isRequest):
         state.requestMapBounds = isRequest
-        // TODO: - 현위치 재검색 버튼 비활성화
+        // TODO: - 현위치 재검색 버튼 비활성화 및 api 요청
         return .none
         
       case let .fetchTrashItems(points):
@@ -62,6 +63,7 @@ public struct HomeFeature {
         state.trashItems.removeAll()
         state.trashItems = items
         return .none
+        
         
       default: return .none
       }

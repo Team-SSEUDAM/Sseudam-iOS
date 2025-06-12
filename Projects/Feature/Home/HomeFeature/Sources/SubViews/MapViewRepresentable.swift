@@ -53,8 +53,8 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
     
     // 지도 범위 요청
-    if requestMapBounds {
-      
+    if requestMapBounds, !context.coordinator.isInitialBounds {
+      currentVisibleBounds(on: uiView.mapView)
     }
     
     if context.coordinator.trashItems != trashItems {

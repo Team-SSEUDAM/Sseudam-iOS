@@ -18,17 +18,7 @@ public struct HomeView: View {
   
   public var body: some View {
     ZStack {
-      MapViewRepresentable(
-        userLocation: $store.location.point,
-        requestMapBounds: $store.requestMapBounds,
-        trashItems: $store.trashItems
-      )
-      .onReceiveMapBounds {
-        store.send(.fetchTrashItems($0))
-      }
-      .markerTapped { id in
-        print("marker tapped: \(id)")
-      }
+      MapView
       .ignoresSafeArea()
     }
     .onAppear {
@@ -38,6 +28,21 @@ public struct HomeView: View {
       for await _ in LocationService.shared.userLocationStream {
         store.send(.location(.moveUserLocation))
       }
+    }
+  }
+  
+  @ViewBuilder
+  private var MapView: some View {
+    MapViewRepresentable(
+      userLocation: $store.location.point,
+      requestMapBounds: $store.requestMapBounds,
+      trashItems: $store.trashItems
+    )
+    .onReceiveMapBounds {
+      store.send(.fetchTrashItems($0))
+    }
+    .markerTapped { id in
+      print("marker tapped: \(id)")
     }
   }
   

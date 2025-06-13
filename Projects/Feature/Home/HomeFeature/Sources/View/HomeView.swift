@@ -23,12 +23,8 @@ public struct HomeView: View {
       .ignoresSafeArea()
       VStack {
         Spacer()
-        HStack {
-          Spacer()
-          UserLocationButton
-        }
+        BottomButtonView
       }
-      
     }
     .onAppear {
       store.send(.onAppear)
@@ -37,6 +33,52 @@ public struct HomeView: View {
       for await _ in LocationService.shared.userLocationStream {
         store.send(.location(.moveUserLocation))
       }
+    }
+  }
+  
+  @ViewBuilder
+  private var MapView: some View {
+    MapViewRepresentable(
+      userLocation: $store.location.point,
+      requestMapBounds: $store.requestMapBounds,
+      trashItems: $store.trashItems,
+      isMapMove: $store.researchButtonEnable
+    )
+    .onReceiveMapBounds {
+      store.send(.fetchTrashItems($0))
+    }
+    .markerTapped { id in
+      print("marker tapped: \(id)")
+    }
+  }
+  
+  /// 하단에 존재하는 버튼
+  @ViewBuilder
+  private var BottomButtonView: some View {
+    HStack {
+      Spacer()
+        .frame(width: 40, height: 40)
+      Spacer()
+      ResearchButton
+      Spacer()
+      UserLocationButton
+    }
+    
+    .padding(.horizontal, 16)
+    .padding(.bottom, 12)
+  }
+  
+  /// 현위치 재검색 버튼
+  @ViewBuilder
+  private var ResearchButton: some View {
+    if store.state.researchButtonEnable {
+      Button {
+        store.send(.requestMapBounds(true))
+      } label: {
+        RoundedRectangle(cornerRadius: 15)
+          .fill(.brown)
+      }
+      .frame(width: 150, height: 33)
     }
   }
   
@@ -50,25 +92,9 @@ public struct HomeView: View {
         .fill(.blue)
         .frame(width: 40, height: 40)
     }
-    .padding(.trailing, 16)
-    .padding(.bottom, 12)
   
   }
   
-  @ViewBuilder
-  private var MapView: some View {
-    MapViewRepresentable(
-      userLocation: $store.location.point,
-      requestMapBounds: $store.requestMapBounds,
-      trashItems: $store.trashItems
-    )
-    .onReceiveMapBounds {
-      store.send(.fetchTrashItems($0))
-    }
-    .markerTapped { id in
-      print("marker tapped: \(id)")
-    }
-  }
   
 }
 

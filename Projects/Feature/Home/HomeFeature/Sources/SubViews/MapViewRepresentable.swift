@@ -19,6 +19,8 @@ struct MapViewRepresentable: UIViewRepresentable {
   @Binding var requestMapBounds: Bool
   /// 지도에 나타나는 쓰레기통 아이템 리스트
   @Binding var trashItems: [TrashItem]
+  /// 지도 움직임 여부
+  @Binding var isMapMove: Bool
   
   /// 지도 범위 전달 클로저
   var mapBounds: (([MapPoint]) -> Void)? = nil
@@ -55,6 +57,7 @@ struct MapViewRepresentable: UIViewRepresentable {
     // 지도 범위 요청
     if requestMapBounds, !context.coordinator.isInitialBounds {
       currentVisibleBounds(on: uiView.mapView)
+      requestMapBounds = false
     }
     
     if context.coordinator.trashItems != trashItems {
@@ -105,6 +108,7 @@ extension MapViewRepresentable {
   
   /// 현재 지도에 보이는 좌표 범위를 반환하는 메서드
   func currentVisibleBounds(on mapView: NMFMapView) {
+    print(#function)
     let bounds = mapView.projection.latlngBounds(fromViewBounds: mapView.bounds)
     let northEast = MapPoint(
       latitude: bounds.northEastLat.rounded(to: 6),

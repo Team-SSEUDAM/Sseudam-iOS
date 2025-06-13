@@ -21,6 +21,7 @@ public struct HomeFeature {
     public var requestMapBounds: Bool = false
     public var trashItems: [TrashItem] = []
     public var trashFilterType: TrashType? = nil
+    public var researchButtonEnable: Bool = false
     public init() {}
   }
 
@@ -51,12 +52,13 @@ public struct HomeFeature {
       
       case let .requestMapBounds(isRequest):
         state.requestMapBounds = isRequest
-        // TODO: - 현위치 재검색 버튼 비활성화 및 api 요청
+        state.researchButtonEnable = false
+        // TODO: - 현위치 검색 api 요청
         return .none
         
       case let .fetchTrashItems(points):
         // TODO: - trash spot API 연결
-        return .none //.send(.storeTrashItems(sampleData))
+        return .send(.storeTrashItems(sampleData))
         
       case let .storeTrashItems(items):
         state.trashItems.removeAll()

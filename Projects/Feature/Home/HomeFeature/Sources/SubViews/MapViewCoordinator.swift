@@ -24,11 +24,15 @@ extension MapViewRepresentable {
     var markers: [NMFMarker] = []
     
     var activeMarker: NMFMarker?
+    
     var activeData: TrashItem?
     
     init(_ parent: MapViewRepresentable) {
       self.parent = parent
     }
+    
+    
+    // MARK: - Delegate
     
     func mapView(_ mapView: NMFMapView, cameraIsChangingByReason reason: Int) {
       if reason == NMFMapChangedByGesture || reason == NMFMapChangedByControl {
@@ -65,14 +69,12 @@ extension MapViewRepresentable {
     
     /// 지도에 나타나는 마커 리스트 저장
     func drawMarker(items: [TrashItem], markers: [NMFMarker]) {
-      print("마커 저장하기: \(markers.count)")
       self.trashItems = items
       self.markers = markers
     }
     
     /// 지도에 올라와있는 마커 삭제
     func deleteAllMarkers() {
-      print(#function)
       print(markers.count)
       if !markers.isEmpty {
         markers.forEach {

@@ -22,7 +22,7 @@ public struct LocationFeature {
   public enum Action: Equatable {
     case fetchUserLocation
     case moveUserLocation
-    case storeUsserLocation(MapPoint)
+    case storeUserLocation(MapPoint)
     case moveLocation(MapPoint)
   }
   
@@ -37,12 +37,12 @@ public struct LocationFeature {
         return .run { send in
           if let location = await LocationService.shared.userLocation {
             let userLocation = MapPoint(latitude: location.0, longitude: location.1)
-            await send(.storeUsserLocation(userLocation))
+            await send(.storeUserLocation(userLocation))
             await send(.moveLocation(userLocation))
           }
         }
         
-      case let .storeUsserLocation(location):
+      case let .storeUserLocation(location):
         state.userLocation = location
         return .none
         

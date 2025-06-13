@@ -33,6 +33,7 @@ public struct HomeFeature {
     case fetchTrashItems([MapPoint])
     case storeTrashItems([TrashItem])
     case filterTapped(TrashType?)
+    case researchButtonEnable(Bool)
     case onAppear
   }
 

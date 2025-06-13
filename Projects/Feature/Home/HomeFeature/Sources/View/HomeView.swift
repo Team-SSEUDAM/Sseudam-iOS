@@ -21,6 +21,14 @@ public struct HomeView: View {
     ZStack {
       MapView
       .ignoresSafeArea()
+      VStack {
+        Spacer()
+        HStack {
+          Spacer()
+          UserLocationButton
+        }
+      }
+      
     }
     .onAppear {
       store.send(.onAppear)
@@ -30,6 +38,21 @@ public struct HomeView: View {
         store.send(.location(.moveUserLocation))
       }
     }
+  }
+  
+  @ViewBuilder
+  private var UserLocationButton: some View {
+    // TODO: - 임시 버튼, 변경 필요
+    Button {
+      store.send(.location(.fetchUserLocation))
+    } label: {
+      Circle()
+        .fill(.blue)
+        .frame(width: 40, height: 40)
+    }
+    .padding(.trailing, 16)
+    .padding(.bottom, 12)
+  
   }
   
   @ViewBuilder

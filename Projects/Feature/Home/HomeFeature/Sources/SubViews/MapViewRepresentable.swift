@@ -17,14 +17,14 @@ struct MapViewRepresentable: UIViewRepresentable {
   @Binding var userLocation: MapPoint?
   /// 현재 지도 범위 요청 플래그
   @Binding var requestMapBounds: Bool
-  
+  /// 지도에 나타나는 쓰레기통 아이템 리스트
   @Binding var trashItems: [TrashItem]
   
   /// 지도 범위 전달 클로저
   var mapBounds: (([MapPoint]) -> Void)? = nil
   /// 마커 탭 시 id값을 전달하기 위한 클로저
   var onMarkerTapped: ((Int?) -> Void)? = nil
-  /// 초기 위치
+  /// 기본 위치
   private let defaultPoint: MapPoint = .init(latitude: 37.50545, longitude: 127.10143)
   
   func makeUIView(context: Context) -> NMFNaverMapView {
@@ -69,7 +69,11 @@ struct MapViewRepresentable: UIViewRepresentable {
   func makeCoordinator() -> Coordinator {
     Coordinator(self)
   }
-  
+}
+
+// MARK: - Map Control
+
+extension MapViewRepresentable {
   
   /// 카메라 이동 메서드
   private func moveCamera(_ view: NMFNaverMapView, to point: MapPoint?, zoomLevel: Double = 16) {
@@ -115,6 +119,36 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
   }
   
+  private func markerTapEvent(to marker: NMFMarker, data: TrashItem, context: Context) {
+    if marker == context.coordinator.activeMarker { return }
+    
+    // TODO: - Active 마커로 이미지 변경
+    context.coordinator.markerTapEvent(marker: marker, data: data)
+    if let onMarkerTapped = onMarkerTapped {
+      onMarkerTapped(data.id)
+    }
+  }
+  
+  /// 여러 마커의 중간지점 찾는 메서드
+  private func averageCenter(of points: [MapPoint]) -> MapPoint? {
+    guard !points.isEmpty else { return nil }
+
+    let total = points.reduce((lat: 0.0, lon: 0.0)) { result, point in
+      (result.lat + point.latitude, result.lon + point.longitude)
+    }
+
+    let count = Double(points.count)
+    return MapPoint(
+      latitude: total.lat / count,
+      longitude: total.lon / count
+    )
+  }
+}
+
+// MARK: - Marker
+
+extension MapViewRepresentable {
+  
   /// 지도에 마커 보여주기
   private func presentMarkers(_ view: NMFNaverMapView, items: [TrashItem], context: Context) {
     print(#function)
@@ -149,40 +183,6 @@ struct MapViewRepresentable: UIViewRepresentable {
     context.coordinator.drawMarker(items: items, markers: markers)
   }
   
-  
-  private func markerTapEvent(to marker: NMFMarker, data: TrashItem, context: Context) {
-    if marker == context.coordinator.activeMarker { return }
-    
-    // TODO: - Active 마커로 이미지 변경
-    context.coordinator.markerTapEvent(marker: marker, data: data)
-    if let onMarkerTapped = onMarkerTapped {
-      onMarkerTapped(data.id)
-    }
-  }
-  
-  /// 여러 마커의 중간지점 찾는 메서드
-  private func averageCenter(of points: [MapPoint]) -> MapPoint? {
-    guard !points.isEmpty else { return nil }
-
-    let total = points.reduce((lat: 0.0, lon: 0.0)) { result, point in
-      (result.lat + point.latitude, result.lon + point.longitude)
-    }
-
-    let count = Double(points.count)
-    return MapPoint(
-      latitude: total.lat / count,
-      longitude: total.lon / count
-    )
-  }
-  
-  /// 그려져있는 마커 지우기
-  func deleteDrawMarker(context: Context) {
-    if !context.coordinator.markers.isEmpty {
-      context.coordinator.deleteAllMarkers()
-      
-    }
-  }
-  
   /// 지도에 마커 하나 그리기
   private func drawMarker(
     _ view: NMFNaverMapView,
@@ -196,5 +196,13 @@ struct MapViewRepresentable: UIViewRepresentable {
     marker.mapView = view.mapView
     
     return marker
+  }
+  
+  /// 그려져있는 마커 지우기
+  func deleteDrawMarker(context: Context) {
+    if !context.coordinator.markers.isEmpty {
+      context.coordinator.deleteAllMarkers()
+      
+    }
   }
 }

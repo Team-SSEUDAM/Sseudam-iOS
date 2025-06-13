@@ -48,7 +48,7 @@ extension MapViewRepresentable {
     
     /// 활성화 되어있는 마커 해제
     private func resetActiveMarker() {
-      if let activeMarker = self.activeMarker, let data = activeData {
+      if let _ = self.activeMarker, let _ = activeData {
         // TODO: - 아이콘 inactive로 바꾸기
         self.activeMarker = nil
         self.activeData = nil

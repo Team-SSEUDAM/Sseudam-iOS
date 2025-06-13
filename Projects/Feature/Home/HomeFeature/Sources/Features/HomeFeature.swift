@@ -56,8 +56,7 @@ public struct HomeFeature {
         
       case let .fetchTrashItems(points):
         // TODO: - trash spot API 연결
-        dump(points)
-        return .send(.storeTrashItems(sampleData))
+        return .none //.send(.storeTrashItems(sampleData))
         
       case let .storeTrashItems(items):
         state.trashItems.removeAll()

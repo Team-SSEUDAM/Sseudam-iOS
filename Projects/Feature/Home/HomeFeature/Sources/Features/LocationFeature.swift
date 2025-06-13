@@ -45,6 +45,7 @@ public struct LocationFeature {
       case let .storeUsserLocation(location):
         state.userLocation = location
         return .none
+        
       case let .moveLocation(point):
         state.point = point
         return .none

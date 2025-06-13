@@ -12,8 +12,9 @@ import ProjectDescriptionHelpers
 let project = Project.makeStaticLibraryProject(
   for: Domain.Home,
   dependencies: [
-    .SPM.TCA,
-    .SPM.NMapsMap
+    .Shared.ThirdParty,
+    .Shared.Utility
+    
   ],
   nameSuffix: "Interface"
 )

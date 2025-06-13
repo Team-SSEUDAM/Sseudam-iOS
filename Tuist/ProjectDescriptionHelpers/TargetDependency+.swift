@@ -43,6 +43,7 @@ public enum Core: String, ModuleRepresentable {
 
 public enum Shared: String, ModuleRepresentable {
   case ThirdParty
+  case Utility
   public var typePath: String { "Shared" }
 }
 
@@ -95,6 +96,7 @@ extension TargetDependencyDelegate {
   public static func makeSPMDependency(for target: SPM) -> TargetDependency {
     return .external(name: target.rawValue)
   }
+    
 }
 
 extension TargetDependency {
@@ -122,6 +124,7 @@ extension TargetDependency {
   
   public struct Shared: TargetDependencyDelegate {
     public static let ThirdParty = Self.project(.shared(.ThirdParty))
+    public static let Utility = Self.project(.shared(.Utility))
   }
   
   public struct SPM: TargetDependencyDelegate {

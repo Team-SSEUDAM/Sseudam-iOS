@@ -17,7 +17,6 @@ struct DesignKitDemo: View {
     case touch_area
     case navigation_bar
     case alert
-    case pin
     case badge
     case text_field
     case underline_tab_bar
@@ -37,8 +36,7 @@ struct DesignKitDemo: View {
       case .touch_area: TouchAreaDemo()
       case .navigation_bar: NavigationBarDemo()
       case .alert: AlertDemo()
-      case .pin: Pin()
-      case .badge: Badge()
+      case .badge: BadgeDemo()
       case .text_field: TextField()
       case .underline_tab_bar: UnderlineTabBar()
       case .tab_bar: TabBar()

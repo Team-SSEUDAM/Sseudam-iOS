@@ -36,8 +36,7 @@ struct SecondaryButtonDemo: View {
       Section("아이콘 버튼") {
         SecondaryButton(
           icon: {
-            Icon(image: .addSpot)
-              .size(.large)
+            Icon(image: .addSpot, size: .large)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",
@@ -46,8 +45,7 @@ struct SecondaryButtonDemo: View {
         
         SecondaryButton(
           icon: {
-            Icon(image: .addSpot)
-              .size(.small)
+            Icon(image: .addSpot, size: .small)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",
@@ -66,8 +64,7 @@ struct SecondaryButtonDemo: View {
         
         SecondaryButton(
           icon: {
-            Icon(image: .addSpot)
-              .size(.large)
+            Icon(image: .addSpot, size: .large)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",

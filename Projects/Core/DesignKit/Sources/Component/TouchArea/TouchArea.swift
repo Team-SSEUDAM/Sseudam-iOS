@@ -35,8 +35,10 @@ public struct TouchArea: View {
     Rectangle()
       .fill(.clear)
       .overlay {
-        Icon(image: image)
-          .size(size)
+        Icon(
+          image: image,
+          size: size
+        )
       }
       .frame(width: .Number48, height: .Number48, alignment: .center)
   }

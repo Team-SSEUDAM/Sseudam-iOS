@@ -30,7 +30,7 @@ public struct HomeView: View {
     .onAppear {
       store.send(.onAppear)
     }
-    .task {
+    .task { @MainActor in
       for await _ in LocationService.shared.userLocationStream {
         store.send(.location(.moveUserLocation))
       }

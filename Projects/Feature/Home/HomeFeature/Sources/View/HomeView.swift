@@ -22,6 +22,7 @@ public struct HomeView: View {
       MapView
       .ignoresSafeArea()
       VStack {
+        FilterView
         Spacer()
         BottomButtonView
       }
@@ -48,8 +49,32 @@ public struct HomeView: View {
       store.send(.fetchTrashItems($0))
     }
     .markerTapped { id in
-      print("marker tapped: \(id)")
+      print("marker tapped: ", id ?? "")
     }
+  }
+  
+  @ViewBuilder
+  private var FilterView: some View {
+    // TODO: - 임시 필터 버튼, 변경 필요
+    HStack(spacing: 8) {
+      Button {
+        store.send(.filterTapped(nil))
+      } label: {
+        Text("전체")
+      }
+      Button {
+        store.send(.filterTapped(.general))
+      } label: {
+        Text("일반쓰레기")
+      }
+      Button {
+        store.send(.filterTapped(.recycle))
+      } label: {
+        Text("재활용쓰레기")
+      }
+      Spacer()
+    }
+    .frame(height: 33, alignment: .leading)
   }
   
   /// 하단에 존재하는 버튼
@@ -71,6 +96,7 @@ public struct HomeView: View {
   /// 현위치 재검색 버튼
   @ViewBuilder
   private var ResearchButton: some View {
+    // TODO: - 임시 재검색 버튼, 변경 필요
     if store.state.researchButtonEnable {
       Button {
         store.send(.requestMapBounds(true))
@@ -92,9 +118,7 @@ public struct HomeView: View {
         .fill(.blue)
         .frame(width: 40, height: 40)
     }
-  
   }
-  
   
 }
 

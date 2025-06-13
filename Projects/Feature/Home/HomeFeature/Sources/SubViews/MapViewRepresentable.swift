@@ -61,7 +61,6 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
     
     if context.coordinator.trashItems != trashItems {
-      print("마커 새로 그리기")
       deleteDrawMarker(context: context)
       if !trashItems.isEmpty {
         presentMarkers(uiView, items: trashItems, context: context)
@@ -108,7 +107,6 @@ extension MapViewRepresentable {
   
   /// 현재 지도에 보이는 좌표 범위를 반환하는 메서드
   func currentVisibleBounds(on mapView: NMFMapView) {
-    print(#function)
     let bounds = mapView.projection.latlngBounds(fromViewBounds: mapView.bounds)
     let northEast = MapPoint(
       latitude: bounds.northEastLat.rounded(to: 6),
@@ -155,8 +153,6 @@ extension MapViewRepresentable {
   
   /// 지도에 마커 보여주기
   private func presentMarkers(_ view: NMFNaverMapView, items: [TrashItem], context: Context) {
-    print(#function)
-    
     
     if context.coordinator.trashItems != items {
       deleteDrawMarker(context: context)
@@ -182,7 +178,6 @@ extension MapViewRepresentable {
       }
       return marker
     }
-    print("그린 마커 수: \(items.count)")
     // 저장
     context.coordinator.drawMarker(items: items, markers: markers)
   }

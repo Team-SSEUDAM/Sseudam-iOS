@@ -43,3 +43,13 @@ public let sampleData: [TrashItem] = [
   .init(id: 6, name: "6", region: "SEOUL", address: "서울", point: .init(latitude: 37.643112, longitude: 126.920928), trashType: .general)
   
 ]
+
+public let sampleData2: [TrashItem] = [
+  .init(id: 7, name: "7", region: "SEOUL", address: "서울", point: .init(latitude: 37.646512, longitude: 126.917528), trashType: .general),
+  .init(id: 8, name: "8", region: "SEOUL", address: "서울", point: .init(latitude: 37.641512, longitude: 126.924028), trashType: .general),
+  .init(id: 9, name: "9", region: "SEOUL", address: "서울", point: .init(latitude: 37.645812, longitude: 126.923328), trashType: .general),
+  .init(id: 10, name: "10", region: "SEOUL", address: "서울", point: .init(latitude: 37.640912, longitude: 126.918928), trashType: .general),
+  .init(id: 11, name: "11", region: "SEOUL", address: "서울", point: .init(latitude: 37.647312, longitude: 126.920528), trashType: .general),
+  .init(id: 12, name: "12", region: "SEOUL", address: "서울", point: .init(latitude: 37.642312, longitude: 126.926128), trashType: .general)
+  
+]

@@ -9,7 +9,7 @@
 import SwiftUI
 import UIKit
 import HomeDomainInterface
-
+import Utility
 import NMapsMap
 
 struct MapViewRepresentable: UIViewRepresentable {

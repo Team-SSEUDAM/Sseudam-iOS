@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Utility
 import NMapsMap
 import HomeDomainInterface
 
@@ -76,13 +77,3 @@ extension MapViewRepresentable {
   }
 }
 
-
-public extension Double {
-  /// 지정한 소수점 자리수까지 반올림
-  ///
-  /// - Parameters: places: 반올림 할 소수점 자리수
-  func rounded(to places: Int) -> Double {
-    let multiplier = pow(10.0, Double(places))
-    return (self * multiplier).rounded() / multiplier
-  }
-}

@@ -11,12 +11,12 @@ import SwiftUI
 public struct TouchArea: View {
   
   private let image: ImageSet
-  private let size: IconSize
+  private let size: CGFloat
   private let action: (() async -> Void)?
   
   public init(
     image: ImageSet,
-    size: IconSize = .superLarge,
+    size: CGFloat = .Number32,
     _ action: (() async -> Void)? = nil
   ) {
     self.image = image

@@ -20,21 +20,21 @@ struct BadgeDemo: View {
           text: $badgeCount,
           state: .constant(.primary)
         ) {
-          Icon(image: .add, size: .small)
+          Icon(image: .add, size: .Number16)
         }
         
         Badge(
           text: $badgeCount,
           state: .constant(.error)
         ) {
-          Icon(image: .add, size: .small)
+          Icon(image: .add, size: .Number16)
         }
         
         Badge(
           text: $badgeCount,
           state: .constant(.accent)
         ) {
-          Icon(image: .add, size: .small)
+          Icon(image: .add, size: .Number16)
             .foregroundColor(ColorSet.Icon.Inverse)
         }
       }

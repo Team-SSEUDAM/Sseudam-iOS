@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import DesignKit
 import ComposableArchitecture
 
 struct SseudamView: View {
@@ -27,10 +28,11 @@ struct SseudamView: View {
         EmptyView()
       }
       Spacer()
-      CustomTabBar(selectedTab: store.selectedTab)
-        .tabSelected { tab in
-          store.send(.selectTab(tab))
-        }
+      CustomTabBar(
+        selectedTab: $store.selectedTab
+      ) {
+        store.send(.selectTab($0))
+      }
     }
   }
 }

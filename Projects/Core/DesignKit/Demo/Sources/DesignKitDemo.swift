@@ -41,7 +41,7 @@ struct DesignKitDemo: View {
       case .snack_bar: SnackBarDemo()
       case .text_field: TextFieldDemo()
       case .underline_tab_bar: UnderlineTabBar()
-      case .tab_bar: TabBar()
+      case .tab_bar: CustomTabBarDemo()
       case .category_chip: CategoryChip()
       case .check_box: CheckBox()
       case .coach_mark: CoachMark()

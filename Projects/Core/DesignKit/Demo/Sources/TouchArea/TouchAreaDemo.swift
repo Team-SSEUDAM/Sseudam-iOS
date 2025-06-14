@@ -15,7 +15,7 @@ struct TouchAreaDemo: View {
     HStack {
       TouchArea(
         image: .addSpot,
-        size: .superLarge
+        size: .Number32
       ) {
         print("Super Large")
       }
@@ -25,7 +25,7 @@ struct TouchAreaDemo: View {
       
       TouchArea(
         image: .addSpot,
-        size: .medium
+        size: .Number18
       ) {
         print("Medium")
       }
@@ -35,7 +35,7 @@ struct TouchAreaDemo: View {
       
       TouchArea(
         image: .addSpot,
-        size: .small
+        size: .Number16
       ) {
         print("Small")
       }

@@ -6,7 +6,8 @@
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
-import Foundation
+import SwiftUI
+import DesignKit
 import ComposableArchitecture
 
 @Reducer
@@ -14,12 +15,12 @@ struct SseudamFeature {
   
   @ObservableState
   struct State {
-    var selectedTab: TabItem = .home
+    var selectedTab: TabBarItem = .home
   }
   
   enum Action: BindableAction {
     case binding(BindingAction<State>)
-    case selectTab(TabItem)
+    case selectTab(TabBarItem)
   }
   
   var body: some ReducerOf<Self> {

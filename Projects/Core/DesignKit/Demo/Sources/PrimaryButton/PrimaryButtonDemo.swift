@@ -35,7 +35,7 @@ struct PrimaryButtonDemo: View {
       Section("아이콘 버튼") {
         PrimaryButton(
           icon: {
-            Icon(image: .addSpot, size: .large)
+            Icon(image: .addSpot, size: .Number20)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",
@@ -44,7 +44,7 @@ struct PrimaryButtonDemo: View {
         
         PrimaryButton(
           icon: {
-            Icon(image: .addSpot, size: .small)
+            Icon(image: .addSpot, size: .Number16)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",
@@ -62,7 +62,7 @@ struct PrimaryButtonDemo: View {
         
         PrimaryButton(
           icon: {
-            Icon(image: .addSpot, size: .large)
+            Icon(image: .addSpot, size: .Number20)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",
@@ -79,7 +79,7 @@ struct PrimaryButtonDemo: View {
         
         PrimaryButton(
           icon: {
-            Icon(image: .addSpot, size: .large)
+            Icon(image: .addSpot, size: .Number20)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",

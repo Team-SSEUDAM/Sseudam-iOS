@@ -67,7 +67,6 @@ public struct HomeFeature {
       case let .requestMapBounds(isRequest):
         state.requestMapBounds = isRequest
         state.researchButtonEnable = false
-        print(state.trashType ?? "전체")
         // TODO: - 현위치 검색 api 요청
         return .none
         

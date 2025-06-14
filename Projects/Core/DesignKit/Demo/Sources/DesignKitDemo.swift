@@ -39,7 +39,7 @@ struct DesignKitDemo: View {
       case .alert: AlertDemo()
       case .badge: BadgeDemo()
       case .snack_bar: SnackBarDemo()
-      case .text_field: TextField()
+      case .text_field: TextFieldDemo()
       case .underline_tab_bar: UnderlineTabBar()
       case .tab_bar: TabBar()
       case .category_chip: CategoryChip()

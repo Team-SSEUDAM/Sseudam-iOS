@@ -22,17 +22,17 @@ public enum Module {
 }
 
 public enum Feature: String, ModuleRepresentable {
-  case Sample
+  case Home
   public var typePath: String { "Feature" }
 }
 
 public enum Domain: String, ModuleRepresentable {
-  case Sample
+  case Home
   public var typePath: String { "Domain" }
 }
 
 public enum Data: String, ModuleRepresentable {
-  case Sample
+  case Home
   public var typePath: String { "Data" }
 }
 
@@ -43,11 +43,13 @@ public enum Core: String, ModuleRepresentable {
 
 public enum Shared: String, ModuleRepresentable {
   case ThirdParty
+  case Utility
   public var typePath: String { "Shared" }
 }
 
 public enum SPM: String, ModuleRepresentable {
   case TCA = "ComposableArchitecture"
+  case NMapsMap = "NMapsMap"
   public var typePath: String { "SPM" }
 }
 
@@ -94,27 +96,25 @@ extension TargetDependencyDelegate {
   public static func makeSPMDependency(for target: SPM) -> TargetDependency {
     return .external(name: target.rawValue)
   }
+    
 }
 
 extension TargetDependency {
   public struct Features: TargetDependencyDelegate {
-    public struct Sample: TargetDependencyDelegate {
-      public static let Interface = Self.project(.feature(.Sample, isInterface: true))
-      public static let Implement = Self.project(.feature(.Sample))
-    }
+    public static let Home = Self.project(.feature(.Home))
   }
   
   public struct Domain: TargetDependencyDelegate {
-    public struct Sample: TargetDependencyDelegate {
-      public static let Interface = Self.project(.domain(.Sample, isInterface: true))
-      public static let Implement = Self.project(.domain(.Sample))
+    public struct Home: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Home, isInterface: true))
+      public static let Implement = Self.project(.domain(.Home))
     }
   }
   
   public struct Data: TargetDependencyDelegate {
-    public struct Sample: TargetDependencyDelegate {
-      public static let Interface = Self.project(.data(.Sample, isInterface: true))
-      public static let Implement = Self.project(.data(.Sample))
+    public struct Home: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Home, isInterface: true))
+      public static let Implement = Self.project(.data(.Home))
     }
   }
   
@@ -124,10 +124,12 @@ extension TargetDependency {
   
   public struct Shared: TargetDependencyDelegate {
     public static let ThirdParty = Self.project(.shared(.ThirdParty))
+    public static let Utility = Self.project(.shared(.Utility))
   }
   
   public struct SPM: TargetDependencyDelegate {
     public static let TCA = Self.project(.spm(.TCA))
+    public static let NMapsMap = Self.project(.spm(.NMapsMap))
   }
 }
 

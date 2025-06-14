@@ -12,7 +12,7 @@ fileprivate let name: Template.Attribute = .required("feature")
 fileprivate let author: Template.Attribute = .required("author")
 
 /// 파일 경로
-fileprivate let FeaturePath: String = "Projects/Features/\(name)"
+fileprivate let FeaturePath: String = "Projects/Feature/\(name)"
 
 
 let featureTemplate = Template(
@@ -29,7 +29,7 @@ let featureTemplate = Template(
     ),
     // SwiftUI View
     .file(
-      path: "\(FeaturePath)/\(name)Feature/Sources/\(name)View.swift",
+      path: "\(FeaturePath)/\(name)FeatureInterface/Sources/\(name)View.swift",
       templatePath: "feature_view.stencil"
     ),
     // Reducer Interface

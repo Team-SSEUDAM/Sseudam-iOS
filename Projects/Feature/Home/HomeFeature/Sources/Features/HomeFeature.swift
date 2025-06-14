@@ -48,7 +48,6 @@ public struct HomeFeature {
         return .run { send in
           await MainActor.run {
             send(.location(.fetchUserLocation))
-            send(.requestMapBounds(true))
           }
         }
         
@@ -73,13 +72,15 @@ public struct HomeFeature {
         if let _ = state.trashType {
           return .send(.storeTrashItems(sampleData2))
         }
-        return .send(.storeTrashItems(sampleData))
+        return .none//.send(.storeTrashItems(sampleData))
         
       case let .storeTrashItems(items):
         state.trashItems.removeAll()
         state.trashItems = items
         return .none
         
+      case let .location(.delegate(.requestMapBounds(isRequest))):
+        return .send(.requestMapBounds(isRequest))
         
       default: return .none
       }

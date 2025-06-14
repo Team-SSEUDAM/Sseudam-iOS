@@ -49,7 +49,6 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     case .denied, .restricted:
       userLocation = nil
       userLocationContinuation?.yield(())
-      // TODO: - 위치 권한 거부 시 토스트?
       break
     @unknown default:
       break
@@ -77,9 +76,16 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
   
   nonisolated public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
     let status = manager.authorizationStatus
-    if status == .authorizedWhenInUse || status == .authorizedAlways {
-      Task {
+    Task {
+      switch status {
+      case .authorizedAlways, .authorizedWhenInUse:
         await locationManager.startUpdatingLocation()
+      case .denied, .restricted:
+        await MainActor.run {
+          userLocation = nil
+          userLocationContinuation?.yield(())
+        }
+      default: break
       }
     }
   }

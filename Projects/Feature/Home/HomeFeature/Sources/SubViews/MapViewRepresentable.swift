@@ -55,9 +55,16 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
     
     // 지도 범위 요청
-    if requestMapBounds, !context.coordinator.isInitialBounds {
-      currentVisibleBounds(on: uiView.mapView)
-      requestMapBounds = false
+    if requestMapBounds {
+      if context.coordinator.isInitialBounds {
+        context.coordinator.configInitialMove(
+          uiView.mapView,
+          requestMapBounds: requestMapBounds
+        )
+      } else {
+        currentVisibleBounds(on: uiView.mapView)
+        requestMapBounds = false
+      }
     }
     
     if context.coordinator.trashItems != trashItems {

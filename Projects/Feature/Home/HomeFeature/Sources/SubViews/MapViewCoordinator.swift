@@ -43,8 +43,13 @@ extension MapViewRepresentable {
     }
     
     func mapViewCameraIdle(_ mapView: NMFMapView) {
-      // 앱 처음 진입 시 카메라 이동 완료 후 지도 범위 값 가져오도록 처리
-      if isInitialBounds, parent.requestMapBounds {
+      configInitialMove(mapView, requestMapBounds: parent.requestMapBounds)
+    }
+    
+    
+    // 앱 처음 진입 시 카메라 이동 완료 후 지도 범위 값 가져오도록 처리
+    func configInitialMove(_ mapView: NMFMapView, requestMapBounds: Bool) {
+      if isInitialBounds, requestMapBounds {
         parent.currentVisibleBounds(on: mapView)
         parent.requestMapBounds = false
         isInitialBounds = false

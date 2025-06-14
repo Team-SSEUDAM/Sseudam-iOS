@@ -42,7 +42,7 @@ struct DesignKitDemo: View {
       case .text_field: TextFieldDemo()
       case .underline_tab_bar: UnderlineTabBar()
       case .tab_bar: CustomTabBarDemo()
-      case .category_chip: CategoryChip()
+      case .category_chip: ChipButtonDemo()
       case .check_box: CheckBox()
       case .coach_mark: CoachMark()
       }

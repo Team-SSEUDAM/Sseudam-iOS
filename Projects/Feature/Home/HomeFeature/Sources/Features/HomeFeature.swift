@@ -67,12 +67,8 @@ public struct HomeFeature {
         // TODO: - 현위치 검색 api 요청
         return .none
         
-      case let .fetchTrashItems(_):
-        // TODO: - trash spot API 연결
-        if let _ = state.trashType {
-          return .send(.storeTrashItems(sampleData2))
-        }
-        return .none//.send(.storeTrashItems(sampleData))
+      case let .fetchTrashItems(bounds):
+        return fetchTrashItem(bounds: bounds, type: state.trashType)
         
       case let .storeTrashItems(items):
         state.trashItems.removeAll()
@@ -88,4 +84,13 @@ public struct HomeFeature {
   }
 }
 
-
+extension HomeFeature {
+  
+  // TODO: - trash spot API 연결
+  private func fetchTrashItem(bounds: [MapPoint], type: TrashType?) -> Effect<Action> {
+    if let _ = type {
+      return .send(.storeTrashItems(sampleData2))
+    }
+    return .none
+  }
+}

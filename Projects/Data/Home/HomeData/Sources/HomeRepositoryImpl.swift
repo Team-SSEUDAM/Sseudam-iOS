@@ -10,12 +10,12 @@ import Foundation
 import HomeDomainInterface
 import HomeDataInterface
 
-public struct HomeRepositoryImpl: HomeRepository {
-//  private let networker: NetworkProtocol
-  
-//  public init(networker: NetworkProtocol) {
-//    self.networker = networker
-//  }
-  public func fetchData() async throws -> Void {}
-  
+public extension HomeRepository {
+  static var live: HomeRepository {
+    HomeRepository(
+      fetchData: {
+        return "Hello, World!"
+      }
+    )
+  }
 }

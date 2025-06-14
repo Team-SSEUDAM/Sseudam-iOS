@@ -8,6 +8,10 @@
 
 import Foundation
 
-public protocol {{ feature }}Repository {
-  func fetchData() async throws -> Void
+public struct HomeRepository {
+  public var fetchData: @Sendable () async throws -> Void
+
+  public init(fetchData: @Sendable @escaping () async throws -> Void) {
+    self.fetchData = fetchData
+  }
 }

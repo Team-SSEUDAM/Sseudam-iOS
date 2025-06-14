@@ -11,6 +11,9 @@ import ProjectDescriptionHelpers
 
 let project = Project.makeStaticLibraryProject(
   for: Domain.{{ feature }},
-  dependencies: [],
+  dependencies: [
+    .Shared.ThirdParty,
+    .Shared.Utility
+  ],
   nameSuffix: "Interface"
 )

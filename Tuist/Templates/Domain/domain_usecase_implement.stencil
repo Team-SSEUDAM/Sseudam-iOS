@@ -9,14 +9,10 @@
 import Foundation
 import {{ feature }}DomainInterface
 
-public struct {{ feature }}UseCaseImpl: {{ feature }}UseCase {
-  private let repository: {{ feature }}Repository
-
-  public init(
-    repository: {{ feature }}Repository
-  ) {
-    self.repository = repository
+extension {{ feature }}UseCase {
+  public static func live(repository: {{ feature }}Repository) -> {{ feature }}UseCase {
+    .init {
+      try await repository.fetchData()
+    }
   }
-
-  public func execute() async throws { }
 }

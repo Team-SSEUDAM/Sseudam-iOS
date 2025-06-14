@@ -8,6 +8,10 @@
 
 import Foundation
 
-public protocol {{ feature }}UseCase {
-  func execute() async throws
+public struct {{ feature }}UseCase {
+  public var execute: @Sendable () async throws -> Void
+  
+  public init(execute: @Sendable @escaping () async throws -> Void) {
+    self.execute = execute
+  }
 }

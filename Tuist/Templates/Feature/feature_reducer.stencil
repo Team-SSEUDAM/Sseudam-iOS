@@ -1,5 +1,5 @@
 //
-//  {{ feature }}Reducer.swift
+//  {{ feature }}Feature.swift
 //
 //  {{ feature }}
 //
@@ -9,7 +9,7 @@
 import ComposableArchitecture
 
 @Reducer
-public struct {{ feature }}Reducer {
+public struct {{ feature }}Feature {
   private let reducer: Reduce<State, Action>
   
   public init(reducer: Reduce<State, Action>) {
@@ -28,6 +28,10 @@ public struct {{ feature }}Reducer {
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
-    reducer
+    Reduce { state, action in
+      switch action {
+        default: return .none
+      }
+    }
   }
 }

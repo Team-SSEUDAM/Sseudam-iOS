@@ -29,18 +29,13 @@ let featureTemplate = Template(
     ),
     // SwiftUI View
     .file(
-      path: "\(FeaturePath)/\(name)FeatureInterface/Sources/\(name)View.swift",
+      path: "\(FeaturePath)/\(name)Feature/Sources/\(name)View.swift",
       templatePath: "feature_view.stencil"
     ),
-    // Reducer Interface
+    // Reducer
     .file(
-      path: "\(FeaturePath)/\(name)FeatureInterface/Sources/\(name)Reducer.swift",
-      templatePath: "feature_reducer_interface.stencil"
-    ),
-    // Reducer Implement
-    .file(
-      path: "\(FeaturePath)/\(name)Feature/Sources/\(name)Reducer.swift",
-      templatePath: "feature_reducer_implement.stencil"
+      path: "\(FeaturePath)/\(name)Feature/Sources/\(name)Feature.swift",
+      templatePath: "feature_reducer.stencil"
     ),
     // test
     .file(

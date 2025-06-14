@@ -36,6 +36,8 @@ public struct HomeFeature {
     case researchButtonEnable(Bool)
     case onAppear
   }
+  
+  @Dependency(\.HomeUseCase) var homeUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -46,6 +48,8 @@ public struct HomeFeature {
       switch action {
       case .onAppear:
         return .run { send in
+          let test = try await homeUseCase.execute()
+          print(test)
           await MainActor.run {
             send(.location(.fetchUserLocation))
           }

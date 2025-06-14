@@ -15,6 +15,7 @@ struct SseudamApp: App {
     if let id = Bundle.main.infoDictionary?["NMCLIENTID"] as? String {
       NMFAuthManager.shared().ncpKeyId = id 
     }
+    DependencyRegister().injection()
   }
   var body: some Scene {
     WindowGroup {

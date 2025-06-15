@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct HomeRepository {
+public struct {{ feature }}Repository {
   public var fetchData: @Sendable () async throws -> Void
 
   public init(fetchData: @Sendable @escaping () async throws -> Void) {

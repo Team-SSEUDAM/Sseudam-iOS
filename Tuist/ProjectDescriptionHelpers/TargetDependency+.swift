@@ -13,7 +13,7 @@ public protocol ModuleRepresentable: RawRepresentable where RawValue == String {
 }
 
 public enum Module {
-  case feature(Feature, isInterface: Bool = false)
+  case feature(Feature)
   case domain(Domain, isInterface: Bool = false)
   case data(Data, isInterface: Bool = false)
   case core(Core)
@@ -58,7 +58,7 @@ protocol TargetDependencyDelegate { }
 extension TargetDependencyDelegate {
   public static func project(_ module: Module) -> TargetDependency {
     switch module {
-    case let .feature(feature, isInterface): return makeProjectDependency(for: feature, isInterface: isInterface, removeAddPath: true)
+    case let .feature(feature): return makeProjectDependency(for: feature, removeAddPath: true)
     case let .domain(domain, isInterface): return makeProjectDependency(for: domain, isInterface: isInterface)
     case let .data(data, isInterface): return makeProjectDependency(for: data, isInterface: isInterface)
     case let .core(core): return makeProjectDependency(for: core)

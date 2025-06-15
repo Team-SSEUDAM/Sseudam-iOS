@@ -36,6 +36,8 @@ public struct HomeFeature {
     case researchButtonEnable(Bool)
     case onAppear
   }
+  
+  @Dependency(\.HomeUseCase) var homeUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -46,6 +48,8 @@ public struct HomeFeature {
       switch action {
       case .onAppear:
         return .run { send in
+          let test = try await homeUseCase.execute()
+          print(test)
           await MainActor.run {
             send(.location(.fetchUserLocation))
           }
@@ -63,7 +67,6 @@ public struct HomeFeature {
       case let .requestMapBounds(isRequest):
         state.requestMapBounds = isRequest
         state.researchButtonEnable = false
-        print(state.trashType ?? "전체")
         // TODO: - 현위치 검색 api 요청
         return .none
         

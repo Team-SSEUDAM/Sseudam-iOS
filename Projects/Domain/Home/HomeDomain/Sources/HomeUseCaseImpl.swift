@@ -9,14 +9,11 @@
 import Foundation
 import HomeDomainInterface
 
-public struct HomeUseCaseImpl: HomeUseCase {
-  private let repository: HomeRepository
-
-  public init(
-    repository: HomeRepository
-  ) {
-    self.repository = repository
+extension HomeUseCase {
+  public static func live(repository: HomeRepository) -> HomeUseCase {
+    .init {
+      try await repository.fetchData()
+    }
   }
-
-  public func execute() async throws { }
+  
 }

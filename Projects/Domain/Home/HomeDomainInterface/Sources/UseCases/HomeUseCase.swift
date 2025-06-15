@@ -8,6 +8,10 @@
 
 import Foundation
 
-public protocol HomeUseCase {
-  func execute() async throws
+public struct HomeUseCase {
+  public var execute: @Sendable () async throws -> String
+  
+  public init(execute: @Sendable @escaping () async throws -> String) {
+    self.execute = execute
+  }
 }

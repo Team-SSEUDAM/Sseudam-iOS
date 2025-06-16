@@ -12,8 +12,9 @@ import ProjectDescriptionHelpers
 let project = Project.makeStaticLibraryProject(
   for: Domain.Home,
   dependencies: [
-    .Core.Module,
-    .Shared.Module
+    .Core.DesignKit,
+    .Shared.ThirdParty,
+    .Shared.Utility,
   ],
   nameSuffix: "Interface"
 )

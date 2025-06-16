@@ -23,7 +23,7 @@ struct SseudamView: View {
       switch store.selectedTab {
       case .home:
         HomeView(store: store.scope(state: \.home, action: \.home))
-      case .search:
+      case .myPet:
         EmptyView()
       case .profile:
         EmptyView()

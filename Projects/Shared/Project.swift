@@ -2,53 +2,49 @@
 //  Project.swift
 //  CoreManifests
 //
-//  Created by Jiyeon on 6/5/25.
+//  Created by 조용인 on 6/16/25.
 //
 
 import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project(
-  name: "Core",
+  name: "Shared",
   organizationName: "Sseudam.a2bo.ios",
   options: .default,
   settings: .default,
   targets: [
     .target(
-      name: "Core",
+      name: "Shared",
       destinations: .iOS,
       product: .staticLibrary,
-      bundleId: "Sseudam.a2bo.ios.core.core",
+      bundleId: "Sseudam.a2bo.ios.core.shared",
       deploymentTargets: .iOS("17.0"),
       dependencies: [
-        .Core.DesignKit,
+        .Shared.ThirdParty,
+        .Shared.Utility
       ]
     ),
     .target(
-      name: "DesignKit",
+      name: "ThirdParty",
       destinations: .iOS,
       product: .staticLibrary,
-      bundleId: "Sseudam.a2bo.ios.core.designKit",
+      bundleId: "Sseudam.a2bo.ios.core.thirdparty",
       deploymentTargets: .iOS("17.0"),
       infoPlist: .extendingDefault(with: [:]),
-      sources: ["./DesignKit/Sources/**"],
-      resources: ["./DesignKit/Resources/**"]
+      dependencies: [
+        .SPM.TCA,
+        .SPM.NMapsMap
+      ]
     ),
     .target(
-      name: "DesignKitDemo",
+      name: "Utility",
       destinations: .iOS,
-      product: .framework,
-      bundleId: "Sseudam.a2bo.ios.core.designKitDemo",
+      product: .staticLibrary,
+      bundleId: "Sseudam.a2bo.ios.Utility",
       deploymentTargets: .iOS("17.0"),
       infoPlist: .extendingDefault(with: [:]),
-      sources: ["./DesignKit/Demo/Sources/**"],
-      dependencies: [
-        .Core.DesignKit
-      ]
+      sources: ["./Utility/Sources/**"]
     )
-  ],
-  resourceSynthesizers: [
-    .assets(),
-    .fonts()
   ]
 )

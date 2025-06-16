@@ -37,13 +37,11 @@ public enum Data: String, ModuleRepresentable {
 }
 
 public enum Core: String, ModuleRepresentable {
-  case Core
   case DesignKit
   public var typePath: String { "Core" }
 }
 
 public enum Shared: String, ModuleRepresentable {
-  case Shared
   case ThirdParty
   case Utility
   public var typePath: String { "Shared" }
@@ -91,7 +89,7 @@ extension TargetDependencyDelegate {
   ) -> TargetDependency {
     return .project(
       target: "\(target)",
-      path: .relativeToRoot("./Projects/\(target.typePath)")
+      path: .relativeToRoot("./Projects/\(target.typePath)/\(target)")
     )
   }
   
@@ -121,12 +119,10 @@ extension TargetDependency {
   }
   
   public struct Core: TargetDependencyDelegate {
-    public static let Module = Self.project(.core(.Core))
     public static let DesignKit = Self.project(.core(.DesignKit))
   }
   
   public struct Shared: TargetDependencyDelegate {
-    public static let Module = Self.project(.shared(.Shared))
     public static let ThirdParty = Self.project(.shared(.ThirdParty))
     public static let Utility = Self.project(.shared(.Utility))
   }

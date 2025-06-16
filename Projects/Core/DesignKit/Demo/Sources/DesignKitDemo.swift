@@ -23,6 +23,7 @@ struct DesignKitDemo: View {
     case underline_tab_bar
     case tab_bar
     case category_chip
+    case category_chip_box_button
     case check_box
     case coach_mark
     
@@ -43,6 +44,7 @@ struct DesignKitDemo: View {
       case .underline_tab_bar: UnderlineTabBar()
       case .tab_bar: CustomTabBarDemo()
       case .category_chip: ChipButtonDemo()
+      case .category_chip_box_button: ChipBoxButtonDemo()
       case .check_box: CheckBox()
       case .coach_mark: CoachMark()
       }

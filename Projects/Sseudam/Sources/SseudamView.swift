@@ -9,6 +9,7 @@
 import SwiftUI
 import DesignKit
 import ComposableArchitecture
+import HomeFeature
 
 struct SseudamView: View {
   @Bindable var store: StoreOf<SseudamFeature> = Store(
@@ -21,7 +22,7 @@ struct SseudamView: View {
     VStack {
       switch store.selectedTab {
       case .home:
-        EmptyView()
+        HomeView(store: store.scope(state: \.home, action: \.home))
       case .search:
         EmptyView()
       case .profile:
@@ -40,4 +41,5 @@ struct SseudamView: View {
 #Preview {
   SseudamView()
 }
+
 

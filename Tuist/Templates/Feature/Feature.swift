@@ -12,7 +12,7 @@ fileprivate let name: Template.Attribute = .required("feature")
 fileprivate let author: Template.Attribute = .required("author")
 
 /// 파일 경로
-fileprivate let FeaturePath: String = "Projects/Features/\(name)"
+fileprivate let FeaturePath: String = "Projects/Feature/\(name)"
 
 
 let featureTemplate = Template(
@@ -32,15 +32,10 @@ let featureTemplate = Template(
       path: "\(FeaturePath)/\(name)Feature/Sources/\(name)View.swift",
       templatePath: "feature_view.stencil"
     ),
-    // Reducer Interface
+    // Reducer
     .file(
-      path: "\(FeaturePath)/\(name)FeatureInterface/Sources/\(name)Reducer.swift",
-      templatePath: "feature_reducer_interface.stencil"
-    ),
-    // Reducer Implement
-    .file(
-      path: "\(FeaturePath)/\(name)Feature/Sources/\(name)Reducer.swift",
-      templatePath: "feature_reducer_implement.stencil"
+      path: "\(FeaturePath)/\(name)Feature/Sources/\(name)Feature.swift",
+      templatePath: "feature_reducer.stencil"
     ),
     // test
     .file(

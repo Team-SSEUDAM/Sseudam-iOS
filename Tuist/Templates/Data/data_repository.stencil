@@ -11,12 +11,13 @@ import {{ feature }}DomainInterface
 import {{ feature }}DataInterface
 import Core
 
-public struct {{ feature }}RepositoryImpl: {{ feature }}Repository {
-  private let networker: NetworkProtocol
-  
-  public init(networker: NetworkProtocol) {
-    self.networker = networker
+public extension {{ feature }}Repository {
+  static var live: {{ feature }}Repository {
+    {{ feature }}Repository(
+      fetchData: {
+        // 실제 네트워크 작업 구현
+        return
+      }
+    )
   }
-  public func fetchData() async throws -> Void {}
-  
 }

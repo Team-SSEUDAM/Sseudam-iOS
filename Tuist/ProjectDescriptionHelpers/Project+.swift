@@ -75,20 +75,15 @@ public extension Project {
     )
     let feature = Target.makeDynamicFrameworkTarget(
       for: module,
-      dependencies: [.target(name: name(for: module, suffix: "Interface"))]
+      dependencies: dependencies
     )
     let featureUnitTest = Target.makeTestingTarget(
       for: module,
-      dependencies: [.target(name: name(for: module, suffix: "Interface"))]
-    )
-    let featureInterface = Target.makeStaticLibraryTarget(
-      for: module,
-      dependencies: dependencies,
-      nameSuffix: "Interface"
+      dependencies: [.target(name: name(for: module))]
     )
     return baseProject(
       name: name(for: module),
-      targets: [demo, feature, featureUnitTest, featureInterface]
+      targets: [demo, feature, featureUnitTest]
     )
   }
   

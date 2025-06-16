@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import DesignKit
 
 struct BadgeDemo: View {
   

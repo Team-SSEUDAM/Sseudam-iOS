@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import DesignKit
 
 struct AlertDemo: View {
   var body: some View {

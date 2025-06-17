@@ -1,5 +1,5 @@
 //
-//  ChipButton.swift
+//  CategoryButton.swift
 //  DesignKit
 //
 //  Created by 조용인 on 6/15/25.
@@ -8,21 +8,21 @@
 
 import SwiftUI
 
-public struct ChipButton: View {
+public struct CategoryButton: View {
   
-  @Binding public var state: ChipButtonState
-  @Binding public var text: String
+  @Binding public var state: CategoryButtonState
   
+  private let text: String
   private let icon: ImageSet?
   private let action: (() async -> Void)?
   
   public init(
-    text: Binding<String>,
-    state: Binding<ChipButtonState>,
+    text: String,
+    state: Binding<CategoryButtonState>,
     icon: ImageSet? = nil,
     _ action: (() async -> Void)? = nil
   ) {
-    self._text = text
+    self.text = text
     self._state = state
     self.icon = icon
     self.action = action

@@ -11,6 +11,7 @@ import DesignKit
 import ComposableArchitecture
 
 import HomeFeature
+import TrashDetailFeature
 
 @Reducer
 struct SseudamFeature {
@@ -19,12 +20,14 @@ struct SseudamFeature {
   struct State {
     var selectedTab: TabBarItem = .home
     var home: HomeFeature.State = HomeFeature.State()
+    var trashDetail: TrashDetailFeature.State? = nil
   }
   
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case selectTab(TabBarItem)
     case home(HomeFeature.Action)
+    case trashDetail(TrashDetailFeature.Action)
   }
   
   var body: some ReducerOf<Self> {
@@ -40,6 +43,9 @@ struct SseudamFeature {
         
       default: return .none
       }
+    }
+    .ifLet(\.trashDetail, action: \.trashDetail) {
+      TrashDetailFeature()
     }
     
   }

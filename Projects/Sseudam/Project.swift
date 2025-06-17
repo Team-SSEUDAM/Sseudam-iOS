@@ -29,6 +29,8 @@ let project = Project.makeApp(
   dependencies: [
     .Features.Home,
     .Domain.Home.Implement,
-    .Data.Home.Implement
+    .Data.Home.Implement,
+    
+    .Features.TrashDetail
   ]
 )

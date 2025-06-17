@@ -8,11 +8,8 @@
 
 import SwiftUI
 
-fileprivate struct FontStyleModifier: ViewModifier {
-  var font: FontInfo
-  init(font: FontInfo) {
-    self.font = font
-  }
+private struct FontStyleModifier: ViewModifier {
+  let font: FontInfo
   
   func body(content: Content) -> some View {
     content

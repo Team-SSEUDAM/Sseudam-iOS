@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import DesignKit
 
 struct ChipButtonDemo: View {
   var body: some View {

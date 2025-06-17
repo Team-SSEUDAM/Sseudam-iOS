@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import DesignKit
 
 struct SnackBarDemo: View {
   @State var message: String? = ""

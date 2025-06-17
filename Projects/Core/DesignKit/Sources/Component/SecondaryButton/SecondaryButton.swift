@@ -78,7 +78,7 @@ public struct SecondaryButton<Icon: View>: View {
       icon()
       Text(title)
         .foregroundColor(state.textColor)
-        .font(size.font.font)
+        .font(size.font)
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, size.padding.vertical)

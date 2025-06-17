@@ -20,7 +20,7 @@ public struct PrimaryButton<Icon: View>: View {
       }
     }
     
-    public var padding: (vertical: CGFloat, horizonal: CGFloat) {
+    public var padding: (vertical: CGFloat, horizontal: CGFloat) {
       switch self {
       case .large: return (.Number12, .Number28)
       case .medium: return (.Number10, .Number20)

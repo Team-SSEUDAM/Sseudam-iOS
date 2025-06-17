@@ -20,7 +20,7 @@ public struct SecondaryButton<Icon: View>: View {
       }
     }
     
-    public var padding: (vertical: CGFloat, horizonal: CGFloat) {
+    public var padding: (vertical: CGFloat, horizontal: CGFloat) {
       switch self {
       case .large: return (.Number12, .Number28)
       case .medium: return (.Number10, .Number20)
@@ -94,7 +94,7 @@ public struct SecondaryButton<Icon: View>: View {
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, size.padding.vertical)
-    .padding(.horizontal, size.padding.horizonal)
+    .padding(.horizontal, size.padding.horizontal)
     .overlay(
       RoundedRectangle(cornerRadius: size.cornerRadius)
         .inset(by: 0.5)

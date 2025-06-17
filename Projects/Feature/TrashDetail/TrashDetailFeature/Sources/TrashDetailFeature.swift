@@ -1,15 +1,15 @@
 //
-//  {{ feature }}Feature.swift
+//  TrashDetailFeature.swift
 //
-//  {{ feature }}
+//  TrashDetail
 //
-//  Created by {{ author }}
+//  Created by JiYeon
 //
 
 import ComposableArchitecture
 
 @Reducer
-public struct {{ feature }}Feature {
+public struct TrashDetailFeature {
   
   public init() {
     

@@ -10,9 +10,9 @@ import SwiftUI
 import ComposableArchitecture
 
 public struct {{ feature }}View: View {
-  @Bindable var store: StoreOf<{{ feature }}Reducer>
+  @Bindable var store: StoreOf<{{ feature }}Feature>
 
-  public init(store: StoreOf<{{ feature }}Reducer>) {
+  public init(store: StoreOf<{{ feature }}Feature>) {
     self.store = store
   }
 

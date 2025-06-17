@@ -12,12 +12,12 @@ public struct TouchArea: View {
   
   private let image: ImageSet
   private let size: CGFloat
-  private let action: (() async -> Void)?
+  private let action: @Sendable () async -> Void
   
   public init(
     image: ImageSet,
     size: CGFloat = .Number32,
-    _ action: (() async -> Void)? = nil
+    _ action: @escaping @Sendable () async -> Void
   ) {
     self.image = image
     self.size = size
@@ -26,9 +26,7 @@ public struct TouchArea: View {
   
   public var body: some View {
     content
-      .onTapGesture {
-        Task { @MainActor in await action?() }
-      }
+      .onTapGesture { Task { await action() } }
   }
   
   @ViewBuilder private var content: some View {

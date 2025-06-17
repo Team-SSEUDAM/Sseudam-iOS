@@ -31,7 +31,10 @@ public struct CategoryButton: View {
   public var body: some View {
     contentView()
       .onTapGesture {
-        Task { await action() }
+        Task {
+          state = state == .normal ? .selected : .normal
+          await action()
+        }
       }
       
   }

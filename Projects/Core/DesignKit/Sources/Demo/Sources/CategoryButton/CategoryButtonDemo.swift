@@ -9,12 +9,13 @@
 import SwiftUI
 
 struct CategoryButtonDemo: View {
+  @State private var categoryButtonState: CategoryButtonState = .normal
   var body: some View {
     List {
       Section("일반 칩 버튼") {
         CategoryButton(
           text: "칩버튼",
-          state: .constant(.normal)
+          state: $categoryButtonState
         ) {
           print("칩버튼 클릭")
         }

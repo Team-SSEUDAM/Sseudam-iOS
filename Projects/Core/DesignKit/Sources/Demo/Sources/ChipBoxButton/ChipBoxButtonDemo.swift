@@ -17,14 +17,18 @@ struct ChipBoxButtonDemo: View {
           text: .constant("칩버튼"),
           state: .constant(.normal),
           icon: .addSpot
-        )
+        ) {
+          print("칩버튼 클릭")
+        }
         .frame(width: .infinity)
         
         ChipBoxButton(
           text: .constant("칩버튼"),
           state: .constant(.selected),
           icon: .addSpot
-        )
+        ) {
+          print("칩버튼 클릭")
+        }
         .frame(width: .infinity)
       }
       
@@ -33,14 +37,18 @@ struct ChipBoxButtonDemo: View {
           text: .constant("아이콘칩"),
           state: .constant(.normal),
           icon: .addSpot
-        )
+        ) {
+          print("아이콘칩 클릭")
+        }
         .frame(width: .infinity)
         
         ChipBoxButton(
           text: .constant("아이콘칩"),
           state: .constant(.selected),
           icon: .addSpot
-        )
+        ) {
+          print("아이콘칩 클릭")
+        }
         .frame(width: .infinity)
       }
     }

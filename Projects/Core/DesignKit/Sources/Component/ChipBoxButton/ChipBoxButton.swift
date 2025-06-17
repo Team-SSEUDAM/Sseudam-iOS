@@ -14,13 +14,13 @@ public struct ChipBoxButton: View {
   @Binding public var text: String
   
   private let icon: ImageSet
-  private let action: (() async -> Void)?
+  private let action: @Sendable () async -> Void
   
   public init(
     text: Binding<String>,
     state: Binding<ChipBoxButtonState>,
     icon: ImageSet,
-    _ action: (() async -> Void)? = nil
+    _ action: @escaping @Sendable () async -> Void
   ) {
     self._text = text
     self._state = state
@@ -31,7 +31,7 @@ public struct ChipBoxButton: View {
   public var body: some View {
     contentView()
       .onTapGesture {
-        Task { @MainActor in await action?() }
+        Task { await action() }
       }
       
   }
@@ -54,9 +54,23 @@ public struct ChipBoxButton: View {
     .padding(.vertical, .Number12)
     .background(
       RoundedRectangle(cornerRadius: .Number8)
-        .inset(by: 0.5)
-        .stroke(state.borderColor, lineWidth: 1)
         .fill(state.backgroundColor)
+        .overlay{
+          RoundedRectangle(cornerRadius: .Number8)
+            .inset(by: 0.5)
+            .stroke(state.borderColor, lineWidth: 1)
+        }
     )
   }
+}
+
+#Preview {
+  ChipBoxButton(
+    text: .constant("Chip Box Button"),
+    state: .constant(.selected),
+    icon: .addSpot
+  ) {
+    print("Chip Box Button tapped")
+  }
+  .padding()
 }

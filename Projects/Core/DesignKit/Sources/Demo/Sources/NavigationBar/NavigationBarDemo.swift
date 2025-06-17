@@ -16,11 +16,15 @@ struct NavigationBarDemo: View {
       Section("뒤로가기 + 타이틀 + 닫기") {
         NavigationBar(
           backContent: {
-            TouchArea(image: .cancel)
+            TouchArea(image: .cancel) {
+              print("뒤로가기 버튼")
+            }
           },
           title: "text",
           closeContent: {
-            TouchArea(image: .delete)
+            TouchArea(image: .delete) {
+              print("닫기 버튼")
+            }
           }
         )
       }
@@ -50,7 +54,9 @@ struct NavigationBarDemo: View {
       Section("뒤로가기 + 닫기") {
         NavigationBar(
           backContent: {
-            TouchArea(image: .cancel)
+            TouchArea(image: .cancel) {
+              print("뒤로가기 버튼")
+            }
           },
           title: nil,
           closeContent: {

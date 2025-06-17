@@ -33,17 +33,6 @@ let workspace = Workspace(
       archiveAction: .archiveAction(configuration: .release),
       profileAction: .profileAction(configuration: .release),
       analyzeAction: .analyzeAction(configuration: .release)
-    ),
-    .scheme(
-      name: "DesignKitDemo",
-      shared: true,
-      buildAction: .buildAction(
-        targets: [.project(path: "./Projects/Core", target: "DesignKitDemo")]
-      ),
-      runAction: .runAction(configuration: .debug),
-      archiveAction: .archiveAction(configuration: .debug),
-      profileAction: .profileAction(configuration: .debug),
-      analyzeAction: .analyzeAction(configuration: .debug)
     )
   ],
   /// `Workspace`에 포함된 모든 프로젝트에 대해 자동으로 Scheme을 생성하는 옵션 (기본값: `.enabled`)

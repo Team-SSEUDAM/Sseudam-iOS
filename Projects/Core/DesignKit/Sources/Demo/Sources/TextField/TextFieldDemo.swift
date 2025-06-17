@@ -39,8 +39,6 @@ struct TextFieldDemo: View {
         state: $state
       ) {
         Text("이건 설명입니다")
-          .foregroundStyle(state == .error ? ColorSet.Text.Error : ColorSet.Text.Tertiary)
-          .font(FontSet.Body.body3)
       }
     }
   }

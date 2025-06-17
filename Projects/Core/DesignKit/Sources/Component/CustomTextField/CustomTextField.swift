@@ -56,6 +56,8 @@ public struct CustomTextField<Subject: View, Description: View>: View {
           .stroke(state.borderColor, lineWidth: .Number1)
         )
       description()
+        .foregroundStyle(state == .error ? ColorSet.Text.Error : ColorSet.Text.Tertiary)
+        .font(FontSet.Body.body3)
     }
   }
 }

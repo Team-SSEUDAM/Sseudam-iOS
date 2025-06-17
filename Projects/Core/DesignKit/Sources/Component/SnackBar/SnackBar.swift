@@ -13,6 +13,7 @@ public struct SnackBar: View {
   @Binding var message: String?
   @State private var isVisible = false
   @State private var boxOpacity: Double = 1
+  @State private var currentTask: Task<Void, Never>? = nil
   
   private var buttonLabel: String?
   var action: (() async -> Void)?
@@ -67,7 +68,8 @@ public struct SnackBar: View {
   
   private func showToastIfNeeded() {
     guard let message = message, !message.isEmpty else { return }
-    Task {
+    currentTask?.cancel()
+    currentTask = Task {
       boxOpacity = 1
       isVisible = true
       

@@ -25,8 +25,11 @@ public struct TouchArea: View {
   }
   
   public var body: some View {
-    content
-      .onTapGesture { Task { await action() } }
+    Button {
+      Task { await action() }
+    } label: {
+      content
+    }
   }
   
   @ViewBuilder private var content: some View {
@@ -39,5 +42,14 @@ public struct TouchArea: View {
         )
       }
       .frame(width: .Number48, height: .Number48, alignment: .center)
+  }
+}
+
+#Preview {
+  TouchArea(
+    image: .addSpot,
+    size: .Number24
+  ) {
+    print("TouchArea tapped")
   }
 }

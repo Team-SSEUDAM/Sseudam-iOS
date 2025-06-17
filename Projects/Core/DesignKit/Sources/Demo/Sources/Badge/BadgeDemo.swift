@@ -11,24 +11,30 @@ import SwiftUI
 struct BadgeDemo: View {
   
   @State private var badgeCount: String = "test"
+  @State private var badgeState: BadgeState = .primary
   
   var body: some View {
     List {
+      Button("Toggle") {
+        badgeCount += "#"
+        badgeState = .accent
+      }
+      
       Section("Badge") {
         Badge(
           text: $badgeCount,
-          state: .constant(.primary),
+          state: badgeState,
           icon: .addSpot
         )
         
         Badge(
           text: $badgeCount,
-          state: .constant(.error)
+          state: badgeState
         )
         
         Badge(
           text: $badgeCount,
-          state: .constant(.accent)
+          state: badgeState
         )
       }
     }

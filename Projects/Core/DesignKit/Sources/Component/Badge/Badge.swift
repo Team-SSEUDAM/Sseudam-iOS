@@ -10,17 +10,17 @@ import SwiftUI
 
 public struct Badge: View {
   
-  @Binding public var state: BadgeState
   @Binding public var text: String
+  private let state: BadgeState
   private let icon: ImageSet?
   
   public init(
     text: Binding<String>,
-    state: Binding<BadgeState>,
+    state: BadgeState,
     icon: ImageSet? = nil
   ) {
     self._text = text
-    self._state = state
+    self.state = state
     self.icon = icon
   }
   

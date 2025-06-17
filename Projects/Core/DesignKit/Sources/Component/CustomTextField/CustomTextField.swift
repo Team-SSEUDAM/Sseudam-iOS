@@ -9,10 +9,10 @@
 
 import SwiftUI
 
-public struct CustomTextField<Subject: View, Discription: View>: View {
+public struct CustomTextField<Subject: View, Description: View>: View {
   
   public let subject: () -> Subject
-  public let discription: () -> Discription
+  public let description: () -> Description
   
   public let placeholder: String
   
@@ -26,13 +26,13 @@ public struct CustomTextField<Subject: View, Discription: View>: View {
     placeholder: String = "",
     text: Binding<String>,
     state: Binding<CustomTextFieldState>,
-    _ discription: @escaping () -> Discription = { EmptyView() }
+    _ description: @escaping () -> Description = { EmptyView() }
   ) {
     self.subject = subject
     self.placeholder = placeholder
     self._text = text
     self._state = state
-    self.discription = discription
+    self.description = description
     
   }
   
@@ -55,7 +55,7 @@ public struct CustomTextField<Subject: View, Discription: View>: View {
           .inset(by: 0.5)
           .stroke(state.borderColor, lineWidth: .Number1)
         )
-      discription()
+      description()
     }
   }
 }

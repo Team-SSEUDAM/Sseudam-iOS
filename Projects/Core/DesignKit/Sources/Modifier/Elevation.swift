@@ -78,7 +78,7 @@ public extension View {
   func elevation(
     backgroundColor: Color = ColorSet.Gray._0,
     level: ElevationModifier.Level = .small,
-    cornerRadius: CGFloat
+    cornerRadius: CGFloat = .Number10
   ) -> some View {
     self.modifier(
       ElevationModifier(

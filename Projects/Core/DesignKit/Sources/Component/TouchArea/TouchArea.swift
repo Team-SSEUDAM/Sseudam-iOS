@@ -30,6 +30,7 @@ public struct TouchArea: View {
     } label: {
       content
     }
+    .buttonStyle(.plain)
   }
   
   @ViewBuilder private var content: some View {

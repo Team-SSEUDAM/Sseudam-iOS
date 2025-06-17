@@ -21,7 +21,7 @@ struct DesignKitDemo: View {
     case text_field
     case tab_bar
     case category_chip
-    case category_chip_box_button
+    case check_box_button
     
     var id: String { rawValue }
     
@@ -38,8 +38,8 @@ struct DesignKitDemo: View {
       case .snack_bar: SnackBarDemo()
       case .text_field: TextFieldDemo()
       case .tab_bar: CustomTabBarDemo()
-      case .category_chip: ChipButtonDemo()
-      case .category_chip_box_button: ChipBoxButtonDemo()
+      case .category_chip: CategoryButtonDemo()
+      case .check_box_button: CheckBoxButtonDemo()
       }
     }
   }

@@ -11,8 +11,8 @@ import SwiftUI
 public struct CheckBoxButton: View {
   
   @Binding public var state: CheckBoxButtonState
-  private let text: String
   
+  private let text: String
   private let icon: ImageSet
   private let action: @Sendable () async -> Void
   
@@ -31,7 +31,10 @@ public struct CheckBoxButton: View {
   public var body: some View {
     contentView()
       .onTapGesture {
-        Task { await action() }
+        Task {
+          state = state == .normal ? .selected : .normal
+          await action()
+        }
       }
       
   }
@@ -62,15 +65,4 @@ public struct CheckBoxButton: View {
         }
     )
   }
-}
-
-#Preview {
-  CheckBoxButton(
-    text: "Check Box Button",
-    state: .constant(.selected),
-    icon: .addSpot
-  ) {
-    print("Check Box Button")
-  }
-  .padding()
 }

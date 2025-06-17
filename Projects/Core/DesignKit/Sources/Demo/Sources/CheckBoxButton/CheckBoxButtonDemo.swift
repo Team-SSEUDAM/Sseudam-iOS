@@ -9,12 +9,14 @@
 import SwiftUI
 
 struct CheckBoxButtonDemo: View {
+  @State private var categoryButtonState: CheckBoxButtonState = .normal
+  
   var body: some View {
     List {
       Section("일반 칩 버튼") {
         CheckBoxButton(
           text: "칩버튼",
-          state: .constant(.normal),
+          state: $categoryButtonState,
           icon: .addSpot
         ) {
           print("칩버튼 클릭")
@@ -52,4 +54,8 @@ struct CheckBoxButtonDemo: View {
       }
     }
   }
+}
+
+#Preview {
+  CheckBoxButtonDemo()
 }

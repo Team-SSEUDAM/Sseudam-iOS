@@ -11,28 +11,31 @@ import SwiftUI
 struct SecondaryButtonDemo: View {
   
   @State private var buttonState: SecondaryButtonState = .normal
-  @State private var disabledState: SecondaryButtonState = .disabled
+  @State private var disabledState: SecondaryButtonState = .normal
   
   var body: some View {
     List {
       Section("일반 텍스트 버튼") {
         SecondaryButton(
           title: "Label",
-          size: .large
+          size: .large,
+          state: buttonState
         ) {
           print("Button Clicked")
         }
         
         SecondaryButton(
           title: "Label",
-          size: .medium
+          size: .medium,
+          state: buttonState
         ) {
           print("Button Clicked")
         }
         
         SecondaryButton(
           title: "Action",
-          size: .medium
+          size: .medium,
+          state: buttonState
         ) {
           print("Action Clicked")
         }
@@ -45,7 +48,8 @@ struct SecondaryButtonDemo: View {
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",
-          size: .large
+          size: .large,
+          state: buttonState
         ) {
           print("Button Clicked")
         }
@@ -56,7 +60,8 @@ struct SecondaryButtonDemo: View {
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",
-          size: .medium
+          size: .medium,
+          state: buttonState
         ) {
           print("Button Clicked")
         }
@@ -66,9 +71,9 @@ struct SecondaryButtonDemo: View {
         SecondaryButton(
           title: "Label",
           size: .large,
-          state: $disabledState
+          state: disabledState
         ) {
-          print("Button Clicked")
+          disabledState = .disabled
         }
         
         SecondaryButton(
@@ -78,7 +83,7 @@ struct SecondaryButtonDemo: View {
           },
           title: "Label",
           size: .large,
-          state:  $disabledState
+          state:  .disabled
         ) {
           print("Button Clicked")
         }

@@ -11,27 +11,32 @@ import SwiftUI
 struct PrimaryButtonDemo: View {
   
   @State private var buttonState: PrimaryButtonState = .normal
+  @State private var disabledButtonState: PrimaryButtonState = .normal
+  @State private var errorButtonState: PrimaryButtonState = .normal
   
   var body: some View {
     List {
       Section("일반 텍스트 버튼") {
         PrimaryButton(
           title: "Label",
-          size: .large
+          size: .large,
+          state: buttonState
         ) {
           print("Button Clicked")
         }
         
         PrimaryButton(
           title: "Label",
-          size: .medium
+          size: .medium,
+          state: buttonState
         ) {
           print("Button Clicked")
         }
         
         PrimaryButton(
           title: "Action",
-          size: .medium
+          size: .medium,
+          state: buttonState
         ) {
           print("Button Clicked")
         }
@@ -44,7 +49,8 @@ struct PrimaryButtonDemo: View {
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",
-          size: .large
+          size: .large,
+          state: buttonState
         ) {
           print("Button Clicked")
         }
@@ -55,8 +61,10 @@ struct PrimaryButtonDemo: View {
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",
-          size: .medium
+          size: .medium,
+          state: .normal
         ) {
+          
           print("Button Clicked")
         }
       }
@@ -64,9 +72,10 @@ struct PrimaryButtonDemo: View {
       Section("비활성화 버튼") {
         PrimaryButton(
           title: "Label",
-          size: .large
+          size: .large,
+          state: disabledButtonState
         ) {
-          print("Button Clicked")
+          disabledButtonState = .disabled
         }
         
         PrimaryButton(
@@ -75,7 +84,8 @@ struct PrimaryButtonDemo: View {
               .foregroundColor(ColorSet.Icon.Inverse)
           },
           title: "Label",
-          size: .large
+          size: .large,
+          state: .disabled
         ) {
           print("Button Clicked")
         }
@@ -85,7 +95,7 @@ struct PrimaryButtonDemo: View {
         PrimaryButton(
           title: "Label",
           size: .large,
-          state: .constant(.error)
+          state: .error
         ) {
           print("Button Clicked")
         }
@@ -97,9 +107,9 @@ struct PrimaryButtonDemo: View {
           },
           title: "Label",
           size: .large,
-          state: $buttonState
+          state: errorButtonState
         ) {
-          buttonState = .disabled
+          errorButtonState = .error
         }
       }
     }

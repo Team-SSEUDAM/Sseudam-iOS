@@ -35,26 +35,26 @@ public struct SecondaryButton<Icon: View>: View {
     }
   }
   
-  public var title: String
-  public var size: SecondaryButtonSize
-  public var icon: () -> Icon
+  private var title: String
+  private var size: SecondaryButtonSize
+  private var icon: () -> Icon
+  private var state: SecondaryButtonState
   
-  public var action: @Sendable () async -> Void
+  private var action: @Sendable () async -> Void
   
-  @Binding public var state: SecondaryButtonState
   @State private var isPressed: Bool = false
   
   public init(
     icon: @escaping () -> Icon = { EmptyView() },
     title: String,
     size: SecondaryButtonSize = .large,
-    state: Binding<SecondaryButtonState> = .constant(.normal),
+    state: SecondaryButtonState = .normal,
     _ action: @escaping @Sendable () async -> Void
   ) {
     self.title = title
     self.size = size
     self.icon = icon
-    self._state = state
+    self.state = state
     self.action = action
   }
   

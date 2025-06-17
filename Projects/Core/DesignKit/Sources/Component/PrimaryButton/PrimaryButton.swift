@@ -35,26 +35,27 @@ public struct PrimaryButton<Icon: View>: View {
     }
   }
   
-  public var title: String
-  public var size: PrimaryButtonSize
-  public var icon: () -> Icon
+  private var state: PrimaryButtonState
+  private var title: String
+  private var size: PrimaryButtonSize
+  private var icon: () -> Icon
   
   public var action: @Sendable () async -> Void
   
-  @Binding public var state: PrimaryButtonState
+  
   @State private var isPressed: Bool = false
   
   public init(
     icon: @escaping () -> Icon = { EmptyView() },
     title: String,
     size: PrimaryButtonSize = .large,
-    state: Binding<PrimaryButtonState> = .constant(.normal),
+    state: PrimaryButtonState,
     _ action: @escaping @Sendable () async -> Void
   ) {
     self.title = title
     self.size = size
     self.icon = icon
-    self._state = state
+    self.state = state
     self.action = action
   }
   

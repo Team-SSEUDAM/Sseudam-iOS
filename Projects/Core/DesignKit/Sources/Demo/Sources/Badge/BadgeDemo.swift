@@ -17,25 +17,19 @@ struct BadgeDemo: View {
       Section("Badge") {
         Badge(
           text: $badgeCount,
-          state: .constant(.primary)
-        ) {
-          Icon(image: .add, size: .Number16)
-        }
+          state: .constant(.primary),
+          icon: .addSpot
+        )
         
         Badge(
           text: $badgeCount,
           state: .constant(.error)
-        ) {
-          Icon(image: .add, size: .Number16)
-        }
+        )
         
         Badge(
           text: $badgeCount,
           state: .constant(.accent)
-        ) {
-          Icon(image: .add, size: .Number16)
-            .foregroundColor(ColorSet.Icon.Inverse)
-        }
+        )
       }
     }
   }

@@ -8,16 +8,16 @@
 
 import SwiftUI
 
-public struct Badge<Icon: View>: View {
+public struct Badge: View {
   
   @Binding public var state: BadgeState
   @Binding public var text: String
-  private let icon: (() -> Icon)?
+  private let icon: ImageSet?
   
   public init(
     text: Binding<String>,
     state: Binding<BadgeState>,
-    icon: (() -> Icon)? = nil
+    icon: ImageSet? = nil
   ) {
     self._text = text
     self._state = state
@@ -26,7 +26,13 @@ public struct Badge<Icon: View>: View {
   
   public var body: some View {
     HStack(spacing: .Number2) {
-      icon?()
+      if let icon {
+        Icon(
+          image: icon,
+          size: .Number16
+        )
+        .foregroundColor(state.textColor)
+      }
       Text(text)
         .foregroundStyle(state.textColor)
         .font(FontSet.Caption.caption1)

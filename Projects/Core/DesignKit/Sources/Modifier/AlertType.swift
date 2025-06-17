@@ -25,7 +25,7 @@ public enum AlertType: Equatable {
   
   var cancel: String {
     switch self {
-    default: return "cancel"
+    case .sample: return "cancel"
     }
   }
   

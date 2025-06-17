@@ -13,23 +13,23 @@ struct CategoryButtonDemo: View {
     List {
       Section("일반 칩 버튼") {
         CategoryButton(
-          text: .constant("칩버튼"),
+          text: "칩버튼",
           state: .constant(.normal)
         )
         CategoryButton(
-          text: .constant("칩버튼"),
+          text: "칩버튼",
           state: .constant(.selected)
         )
       }
       
       Section("아이콘 칩 버튼") {
         CategoryButton(
-          text: .constant("아이콘칩"),
+          text: "아이콘칩",
           state: .constant(.normal),
           icon: .addSpot
         )
         CategoryButton(
-          text: .constant("아이콘칩"),
+          text: "아이콘칩",
           state: .constant(.selected),
           icon: .addSpot
         )

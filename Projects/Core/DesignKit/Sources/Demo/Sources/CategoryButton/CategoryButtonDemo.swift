@@ -8,27 +8,27 @@
 
 import SwiftUI
 
-struct ChipButtonDemo: View {
+struct CategoryButtonDemo: View {
   var body: some View {
     List {
       Section("일반 칩 버튼") {
-        ChipButton(
+        CategoryButton(
           text: .constant("칩버튼"),
           state: .constant(.normal)
         )
-        ChipButton(
+        CategoryButton(
           text: .constant("칩버튼"),
           state: .constant(.selected)
         )
       }
       
       Section("아이콘 칩 버튼") {
-        ChipButton(
+        CategoryButton(
           text: .constant("아이콘칩"),
           state: .constant(.normal),
           icon: .addSpot
         )
-        ChipButton(
+        CategoryButton(
           text: .constant("아이콘칩"),
           state: .constant(.selected),
           icon: .addSpot
@@ -39,5 +39,5 @@ struct ChipButtonDemo: View {
 }
 
 #Preview {
-  ChipButtonDemo()
+  CategoryButtonDemo()
 }

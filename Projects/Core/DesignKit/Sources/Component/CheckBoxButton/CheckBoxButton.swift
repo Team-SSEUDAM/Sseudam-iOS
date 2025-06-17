@@ -1,5 +1,5 @@
 //
-//  ChipBoxButton.swift
+//  CheckBoxButton.swift
 //  DesignKit
 //
 //  Created by 조용인 on 6/15/25.
@@ -8,21 +8,21 @@
 
 import SwiftUI
 
-public struct ChipBoxButton: View {
+public struct CheckBoxButton: View {
   
-  @Binding public var state: ChipBoxButtonState
-  @Binding public var text: String
+  @Binding public var state: CheckBoxButtonState
+  private let text: String
   
   private let icon: ImageSet
   private let action: @Sendable () async -> Void
   
   public init(
-    text: Binding<String>,
-    state: Binding<ChipBoxButtonState>,
+    text: String,
+    state: Binding<CheckBoxButtonState>,
     icon: ImageSet,
     _ action: @escaping @Sendable () async -> Void
   ) {
-    self._text = text
+    self.text = text
     self._state = state
     self.icon = icon
     self.action = action
@@ -65,12 +65,12 @@ public struct ChipBoxButton: View {
 }
 
 #Preview {
-  ChipBoxButton(
-    text: .constant("Chip Box Button"),
+  CheckBoxButton(
+    text: "Check Box Button",
     state: .constant(.selected),
     icon: .addSpot
   ) {
-    print("Chip Box Button tapped")
+    print("Check Box Button")
   }
   .padding()
 }

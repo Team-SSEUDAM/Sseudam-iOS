@@ -1,5 +1,5 @@
 //
-//  ChipBoxButtonDemo.swift
+//  CheckBoxButtonDemo.swift
 //  DesignKit
 //
 //  Created by 조용인 on 6/15/25.
@@ -8,12 +8,12 @@
 
 import SwiftUI
 
-struct ChipBoxButtonDemo: View {
+struct CheckBoxButtonDemo: View {
   var body: some View {
     List {
       Section("일반 칩 버튼") {
-        ChipBoxButton(
-          text: .constant("칩버튼"),
+        CheckBoxButton(
+          text: "칩버튼",
           state: .constant(.normal),
           icon: .addSpot
         ) {
@@ -21,8 +21,8 @@ struct ChipBoxButtonDemo: View {
         }
         .frame(width: .infinity)
         
-        ChipBoxButton(
-          text: .constant("칩버튼"),
+        CheckBoxButton(
+          text: "칩버튼",
           state: .constant(.selected),
           icon: .addSpot
         ) {
@@ -32,8 +32,8 @@ struct ChipBoxButtonDemo: View {
       }
       
       Section("아이콘 칩 버튼") {
-        ChipBoxButton(
-          text: .constant("아이콘칩"),
+        CheckBoxButton(
+          text: "아이콘칩",
           state: .constant(.normal),
           icon: .addSpot
         ) {
@@ -41,8 +41,8 @@ struct ChipBoxButtonDemo: View {
         }
         .frame(width: .infinity)
         
-        ChipBoxButton(
-          text: .constant("아이콘칩"),
+        CheckBoxButton(
+          text: "아이콘칩",
           state: .constant(.selected),
           icon: .addSpot
         ) {

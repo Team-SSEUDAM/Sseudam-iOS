@@ -1,5 +1,5 @@
 //
-//  ChipBoxButtonState.swift
+//  CheckBoxButtonState.swift
 //  DesignKit
 //
 //  Created by 조용인 on 6/15/25.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-public enum ChipBoxButtonState {
+public enum CheckBoxButtonState {
   case normal, selected
   
   public var backgroundColor: Color {

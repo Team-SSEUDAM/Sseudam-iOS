@@ -39,7 +39,7 @@ public struct NavigationBar<BackContent: View, CloseContent: View>: View {
           .foregroundStyle(ColorSet.Text.Primary)
       }
       Spacer()
-      closeContent().padding(.leading, .Number4)
+      closeContent().padding(.trailing, .Number4)
     }
     .background(ColorSet.Background.Primary)
   }

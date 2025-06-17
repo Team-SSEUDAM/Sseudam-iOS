@@ -13,9 +13,7 @@ struct IconButtonDemo: View {
   var body: some View {
     HStack {
       IconButton(
-        icon: {
-          Icon(image: .addSpot)
-        }
+        icon: .addSpot
       ) {
         print("Add Spot tapped")
       }

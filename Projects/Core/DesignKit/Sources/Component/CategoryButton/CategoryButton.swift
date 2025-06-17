@@ -14,13 +14,13 @@ public struct CategoryButton: View {
   
   private let text: String
   private let icon: ImageSet?
-  private let action: (() async -> Void)?
+  private let action: @Sendable () async -> Void
   
   public init(
     text: String,
     state: Binding<CategoryButtonState>,
     icon: ImageSet? = nil,
-    _ action: (() async -> Void)? = nil
+    _ action: @escaping @Sendable () async -> Void
   ) {
     self.text = text
     self._state = state
@@ -31,7 +31,7 @@ public struct CategoryButton: View {
   public var body: some View {
     contentView()
       .onTapGesture {
-        Task { @MainActor in await action?() }
+        Task { await action() }
       }
       
   }

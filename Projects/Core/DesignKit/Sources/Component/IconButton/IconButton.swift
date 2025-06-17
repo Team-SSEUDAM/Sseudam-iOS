@@ -8,16 +8,16 @@
 
 import SwiftUI
 
-public struct IconButton<Icon: View>: View {
+public struct IconButton: View {
   
-  public var icon: (() -> Icon)? = nil
-  public var action: (() async -> Void)? = nil
+  public var icon: ImageSet
+  public var action: @Sendable () async -> Void
   
   @State private var isPressed: Bool = false
   
   public init(
-    icon: (() -> Icon)?,
-    _ action: (() async -> Void)? = nil
+    icon: ImageSet,
+    _ action: @escaping @Sendable () async -> Void
   ) {
     self.icon = icon
     self.action = action
@@ -31,7 +31,7 @@ public struct IconButton<Icon: View>: View {
           .onEnded {
             _ in
             isPressed = false
-            Task { @MainActor in await action?() }
+            Task { await action() }
           }
       )
   }
@@ -41,7 +41,7 @@ public struct IconButton<Icon: View>: View {
     Circle()
       .fill(ColorSet.Background.Primary)
       .overlay {
-        icon?()
+        Icon(image: icon)
       }
       .padding(.Number8)
       .elevation(cornerRadius: .Number24)

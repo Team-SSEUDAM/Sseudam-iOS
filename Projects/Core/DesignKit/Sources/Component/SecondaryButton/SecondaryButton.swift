@@ -37,35 +37,23 @@ public struct SecondaryButton<Icon: View>: View {
   
   public var title: String
   public var size: SecondaryButtonSize
-  public var icon: (() -> Icon)? = nil
+  public var icon: () -> Icon
   
-  public var action: (() async -> Void)? = nil
+  public var action: @Sendable () async -> Void
   
   @Binding public var state: SecondaryButtonState
   @State private var isPressed: Bool = false
   
   public init(
-    icon: (() -> Icon)?,
+    icon: @escaping () -> Icon = { EmptyView() },
     title: String,
     size: SecondaryButtonSize = .large,
     state: Binding<SecondaryButtonState> = .constant(.normal),
-    _ action: (() async -> Void)? = nil
+    _ action: @escaping @Sendable () async -> Void
   ) {
     self.title = title
     self.size = size
     self.icon = icon
-    self._state = state
-    self.action = action
-  }
-  
-  public init(
-    title: String,
-    size: SecondaryButtonSize = .large,
-    state: Binding<SecondaryButtonState> = .constant(.normal),
-    _ action: (() async -> Void)? = nil
-  ) where Icon == EmptyView {
-    self.title = title
-    self.size = size
     self._state = state
     self.action = action
   }
@@ -78,7 +66,7 @@ public struct SecondaryButton<Icon: View>: View {
           .onEnded {
             _ in
             isPressed = false
-            Task { @MainActor in await action?() }
+            Task { await action() }
           }
       )
       .disabled(state == .disabled)
@@ -87,7 +75,7 @@ public struct SecondaryButton<Icon: View>: View {
   @ViewBuilder
   private var content: some View {
     HStack(spacing: .Number6) {
-      icon?()
+      icon()
       Text(title)
         .foregroundColor(state.textColor)
         .font(size.font.font)

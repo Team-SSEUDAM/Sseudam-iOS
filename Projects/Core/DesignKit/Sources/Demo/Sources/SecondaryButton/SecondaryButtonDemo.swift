@@ -19,17 +19,23 @@ struct SecondaryButtonDemo: View {
         SecondaryButton(
           title: "Label",
           size: .large
-        )
+        ) {
+          print("Button Clicked")
+        }
         
         SecondaryButton(
           title: "Label",
           size: .medium
-        )
+        ) {
+          print("Button Clicked")
+        }
         
         SecondaryButton(
           title: "Action",
           size: .medium
-        )
+        ) {
+          print("Action Clicked")
+        }
       }
       
       Section("아이콘 버튼") {
@@ -40,7 +46,9 @@ struct SecondaryButtonDemo: View {
           },
           title: "Label",
           size: .large
-        )
+        ) {
+          print("Button Clicked")
+        }
         
         SecondaryButton(
           icon: {
@@ -59,7 +67,9 @@ struct SecondaryButtonDemo: View {
           title: "Label",
           size: .large,
           state: $disabledState
-        )
+        ) {
+          print("Button Clicked")
+        }
         
         SecondaryButton(
           icon: {
@@ -69,7 +79,9 @@ struct SecondaryButtonDemo: View {
           title: "Label",
           size: .large,
           state:  $disabledState
-        )
+        ) {
+          print("Button Clicked")
+        }
       }
     }
   }

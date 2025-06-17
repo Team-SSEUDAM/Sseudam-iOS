@@ -18,17 +18,23 @@ struct PrimaryButtonDemo: View {
         PrimaryButton(
           title: "Label",
           size: .large
-        )
+        ) {
+          print("Button Clicked")
+        }
         
         PrimaryButton(
           title: "Label",
           size: .medium
-        )
+        ) {
+          print("Button Clicked")
+        }
         
         PrimaryButton(
           title: "Action",
           size: .medium
-        )
+        ) {
+          print("Button Clicked")
+        }
       }
       
       Section("아이콘 버튼") {
@@ -39,7 +45,9 @@ struct PrimaryButtonDemo: View {
           },
           title: "Label",
           size: .large
-        )
+        ) {
+          print("Button Clicked")
+        }
         
         PrimaryButton(
           icon: {
@@ -57,7 +65,9 @@ struct PrimaryButtonDemo: View {
         PrimaryButton(
           title: "Label",
           size: .large
-        )
+        ) {
+          print("Button Clicked")
+        }
         
         PrimaryButton(
           icon: {
@@ -66,7 +76,9 @@ struct PrimaryButtonDemo: View {
           },
           title: "Label",
           size: .large
-        )
+        ) {
+          print("Button Clicked")
+        }
       }
       
       Section("에러 버튼") {
@@ -74,7 +86,9 @@ struct PrimaryButtonDemo: View {
           title: "Label",
           size: .large,
           state: .constant(.error)
-        )
+        ) {
+          print("Button Clicked")
+        }
         
         PrimaryButton(
           icon: {

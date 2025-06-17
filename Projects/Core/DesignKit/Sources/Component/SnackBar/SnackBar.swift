@@ -16,12 +16,12 @@ public struct SnackBar: View {
   @State private var currentTask: Task<Void, Never>? = nil
   
   private var buttonLabel: String?
-  var action: (() async -> Void)?
+  public var action: @Sendable () async -> Void
   
   public init(
     message: Binding<String?>,
     buttonLabel: String? = nil,
-    _ action: (() async -> Void)? = nil
+    _ action: @escaping @Sendable () async -> Void
   ) {
     self._message = message
     self.buttonLabel = buttonLabel
@@ -42,8 +42,8 @@ public struct SnackBar: View {
               .font(FontSet.Body.body2)
               .foregroundStyle(ColorSet.Text.Inverse)
               .frame(maxWidth: .infinity, alignment: .leading)
-            if let buttonLabel, let action {
-              Button { Task { @MainActor in await action() } }
+            if let buttonLabel {
+              Button { Task { await action() } }
               label: {
                 Text(buttonLabel)
                   .font(FontSet.Label.label1)

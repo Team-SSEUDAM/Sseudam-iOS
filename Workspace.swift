@@ -17,7 +17,7 @@ let workspace = Workspace(
       /// `develop` 환경에서 사용할 Scheme 이름
       name: "develop",
       buildAction: .buildAction(
-        targets: [.project(path: "./Projects/Sseudam", target: "Sseudam_Develop")] /// `develop` 환경에서 사용할 `.app` Target 이름
+        targets: [.project(path: "./Projects/Sseudam", target: "Sseudam_develop")] /// `develop` 환경에서 사용할 `.app` Target 이름
       ),
       runAction: .runAction(configuration: .debug), /// 옵션으로 제공되는 `.debug` 전용 Configuration (실제 이름은 `Debug.xcconfig`)
       archiveAction: .archiveAction(configuration: .debug),

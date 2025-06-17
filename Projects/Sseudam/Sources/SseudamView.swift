@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import DesignKit
 import ComposableArchitecture
 import HomeFeature
 
@@ -22,16 +23,17 @@ struct SseudamView: View {
       switch store.selectedTab {
       case .home:
         HomeView(store: store.scope(state: \.home, action: \.home))
-      case .search:
+      case .myPet:
         EmptyView()
       case .profile:
         EmptyView()
       }
       Spacer()
-      CustomTabBar(selectedTab: store.selectedTab)
-        .tabSelected { tab in
-          store.send(.selectTab(tab))
-        }
+      CustomTabBar(
+        selectedTab: $store.selectedTab
+      ) {
+        store.send(.selectTab($0))
+      }
     }
   }
 }

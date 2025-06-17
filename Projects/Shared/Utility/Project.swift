@@ -1,12 +1,13 @@
 //
 //  Project.swift
-//  SharedManifests
+//  Manifests
 //
-//  Created by Jiyeon on 6/5/25.
+//  Created by 조용인 on 6/16/25.
 //
 
 import ProjectDescription
 import ProjectDescriptionHelpers
+
 let project = Project(
   name: "Utility",
   organizationName: "Sseudam.a2bo.ios",
@@ -20,9 +21,8 @@ let project = Project(
       bundleId: "Sseudam.a2bo.ios.Utility",
       deploymentTargets: .iOS("17.0"),
       infoPlist: .extendingDefault(with: [:]),
-      sources: ["Sources/**"],
-      dependencies: [
-      ]
+      sources: ["Sources/**"]
     )
   ]
 )
+

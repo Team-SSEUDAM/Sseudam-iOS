@@ -1,8 +1,8 @@
 //
 //  Project.swift
-//  SharedManifests
+//  Manifests
 //
-//  Created by Jiyeon on 6/5/25.
+//  Created by 조용인 on 6/16/25.
 //
 
 import ProjectDescription
@@ -29,5 +29,4 @@ let project = Project(
     )
   ]
 )
-
 

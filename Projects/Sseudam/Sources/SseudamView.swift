@@ -19,6 +19,7 @@ struct SseudamView: View {
   }
   
   var body: some View {
+    
     VStack {
       switch store.selectedTab {
       case .home:

@@ -41,7 +41,7 @@ public extension Target {
       entitlements: .file(path: .relativeToRoot(env.entitlements)),
       scripts: script,
       dependencies: dependencies,
-      settings: .default
+      settings: env == .develop ? .dev : .release
     )
   }
   

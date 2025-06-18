@@ -14,7 +14,7 @@ extension Settings {
       "DEVELOPMENT_TEAM": "6NXQDZ68FD",
       "CODE_SIGN_STYLE": "Manual",
       "PROVISIONING_PROFILE_SPECIFIER": "match Development Sseudam.a2bo.ios.Release",
-      "CODE_SIGN_IDENTITY": "Apple Development: 용인 조 (4JMDNFV62N)"
+      "CODE_SIGN_IDENTITY": "Apple Development: yongin cho (B2J2829PJ5)"
     ],
     configurations: [
       .debug(name: "Debug", xcconfig: .relativeToRoot("Config/Debug.xcconfig")),
@@ -27,7 +27,7 @@ extension Settings {
       "DEVELOPMENT_TEAM": "6NXQDZ68FD",
       "CODE_SIGN_STYLE": "Manual",
       "PROVISIONING_PROFILE_SPECIFIER": "match Development Sseudam.a2bo.ios.Debug",
-      "CODE_SIGN_IDENTITY": "Apple Development: 용인 조 (4JMDNFV62N)"
+      "CODE_SIGN_IDENTITY": "Apple Development: yongin cho (B2J2829PJ5)"
     ],
     configurations: [
       .debug(name: "Debug", xcconfig: .relativeToRoot("Config/Debug.xcconfig")),

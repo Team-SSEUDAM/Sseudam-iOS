@@ -1,13 +1,20 @@
+####################################
+# signing 저장소
+####################################
 git_url("https://github.com/usa4060/Sseudam-iOS_private.git")
-
 storage_mode("git")
+branch("develop")
 
-type("development") # The default type, can be: appstore, adhoc, enterprise or development
+####################################
+# App Store Connect API
+####################################
+api_key(
+  key_id: "5P52UNXM75",
+  issuer_id: "50746a19-f287-4d7d-889f-aaed603356ac",
+  key_filepath: "./AuthKey_5P52UNXM75.p8"
+)
 
-# app_identifier(["tools.fastlane.app", "tools.fastlane.app2"])
-# username("user@fastlane.tools") # Your Apple Developer Portal username
-
-# For all available options run `fastlane match --help`
-# Remove the # in the beginning of the line to enable the other options
-
-# The docs are available on https://docs.fastlane.tools/actions/match
+####################################
+# 기본 인증서 타입
+####################################
+type("development")            # 필요 시 appstore / adhoc lane에서 override

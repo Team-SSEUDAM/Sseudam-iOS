@@ -3,16 +3,17 @@
 ####################################
 git_url("https://github.com/usa4060/Sseudam-iOS_private.git")
 storage_mode("git")
-branch("develop")
+username("cocoa9805@naver.com")
+app_identifier(["Sseudam.a2bo.ios.Debug", "Sseudam.a2bo.ios.Release"])
 
 ####################################
-# App Store Connect API
+# App Store Connect API (2FA 인증 벗어나기)
 ####################################
-api_key(
-  key_id: "5P52UNXM75",
-  issuer_id: "50746a19-f287-4d7d-889f-aaed603356ac",
-  key_filepath: "./AuthKey_5P52UNXM75.p8"
-)
+#api_key(
+#  key_id: "5P52UNXM75",
+#  issuer_id: "50746a19-f287-4d7d-889f-aaed603356ac",
+#  key_filepath: "fastlane/AuthKey_5P52UNXM75.p8"
+#)
 
 ####################################
 # 기본 인증서 타입

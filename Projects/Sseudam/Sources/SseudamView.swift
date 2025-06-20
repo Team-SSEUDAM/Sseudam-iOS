@@ -30,7 +30,6 @@ struct SseudamView: View {
       case .profile:
         EmptyView()
       }
-      Spacer()
       CustomTabBar(
         selectedTab: $store.selectedTab
       ) {

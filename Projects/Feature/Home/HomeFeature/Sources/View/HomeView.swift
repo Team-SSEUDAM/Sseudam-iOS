@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Utility
+import DesignKit
 import ComposableArchitecture
 
 public struct HomeView: View {
@@ -97,27 +98,31 @@ public struct HomeView: View {
   /// 현위치 재검색 버튼
   @ViewBuilder
   private var ResearchButton: some View {
-    // TODO: - 임시 재검색 버튼, 변경 필요
     if store.state.researchButtonEnable {
-      Button {
-        store.send(.requestMapBounds(true))
-      } label: {
-        RoundedRectangle(cornerRadius: 15)
-          .fill(.brown)
+      HStack(alignment: .center, spacing: .Number4) {
+        Icon(
+          image: .replay,
+          size: .Number16,
+          color: ColorSet.Icon.Accent
+        )
+        Text("현 위치에서 재검색")
+          .foregroundStyle(ColorSet.Text.Primary)
+          .font(FontSet.Body.body3)
       }
-      .frame(width: 150, height: 33)
+      .padding(.leading, .Number12)
+      .padding(.trailing, .Number16)
+      .padding(.vertical, .Number6)
+      .frame(height: 33, alignment: .center)
+      .background(ColorSet.Background.Primary)
+      .cornerRadius(.Number100)
+      .elevation(level: .medium, cornerRadius: .Number100)
     }
   }
   
   @ViewBuilder
   private var UserLocationButton: some View {
-    // TODO: - 임시 버튼, 변경 필요
-    Button {
+    IconButton(icon: .myLocation) {
       store.send(.location(.fetchUserLocation))
-    } label: {
-      Circle()
-        .fill(.blue)
-        .frame(width: 40, height: 40)
     }
   }
   

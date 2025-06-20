@@ -41,7 +41,7 @@ public struct IconButton: View {
     Circle()
       .fill(ColorSet.Background.Primary)
       .overlay {
-        Icon(image: icon)
+        Icon(image: icon, size: .Number28)
       }
       .padding(.Number8)
       .elevation(cornerRadius: .Number24)

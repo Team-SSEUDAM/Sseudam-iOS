@@ -9,7 +9,6 @@
 import Foundation
 import ReportDomainInterface
 import ReportDataInterface
-import Core
 
 public extension ReportRepository {
   static var live: ReportRepository {

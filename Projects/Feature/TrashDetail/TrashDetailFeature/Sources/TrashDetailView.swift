@@ -42,7 +42,7 @@ public struct TrashDetailView: View {
   @ViewBuilder
   private var EmptyDataView: some View {
     HStack(alignment: .center) {
-      VStack(alignment: .center, spacing: 20) {
+      VStack(alignment: .center, spacing: .Number20) {
         Icon(
           image: .sentimentDissatisfied,
           size: .Number32,

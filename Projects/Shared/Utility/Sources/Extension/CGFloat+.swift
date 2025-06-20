@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 public extension Float {
   /// SafeAreaInsets의 bottom 값을 반환합니다.

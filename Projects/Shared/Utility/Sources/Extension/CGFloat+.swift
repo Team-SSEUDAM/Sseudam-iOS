@@ -9,15 +9,16 @@
 import Foundation
 import UIKit
 
-public extension Float {
+public extension CGFloat {
   /// SafeAreaInsets의 bottom 값을 반환합니다.
-  public var safeAreaBottom: Self {
+  var safeAreaBottom: Self {
     return UIApplication.shared.connectedScenes
       .compactMap { $0 as? UIWindowScene }
       .first?.windows.first?.safeAreaInsets.bottom ?? 0
   }
   
-  public var safeAreaTop: Self {
+  /// SafeAreaInsets의 top 값을 반환합니다.
+  var safeAreaTop: Self {
     return UIApplication.shared.connectedScenes
       .compactMap { $0 as? UIWindowScene }
       .first?.windows.first?.safeAreaInsets.top ?? 0

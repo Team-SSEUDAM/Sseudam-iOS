@@ -26,15 +26,6 @@ public extension TrashType {
     }
   }
   
-  var icon: Image? {
-    switch self {
-    case .general:
-      Icons.delete.swiftUIImage
-    case .recycle:
-      Icons.recycle.swiftUIImage
-    }
-  }
-  
   private static let activePinImages: [Self: NMFOverlayImage] = [
     .general: NMFOverlayImage(image: Icons.normalTrashPin.image),
     .recycle: NMFOverlayImage(image: Icons.recycleTrashPin.image)

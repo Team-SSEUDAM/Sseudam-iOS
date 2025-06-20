@@ -27,6 +27,7 @@ public struct HomeView: View {
         Spacer()
         BottomButtonView
       }
+      .padding(.horizontal, .Number16)
     }
     .onAppear {
       store.send(.onAppear)
@@ -57,26 +58,9 @@ public struct HomeView: View {
   
   @ViewBuilder
   private var FilterView: some View {
-    // TODO: - 임시 필터 버튼, 변경 필요
-    HStack(spacing: 8) {
-      Button {
-        store.send(.filterTapped(nil))
-      } label: {
-        Text("전체")
-      }
-      Button {
-        store.send(.filterTapped(.general))
-      } label: {
-        Text("일반쓰레기")
-      }
-      Button {
-        store.send(.filterTapped(.recycle))
-      } label: {
-        Text("재활용쓰레기")
-      }
-      Spacer()
+    FilterButtonList { type in
+      store.send(.filterTapped(type))
     }
-    .frame(height: 33, alignment: .leading)
   }
   
   /// 하단에 존재하는 버튼
@@ -90,7 +74,6 @@ public struct HomeView: View {
       Spacer()
       UserLocationButton
     }
-    .padding(.horizontal, .Number16)
     .padding(.bottom, store.isPresentDetail ? 177-62+12 : .Number12)
     .animation(.easeInOut(duration: 0.25), value: store.isPresentDetail)
   }

@@ -38,7 +38,7 @@ struct SseudamView: View {
       }
       
     }
-    .bottomSheet(isPresented: $store.isPresentDetail, height: 197) {
+    .bottomSheet(isPresented: $store.isPresentDetail, height: 177) {
       IfLetStore(store.scope(state: \.trashDetail, action: \.trashDetail)) { store in
         TrashDetailView(store: store)
       }

@@ -83,14 +83,14 @@ public struct HomeView: View {
   private var BottomButtonView: some View {
     HStack {
       Spacer()
-        .frame(width: 40, height: 40)
+        .frame(width: .Number40, height: .Number40)
       Spacer()
       ResearchButton
       Spacer()
       UserLocationButton
     }
-    .padding(.horizontal, 16)
-    .padding(.bottom, store.isPresentDetail ? (197-62+12) : 12)
+    .padding(.horizontal, .Number16)
+    .padding(.bottom, store.isPresentDetail ? 177-62+12 : .Number12)
     .animation(.easeInOut(duration: 0.25), value: store.isPresentDetail)
   }
   

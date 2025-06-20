@@ -23,16 +23,19 @@ public enum Module {
 
 public enum Feature: String, ModuleRepresentable {
   case Home
+  case Report
   public var typePath: String { "Feature" }
 }
 
 public enum Domain: String, ModuleRepresentable {
   case Home
+  case Report
   public var typePath: String { "Domain" }
 }
 
 public enum Data: String, ModuleRepresentable {
   case Home
+  case Report
   public var typePath: String { "Data" }
 }
 
@@ -104,6 +107,7 @@ extension TargetDependencyDelegate {
 extension TargetDependency {
   public struct Features: TargetDependencyDelegate {
     public static let Home = Self.project(.feature(.Home))
+    public static let Report = Self.project(.feature(.Report))
   }
   
   public struct Domain: TargetDependencyDelegate {
@@ -111,12 +115,22 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.Home, isInterface: true))
       public static let Implement = Self.project(.domain(.Home))
     }
+    
+    public struct Report: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Report, isInterface: true))
+      public static let Implement = Self.project(.domain(.Report))
+    }
   }
   
   public struct Data: TargetDependencyDelegate {
     public struct Home: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Home, isInterface: true))
       public static let Implement = Self.project(.data(.Home))
+    }
+    
+    public struct Report: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Report, isInterface: true))
+      public static let Implement = Self.project(.data(.Report))
     }
   }
   

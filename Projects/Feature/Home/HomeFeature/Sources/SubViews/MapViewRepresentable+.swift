@@ -22,5 +22,10 @@ extension MapViewRepresentable {
     map.onMarkerTapped = action
     return map
   }
+  func didTapMap(_ action: @escaping () -> Void) -> Self {
+    var map = self
+    map.didTapMap = action
+    return map
+  }
 }
 

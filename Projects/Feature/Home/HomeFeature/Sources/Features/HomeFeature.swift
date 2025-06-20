@@ -22,6 +22,7 @@ public struct HomeFeature {
     public var trashItems: [TrashItem] = []
     public var trashType: TrashType? = nil
     public var researchButtonEnable: Bool = false
+    public var isPresentDetail: Bool = false
     public init() {}
   }
 
@@ -34,7 +35,15 @@ public struct HomeFeature {
     case storeTrashItems([TrashItem])
     case filterTapped(TrashType?)
     case researchButtonEnable(Bool)
+    case markerTapped(Int?)
     case onAppear
+    
+    case presentDetailView(Bool)
+    case delegate(Delegate)
+  }
+  
+  public enum Delegate: Equatable {
+    case presentDetailView(Bool)
   }
   
   @Dependency(\.HomeUseCase) var homeUseCase
@@ -77,6 +86,17 @@ public struct HomeFeature {
         state.trashItems.removeAll()
         state.trashItems = items
         return .none
+        
+      case let .markerTapped(id):
+        if let _ = id {
+          state.isPresentDetail = true
+          return .send(.delegate(.presentDetailView(true)))
+        }
+        state.isPresentDetail = false
+        return .send(.delegate(.presentDetailView(false)))
+        
+      case let .presentDetailView(isPresent):
+        return .send(.delegate(.presentDetailView(isPresent)))
         
       case let .location(.delegate(.requestMapBounds(isRequest))):
         return .send(.requestMapBounds(isRequest))

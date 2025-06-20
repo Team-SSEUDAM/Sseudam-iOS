@@ -28,6 +28,7 @@ public struct CustomTabBar: View {
       }
     }
     .padding(.horizontal, .Number8)
+    .background(.white)
   }
   
   @ViewBuilder
@@ -49,3 +50,4 @@ public struct CustomTabBar: View {
     .onTapGesture { Task { await onTabSelected(tab) } }
   }
 }
+

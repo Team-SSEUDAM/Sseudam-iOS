@@ -34,6 +34,12 @@ extension MapViewRepresentable {
     
     // MARK: - Delegate
     
+    func mapView(_ mapView: NMFMapView, didTapMap latlng: NMGLatLng, point: CGPoint) {
+      if let onMarkerTapped = parent.onMarkerTapped {
+        onMarkerTapped(nil)
+      }
+    }
+    
     func mapView(_ mapView: NMFMapView, cameraIsChangingByReason reason: Int) {
       if reason == NMFMapChangedByGesture || reason == NMFMapChangedByControl {
         if !isInitialBounds, !parent.isMapMove {

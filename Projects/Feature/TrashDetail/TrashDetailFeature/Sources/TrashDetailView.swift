@@ -17,7 +17,13 @@ public struct TrashDetailView: View {
   }
 
   public var body: some View {
-    EmptyView()
+    VStack {
+      Spacer()
+      Text("hleeo")
+        .onAppear {
+          print("111111")
+        }
+    }
   }
 }
 

@@ -49,7 +49,8 @@ public struct HomeView: View {
       store.send(.fetchTrashItems($0))
     }
     .markerTapped { id in
-      print("marker tapped: ", id ?? "")
+      print("marker tapped: ", id ?? "x")
+      store.send(.markerTapped(id))
     }
   }
   
@@ -88,9 +89,9 @@ public struct HomeView: View {
       Spacer()
       UserLocationButton
     }
-    
     .padding(.horizontal, 16)
-    .padding(.bottom, 12)
+    .padding(.bottom, store.isPresentDetail ? (197-62+12) : 12)
+    .animation(.easeInOut(duration: 0.25), value: store.isPresentDetail)
   }
   
   /// 현위치 재검색 버튼
@@ -121,5 +122,3 @@ public struct HomeView: View {
   }
   
 }
-
-

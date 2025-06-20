@@ -26,6 +26,8 @@ struct MapViewRepresentable: UIViewRepresentable {
   var mapBounds: (([MapPoint]) -> Void)? = nil
   /// 마커 탭 시 id값을 전달하기 위한 클로저
   var onMarkerTapped: ((Int?) -> Void)? = nil
+  
+  var didTapMap:(() -> Void)? = nil
   /// 기본 위치
   private let defaultPoint: MapPoint = .init(latitude: 37.50545, longitude: 127.10143)
   

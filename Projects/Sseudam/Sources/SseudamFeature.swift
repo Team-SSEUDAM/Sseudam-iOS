@@ -21,6 +21,7 @@ struct SseudamFeature {
     var selectedTab: TabBarItem = .home
     var home: HomeFeature.State = HomeFeature.State()
     var trashDetail: TrashDetailFeature.State? = nil
+    var isPresentDetail: Bool = false
   }
   
   enum Action: BindableAction, Equatable {
@@ -40,7 +41,10 @@ struct SseudamFeature {
       case let .selectTab(tab):
         state.selectedTab = tab
         return .none
-        
+      case let .home(.delegate(.presentDetailView(isPresent))):
+        state.trashDetail = isPresent ? .init() : nil
+        state.isPresentDetail = isPresent
+        return .none
       default: return .none
       }
     }

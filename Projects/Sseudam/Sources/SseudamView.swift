@@ -10,6 +10,7 @@ import SwiftUI
 import DesignKit
 import ComposableArchitecture
 import HomeFeature
+import TrashDetailFeature
 
 struct SseudamView: View {
   @Bindable var store: StoreOf<SseudamFeature> = Store(
@@ -35,6 +36,12 @@ struct SseudamView: View {
       ) {
         store.send(.selectTab($0))
       }
+      
+    }
+    .bottomSheet(isPresented: $store.isPresentDetail, height: 197) {
+      IfLetStore(store.scope(state: \.trashDetail, action: \.trashDetail)) { store in
+        TrashDetailView(store: store)
+      }
     }
   }
 }
@@ -42,5 +49,4 @@ struct SseudamView: View {
 #Preview {
   SseudamView()
 }
-
 

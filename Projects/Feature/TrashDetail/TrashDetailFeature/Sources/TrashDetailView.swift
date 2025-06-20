@@ -18,6 +18,8 @@ public struct TrashDetailView: View {
   }
   
   public var body: some View {
+//    EmptyDataView
+    
     VStack(spacing: .Number16) {
       HStack(spacing: .Number16) {
         VStack(alignment: .leading, spacing: .Number8) {
@@ -35,6 +37,31 @@ public struct TrashDetailView: View {
     .padding(.horizontal, .Number16)
     .padding(.vertical, .Number20)
     
+  }
+  
+  @ViewBuilder
+  private var EmptyDataView: some View {
+    HStack(alignment: .center) {
+      VStack(alignment: .center, spacing: 20) {
+        Icon(
+          image: .sentimentDissatisfied,
+          size: .Number32,
+          color: ColorSet.Icon.Secondary
+        )
+        VStack(alignment: .center, spacing: .Number16) {
+          Text("이 근방에는 쓰레기통이 없어요.")
+            .foregroundStyle(ColorSet.Text.Secondary)
+          PrimaryButton(
+            title: "제보하러 가기",
+            size: .medium,
+            state: .normal
+          ) {
+              print("제보하러 가기")
+            }
+            .frame(width: 116)
+        }
+      }
+    }
   }
   
   @ViewBuilder

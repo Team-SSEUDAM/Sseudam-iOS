@@ -71,7 +71,7 @@ extension MapViewRepresentable {
     }
     
     /// 활성화 되어있는 마커 해제
-    private func resetActiveMarker() {
+    func resetActiveMarker() {
       if let activeMarker = self.activeMarker,
          let activeData = activeData {
         activeMarker.iconImage = activeData.trashType.inactiveImage

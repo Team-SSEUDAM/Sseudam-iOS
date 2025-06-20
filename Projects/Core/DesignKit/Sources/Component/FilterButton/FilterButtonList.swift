@@ -19,7 +19,7 @@ public struct FilterButtonList: View {
   private let filters: [FilterButtonType] = [.all, .general, .recycle]
   
   public var body: some View {
-    HStack(spacing: .Number12) {
+    HStack(spacing: .Number8) {
       ForEach(filters, id: \.self) { filter in
         FilterButton(type: filter, isActive: selectedFilter == filter)
           .onTapGesture {

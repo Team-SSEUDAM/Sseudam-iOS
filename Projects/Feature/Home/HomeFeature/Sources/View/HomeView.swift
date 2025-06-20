@@ -23,11 +23,10 @@ public struct HomeView: View {
       MapView
       .ignoresSafeArea()
       VStack {
-        FilterView
+        TopButtonView
         Spacer()
         BottomButtonView
       }
-      .padding(.horizontal, .Number16)
     }
     .onAppear {
       store.send(.onAppear)
@@ -45,7 +44,8 @@ public struct HomeView: View {
       userLocation: $store.location.point,
       requestMapBounds: $store.requestMapBounds,
       trashItems: $store.trashItems,
-      isMapMove: $store.researchButtonEnable
+      isMapMove: $store.researchButtonEnable,
+      isNeedDeleteMarker: $store.isNeedDeleteMarker
     )
     .onReceiveMapBounds {
       store.send(.fetchTrashItems($0))
@@ -57,10 +57,22 @@ public struct HomeView: View {
   }
   
   @ViewBuilder
-  private var FilterView: some View {
-    FilterButtonList { type in
-      store.send(.filterTapped(type))
+  private var TopButtonView: some View {
+    HStack(spacing: .Number8) {
+      if store.isPresentDetail {
+        IconButton(icon: .leftChevron) {
+          Task { @MainActor in
+            store.send(.presentDetailView(false))
+            store.send(.deleteActiveMarker)
+          }
+        }
+      }
+      FilterButtonList { type in
+        store.send(.filterTapped(type))
+      }
     }
+    .padding(.vertical, .Number8)
+    .padding(.leading, .Number16)
   }
   
   /// 하단에 존재하는 버튼
@@ -75,6 +87,7 @@ public struct HomeView: View {
       UserLocationButton
     }
     .padding(.bottom, store.isPresentDetail ? 177-62+12 : .Number12)
+    .padding(.horizontal, .Number16)
     .animation(.easeInOut(duration: 0.25), value: store.isPresentDetail)
   }
   
@@ -105,7 +118,9 @@ public struct HomeView: View {
   @ViewBuilder
   private var UserLocationButton: some View {
     IconButton(icon: .myLocation) {
-      store.send(.location(.fetchUserLocation))
+      Task { @MainActor in
+        store.send(.location(.fetchUserLocation))
+      }
     }
   }
   

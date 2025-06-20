@@ -23,6 +23,7 @@ public struct HomeFeature {
     public var trashItems: [TrashItem] = []
     public var trashType: TrashType? = nil
     public var researchButtonEnable: Bool = false
+    public var isNeedDeleteMarker: Bool = false
     public var isPresentDetail: Bool = false
     public init() {}
   }
@@ -37,6 +38,7 @@ public struct HomeFeature {
     case filterTapped(TrashType?)
     case researchButtonEnable(Bool)
     case markerTapped(Int?)
+    case deleteActiveMarker
     case onAppear
     
     case presentDetailView(Bool)
@@ -89,14 +91,13 @@ public struct HomeFeature {
         return .none
         
       case let .markerTapped(id):
-        if let _ = id {
-          state.isPresentDetail = true
-          return .send(.delegate(.presentDetailView(true)))
-        }
-        state.isPresentDetail = false
-        return .send(.delegate(.presentDetailView(false)))
+        return .send(.presentDetailView(id != .none))
         
+      case .deleteActiveMarker:
+        state.isNeedDeleteMarker = true
+        return .none
       case let .presentDetailView(isPresent):
+        state.isPresentDetail = isPresent
         return .send(.delegate(.presentDetailView(isPresent)))
         
       case let .location(.delegate(.requestMapBounds(isRequest))):

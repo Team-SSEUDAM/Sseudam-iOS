@@ -22,6 +22,8 @@ struct MapViewRepresentable: UIViewRepresentable {
   /// 지도 움직임 여부
   @Binding var isMapMove: Bool
   
+  @Binding var isNeedDeleteMarker: Bool
+  
   /// 지도 범위 전달 클로저
   var mapBounds: (([MapPoint]) -> Void)? = nil
   /// 마커 탭 시 id값을 전달하기 위한 클로저
@@ -74,6 +76,12 @@ struct MapViewRepresentable: UIViewRepresentable {
       if !trashItems.isEmpty {
         presentMarkers(uiView, items: trashItems, context: context)
       }
+    }
+    
+    if isNeedDeleteMarker,
+       context.coordinator.activeMarker != nil {
+      context.coordinator.resetActiveMarker()
+      isNeedDeleteMarker = false
     }
   }
   
@@ -132,7 +140,6 @@ extension MapViewRepresentable {
   
   private func markerTapEvent(to marker: NMFMarker, data: TrashItem, context: Context) {
     if marker == context.coordinator.activeMarker { return }
-    
     marker.iconImage = data.trashType.activePinImage
     context.coordinator.markerTapEvent(marker: marker, data: data)
     if let onMarkerTapped = onMarkerTapped {

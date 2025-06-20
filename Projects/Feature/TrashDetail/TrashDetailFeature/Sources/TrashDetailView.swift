@@ -20,9 +20,6 @@ public struct TrashDetailView: View {
     VStack {
       Spacer()
       Text("hleeo")
-        .onAppear {
-          print("111111")
-        }
     }
   }
 }

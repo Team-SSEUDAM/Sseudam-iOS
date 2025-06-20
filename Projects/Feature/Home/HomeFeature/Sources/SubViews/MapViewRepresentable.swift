@@ -133,7 +133,7 @@ extension MapViewRepresentable {
   private func markerTapEvent(to marker: NMFMarker, data: TrashItem, context: Context) {
     if marker == context.coordinator.activeMarker { return }
     
-    // TODO: - Active 마커로 이미지 변경
+    marker.iconImage = data.trashType.activePinImage
     context.coordinator.markerTapEvent(marker: marker, data: data)
     if let onMarkerTapped = onMarkerTapped {
       onMarkerTapped(data.id)
@@ -173,11 +173,9 @@ extension MapViewRepresentable {
     // 그리기
     let markers: [NMFMarker] = items.map { item in
       let point = NMGLatLng(lat: item.point.latitude, lng: item.point.longitude)
-      let marker = NMFMarker(position: point)
-      marker.mapView = view.mapView
       
-      // TODO: - 마커 이미지 설정 후 적용하기
-      //drawMarker(view, to: point, icon: item.type.inactiveImage)
+      let marker = drawMarker(view, to: point, icon: item.trashType.inactiveImage)
+      marker.mapView = view.mapView
       
       marker.touchHandler = { (overlay: NMFOverlay) -> Bool in
         guard let marker = overlay as? NMFMarker else { return true }
@@ -201,6 +199,7 @@ extension MapViewRepresentable {
     let marker = NMFMarker(position: point, iconImage: icon)
     marker.isHideCollidedSymbols = true
     marker.anchor = anchor
+    marker.iconImage = icon
     marker.mapView = view.mapView
     
     return marker

@@ -8,6 +8,7 @@
 
 import ComposableArchitecture
 import HomeDomainInterface
+import DesignKit
 
 @Reducer
 public struct HomeFeature {

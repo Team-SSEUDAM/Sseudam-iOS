@@ -8,6 +8,13 @@
 
 import SwiftUI
 
+/// ViewModifier를 사용하여 커스텀 바텀시트를 뷰에 오버레이 형태로 적용
+///
+/// - Parameters:
+///   - isPresented: 바텀시트의 표시 여부를 제어하는 바인딩 값
+///   - height: 바텀시트의 초기 높이
+///   - maxHeight: 바텀시트의 최대 높이. nil일 경우 height 값과 동일하게 설정됨
+///   - bottomSheetContent: 바텀시트에 표시할 콘텐츠 뷰
 public struct BottomSheetOverlay<BottomSheetContent: View>: ViewModifier {
   @Binding private var isPresented: Bool
   private let height: CGFloat
@@ -51,7 +58,7 @@ public struct BottomSheetOverlay<BottomSheetContent: View>: ViewModifier {
       .overlay(alignment: .bottom) {
         if showSheet {
           bottomSheetContent()
-            .padding(.bottom, 20)
+            .padding(.bottom, .Number20)
             .frame(height: height)
             .frame(maxWidth: .infinity)
             .background(.white)

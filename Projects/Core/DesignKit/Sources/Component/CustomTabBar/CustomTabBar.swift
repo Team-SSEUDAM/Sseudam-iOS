@@ -28,6 +28,8 @@ public struct CustomTabBar: View {
       }
     }
     .padding(.horizontal, .Number8)
+    .padding(.bottom, 21)
+    .elevation(cornerRadius: .Number0)
     .background(.white)
   }
   

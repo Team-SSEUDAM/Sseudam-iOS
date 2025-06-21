@@ -38,7 +38,6 @@ struct SseudamView: View {
           ) {
             store.send(.selectTab($0))
           }
-          .padding(.bottom, 21)
         }
       }
       

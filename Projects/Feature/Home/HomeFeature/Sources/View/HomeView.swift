@@ -21,6 +21,7 @@ public struct HomeView: View {
   private let tabbarHeight: CGFloat = 83
   private let bottomSheetHeight: CGFloat = .detailSheetHeight
   private let bottomPadding: CGFloat = .Number12
+  private let filters: [FilterButtonType] = FilterButtonType.allCases
   
   public var body: some View {
     ZStack {
@@ -71,7 +72,7 @@ public struct HomeView: View {
           }
         }
       }
-      FilterButtonList { type in
+      TrashFilterView { type in
         store.send(.filterTapped(type))
       }
     }
@@ -112,6 +113,34 @@ public struct HomeView: View {
       Task { @MainActor in
         store.send(.location(.fetchUserLocation))
       }
+    }
+  }
+  
+}
+public enum FilterButtonType: Hashable, CaseIterable {
+  case all
+  case general
+  case recycle
+  
+  var title: String {
+    switch self {
+    case .all:
+      "전체"
+    case .general:
+      "일반 쓰레기"
+    case .recycle:
+      "재활용 쓰레기"
+    }
+  }
+  
+  var icon: ImageSet? {
+    switch self {
+    case .all:
+      return nil
+    case .general:
+      return .delete
+    case .recycle:
+      return .recycle
     }
   }
   

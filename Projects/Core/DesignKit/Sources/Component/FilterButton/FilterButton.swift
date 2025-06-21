@@ -10,24 +10,30 @@ import SwiftUI
 
 public struct FilterButton: View {
   
-  var type: FilterButtonType
+  var title: String
+  var icon: ImageSet?
   var isActive: Bool
   
-  public init(type: FilterButtonType, isActive: Bool) {
-    self.type = type
+  public init(
+    title: String,
+    icon: ImageSet? = nil,
+    isActive: Bool
+  ) {
+    self.title = title
+    self.icon = icon
     self.isActive = isActive
   }
   
   public var body: some View {
     HStack(alignment: .center, spacing: .Number4) {
-      if let icon = type.icon {
+      if let icon = icon {
         Icon(image: icon, size: .Number16, color: iconColor)
       }
-      Text(type.title)
+      Text(title)
         .font(FontSet.Body.body3)
         .foregroundStyle(textColor)
     }
-    .padding(.leading, type.icon == .none ? .Number16 : .Number12)
+    .padding(.leading, icon == .none ? .Number16 : .Number12)
     .padding(.trailing, .Number16)
     .padding(.vertical, .Number6)
     .background(bgColor)

@@ -8,31 +8,13 @@
 
 import Foundation
 
-public enum FilterButtonType: Hashable {
-  case all
-  case general
-  case recycle
-  
-  var title: String {
-    switch self {
-    case .all:
-      "전체"
-    case .general:
-      "일반 쓰레기"
-    case .recycle:
-      "재활용 쓰레기"
-    }
+public struct FilterButtonType: Hashable, Identifiable {
+  public let id = UUID()
+  public let title: String
+  public let icon: ImageSet?
+
+  public init(title: String, icon: ImageSet? = nil) {
+    self.title = title
+    self.icon = icon
   }
-  
-  var icon: ImageSet? {
-    switch self {
-    case .all:
-      return nil
-    case .general:
-      return .delete
-    case .recycle:
-      return .recycle
-    }
-  }
-  
 }

@@ -82,7 +82,11 @@ public struct HomeView: View {
       Spacer()
         .frame(width: .Number40, height: .Number40)
       Spacer()
-      ResearchButton
+      if store.state.researchButtonEnable {
+        ResearchButton {
+          store.send(.requestMapBounds(true))
+        }
+      }
       Spacer()
       UserLocationButton
     }
@@ -90,30 +94,6 @@ public struct HomeView: View {
     .padding(.horizontal, .Number16)
     .animation(.easeInOut(duration: store.isPresentDetail ? 0.3 : 0.13), value: store.isPresentDetail)
     
-  }
-  
-  /// 현위치 재검색 버튼
-  @ViewBuilder
-  private var ResearchButton: some View {
-    if store.state.researchButtonEnable {
-      HStack(alignment: .center, spacing: .Number4) {
-        Icon(
-          image: .replay,
-          size: .Number16,
-          color: ColorSet.Icon.Accent
-        )
-        Text("현 위치에서 재검색")
-          .foregroundStyle(ColorSet.Text.Primary)
-          .font(FontSet.Body.body3)
-      }
-      .padding(.leading, .Number12)
-      .padding(.trailing, .Number16)
-      .padding(.vertical, .Number6)
-      .frame(height: 33, alignment: .center)
-      .background(ColorSet.Background.Primary)
-      .cornerRadius(.Number100)
-      .elevation(level: .medium, cornerRadius: .Number100)
-    }
   }
   
   @ViewBuilder

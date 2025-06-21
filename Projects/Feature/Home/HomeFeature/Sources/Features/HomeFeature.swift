@@ -17,7 +17,6 @@ public struct HomeFeature {
   
   @ObservableState
   public struct State: Equatable {
-    
     public var location: LocationFeature.State = .init()
     public var requestMapBounds: Bool = false
     public var trashItems: [TrashItem] = []
@@ -96,13 +95,17 @@ public struct HomeFeature {
       case .deleteActiveMarker:
         state.isNeedDeleteMarker = true
         return .none
-      case let .presentDetailView(isPresent):
-        state.isPresentDetail = isPresent
-        return .send(.delegate(.presentDetailView(isPresent)))
+        
+        // MARK: - Receive LocationFeature delegate action
         
       case let .location(.delegate(.requestMapBounds(isRequest))):
         return .send(.requestMapBounds(isRequest))
+
+        // MARK: - Send Action to HomeRoot
         
+      case let .presentDetailView(isPresent):
+        state.isPresentDetail = isPresent
+        return .send(.delegate(.presentDetailView(isPresent)))
       default: return .none
       }
     }

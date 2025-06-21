@@ -51,19 +51,16 @@ public struct BottomSheetOverlay<BottomSheetContent: View>: ViewModifier {
       .overlay(alignment: .bottom) {
         if showSheet {
           bottomSheetContent()
+            .padding(.bottom, 20)
             .frame(height: height)
             .frame(maxWidth: .infinity)
             .background(.white)
             .clipCorners(.Number16, corners: [.topLeft, .topRight])
+            .elevation(level: .medium, cornerRadius: .Number16)
             .offset(y: offsetY)
             .allowsHitTesting(true)
-            .onAppear {
-              offsetY = height
-              withAnimation(.easeOut(duration: 0.3)) {
-                offsetY = 0
-              }
-            }
         }
       }
+      .ignoresSafeArea(edges: .bottom)
   }
 }

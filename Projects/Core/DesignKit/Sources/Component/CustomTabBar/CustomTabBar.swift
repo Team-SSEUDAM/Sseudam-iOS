@@ -46,6 +46,7 @@ public struct CustomTabBar: View {
         .font(FontSet.Label.label3)
         .foregroundStyle(isActive ? ColorSet.Text.Accent : ColorSet.Text.Secondary)
     }
+    .padding(.vertical, .Number8)
     .frame(maxWidth: .infinity, maxHeight: 62)
     .onTapGesture { Task { await onTabSelected(tab) } }
   }

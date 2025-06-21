@@ -19,37 +19,31 @@ struct SseudamFeature {
   @ObservableState
   struct State {
     var selectedTab: TabBarItem = .home
-    var home: HomeFeature.State = HomeFeature.State()
-    var trashDetail: TrashDetailFeature.State? = nil
-    var isPresentDetail: Bool = false
+    var homeRoot: HomeRootFeature.State = .init()
+    var isTabbarHidden: Bool = false
   }
   
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case selectTab(TabBarItem)
-    case home(HomeFeature.Action)
-    case trashDetail(TrashDetailFeature.Action)
+    case homeRoot(HomeRootFeature.Action)
   }
   
   var body: some ReducerOf<Self> {
     BindingReducer()
-    Scope(state: \.home, action: \.home) {
-      HomeFeature()
+    Scope(state: \.homeRoot, action: \.homeRoot) {
+      HomeRootFeature()
     }
     Reduce { state, action in
       switch action {
       case let .selectTab(tab):
         state.selectedTab = tab
         return .none
-      case let .home(.delegate(.presentDetailView(isPresent))):
-        state.trashDetail = isPresent ? .init() : nil
-        state.isPresentDetail = isPresent
+      case let .homeRoot(.delegate(.hiddenTabBar(isHidden))):
+        state.isTabbarHidden = (isHidden)
         return .none
       default: return .none
       }
-    }
-    .ifLet(\.trashDetail, action: \.trashDetail) {
-      TrashDetailFeature()
     }
     
   }

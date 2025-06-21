@@ -86,9 +86,10 @@ public struct HomeView: View {
       Spacer()
       UserLocationButton
     }
-    .padding(.bottom, store.isPresentDetail ? 177-62+12 : .Number12)
+    .padding(.bottom, store.isPresentDetail ? 197+12 : 83+12)
     .padding(.horizontal, .Number16)
-    .animation(.easeInOut(duration: 0.25), value: store.isPresentDetail)
+    .animation(.easeInOut(duration: store.isPresentDetail ? 0.3 : 0.13), value: store.isPresentDetail)
+    
   }
   
   /// 현위치 재검색 버튼

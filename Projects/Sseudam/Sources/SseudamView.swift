@@ -21,27 +21,29 @@ struct SseudamView: View {
   
   var body: some View {
     
-    VStack {
+    ZStack {
       switch store.selectedTab {
       case .home:
-        HomeView(store: store.scope(state: \.home, action: \.home))
+        HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
       case .myPet:
         EmptyView()
       case .profile:
         EmptyView()
       }
-      CustomTabBar(
-        selectedTab: $store.selectedTab
-      ) {
-        store.send(.selectTab($0))
+      VStack {
+        Spacer()
+        if !store.isTabbarHidden {
+          CustomTabBar(
+            selectedTab: $store.selectedTab
+          ) {
+            store.send(.selectTab($0))
+          }
+          .padding(.bottom, 21)
+        }
       }
       
     }
-    .bottomSheet(isPresented: $store.isPresentDetail, height: 177) {
-      IfLetStore(store.scope(state: \.trashDetail, action: \.trashDetail)) { store in
-        TrashDetailView(store: store)
-      }
-    }
+    .ignoresSafeArea(edges: .bottom)
   }
 }
 

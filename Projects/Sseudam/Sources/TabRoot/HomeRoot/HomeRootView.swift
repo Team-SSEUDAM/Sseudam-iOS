@@ -21,7 +21,7 @@ struct HomeRootView: View {
   
   var body: some View {
     HomeView(store: store.scope(state: \.home, action: \.home))
-      .bottomSheet(isPresented: $store.isPresentDetail, height: 197) {
+      .bottomSheet(isPresented: $store.isPresentDetail, height: .detailSheetHeight) {
         IfLetStore(store.scope(state: \.trashDetail, action: \.trashDetail)) { store in
           TrashDetailView(store: store)
         }

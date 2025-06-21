@@ -18,6 +18,10 @@ public struct HomeView: View {
     self.store = store
   }
   
+  private let tabbarHeight: CGFloat = 83
+  private let bottomSheetHeight: CGFloat = .detailSheetHeight
+  private let bottomPadding: CGFloat = .Number12
+  
   public var body: some View {
     ZStack {
       MapView
@@ -90,9 +94,15 @@ public struct HomeView: View {
       Spacer()
       UserLocationButton
     }
-    .padding(.bottom, store.isPresentDetail ? 197+12 : 83+12)
+    .padding(
+      .bottom,
+      (store.isPresentDetail ? bottomSheetHeight : tabbarHeight)+bottomPadding
+    )
     .padding(.horizontal, .Number16)
-    .animation(.easeInOut(duration: store.isPresentDetail ? 0.3 : 0.13), value: store.isPresentDetail)
+    .animation(
+      .easeInOut(duration: store.isPresentDetail ? 0.3 : 0.13),
+      value: store.isPresentDetail
+    )
     
   }
   

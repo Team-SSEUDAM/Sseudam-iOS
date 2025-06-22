@@ -19,7 +19,7 @@ struct SseudamView: View {
   ) {
     SseudamFeature()
   }
-  @State var isPresent: Bool = false
+  
   var body: some View {
     
     ZStack {
@@ -29,12 +29,7 @@ struct SseudamView: View {
       case .myPet:
         EmptyView()
       case .myPage:
-//        EmptyView()
-        VStack {
-          Button("로그인") {
-            isPresent = true
-          }
-        }
+        MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
       }
       VStack {
         Spacer()
@@ -49,8 +44,11 @@ struct SseudamView: View {
       
     }
     .ignoresSafeArea(edges: .bottom)
-    .fullScreenCover(isPresented: $isPresent) {
-      AuthView(store: store.scope(state: \.auth, action: \.auth))
+    .fullScreenCover(isPresented: $store.isAuthPresent) {
+      IfLetStore(store.scope(state: \.auth, action: \.auth)) { store in
+        AuthView(store: store)
+      }
+      
     }
   }
 }

@@ -20,15 +20,21 @@ struct SseudamFeature {
   @ObservableState
   struct State {
     var selectedTab: TabBarItem = .home
-    var homeRoot: HomeRootFeature.State = .init()
     var isTabbarHidden: Bool = false
-    var auth: AuthFeature.State = AuthFeature.State()
+    var isAuthPresent: Bool = false
+    
+    var homeRoot: HomeRootFeature.State = .init()
+    var mypageRoot: MyPageRootFeature.State = .init()
+    var auth: AuthFeature.State? = nil
   }
   
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case selectTab(TabBarItem)
+    
     case homeRoot(HomeRootFeature.Action)
+    case mypageRoot(MyPageRootFeature.Action)
+    
     case auth(AuthFeature.Action)
   }
   
@@ -37,8 +43,8 @@ struct SseudamFeature {
     Scope(state: \.homeRoot, action: \.homeRoot) {
       HomeRootFeature()
     }
-    Scope(state: \.auth, action: \.auth) {
-      AuthFeature()
+    Scope(state: \.mypageRoot, action: \.mypageRoot) {
+      MyPageRootFeature()
     }
     Reduce { state, action in
       switch action {
@@ -48,8 +54,15 @@ struct SseudamFeature {
       case let .homeRoot(.delegate(.hiddenTabBar(isHidden))):
         state.isTabbarHidden = (isHidden)
         return .none
+      case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):
+        state.isAuthPresent = isPresent
+        state.auth = isPresent ? .init() : nil
+        return .none
       default: return .none
       }
+    }
+    .ifLet(\.auth, action: \.auth) {
+      AuthFeature()
     }
     
   }

@@ -14,13 +14,13 @@ public struct CheckBoxButton: View {
   
   private let text: String
   private let icon: ImageSet
-  private let action: @Sendable () async -> Void
+  private let action: @Sendable () -> Void
   
   public init(
     text: String,
     state: Binding<CheckBoxButtonState>,
     icon: ImageSet,
-    _ action: @escaping @Sendable () async -> Void
+    _ action: @escaping @Sendable () -> Void
   ) {
     self.text = text
     self._state = state
@@ -33,7 +33,7 @@ public struct CheckBoxButton: View {
       .onTapGesture {
         Task {
           state = state == .normal ? .selected : .normal
-          await action()
+          action()
         }
       }
       

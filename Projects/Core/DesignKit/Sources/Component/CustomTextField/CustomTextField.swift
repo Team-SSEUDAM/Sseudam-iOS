@@ -47,6 +47,9 @@ public struct CustomTextField<Subject: View, Description: View>: View {
       subject()
       TextField(placeholder, text: $text)
         .focused($isFocused)
+        .onChange(of: isFocused) { _, focused in
+          if !focused { state = .normal }
+        }
         .font(FontSet.Body.body2)
         .foregroundColor(state == .disabled ? ColorSet.Text.Tertiary : ColorSet.Text.Primary)
         .padding(.Number12)

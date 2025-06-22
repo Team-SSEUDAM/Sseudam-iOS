@@ -11,6 +11,7 @@ import DesignKit
 import ComposableArchitecture
 import HomeFeature
 import TrashDetailFeature
+import AuthFeature
 
 struct SseudamView: View {
   @Bindable var store: StoreOf<SseudamFeature> = Store(
@@ -18,7 +19,7 @@ struct SseudamView: View {
   ) {
     SseudamFeature()
   }
-  
+  @State var isPresent: Bool = false
   var body: some View {
     
     ZStack {
@@ -28,7 +29,12 @@ struct SseudamView: View {
       case .myPet:
         EmptyView()
       case .profile:
-        EmptyView()
+//        EmptyView()
+        VStack {
+          Button("로그인") {
+            isPresent = true
+          }
+        }
       }
       VStack {
         Spacer()
@@ -43,6 +49,9 @@ struct SseudamView: View {
       
     }
     .ignoresSafeArea(edges: .bottom)
+    .fullScreenCover(isPresented: $isPresent) {
+      AuthView(store: store.scope(state: \.auth, action: \.auth))
+    }
   }
 }
 

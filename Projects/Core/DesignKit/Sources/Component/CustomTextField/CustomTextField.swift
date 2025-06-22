@@ -16,6 +16,8 @@ public struct CustomTextField<Subject: View, Description: View>: View {
   
   public let placeholder: String
   
+  /// 외부에서 TextField의 포커스를 제어할 수 있도록 하는 바인딩
+  @Binding var injectedFocus: Bool
   @FocusState private var isFocused: Bool
   
   @Binding public var text: String
@@ -26,14 +28,15 @@ public struct CustomTextField<Subject: View, Description: View>: View {
     placeholder: String = "",
     text: Binding<String>,
     state: Binding<CustomTextFieldState>,
+    injectedFocus: Binding<Bool>,
     _ description: @escaping () -> Description = { EmptyView() }
   ) {
     self.subject = subject
     self.placeholder = placeholder
     self._text = text
     self._state = state
+    self._injectedFocus = injectedFocus
     self.description = description
-    
   }
   
   public var body: some View {
@@ -47,8 +50,9 @@ public struct CustomTextField<Subject: View, Description: View>: View {
       subject()
       TextField(placeholder, text: $text)
         .focused($isFocused)
-        .onChange(of: isFocused) { _, focused in
-          if !focused { state = .normal }
+        .onAppear { isFocused = injectedFocus }
+        .onChange(of: isFocused) { _, isFocused in
+          if !isFocused { state = .normal }
         }
         .font(FontSet.Body.body2)
         .foregroundColor(state == .disabled ? ColorSet.Text.Tertiary : ColorSet.Text.Primary)

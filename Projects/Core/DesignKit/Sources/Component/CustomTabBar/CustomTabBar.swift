@@ -11,11 +11,11 @@ import SwiftUI
 public struct CustomTabBar: View {
   
   @Binding var selectedTab: TabBarItem
-  var onTabSelected: @Sendable (TabBarItem) async -> Void
+  var onTabSelected: @Sendable (TabBarItem) -> Void
   
   public init(
     selectedTab: Binding<TabBarItem>,
-    _ onTabSelected: @escaping @Sendable (TabBarItem) async -> Void
+    _ onTabSelected: @escaping @Sendable (TabBarItem) -> Void
   ) {
     self._selectedTab = selectedTab
     self.onTabSelected = onTabSelected
@@ -46,6 +46,6 @@ public struct CustomTabBar: View {
         .foregroundStyle(isActive ? ColorSet.Text.Accent : ColorSet.Text.Secondary)
     }
     .frame(maxWidth: .infinity, maxHeight: 62)
-    .onTapGesture { Task { await onTabSelected(tab) } }
+    .onTapGesture { onTabSelected(tab) }
   }
 }

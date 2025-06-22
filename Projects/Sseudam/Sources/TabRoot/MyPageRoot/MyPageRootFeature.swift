@@ -14,7 +14,7 @@ import AuthFeature
 struct MyPageRootFeature {
   @ObservableState
   struct State {
-    var auth: AuthFeature.State? = nil
+    
   }
   
   enum Action: BindableAction, Equatable {
@@ -22,7 +22,7 @@ struct MyPageRootFeature {
     case delegate(Delegate)
     
     case requestLogin(Bool, AuthEntryPoint)
-    case auth(AuthFeature.Action)
+    
   }
   
   enum Delegate: Equatable {
@@ -40,9 +40,7 @@ struct MyPageRootFeature {
       }
       
     }
-    .ifLet(\.auth, action: \.auth ) {
-      AuthFeature()
-    }
+    
   }
   
   

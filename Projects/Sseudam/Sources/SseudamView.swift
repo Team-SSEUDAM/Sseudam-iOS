@@ -48,7 +48,9 @@ struct SseudamView: View {
       IfLetStore(store.scope(state: \.login, action: \.login)) { store in
         LoginView(store: store)
       }
-      
+    }
+    .transaction { transaction in
+      transaction.disablesAnimations = true
     }
   }
 }

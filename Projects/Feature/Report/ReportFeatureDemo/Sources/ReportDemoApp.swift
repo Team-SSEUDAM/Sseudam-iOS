@@ -7,12 +7,19 @@
 //
 
 import SwiftUI
+import NMapsMap
+import ReportFeature
 import ComposableArchitecture
 
 @main
 struct ReportDemoApp: App {
-  let store = Store(initialState: ReportReducer.State(), reducer: {
-    ReportReducer()
+  init() {
+    if let id = Bundle.main.infoDictionary?["NMCLIENTID"] as? String {
+      NMFAuthManager.shared().ncpKeyId = id
+    }
+  }
+  let store = Store(initialState: ReportFeature.State(), reducer: {
+    ReportFeature()
   })
 
   var body: some Scene {

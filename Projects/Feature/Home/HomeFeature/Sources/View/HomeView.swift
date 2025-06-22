@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Utility
+import DesignKit
 import ComposableArchitecture
 
 public struct HomeView: View {
@@ -17,12 +18,16 @@ public struct HomeView: View {
     self.store = store
   }
   
+  private let tabbarHeight: CGFloat = 83
+  private let bottomSheetHeight: CGFloat = .detailSheetHeight
+  private let bottomPadding: CGFloat = .Number12
+  
   public var body: some View {
     ZStack {
       MapView
       .ignoresSafeArea()
       VStack {
-        FilterView
+        TopButtonView
         Spacer()
         BottomButtonView
       }
@@ -43,38 +48,35 @@ public struct HomeView: View {
       userLocation: $store.location.point,
       requestMapBounds: $store.requestMapBounds,
       trashItems: $store.trashItems,
-      isMapMove: $store.researchButtonEnable
+      isMapMove: $store.researchButtonEnable,
+      isNeedDeleteMarker: $store.isNeedDeleteMarker
     )
     .onReceiveMapBounds {
       store.send(.fetchTrashItems($0))
     }
     .markerTapped { id in
-      print("marker tapped: ", id ?? "")
+      print("marker tapped: ", id ?? "x")
+      store.send(.markerTapped(id))
     }
   }
   
   @ViewBuilder
-  private var FilterView: some View {
-    // TODO: - 임시 필터 버튼, 변경 필요
-    HStack(spacing: 8) {
-      Button {
-        store.send(.filterTapped(nil))
-      } label: {
-        Text("전체")
+  private var TopButtonView: some View {
+    HStack(spacing: .Number8) {
+      if store.isPresentDetail {
+        IconButton(icon: .leftChevron) {
+          
+          store.send(.presentDetailView(false))
+          store.send(.deleteActiveMarker)
+          
+        }
       }
-      Button {
-        store.send(.filterTapped(.general))
-      } label: {
-        Text("일반쓰레기")
+      TrashFilterView { type in
+        store.send(.filterTapped(type))
       }
-      Button {
-        store.send(.filterTapped(.recycle))
-      } label: {
-        Text("재활용쓰레기")
-      }
-      Spacer()
     }
-    .frame(height: 33, alignment: .leading)
+    .padding(.vertical, .Number8)
+    .padding(.leading, .Number16)
   }
   
   /// 하단에 존재하는 버튼
@@ -82,44 +84,33 @@ public struct HomeView: View {
   private var BottomButtonView: some View {
     HStack {
       Spacer()
-        .frame(width: 40, height: 40)
+        .frame(width: .Number40, height: .Number40)
       Spacer()
-      ResearchButton
+      if store.state.researchButtonEnable {
+        ResearchButton {
+          store.send(.requestMapBounds(true))
+        }
+      }
       Spacer()
       UserLocationButton
     }
+    .padding(
+      .bottom,
+      (store.isPresentDetail ? bottomSheetHeight : tabbarHeight)+bottomPadding
+    )
+    .padding(.horizontal, .Number16)
+    .animation(
+      .easeInOut(duration: store.isPresentDetail ? 0.3 : 0.13),
+      value: store.isPresentDetail
+    )
     
-    .padding(.horizontal, 16)
-    .padding(.bottom, 12)
-  }
-  
-  /// 현위치 재검색 버튼
-  @ViewBuilder
-  private var ResearchButton: some View {
-    // TODO: - 임시 재검색 버튼, 변경 필요
-    if store.state.researchButtonEnable {
-      Button {
-        store.send(.requestMapBounds(true))
-      } label: {
-        RoundedRectangle(cornerRadius: 15)
-          .fill(.brown)
-      }
-      .frame(width: 150, height: 33)
-    }
   }
   
   @ViewBuilder
   private var UserLocationButton: some View {
-    // TODO: - 임시 버튼, 변경 필요
-    Button {
+    IconButton(icon: .myLocation) {
       store.send(.location(.fetchUserLocation))
-    } label: {
-      Circle()
-        .fill(.blue)
-        .frame(width: 40, height: 40)
     }
   }
   
 }
-
-

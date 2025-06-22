@@ -11,6 +11,7 @@ import DesignKit
 import ComposableArchitecture
 
 import HomeFeature
+import TrashDetailFeature
 
 @Reducer
 struct SseudamFeature {
@@ -18,26 +19,29 @@ struct SseudamFeature {
   @ObservableState
   struct State {
     var selectedTab: TabBarItem = .home
-    var home: HomeFeature.State = HomeFeature.State()
+    var homeRoot: HomeRootFeature.State = .init()
+    var isTabbarHidden: Bool = false
   }
   
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case selectTab(TabBarItem)
-    case home(HomeFeature.Action)
+    case homeRoot(HomeRootFeature.Action)
   }
   
   var body: some ReducerOf<Self> {
     BindingReducer()
-    Scope(state: \.home, action: \.home) {
-      HomeFeature()
+    Scope(state: \.homeRoot, action: \.homeRoot) {
+      HomeRootFeature()
     }
     Reduce { state, action in
       switch action {
       case let .selectTab(tab):
         state.selectedTab = tab
         return .none
-        
+      case let .homeRoot(.delegate(.hiddenTabBar(isHidden))):
+        state.isTabbarHidden = (isHidden)
+        return .none
       default: return .none
       }
     }

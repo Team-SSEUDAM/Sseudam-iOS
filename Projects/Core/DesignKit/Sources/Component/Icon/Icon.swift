@@ -12,14 +12,16 @@ public struct Icon: View {
   
   public var image: ImageSet
   public var size: CGFloat
-  public var color: Color = ColorSet.Icon.Primary
+  public var color: Color
   
   public init(
     image: ImageSet,
-    size: CGFloat = .Number20
+    size: CGFloat = .Number20,
+    color: Color = ColorSet.Icon.Primary
   ) {
     self.image = image
     self.size = size
+    self.color = color
   }
   
   public var body: some View {

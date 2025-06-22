@@ -10,6 +10,7 @@ import SwiftUI
 import DesignKit
 import ComposableArchitecture
 import HomeFeature
+import TrashDetailFeature
 
 struct SseudamView: View {
   @Bindable var store: StoreOf<SseudamFeature> = Store(
@@ -20,27 +21,32 @@ struct SseudamView: View {
   
   var body: some View {
     
-    VStack {
+    ZStack {
       switch store.selectedTab {
       case .home:
-        HomeView(store: store.scope(state: \.home, action: \.home))
+        HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
       case .myPet:
         EmptyView()
       case .profile:
         EmptyView()
       }
-      Spacer()
-      CustomTabBar(
-        selectedTab: $store.selectedTab
-      ) {
-        store.send(.selectTab($0))
+      VStack {
+        Spacer()
+        if !store.isTabbarHidden {
+          CustomTabBar(
+            selectedTab: $store.selectedTab
+          ) {
+            store.send(.selectTab($0))
+          }
+        }
       }
+      
     }
+    .ignoresSafeArea(edges: .bottom)
   }
 }
 
 #Preview {
   SseudamView()
 }
-
 

@@ -8,6 +8,7 @@
 
 import ComposableArchitecture
 import HomeDomainInterface
+import DesignKit
 
 @Reducer
 public struct HomeFeature {
@@ -16,12 +17,13 @@ public struct HomeFeature {
   
   @ObservableState
   public struct State: Equatable {
-    
     public var location: LocationFeature.State = .init()
     public var requestMapBounds: Bool = false
     public var trashItems: [TrashItem] = []
     public var trashType: TrashType? = nil
     public var researchButtonEnable: Bool = false
+    public var isNeedDeleteMarker: Bool = false
+    public var isPresentDetail: Bool = false
     public init() {}
   }
 
@@ -34,7 +36,16 @@ public struct HomeFeature {
     case storeTrashItems([TrashItem])
     case filterTapped(TrashType?)
     case researchButtonEnable(Bool)
+    case markerTapped(Int?)
+    case deleteActiveMarker
     case onAppear
+    
+    case presentDetailView(Bool)
+    case delegate(Delegate)
+  }
+  
+  public enum Delegate: Equatable {
+    case presentDetailView(Bool)
   }
   
   @Dependency(\.HomeUseCase) var homeUseCase
@@ -78,9 +89,23 @@ public struct HomeFeature {
         state.trashItems = items
         return .none
         
+      case let .markerTapped(id):
+        return .send(.presentDetailView(id != .none))
+        
+      case .deleteActiveMarker:
+        state.isNeedDeleteMarker = true
+        return .none
+        
+        // MARK: - Receive LocationFeature delegate action
+        
       case let .location(.delegate(.requestMapBounds(isRequest))):
         return .send(.requestMapBounds(isRequest))
+
+        // MARK: - Send Action to HomeRoot
         
+      case let .presentDetailView(isPresent):
+        state.isPresentDetail = isPresent
+        return .send(.delegate(.presentDetailView(isPresent)))
       default: return .none
       }
     }

@@ -14,6 +14,7 @@ private struct FontStyleModifier: ViewModifier {
   func body(content: Content) -> some View {
     content
       .font(font.font)
+      .padding(.vertical, font.lineheight/2)
   }
 }
 

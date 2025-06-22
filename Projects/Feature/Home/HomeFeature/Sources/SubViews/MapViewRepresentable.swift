@@ -22,10 +22,14 @@ struct MapViewRepresentable: UIViewRepresentable {
   /// 지도 움직임 여부
   @Binding var isMapMove: Bool
   
+  @Binding var isNeedDeleteMarker: Bool
+  
   /// 지도 범위 전달 클로저
   var mapBounds: (([MapPoint]) -> Void)? = nil
   /// 마커 탭 시 id값을 전달하기 위한 클로저
   var onMarkerTapped: ((Int?) -> Void)? = nil
+  
+  var didTapMap:(() -> Void)? = nil
   /// 기본 위치
   private let defaultPoint: MapPoint = .init(latitude: 37.50545, longitude: 127.10143)
   
@@ -72,6 +76,12 @@ struct MapViewRepresentable: UIViewRepresentable {
       if !trashItems.isEmpty {
         presentMarkers(uiView, items: trashItems, context: context)
       }
+    }
+    
+    if isNeedDeleteMarker,
+       context.coordinator.activeMarker != nil {
+      context.coordinator.resetActiveMarker()
+      isNeedDeleteMarker = false
     }
   }
   
@@ -130,8 +140,7 @@ extension MapViewRepresentable {
   
   private func markerTapEvent(to marker: NMFMarker, data: TrashItem, context: Context) {
     if marker == context.coordinator.activeMarker { return }
-    
-    // TODO: - Active 마커로 이미지 변경
+    marker.iconImage = data.trashType.activePinImage
     context.coordinator.markerTapEvent(marker: marker, data: data)
     if let onMarkerTapped = onMarkerTapped {
       onMarkerTapped(data.id)
@@ -171,11 +180,9 @@ extension MapViewRepresentable {
     // 그리기
     let markers: [NMFMarker] = items.map { item in
       let point = NMGLatLng(lat: item.point.latitude, lng: item.point.longitude)
-      let marker = NMFMarker(position: point)
-      marker.mapView = view.mapView
       
-      // TODO: - 마커 이미지 설정 후 적용하기
-      //drawMarker(view, to: point, icon: item.type.inactiveImage)
+      let marker = drawMarker(view, to: point, icon: item.trashType.inactiveImage)
+      marker.mapView = view.mapView
       
       marker.touchHandler = { (overlay: NMFOverlay) -> Bool in
         guard let marker = overlay as? NMFMarker else { return true }
@@ -199,6 +206,7 @@ extension MapViewRepresentable {
     let marker = NMFMarker(position: point, iconImage: icon)
     marker.isHideCollidedSymbols = true
     marker.anchor = anchor
+    marker.iconImage = icon
     marker.mapView = view.mapView
     
     return marker

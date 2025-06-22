@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreLocation
+import DesignKit
 
 public struct TrashItem: Equatable, Sendable {
   public var id: Int
@@ -17,11 +18,6 @@ public struct TrashItem: Equatable, Sendable {
   public var point: MapPoint
   public var trashType: TrashType
   
-}
-
-public enum TrashType: String, Sendable {
-  case recycle = "RECYCLE"
-  case general = "GENERAL"
 }
 
 public struct MapPoint: Equatable, Sendable {

@@ -34,6 +34,13 @@ extension MapViewRepresentable {
     
     // MARK: - Delegate
     
+    func mapView(_ mapView: NMFMapView, didTapMap latlng: NMGLatLng, point: CGPoint) {
+      if let onMarkerTapped = parent.onMarkerTapped {
+        onMarkerTapped(nil)
+        resetActiveMarker()
+      }
+    }
+    
     func mapView(_ mapView: NMFMapView, cameraIsChangingByReason reason: Int) {
       if reason == NMFMapChangedByGesture || reason == NMFMapChangedByControl {
         if !isInitialBounds, !parent.isMapMove {
@@ -64,9 +71,10 @@ extension MapViewRepresentable {
     }
     
     /// 활성화 되어있는 마커 해제
-    private func resetActiveMarker() {
-      if let _ = self.activeMarker, let _ = activeData {
-        // TODO: - 아이콘 inactive로 바꾸기
+    func resetActiveMarker() {
+      if let activeMarker = self.activeMarker,
+         let activeData = activeData {
+        activeMarker.iconImage = activeData.trashType.inactiveImage
         self.activeMarker = nil
         self.activeData = nil
       }

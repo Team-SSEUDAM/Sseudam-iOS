@@ -6,8 +6,26 @@ import PackageDescription
 #if TUIST
 import struct ProjectDescription.PackageSettings
 let packageSettings = PackageSettings(
-  productTypes: [:]
+  productTypes: [
+    "ComposableArchitecture": .framework,
+    "Dependencies": .framework,
+    "Clocks": .framework,
+    "ConcurrencyExtras": .framework,
+    "CombineSchedulers": .framework,
+    "IdentifiedCollections": .framework,
+    "OrderedCollections": .framework,
+    "_CollectionsUtilities": .framework,
+    "DependenciesMacros": .framework,
+    "SwiftUINavigationCore": .framework,
+    "Perception": .framework,
+    "IssueReporting": .framework,
+    "CasePaths": .framework,
+    "CustomDump": .framework,
+    "XCTestDynamicOverlay": .framework,
+    "PerceptionCore": .framework
+  ]
 )
+
 #endif
 
 /// SwiftPM이 이 디렉터리를 패키지로 인식하도록 하는 매니페스트

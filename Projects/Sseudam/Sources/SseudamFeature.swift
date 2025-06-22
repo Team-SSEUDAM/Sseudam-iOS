@@ -21,11 +21,11 @@ struct SseudamFeature {
   struct State {
     var selectedTab: TabBarItem = .home
     var isTabbarHidden: Bool = false
-    var isAuthPresent: Bool = false
+    var isLoginPresent: Bool = false
     
     var homeRoot: HomeRootFeature.State = .init()
     var mypageRoot: MyPageRootFeature.State = .init()
-    var auth: AuthFeature.State? = nil
+    var login: LoginFeature.State? = nil
   }
   
   enum Action: BindableAction, Equatable {
@@ -35,7 +35,8 @@ struct SseudamFeature {
     case homeRoot(HomeRootFeature.Action)
     case mypageRoot(MyPageRootFeature.Action)
     
-    case auth(AuthFeature.Action)
+    case presentLogin(Bool)
+    case login(LoginFeature.Action)
   }
   
   var body: some ReducerOf<Self> {
@@ -54,15 +55,25 @@ struct SseudamFeature {
       case let .homeRoot(.delegate(.hiddenTabBar(isHidden))):
         state.isTabbarHidden = (isHidden)
         return .none
+        
+        // MARK: - Login
+        
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):
-        state.isAuthPresent = isPresent
-        state.auth = isPresent ? .init() : nil
+        return .send(.presentLogin(isPresent))
+        
+      case let .presentLogin(isPresent):
+        state.isLoginPresent = isPresent
+        state.login = isPresent ? .init() : nil
         return .none
+        
+      case .login(.delegate(.dismiss)):
+        return .send(.presentLogin(false))
+        
       default: return .none
       }
     }
-    .ifLet(\.auth, action: \.auth) {
-      AuthFeature()
+    .ifLet(\.login, action: \.login) {
+      LoginFeature()
     }
     
   }

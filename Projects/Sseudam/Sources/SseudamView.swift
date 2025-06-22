@@ -44,9 +44,9 @@ struct SseudamView: View {
       
     }
     .ignoresSafeArea(edges: .bottom)
-    .fullScreenCover(isPresented: $store.isAuthPresent) {
-      IfLetStore(store.scope(state: \.auth, action: \.auth)) { store in
-        AuthView(store: store)
+    .fullScreenCover(isPresented: $store.isLoginPresent) {
+      IfLetStore(store.scope(state: \.login, action: \.login)) { store in
+        LoginView(store: store)
       }
       
     }

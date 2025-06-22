@@ -21,7 +21,6 @@ public struct HomeView: View {
   private let tabbarHeight: CGFloat = 83
   private let bottomSheetHeight: CGFloat = .detailSheetHeight
   private let bottomPadding: CGFloat = .Number12
-  private let filters: [FilterButtonType] = FilterButtonType.allCases
   
   public var body: some View {
     ZStack {
@@ -66,10 +65,10 @@ public struct HomeView: View {
     HStack(spacing: .Number8) {
       if store.isPresentDetail {
         IconButton(icon: .leftChevron) {
-          Task { @MainActor in
-            store.send(.presentDetailView(false))
-            store.send(.deleteActiveMarker)
-          }
+          
+          store.send(.presentDetailView(false))
+          store.send(.deleteActiveMarker)
+          
         }
       }
       TrashFilterView { type in
@@ -110,37 +109,7 @@ public struct HomeView: View {
   @ViewBuilder
   private var UserLocationButton: some View {
     IconButton(icon: .myLocation) {
-      Task { @MainActor in
-        store.send(.location(.fetchUserLocation))
-      }
-    }
-  }
-  
-}
-public enum FilterButtonType: Hashable, CaseIterable {
-  case all
-  case general
-  case recycle
-  
-  var title: String {
-    switch self {
-    case .all:
-      "전체"
-    case .general:
-      "일반 쓰레기"
-    case .recycle:
-      "재활용 쓰레기"
-    }
-  }
-  
-  var icon: ImageSet? {
-    switch self {
-    case .all:
-      return nil
-    case .general:
-      return .delete
-    case .recycle:
-      return .recycle
+      store.send(.location(.fetchUserLocation))
     }
   }
   

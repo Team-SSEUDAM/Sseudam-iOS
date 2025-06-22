@@ -11,13 +11,13 @@ import SwiftUI
 public struct IconButton: View {
   
   public var icon: ImageSet
-  public var action: @Sendable () async -> Void
+  public var action: () async -> Void
   
   @State private var isPressed: Bool = false
   
   public init(
     icon: ImageSet,
-    _ action: @escaping @Sendable () async -> Void
+    _ action: @escaping () async -> Void
   ) {
     self.icon = icon
     self.action = action
@@ -31,7 +31,7 @@ public struct IconButton: View {
           .onEnded {
             _ in
             isPressed = false
-            Task { await action() }
+            Task { @MainActor in await action() }
           }
       )
   }

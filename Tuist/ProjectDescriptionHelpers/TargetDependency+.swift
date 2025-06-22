@@ -23,6 +23,7 @@ public enum Module {
 
 public enum Feature: String, ModuleRepresentable {
   case Home
+  case TrashDetail
   case Report
   public var typePath: String { "Feature" }
 }
@@ -108,6 +109,7 @@ extension TargetDependency {
   public struct Features: TargetDependencyDelegate {
     public static let Home = Self.project(.feature(.Home))
     public static let Report = Self.project(.feature(.Report))
+    public static let TrashDetail = Self.project(.feature(.TrashDetail))
   }
   
   public struct Domain: TargetDependencyDelegate {

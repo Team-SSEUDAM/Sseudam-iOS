@@ -25,6 +25,7 @@ let packageSettings = PackageSettings(
     "PerceptionCore": .framework
   ]
 )
+
 #endif
 
 /// SwiftPM이 이 디렉터리를 패키지로 인식하도록 하는 매니페스트

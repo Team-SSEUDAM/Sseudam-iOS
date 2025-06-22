@@ -36,6 +36,7 @@ public enum ImageSet: String {
   case search = "search"
   case sentimentDissatisfied = "sentiment_dissatisfied"
   case settings = "settings"
+  case verified = "verified"
   
   public var swiftUIImage: DesignKitImages { DesignKitImages(name: self.rawValue) }
 }

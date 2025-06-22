@@ -34,4 +34,6 @@ public extension CGFloat {
   static let Number100: CGFloat = 100
   static let Number200: CGFloat = 200
   static let Number320: CGFloat = 320
+  
+  static let detailSheetHeight: CGFloat = 197
 }

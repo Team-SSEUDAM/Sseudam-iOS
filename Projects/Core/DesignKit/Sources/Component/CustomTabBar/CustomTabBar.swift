@@ -28,6 +28,9 @@ public struct CustomTabBar: View {
       }
     }
     .padding(.horizontal, .Number8)
+    .padding(.bottom, 21)
+    .elevation(cornerRadius: .Number0)
+    .background(.white)
   }
   
   @ViewBuilder
@@ -45,7 +48,9 @@ public struct CustomTabBar: View {
         .font(FontSet.Label.label3)
         .foregroundStyle(isActive ? ColorSet.Text.Accent : ColorSet.Text.Secondary)
     }
+    .padding(.vertical, .Number8)
     .frame(maxWidth: .infinity, maxHeight: 62)
     .onTapGesture { onTabSelected(tab) }
   }
 }
+

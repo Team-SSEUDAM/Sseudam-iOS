@@ -51,7 +51,7 @@ extension Project.Options.TextSettings {
 
 extension Project.Options {
   public static let `default` = Self.options(
-    automaticSchemesOptions: .disabled,
+//    automaticSchemesOptions: .disabled,
     defaultKnownRegions: ["ko"],
     developmentRegion: "ko",
     textSettings: .default

@@ -28,7 +28,7 @@ struct SseudamView: View {
         HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
       case .myPet:
         EmptyView()
-      case .profile:
+      case .myPage:
 //        EmptyView()
         VStack {
           Button("로그인") {

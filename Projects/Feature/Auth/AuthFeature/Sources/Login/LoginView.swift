@@ -68,7 +68,7 @@ public struct LoginView: View {
         bg: ColorSet.SocialLogin.Apple,
         text: .white
       )) {
-      
+        store.send(.appleLoginTapped)
     }
   }
   

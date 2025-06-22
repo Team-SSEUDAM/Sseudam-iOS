@@ -13,7 +13,8 @@ let project = Project.makeStaticLibraryProject(
   for: Domain.Report,
   dependencies: [
     .Shared.ThirdParty,
-    .Shared.Utility
+    .Shared.Utility,
+    .Core.DesignKit
   ],
   nameSuffix: "Interface"
 )

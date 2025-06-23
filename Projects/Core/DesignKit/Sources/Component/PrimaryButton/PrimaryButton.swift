@@ -38,7 +38,7 @@ public struct PrimaryButton<Icon: View>: View {
   private var size: PrimaryButtonSize
   private var icon: () -> Icon
   
-  public var action: @Sendable () async -> Void
+  public var action: @Sendable () -> Void
   
   
   @Binding public var state: PrimaryButtonState
@@ -50,7 +50,7 @@ public struct PrimaryButton<Icon: View>: View {
     title: Binding<String>,
     size: PrimaryButtonSize = .large,
     state: Binding<PrimaryButtonState>,
-    _ action: @escaping @Sendable () async -> Void
+    _ action: @escaping @Sendable () -> Void
   ) {
     self._title = title
     self.size = size
@@ -67,7 +67,7 @@ public struct PrimaryButton<Icon: View>: View {
           .onEnded {
             _ in
             isPressed = false
-            Task { await action() }
+            action()
           }
       )
       .disabled(state == .disabled)

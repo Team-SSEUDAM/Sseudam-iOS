@@ -46,6 +46,7 @@ public struct HomeFeature {
   
   public enum Delegate: Equatable {
     case presentDetailView(Bool)
+    case needToHiddenTabBar(Bool)
   }
   
   @Dependency(\.HomeUseCase) var homeUseCase
@@ -105,7 +106,12 @@ public struct HomeFeature {
         
       case let .presentDetailView(isPresent):
         state.isPresentDetail = isPresent
-        return .send(.delegate(.presentDetailView(isPresent)))
+        return .run { send in
+          await MainActor.run {
+            send(.delegate(.needToHiddenTabBar(isPresent)))
+            send(.delegate(.presentDetailView(isPresent)))
+          }
+        }
       default: return .none
       }
     }

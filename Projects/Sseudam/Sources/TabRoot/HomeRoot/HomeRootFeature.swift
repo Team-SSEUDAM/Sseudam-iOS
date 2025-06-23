@@ -15,7 +15,7 @@ import TrashDetailFeature
 struct HomeRootFeature {
   
   @ObservableState
-  struct State {
+  struct State: Equatable {
     var home: HomeFeature.State = HomeFeature.State()
     var trashDetail: TrashDetailFeature.State? = nil
     var isPresentDetail: Bool = false
@@ -43,8 +43,9 @@ struct HomeRootFeature {
       case let .home(.delegate(.presentDetailView(isPresent))):
         state.trashDetail = isPresent ? .init() : nil
         state.isPresentDetail = isPresent
-        return .send(.delegate(.hiddenTabBar(isPresent)))
-        
+        return .none
+      case let .home(.delegate(.needToHiddenTabBar(isHidden))):
+        return .send(.delegate(.hiddenTabBar(isHidden)))
       default: return .none
       }
     }

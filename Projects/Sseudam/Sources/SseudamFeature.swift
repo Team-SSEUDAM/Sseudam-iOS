@@ -25,7 +25,7 @@ struct SseudamFeature {
     
     var homeRoot: HomeRootFeature.State = .init()
     var mypageRoot: MyPageRootFeature.State = .init()
-    var login: LoginFeature.State? = nil
+    @Presents var modal: ModalDestination.State?
   }
   
   enum Action: BindableAction, Equatable {
@@ -36,7 +36,15 @@ struct SseudamFeature {
     case mypageRoot(MyPageRootFeature.Action)
     
     case presentLogin(Bool)
-    case login(LoginFeature.Action)
+    case presentNickname(Bool)
+    case modal(PresentationAction<ModalDestination.Action>)
+  }
+  
+  /// 모달로 띄우기 위한 뷰
+  @Reducer(state: .equatable, action: .equatable)
+  enum ModalDestination {
+    case login(LoginFeature)
+    case signUp(NickNameInputFeature)
   }
   
   var body: some ReducerOf<Self> {
@@ -56,25 +64,40 @@ struct SseudamFeature {
         state.isTabbarHidden = (isHidden)
         return .none
         
-        // MARK: - Login
-        
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):
         return .send(.presentLogin(isPresent))
         
       case let .presentLogin(isPresent):
-        state.isLoginPresent = isPresent
-        state.login = isPresent ? .init() : nil
+        state.modal = isPresent ? .login(LoginFeature.State()) : nil
         return .none
         
-      case .login(.delegate(.dismiss)):
-        return .send(.presentLogin(false))
+      case let .presentNickname(isPresent):
+        state.modal = isPresent ? .signUp(NickNameInputFeature.State()) : nil
+        return .none
+        
+      // login delegate
+      case let .modal(.presented(.login(action))):
+        switch action {
+        case .delegate(.dismiss):
+          return .send(.presentLogin(false))
+          
+        case .delegate(.presentSignUp):
+          return .run { send in
+            await MainActor.run {
+              send(.presentLogin(false))
+              send(.presentNickname(true))
+            }
+          }
+          
+        default: return .none
+        }
+        
+        
         
       default: return .none
       }
     }
-    .ifLet(\.login, action: \.login) {
-      LoginFeature()
-    }
+    .ifLet(\.$modal, action: \.modal)
     
   }
   

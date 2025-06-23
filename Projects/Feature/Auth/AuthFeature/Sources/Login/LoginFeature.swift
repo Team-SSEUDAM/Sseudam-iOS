@@ -26,10 +26,12 @@ public struct LoginFeature {
     case closeButtonTapped
     case appleLoginTapped
     case appleLoginRequest
+    case requestLogin
     case delegate(Delegate)
   }
   
   public enum Delegate: Equatable {
+    case presentSignUp
     case dismiss
   }
   
@@ -55,11 +57,15 @@ public struct LoginFeature {
             // 애플로그인 요청
             if let result = try await AppleLoginHelper.requestAuthorization() {
               print(result)
+              await send(.requestLogin)
             }
           } catch {
             print("[AppleLogin Failure] ", error.localizedDescription)
           }
         }
+      case .requestLogin:
+        // TODO: - 로그인 api 연결
+        return .send(.delegate(.presentSignUp))
         
       default: return .none
       }

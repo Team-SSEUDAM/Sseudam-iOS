@@ -44,10 +44,11 @@ struct SseudamView: View {
       
     }
     .ignoresSafeArea(edges: .bottom)
-    .fullScreenCover(isPresented: $store.isLoginPresent) {
-      IfLetStore(store.scope(state: \.login, action: \.login)) { store in
-        LoginView(store: store)
-      }
+    .fullScreenCover(item: $store.scope(state: \.modal?.login, action: \.modal.login)) { store in
+      LoginView(store: store)
+    }
+    .fullScreenCover(item: $store.scope(state: \.modal?.signUp, action: \.modal.signUp)) { store in
+      NickNameInputView(store: store)
     }
     .transaction { transaction in
       transaction.disablesAnimations = true

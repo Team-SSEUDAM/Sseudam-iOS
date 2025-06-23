@@ -19,10 +19,22 @@ struct ReportMapViewRepresentable: UIViewRepresentable {
   private let defaultPoint = ReportMapPoint(latitude: 37.50545, longitude: 127.10143)
   
   func makeUIView(context: Context) -> NMFNaverMapView {
-    let mapView = NMFNaverMapView()
-    mapView.mapView.addCameraDelegate(delegate: context.coordinator)
-    moveCamera(mapView, to: defaultPoint)
-    return mapView
+    let view = NMFNaverMapView()
+    view.showZoomControls = false
+    view.mapView.positionMode = .direction
+    view.mapView.minZoomLevel = 18
+    view.mapView.zoomLevel = 19
+    view.mapView.maxZoomLevel = 20
+    view.mapView.isIndoorMapEnabled = false
+    view.showIndoorLevelPicker = false
+    view.mapView.liteModeEnabled = true
+    view.mapView.isTiltGestureEnabled = false
+    view.mapView.touchDelegate = context.coordinator
+    view.mapView.addCameraDelegate(delegate: context.coordinator)
+    view.mapView.symbolScale = 0.8
+    
+    moveCamera(view, to: defaultPoint)
+    return view
   }
   
   func updateUIView(_ uiView: NMFNaverMapView, context: Context) {

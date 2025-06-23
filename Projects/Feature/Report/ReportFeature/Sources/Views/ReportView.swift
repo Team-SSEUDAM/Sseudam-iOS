@@ -23,7 +23,10 @@ public struct ReportView: View {
       navigationBar
       MoveLocationView(store: store.scope(state: \.moveLocation, action: \.moveLocation))
       nextButton
+        .padding(.horizontal, .Number16)
+        .padding(.vertical, .Number24)
     }
+    .background(ColorSet.Background.Primary)
     .navigationBarBackButtonHidden(true)
   }
   

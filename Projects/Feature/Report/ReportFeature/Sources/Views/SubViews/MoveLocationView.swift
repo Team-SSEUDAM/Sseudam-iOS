@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Utility
 import DesignKit
 import ComposableArchitecture
 
@@ -18,7 +19,7 @@ public struct MoveLocationView: View {
   }
   
   public var body: some View {
-    VStack(spacing: .Number24) {
+    VStack(alignment: .leading, spacing: .Number24) {
       VStack(alignment: .leading, spacing: .Number8) {
         Text("지도를 움직여,\n쓰레기통 위치를 지정해주세요")
           .font(FontSet.Heading.heading1)
@@ -34,6 +35,9 @@ public struct MoveLocationView: View {
       .onReceive {
         store.send(.centerChanged($0))
       }
+    }
+    .onAppear {
+      store.send(.onAppear)
     }
     .padding(.horizontal, .Number16)
     .padding(.vertical, .Number24)

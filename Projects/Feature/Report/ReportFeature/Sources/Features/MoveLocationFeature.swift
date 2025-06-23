@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import Utility
 
 @Reducer
 public struct MoveLocationFeature {
@@ -18,35 +19,49 @@ public struct MoveLocationFeature {
   @ObservableState
   public struct State: Equatable {
     /// MapView 에 바인딩해 줄 기본 위치(예: Home에서 받은 defaultLocation)
-    public var userLocation: ReportMapPoint?
+    public var userLocation: ReportMapPoint? = nil
     /// 카메라 Idle 시점의 실제 중앙 좌표
     public var centerLocation: ReportMapPoint? = nil
     /// 중앙 좌표 ➔ 역지오코딩 결과로 보여줄 주소 문자열
     public var address: String = ""
-    public init(
-      userLocation: ReportMapPoint? = nil
-    ) {
-      self.userLocation = userLocation
-    }
   }
   
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    case onAppear
     /// 카메라가 Idle(멈춤) 상태일 때 델리게이트로부터 전달된 좌표
     case centerChanged(ReportMapPoint)
+    case initUserLocation(ReportMapPoint)
   }
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
       switch action {
+      case .onAppear:
+        // 사용자의 위치를 가져와서 초기화
+        return moveUserLocation()
       case let .centerChanged(point):
         state.centerLocation = point
         state.address = "\(point.latitude), \(point.longitude)"
         print("MoveLocationFeature: centerChanged - \(state.address)")
         return .none
-        
+      case let .initUserLocation(location):
+        state.userLocation = location
+        return .none
       default: return .none
+      }
+    }
+  }
+}
+
+extension MoveLocationFeature {
+  
+  private func moveUserLocation() -> Effect<Action> {
+    return .run { send in
+      if let location = await LocationService.shared.userLocation {
+        let userLocation = ReportMapPoint(latitude: location.0, longitude: location.1)
+        await send(.initUserLocation(userLocation))
       }
     }
   }

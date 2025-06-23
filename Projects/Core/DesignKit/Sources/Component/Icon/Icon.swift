@@ -13,15 +13,18 @@ public struct Icon: View {
   public var image: ImageSet
   public var size: CGFloat
   public var color: Color
+  public var backgroundColor: Color
   
   public init(
     image: ImageSet,
     size: CGFloat = .Number20,
-    color: Color = ColorSet.Icon.Primary
+    color: Color = ColorSet.Icon.Primary,
+    backgroundColor: Color = .clear
   ) {
     self.image = image
     self.size = size
     self.color = color
+    self.backgroundColor = backgroundColor
   }
   
   public var body: some View {
@@ -31,5 +34,10 @@ public struct Icon: View {
       .scaledToFit()
       .frame(width: size, height: size)
       .foregroundColor(color)
+      .background(
+        Circle()
+          .fill(backgroundColor)
+          .frame(width: size, height: size)
+      )
   }
 }

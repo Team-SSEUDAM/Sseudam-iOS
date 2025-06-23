@@ -6,9 +6,10 @@
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
-import Foundation
 import SwiftUI
 import ComposableArchitecture
+
+import DesignKit
 
 public struct ReportView: View {
   @Bindable var store: StoreOf<ReportFeature>
@@ -18,9 +19,35 @@ public struct ReportView: View {
   }
   
   public var body: some View {
-    
     VStack {
+      navigationBar
       MoveLocationView(store: store.scope(state: \.moveLocation, action: \.moveLocation))
+      nextButton
+    }
+    .navigationBarBackButtonHidden(true)
+  }
+  
+  
+  /// 네비게이션 바
+  @ViewBuilder
+  private var navigationBar: some View {
+    NavigationBar(
+      backContent: {
+        TouchArea(image: .leftChevron) {
+          store.send(.backButtonTapped(.pop))
+        }
+      }
+    )
+  }
+  
+  @ViewBuilder
+  private var nextButton: some View {
+    PrimaryButton(
+      title: $store.nextButtonText,
+      size: .large,
+      state: $store.nextButtonState
+    ) {
+      print("다음 버튼 클릭")
     }
   }
 }

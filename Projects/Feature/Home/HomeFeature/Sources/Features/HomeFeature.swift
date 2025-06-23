@@ -121,6 +121,14 @@ public struct HomeFeature {
             send(.delegate(.presentDetailView(isPresent)))
           }
         }
+        
+      case let .path(action):
+        switch action {
+        case .element(id: _, action: .reportView(.pop)):
+          state.path.removeLast()
+          return .none
+        default: return .none
+        }
       default: return .none
       }
     }

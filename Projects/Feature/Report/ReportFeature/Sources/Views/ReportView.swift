@@ -19,16 +19,34 @@ public struct ReportView: View {
   }
   
   public var body: some View {
-    VStack {
-      navigationBar
-      MoveLocationView(store: store.scope(state: \.moveLocation, action: \.moveLocation))
-      nextButton
-        .padding(.horizontal, .Number16)
-        .padding(.vertical, .Number24)
+    GeometryReader { geo in
+      VStack {
+        navigationBar
+        ScrollViewReader { proxy in
+          ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: .Number16) {
+              ReportStartView(image: .addSpot,
+                              title: "발견한 쓰레기통을 제보해주세요!",
+                              description:"쓰담이 아직 모르는 쓰레기통이 있나요?\n제보 시 5쓰담이 적립되며,\n승인되면 15쓰담을 추가 적립받아요.").frame(width: geo.size.width).id(0)
+              MoveLocationView(store: store.scope(state: \.moveLocation, action: \.moveLocation) ).frame(width: geo.size.width).id(1)
+              WriteNameView(store: store.scope(state: \.writeName, action: \.writeName)).frame(width: geo.size.width).id(2)
+              SelectKindView(store: store.scope(state: \.selectKind, action: \.selectKind)).frame(width: geo.size.width).id(3)
+            }
+          }
+          .onChange(of: store.currentPage) { prev, next in
+            withAnimation { proxy.scrollTo(next, anchor: .center) }
+          }
+          .scrollDisabled(true)
+        }
+        nextButton
+          .padding(.horizontal, .Number16)
+          .padding(.vertical, .Number24)
+          .navigationBarBackButtonHidden(true)
+      }
     }
     .background(ColorSet.Background.Primary)
-    .navigationBarBackButtonHidden(true)
   }
+  
   
   
   /// 네비게이션 바
@@ -50,7 +68,7 @@ public struct ReportView: View {
       size: .large,
       state: $store.nextButtonState
     ) {
-      print("다음 버튼 클릭")
+      store.send(.nextPageTapped)
     }
   }
 }

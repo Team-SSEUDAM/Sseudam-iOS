@@ -27,7 +27,7 @@ public struct WriteNameView: View {
         placeholder: "지하철 역 4번 출구, OO카페 맞은편",
         text: $store.name,
         state: $store.textFieldState,
-        injectedFocus: .constant(true)
+        injectedFocus: $store.injectedFocus
       ) {
         switch store.validation {
         case let .invalid(errorMessage): Text(errorMessage)

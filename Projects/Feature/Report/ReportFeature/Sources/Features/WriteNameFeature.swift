@@ -28,6 +28,7 @@ public struct WriteNameFeature {
   public struct State: Equatable {
     public var name: String = ""
     public var textFieldState: CustomTextFieldState = .normal
+    public var injectedFocus: Bool = false
     public var validation: TestFieldValidation = .none("2~12자까지 입력할 수 있어요.")
     public init() {
     }

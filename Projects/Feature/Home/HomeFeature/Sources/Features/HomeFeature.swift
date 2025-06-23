@@ -8,6 +8,8 @@
 
 import ComposableArchitecture
 import HomeDomainInterface
+
+import ReportFeature
 import DesignKit
 
 @Reducer
@@ -24,6 +26,8 @@ public struct HomeFeature {
     public var researchButtonEnable: Bool = false
     public var isNeedDeleteMarker: Bool = false
     public var isPresentDetail: Bool = false
+    
+    public var path = StackState<Path.State>()
     public init() {}
   }
 
@@ -40,6 +44,9 @@ public struct HomeFeature {
     case deleteActiveMarker
     case onAppear
     
+    case path(StackActionOf<Path>)
+    
+    case reportButtonTapped
     case presentDetailView(Bool)
     case delegate(Delegate)
   }
@@ -103,7 +110,9 @@ public struct HomeFeature {
         return .send(.requestMapBounds(isRequest))
 
         // MARK: - Send Action to HomeRoot
-        
+      case .reportButtonTapped:
+        state.path.append(.reportView(ReportFeature.State()))
+        return .send(.delegate(.needToHiddenTabBar(true)))
       case let .presentDetailView(isPresent):
         state.isPresentDetail = isPresent
         return .run { send in
@@ -115,6 +124,7 @@ public struct HomeFeature {
       default: return .none
       }
     }
+    .forEach(\.path, action: \.path)
   }
 }
 
@@ -128,3 +138,15 @@ extension HomeFeature {
     return .none
   }
 }
+
+extension HomeFeature {
+  @Reducer
+  public enum Path {
+    case reportView(ReportFeature)
+  }
+}
+
+extension HomeFeature.Path.State: Equatable { }
+extension HomeFeature.Path.Action: Equatable { }
+  
+  

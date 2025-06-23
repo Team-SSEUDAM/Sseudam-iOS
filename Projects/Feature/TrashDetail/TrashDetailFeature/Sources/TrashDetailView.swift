@@ -52,9 +52,9 @@ public struct TrashDetailView: View {
           Text("이 근방에는 쓰레기통이 없어요.")
             .foregroundStyle(ColorSet.Text.Secondary)
           PrimaryButton(
-            title: "제보하러 가기",
+            title: .constant("제보하러 가기"),
             size: .medium,
-            state: .normal
+            state: .constant(.normal)
           ) {
               print("제보하러 가기")
             }
@@ -90,7 +90,11 @@ public struct TrashDetailView: View {
         
       }
       
-      PrimaryButton(title: "이 곳에 쓰레기 버리기", size: .medium, state: .normal) {
+      PrimaryButton(
+        title: .constant("이 곳에 쓰레기 버리기"),
+        size: .medium,
+        state: .constant(.normal)
+      ) {
         
       }
       .frame(width: 224)

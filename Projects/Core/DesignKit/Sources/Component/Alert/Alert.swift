@@ -76,9 +76,9 @@ public struct Alert: View {
       ) { await closeAction() }
       
       PrimaryButton(
-        title: type.accept,
+        title: .constant(type.accept),
         size: .large,
-        state: isErrorType ? .error : .normal
+        state: isErrorType ? .constant(.error) : .constant(.normal)
       ) { await acceptAction() }
     }
   }

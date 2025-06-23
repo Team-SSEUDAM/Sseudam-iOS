@@ -25,6 +25,7 @@ public struct NavigationBar<BackContent: View, CloseContent: View>: View {
   }
   
   public var body: some View {
+    NavigationGestureSupportView().frame(width: .Number0, height: .Number0)
     content
   }
   
@@ -42,5 +43,33 @@ public struct NavigationBar<BackContent: View, CloseContent: View>: View {
       closeContent().padding(.trailing, .Number4)
     }
     .background(ColorSet.Background.Primary)
+  }
+}
+
+public struct NavigationGestureSupportView: UIViewControllerRepresentable {
+  
+  public init() { }
+  
+  public func makeUIViewController(context: Context) -> UIViewController {
+    let controller = UIViewController()
+    Task { @MainActor in
+      if let navigationController = controller.navigationController {
+        navigationController.interactivePopGestureRecognizer?.isEnabled = true
+        navigationController.interactivePopGestureRecognizer?.delegate = context.coordinator
+      }
+    }
+    return controller
+  }
+
+  public func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+
+  public func makeCoordinator() -> Coordinator {
+    Coordinator()
+  }
+
+  public class Coordinator: NSObject, UIGestureRecognizerDelegate {
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+      true
+    }
   }
 }

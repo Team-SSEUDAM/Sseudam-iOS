@@ -13,7 +13,7 @@ public enum CustomTextFieldState {
   
   public var borderColor: Color {
     switch self {
-    case .normal: return .clear
+    case .normal: return ColorSet.Border.Secondary
     case .accent: return ColorSet.Border.Accent
     case .disabled: return ColorSet.Border.Secondary
     case .error: return ColorSet.Border.Error

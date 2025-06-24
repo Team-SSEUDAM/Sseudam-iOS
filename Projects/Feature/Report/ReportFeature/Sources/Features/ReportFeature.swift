@@ -49,6 +49,15 @@ public struct ReportFeature {
     case selectKind(SelectKindFeature.Action)
     case binding(BindingAction<State>)
     
+    /// 시작 화면이 나타날 때
+    case didAppearStartReport
+    /// 위치 선택 화면이 나타날 때
+    case didAppearMoveLocation
+    /// 이름 작성 화면이 나타날 때
+    case didAppearWriteName
+    /// 종류 선택 화면이 나타날 때
+    case didAppearSelectKind
+    
     case backButtonTapped(BackActionType)
     case pop
   }
@@ -69,7 +78,31 @@ public struct ReportFeature {
           return .none
         }
       case .nextPageTapped:
-        state.currentPage = min(state.currentPage + 1, 3) /// `페이지 전체 갯수 - 1`로 `startOffset * width`을 설정
+        state.currentPage = min(state.currentPage + 1, 3) /// `페이지 전체 갯수 - 1`
+        switch state.currentPage {
+        case 0: return .send(.didAppearStartReport)
+        case 1: return .send(.didAppearMoveLocation)
+        case 2: return .send(.didAppearWriteName)
+        case 3: return .send(.didAppearSelectKind)
+        default: return .none
+        }
+      case .didAppearStartReport:
+        state.nextButtonState = .disabled
+        state.nextButtonText = "시작하기"
+        return .none
+      case .didAppearMoveLocation:
+        state.nextButtonState = .disabled
+        state.nextButtonText = "다음"
+        return .none
+      case .didAppearWriteName:
+        state.nextButtonState = .disabled
+        state.nextButtonText = "다음"
+        return .none
+      case .didAppearSelectKind:
+        state.nextButtonState = .disabled
+        state.nextButtonText = "다음"
+        return .none
+      case .binding:
         return .none
         default: return .none
       }

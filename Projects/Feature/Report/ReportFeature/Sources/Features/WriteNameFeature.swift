@@ -36,7 +36,13 @@ public struct WriteNameFeature {
   
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    case delegate(Delegate)
     case checkValidName(String)
+    case injectedFocus(Bool)
+    
+    public enum Delegate: Equatable {
+      case nameChanged(String)
+    }
   }
   
   public var body: some ReducerOf<Self> {
@@ -49,16 +55,22 @@ public struct WriteNameFeature {
         switch name.count {
         case 0: state.validation = .none("2~12자까지 입력할 수 있어요.")
           state.textFieldState = .accent
+          return .send(.delegate(.nameChanged("")))
         case 1:
           state.validation = .invalid("이름이 너무 짧습니다")
           state.textFieldState = .error
+          return .send(.delegate(.nameChanged("")))
         case 2...12:
           state.validation = .valid
           state.textFieldState = .accent
+          return .send(.delegate(.nameChanged(name)))
         default:
           state.validation = .invalid("이름이 너무 깁니다")
           state.textFieldState = .error
+          return .send(.delegate(.nameChanged("")))
         }
+      case let .injectedFocus(focus):
+        state.injectedFocus = focus
         return .none
       default: return .none
       }

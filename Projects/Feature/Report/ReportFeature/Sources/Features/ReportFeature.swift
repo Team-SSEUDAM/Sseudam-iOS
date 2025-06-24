@@ -115,11 +115,21 @@ public struct ReportFeature {
       case let .didAppearMoveLocation(prevPage):
         let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "다음"
-        return .send(.nextButtonIsEnabled(needToMakeEnabled))
+        if needToMakeEnabled {
+          return .merge([
+            .send(.writeName(.injectedFocus(false))),
+            .send(.nextButtonIsEnabled(needToMakeEnabled))
+          ])
+        } else {
+          return .send(.nextButtonIsEnabled(needToMakeEnabled))
+        }
       case let .didAppearWriteName(prevPage):
         let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "다음"
-        return .send(.nextButtonIsEnabled(needToMakeEnabled))
+        return .merge([
+          .send(.writeName(.injectedFocus(true))),
+          .send(.nextButtonIsEnabled(needToMakeEnabled))
+        ])
       case let .didAppearSelectKind(prevPage):
         let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "다음"
@@ -130,6 +140,12 @@ public struct ReportFeature {
         case let .centerChanged(location):
           state.reportModel?.location = location
           return .send(.nextButtonIsEnabled(true))
+        }
+      case let .writeName(.delegate(action)):
+        switch action {
+        case let .nameChanged(name):
+          state.reportModel?.name = name
+          return .send(.nextButtonIsEnabled(!name.isEmpty))
         }
       case .binding:
         return .none

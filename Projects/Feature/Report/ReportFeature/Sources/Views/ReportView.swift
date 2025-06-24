@@ -46,6 +46,11 @@ public struct ReportView: View {
               )
               .frame(width: geo.size.width)
               .id(3)
+              SelectPhotoView(
+                store: store.scope(state: \.selectPhoto, action: \.selectPhoto)
+              )
+              .frame(width: geo.size.width)
+              .id(4)
             }
           }
           .onChange(of: store.currentPage) { prev, next in

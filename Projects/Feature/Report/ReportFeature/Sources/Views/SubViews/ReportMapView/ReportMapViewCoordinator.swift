@@ -42,7 +42,7 @@ extension ReportMapViewRepresentable {
       )
       
       Task { @MainActor in
-        await parent.onCenterCoordinateChange?(center)
+        parent.onCenterCoordinateChange?(center)
       }
     }
   }

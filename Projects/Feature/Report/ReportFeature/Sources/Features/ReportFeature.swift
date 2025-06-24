@@ -27,6 +27,8 @@ public struct ReportFeature {
     var writeName: WriteNameFeature.State = WriteNameFeature.State()
     /// 3번 화면인 `SelectKindFeature`의 상태
     var selectKind: SelectKindFeature.State = SelectKindFeature.State()
+    /// 4번 화면인 `SelectPhotoFeature`의 상태
+    var selectPhoto: SelectPhotoFeature.State = SelectPhotoFeature.State()
     
     /// `nextButton`의 활성화 여부
     var nextButtonState: PrimaryButtonState = .normal
@@ -42,6 +44,7 @@ public struct ReportFeature {
     case moveLocation(MoveLocationFeature.Action)
     case writeName(WriteNameFeature.Action)
     case selectKind(SelectKindFeature.Action)
+    case selectPhoto(SelectPhotoFeature.Action)
     case binding(BindingAction<State>)
     
     /// 시작 화면이 나타날 때
@@ -52,6 +55,8 @@ public struct ReportFeature {
     case didAppearWriteName
     /// 종류 선택 화면이 나타날 때
     case didAppearSelectKind
+    /// 사진 선택 화면이 나타날 때
+    case didAppearSelectPhoto
     
     case nextButtonIsEnabled(Bool)
     case nextButtonTapped
@@ -66,6 +71,7 @@ public struct ReportFeature {
     Scope(state: \.moveLocation, action: \.moveLocation) { MoveLocationFeature() }
     Scope(state: \.writeName, action: \.writeName) { WriteNameFeature() }
     Scope(state: \.selectKind, action: \.selectKind) { SelectKindFeature() }
+    Scope(state: \.selectPhoto, action: \.selectPhoto) { SelectPhotoFeature() }
     Reduce { state, action in
       print("😢 ReportFeature Action: \(action)")
       switch action {
@@ -81,15 +87,17 @@ public struct ReportFeature {
         case 1: return .send(.didAppearMoveLocation)
         case 2: return .send(.didAppearWriteName)
         case 3: return .send(.didAppearSelectKind)
+        case 4: return .send(.didAppearSelectPhoto)
         default: return .none
         }
       case .nextButtonTapped:
-        state.currentPage = min(state.currentPage + 1, 3)
+        state.currentPage = min(state.currentPage + 1, 4)
         switch state.currentPage {
         case 0: return .send(.didAppearStartReport)
         case 1: return .send(.didAppearMoveLocation)
         case 2: return .send(.didAppearWriteName)
         case 3: return .send(.didAppearSelectKind)
+        case 4: return .send(.didAppearSelectPhoto)
         default: return .none
         }
       case let .nextButtonIsEnabled(isEnabled):
@@ -117,6 +125,11 @@ public struct ReportFeature {
           .send(.writeName(.injectedFocus(false))),
           .send(.nextButtonIsEnabled(state.selectKind.isEnabled))
         ])
+      case .didAppearSelectPhoto:
+        state.nextButtonText = "제보하기"
+        return .merge([
+          .send(.nextButtonIsEnabled(state.selectPhoto.isEnabled))
+        ])
       /// `MoveLocationFeature`의 `Delegate`처리
       case let .moveLocation(.delegate(action)):
         if state.currentPage != 1 { return .none }
@@ -139,6 +152,13 @@ public struct ReportFeature {
         switch action {
         case let .didSelectKind(kind):
           state.reportModel.kind = kind
+          return .send(.nextButtonIsEnabled(true))
+        }
+      /// `SelectPhotoFeature`의 `Delegate`처리
+      case let .selectPhoto(.delegate(action)):
+        if state.currentPage != 4 { return .none }
+        switch action {
+        case .didSelectPhoto:
           return .send(.nextButtonIsEnabled(true))
         }
       case .binding:

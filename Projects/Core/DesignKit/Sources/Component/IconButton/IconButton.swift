@@ -61,7 +61,11 @@ public struct IconButton: View {
   private var content: some View {
     Circle()
       .overlay {
-        Icon(image: icon, size: .Number28)
+        Icon(
+          image: icon,
+          size: .Number28,
+          renderingMode: .template
+        )
           .foregroundColor(type.icon)
           .backgroundColor(type.background)
       }

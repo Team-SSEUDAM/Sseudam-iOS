@@ -35,6 +35,7 @@ public struct WriteNameView: View {
         case .valid: Text("")
         }
       }
+      Spacer()
     }
     .padding(.horizontal, .Number16)
   }

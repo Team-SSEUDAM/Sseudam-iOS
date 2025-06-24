@@ -22,7 +22,7 @@ public struct Endpoint<R>: APIRequestable where R: Decodable & Sendable {
   public init(
     headers: APIHeaderType = .plain,
     method: HTTPMethod,
-    baseURL: String = Constant.base_url ?? "",
+    baseURL: String = Constants.base_url ?? "",
     path: String,
     parameters: HTTPRequestParameter? = nil,
     isRefreshToken: Bool = false

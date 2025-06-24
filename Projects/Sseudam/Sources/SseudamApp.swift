@@ -7,13 +7,14 @@
 //
 
 import SwiftUI
+import Utility
 import NMapsMap
 
 @main
 struct SseudamApp: App {
   init() {
-    if let id = Bundle.main.infoDictionary?["NMCLIENTID"] as? String {
-      NMFAuthManager.shared().ncpKeyId = id 
+    if let id = Constants.naver_map_client_id {
+      NMFAuthManager.shared().ncpKeyId = id
     }
     DependencyRegister().injection()
   }

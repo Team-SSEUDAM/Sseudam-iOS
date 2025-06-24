@@ -45,13 +45,13 @@ public struct ReportFeature {
     case binding(BindingAction<State>)
     
     /// 시작 화면이 나타날 때
-    case didAppearStartReport(Int)
+    case didAppearStartReport
     /// 위치 선택 화면이 나타날 때
-    case didAppearMoveLocation(Int)
+    case didAppearMoveLocation
     /// 이름 작성 화면이 나타날 때
-    case didAppearWriteName(Int)
+    case didAppearWriteName
     /// 종류 선택 화면이 나타날 때
-    case didAppearSelectKind(Int)
+    case didAppearSelectKind
     
     case nextButtonIsEnabled(Bool)
     case nextButtonTapped
@@ -67,6 +67,7 @@ public struct ReportFeature {
     Scope(state: \.writeName, action: \.writeName) { WriteNameFeature() }
     Scope(state: \.selectKind, action: \.selectKind) { SelectKindFeature() }
     Reduce { state, action in
+      print("😢 ReportFeature Action: \(action)")
       switch action {
       case .backButtonTapped:
         switch state.currentPage {
@@ -74,50 +75,51 @@ public struct ReportFeature {
         default: return .send(.backPageTapped)
         }
       case .backPageTapped:
-        let oldValue = state.currentPage
         state.currentPage = max(state.currentPage - 1, 0)
         switch state.currentPage {
-        case 0: return .send(.didAppearStartReport(oldValue))
-        case 1: return .send(.didAppearMoveLocation(oldValue))
-        case 2: return .send(.didAppearWriteName(oldValue))
-        case 3: return .send(.didAppearSelectKind(oldValue))
+        case 0: return .send(.didAppearStartReport)
+        case 1: return .send(.didAppearMoveLocation)
+        case 2: return .send(.didAppearWriteName)
+        case 3: return .send(.didAppearSelectKind)
         default: return .none
         }
       case .nextButtonTapped:
-        let oldValue = state.currentPage
         state.currentPage = min(state.currentPage + 1, 3)
         switch state.currentPage {
-        case 0: return .send(.didAppearStartReport(oldValue))
-        case 1: return .send(.didAppearMoveLocation(oldValue))
-        case 2: return .send(.didAppearWriteName(oldValue))
-        case 3: return .send(.didAppearSelectKind(oldValue))
+        case 0: return .send(.didAppearStartReport)
+        case 1: return .send(.didAppearMoveLocation)
+        case 2: return .send(.didAppearWriteName)
+        case 3: return .send(.didAppearSelectKind)
         default: return .none
         }
       case let .nextButtonIsEnabled(isEnabled):
         state.nextButtonState = isEnabled ? .normal : .disabled
-        print("nextButtonState: \(state.nextButtonState)")
+        print("😢 nextButtonState: \(state.nextButtonState)")
         return .none
-      case let .didAppearStartReport(prevPage):
+      case .didAppearStartReport:
         state.nextButtonText = "시작하기"
         return .send(.nextButtonIsEnabled(true))
-      case let .didAppearMoveLocation(prevPage):
+      case .didAppearMoveLocation:
         state.nextButtonText = "다음"
         return .merge([
           .send(.writeName(.injectedFocus(false))),
           .send(.nextButtonIsEnabled(state.moveLocation.isEnabled))
         ])
-      case let .didAppearWriteName(prevPage):
+      case .didAppearWriteName:
         state.nextButtonText = "다음"
         return .merge([
           .send(.writeName(.injectedFocus(true))),
           .send(.nextButtonIsEnabled(state.writeName.isEnabled))
         ])
-      case let .didAppearSelectKind(prevPage):
-        let needToMakeEnabled = prevPage > state.currentPage
+      case .didAppearSelectKind:
         state.nextButtonText = "다음"
-        return .send(.nextButtonIsEnabled(needToMakeEnabled))
+        return .merge([
+          .send(.writeName(.injectedFocus(false))),
+          .send(.nextButtonIsEnabled(state.selectKind.isEnabled))
+        ])
       /// `MoveLocationFeature`의 `Delegate`처리
       case let .moveLocation(.delegate(action)):
+        if state.currentPage != 1 { return .none }
         switch action {
         case let .centerChanged(location):
           state.reportModel.location = location
@@ -125,10 +127,19 @@ public struct ReportFeature {
         }
       /// `WriteNameFeature`의 `Delegate`처리
       case let .writeName(.delegate(action)):
+        if state.currentPage != 2 { return .none }
         switch action {
         case let .nameChanged(name):
           state.reportModel.name = name
           return .send(.nextButtonIsEnabled(!name.isEmpty))
+        }
+      /// `SelectKindFeature`의 `Delegate`처리
+      case let .selectKind(.delegate(action)):
+        if state.currentPage != 3 { return .none }
+        switch action {
+        case let .didSelectKind(kind):
+          state.reportModel.kind = kind
+          return .send(.nextButtonIsEnabled(true))
         }
       case .binding:
         return .none

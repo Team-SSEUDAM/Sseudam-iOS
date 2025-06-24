@@ -18,22 +18,28 @@ public struct SelectKindFeature {
     
   }
   
-  public enum SelectedKind: Equatable {
-    case normal, recycle
+  public enum SelectedKind: String, Equatable {
+    case normal = "GENERAL"
+    case recycle = "RECYCLE"
   }
   
   @ObservableState
   public struct State: Equatable {
     public var selectedNormal: CheckBoxButtonState = .normal
     public var selectedRecycle: CheckBoxButtonState = .normal
-    
+    public var isEnabled: Bool = false
     public init() {
     }
   }
   
   public enum Action: BindableAction, Equatable {
-    case selectedKind(SelectedKind)
+    case delegate(Delegate)
     case binding(BindingAction<State>)
+    case selectedKind(SelectedKind)
+    
+    public enum Delegate: Equatable {
+      case didSelectKind(String)
+    }
   }
   
   public var body: some ReducerOf<Self> {
@@ -43,7 +49,8 @@ public struct SelectKindFeature {
       case let .selectedKind(kind):
         state.selectedNormal = kind == .normal ? .selected : .normal
         state.selectedRecycle = kind == .recycle ? .selected : .normal
-        return .none
+        state.isEnabled = true
+        return .send(.delegate(.didSelectKind(kind.rawValue)))
       default: return .none
       }
     }

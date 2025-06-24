@@ -52,7 +52,6 @@ public struct CheckBoxButton: View {
         .font(FontSet.Body.body3)
       Spacer()
     }
-    .frame(maxWidth: .infinity, maxHeight: .Number48)
     .padding(.horizontal, .Number16)
     .padding(.vertical, .Number12)
     .background(

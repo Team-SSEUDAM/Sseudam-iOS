@@ -38,6 +38,7 @@ public struct SelectKindView: View {
         ) {
           store.send(.selectedKind(.recycle))
         }
+        Spacer()
       }
     }
     .padding(.horizontal, .Number16)

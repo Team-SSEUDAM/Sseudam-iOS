@@ -14,6 +14,8 @@ let project = Project.makeStaticLibraryProject(
   dependencies: [
     .Shared.ThirdParty,
     .Shared.Utility,
+    .Shared.KeyChain,
+    .Shared.UserDefaults,
     .Core.DesignKit
   ],
   nameSuffix: "Interface"

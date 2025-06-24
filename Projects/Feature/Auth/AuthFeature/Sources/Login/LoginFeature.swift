@@ -8,12 +8,12 @@
 
 import ComposableArchitecture
 import Utility
+import KeyChain
+import AuthDomainInterface
 
 @Reducer
 public struct LoginFeature {
-  public init() {
-    
-  }
+  public init() { }
   
   @ObservableState
   public struct State: Equatable {
@@ -40,6 +40,7 @@ public struct LoginFeature {
   }
   
   @Dependency(\.mainQueue) var mainQueue
+  @Dependency(\.AppleLoginUseCase) var appleLoginUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -56,8 +57,19 @@ public struct LoginFeature {
           do {
             // 애플로그인 요청
             if let result = try await AppleLoginHelper.requestAuthorization() {
+              if let email = result.email {
+                KeyChainService.save(email, forKey: .email)
+              }
               print(result)
-              await send(.requestLogin)
+              do {
+                let data = try await appleLoginUseCase.execute(result.idToken)
+                if data.isTempToken {
+                  return await send(.requestLogin)
+                }
+              } catch {
+                return await send(.delegate(.dismiss))
+              }
+              
             }
           } catch {
             print("[AppleLogin Failure] ", error.localizedDescription)

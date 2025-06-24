@@ -12,12 +12,12 @@ import AuthDataInterface
 //import Core
 
 public extension AuthRepository {
-  static var live: AuthRepository {
-    AuthRepository(
-      fetchData: {
-        // 실제 네트워크 작업 구현
-        return
-      }
-    )
+  static var test: AuthRepository {
+    AuthRepository(fetchData: {
+      return
+    }, requestAppleLogin: { token in
+      return .init(isTempToken: true, accessToKen: "ㅇㅇ", refreshToken: "ㅇㅇ")
+      
+    })
   }
 }

@@ -15,7 +15,7 @@ public struct NickNameInputFeature {
   
   @ObservableState
   public struct State: Equatable {
-    
+    var nickaname: String = ""
     public init() {}
   }
   

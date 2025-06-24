@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import DesignKit
 import ComposableArchitecture
 
 public struct NickNameInputView: View {
@@ -18,6 +19,27 @@ public struct NickNameInputView: View {
   }
   
   public var body: some View {
-    EmptyView()
+    VStack {
+      Text("닉네임을 입력해주세요")
+        .font(FontSet.Heading.heading1)
+        .foregroundStyle(ColorSet.Text.Primary)
+        .padding(.vertical, .Number8)
+        .padding(.horizontal, .Number16)
+      
+      CustomTextField(
+        placeholder: "닉네임",
+        text: $store.nickaname,
+        state: .constant(.normal)
+      ) {
+        Text("2~12자까지 입력할 수 있어요")
+      }
+      
+      Spacer()
+      PrimaryButton(title: "완료", size: .large, state: .normal) {
+        
+      }
+      .padding(.vertical, .Number16)
+    }
+    .padding(.horizontal, .Number16)
   }
 }

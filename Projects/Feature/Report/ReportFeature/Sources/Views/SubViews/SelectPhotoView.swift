@@ -20,7 +20,7 @@ public struct SelectPhotoView: View {
   
   public var body: some View {
     VStack {
-      VStack(spacing: .Number24) {
+      VStack(alignment: .leading, spacing: .Number24) {
         VStack(alignment: .leading, spacing: .Number8) {
           Text("쓰레기통 사진을 업로드해주세요")
             .font(FontSet.Heading.heading1)

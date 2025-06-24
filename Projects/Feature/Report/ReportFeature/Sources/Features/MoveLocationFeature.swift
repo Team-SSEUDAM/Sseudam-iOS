@@ -28,10 +28,15 @@ public struct MoveLocationFeature {
   
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    case delegate(Delegate)
     case onAppear
     /// 카메라가 Idle(멈춤) 상태일 때 델리게이트로부터 전달된 좌표
     case centerChanged(ReportMapPoint)
     case initUserLocation(ReportMapPoint)
+    
+    public enum Delegate: Equatable {
+      case centerChanged(ReportMapPoint)
+    }
   }
   
   public var body: some ReducerOf<Self> {
@@ -44,8 +49,7 @@ public struct MoveLocationFeature {
       case let .centerChanged(point):
         state.centerLocation = point
         state.address = "\(point.latitude), \(point.longitude)"
-        print("MoveLocationFeature: centerChanged - \(state.address)")
-        return .none
+        return .send(.delegate(.centerChanged(point)))
       case let .initUserLocation(location):
         state.userLocation = location
         return .none

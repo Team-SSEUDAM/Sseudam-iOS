@@ -124,6 +124,13 @@ public struct ReportFeature {
         let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "다음"
         return .send(.nextButtonIsEnabled(needToMakeEnabled))
+      /// `MoveLocationFeature`의 `Delegate`처리
+      case let .moveLocation(.delegate(action)):
+        switch action {
+        case let .centerChanged(location):
+          state.reportModel?.location = location
+          return .send(.nextButtonIsEnabled(true))
+        }
       case .binding:
         return .none
         default: return .none

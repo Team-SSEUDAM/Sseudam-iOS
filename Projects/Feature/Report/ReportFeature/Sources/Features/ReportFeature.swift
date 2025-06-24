@@ -141,6 +141,7 @@ public struct ReportFeature {
           state.reportModel?.location = location
           return .send(.nextButtonIsEnabled(true))
         }
+      /// `WriteNameFeature`의 `Delegate`처리
       case let .writeName(.delegate(action)):
         switch action {
         case let .nameChanged(name):

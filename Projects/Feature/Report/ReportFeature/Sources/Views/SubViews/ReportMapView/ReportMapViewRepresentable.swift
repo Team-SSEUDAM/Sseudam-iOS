@@ -10,6 +10,7 @@ import SwiftUI
 import UIKit
 import Utility
 import NMapsMap
+import ReportDomainInterface
 
 struct ReportMapViewRepresentable: UIViewRepresentable {
   @Binding var userLocation: ReportMapPoint?

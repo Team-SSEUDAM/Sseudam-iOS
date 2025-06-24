@@ -9,6 +9,7 @@
 import Foundation
 import Utility
 import NMapsMap
+import ReportDomainInterface
 
 extension ReportMapViewRepresentable {
   class Coordinator: NSObject, NMFMapViewTouchDelegate, NMFMapViewCameraDelegate {

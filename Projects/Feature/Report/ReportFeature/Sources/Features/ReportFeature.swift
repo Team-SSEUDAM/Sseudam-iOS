@@ -19,20 +19,15 @@ public struct ReportFeature {
   
   @ObservableState
   public struct State: Equatable {
-    /// 현재 페이지 인덱스 (0: 시작화면, 1: 위치 선택, 2: 이름 작성, 3: 종류 선택, 4: 사진 촬영)
+    @Presents var destination: Destination.State?
+    
     var currentPage: Int = 0
-    /// 1번 화면인 `MoveLocationFeature`의 상태
     var moveLocation: MoveLocationFeature.State = MoveLocationFeature.State()
-    /// 2번 화면인 `WriteNameFeature`의 상태
     var writeName: WriteNameFeature.State = WriteNameFeature.State()
-    /// 3번 화면인 `SelectKindFeature`의 상태
     var selectKind: SelectKindFeature.State = SelectKindFeature.State()
-    /// 4번 화면인 `SelectPhotoFeature`의 상태
     var selectPhoto: SelectPhotoFeature.State = SelectPhotoFeature.State()
     
-    /// `nextButton`의 활성화 여부
     var nextButtonState: PrimaryButtonState = .normal
-    /// `nextButton`의 텍스트 (`시작하기`, `다음`, `확인`)
     var nextButtonText: String = "시작하기"
     
     var reportModel: ReportBody = ReportBody()
@@ -41,6 +36,16 @@ public struct ReportFeature {
   }
 
   public enum Action: BindableAction, Equatable {
+    
+    @CasePathable
+    public enum PhotoConfirmationDialog: Equatable {
+      case takePhotoButtonTapped
+      case selectPhotoButtonTapped
+      case selectPhotoFromLibraryButtonTapped
+    }
+    
+    case destination(PresentationAction<Destination.Action>)
+    
     case moveLocation(MoveLocationFeature.Action)
     case writeName(WriteNameFeature.Action)
     case selectKind(SelectKindFeature.Action)
@@ -57,6 +62,8 @@ public struct ReportFeature {
     case didAppearSelectKind
     /// 사진 선택 화면이 나타날 때
     case didAppearSelectPhoto
+    
+    case willAppearPhotoConfirmationDialog
     
     case nextButtonIsEnabled(Bool)
     case nextButtonTapped
@@ -102,7 +109,6 @@ public struct ReportFeature {
         }
       case let .nextButtonIsEnabled(isEnabled):
         state.nextButtonState = isEnabled ? .normal : .disabled
-        print("😢 nextButtonState: \(state.nextButtonState)")
         return .none
       case .didAppearStartReport:
         state.nextButtonText = "시작하기"
@@ -158,13 +164,55 @@ public struct ReportFeature {
       case let .selectPhoto(.delegate(action)):
         if state.currentPage != 4 { return .none }
         switch action {
-        case .didSelectPhoto:
-          return .send(.nextButtonIsEnabled(true))
+        case .selectPhotoButtonTapped:
+          return .send(.willAppearPhotoConfirmationDialog)
         }
+        
+      /// - 바텀 다이얼로그 관련 action 처리
+      case .willAppearPhotoConfirmationDialog:
+        state.destination = .confirmationDialog(.makePhotoConfirmationDialog)
+        return .none
+      case .destination(.presented(.confirmationDialog(.takePhotoButtonTapped))):
+        state.destination = nil /// 다이얼로그 제거
+        // TODO: - 사진 찍기 관련 로직 구현 및 action 전달
+        return .none
+      case .destination(.presented(.confirmationDialog(.selectPhotoButtonTapped))):
+        state.destination = nil /// 다이얼로그 제거
+        // TODO: - 앨범 사진 선택 관련 로직 구현 및 action 전달
+        return .none
+      case .destination(.presented(.confirmationDialog(.selectPhotoFromLibraryButtonTapped))):
+        state.destination = nil /// 다이얼로그 제거
+        // TODO: - 파일에서 사진 선택 관련 로직 구현 및 action 전달
+        return .none
       case .binding:
         return .none
         default: return .none
       }
     }
+    .ifLet(\.$destination, action: \.destination) {
+      Destination.body
+    }
+  }
+}
+
+extension ReportFeature {
+  @Reducer
+  public enum Destination: Equatable {
+    case addCompleteReport
+    case confirmationDialog(ConfirmationDialogState<ReportFeature.Action.PhotoConfirmationDialog>)
+  }
+}
+
+extension ReportFeature.Destination.Action: Equatable { }
+extension ReportFeature.Destination.State: Equatable { }
+
+extension ConfirmationDialogState where Action == ReportFeature.Action.PhotoConfirmationDialog {
+  public static let makePhotoConfirmationDialog = Self {
+    TextState("")
+  } actions: {
+    ButtonState(action: .takePhotoButtonTapped) { TextState("사진 찍기") }
+    ButtonState(action: .selectPhotoButtonTapped) { TextState("사진 보관함에서 선택") }
+    ButtonState(action: .selectPhotoFromLibraryButtonTapped) { TextState("파일에서 선택") }
+    ButtonState(role: .cancel) { TextState("취소") }
   }
 }

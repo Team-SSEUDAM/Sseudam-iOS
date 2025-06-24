@@ -27,8 +27,10 @@ public struct SelectPhotoFeature {
     case binding(BindingAction<State>)
     case delegate(Delegate)
     
+    case centerButtonTapped
+    
     public enum Delegate: Equatable {
-      case didSelectPhoto
+      case selectPhotoButtonTapped
     }
   }
   
@@ -36,6 +38,8 @@ public struct SelectPhotoFeature {
     BindingReducer()
     Reduce { state, action in
       switch action {
+      case .centerButtonTapped:
+        return .send(.delegate(.selectPhotoButtonTapped))
       default: return .none
       }
     }

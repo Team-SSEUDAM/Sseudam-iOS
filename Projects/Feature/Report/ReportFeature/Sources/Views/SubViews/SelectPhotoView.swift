@@ -41,6 +41,9 @@ public struct SelectPhotoView: View {
             )
             .foregroundColor(ColorSet.Gray._200)
           )
+          .onTapGesture {
+            store.send(.centerButtonTapped)
+          }
       }
       .padding(.horizontal, .Number16)
       .padding(.vertical, .Number24)

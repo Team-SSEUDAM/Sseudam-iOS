@@ -65,6 +65,7 @@ public struct ReportView: View {
       }
     }
     .background(ColorSet.Background.Primary)
+    .confirmationDialog($store.scope(state: \.destination?.confirmationDialog, action: \.destination.confirmationDialog))
   }
   
   

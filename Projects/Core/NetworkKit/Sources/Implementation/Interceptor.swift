@@ -25,12 +25,12 @@ public struct Interceptor: TokenRefresher {
       do {
         let response = try await NetworkKit().execute(with: refreshEndpoint)
         KeyChainService.save(response.refreshToken, forKey: .refreshToken)
-        UserDefaultsKey.accessToken = response.accessToken
+        UserDefaultsKeys.accessToken = response.accessToken
         return response.accessToken
       } catch {
-        UserDefaultsKey.isLoggedIn = false
+        UserDefaultsKeys.isLoggedIn = false
         KeyChainService.delete(forKey: .refreshToken)
-        UserDefaultsKey.accessToken = nil
+        UserDefaultsKeys.accessToken = nil
         throw TokenError.expiredToken
       }
       

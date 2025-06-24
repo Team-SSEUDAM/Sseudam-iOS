@@ -54,6 +54,9 @@ public struct CustomTextField<Subject: View, Description: View>: View {
         .onChange(of: isFocused) { _, isFocused in
           if !isFocused { state = .normal }
         }
+        .onChange(of: injectedFocus) { _, injectedFocus in
+          isFocused = injectedFocus
+        }
         .font(FontSet.Body.body2)
         .foregroundColor(state == .disabled ? ColorSet.Text.Tertiary : ColorSet.Text.Primary)
         .padding(.Number12)

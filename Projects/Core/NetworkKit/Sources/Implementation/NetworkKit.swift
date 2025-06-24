@@ -160,7 +160,7 @@ extension NetworkKit {
     for endpoint: any APIRequestable
   ) async throws -> R {
     do {
-      guard let newToken = try await DefaultTokenRefresher.refreshToken() else {
+      guard let newToken = try await Interceptor.refreshToken() else {
         throw throwError(TokenError.expiredToken, endpoint: endpoint)
       }
       // 기존 작업 재요청

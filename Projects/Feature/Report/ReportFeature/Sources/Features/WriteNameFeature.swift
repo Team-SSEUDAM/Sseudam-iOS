@@ -29,6 +29,7 @@ public struct WriteNameFeature {
     public var name: String = ""
     public var textFieldState: CustomTextFieldState = .normal
     public var injectedFocus: Bool = false
+    public var isEnabled: Bool = false
     public var validation: TestFieldValidation = .none("2~12자까지 입력할 수 있어요.")
     public init() {
     }
@@ -55,18 +56,22 @@ public struct WriteNameFeature {
         switch name.count {
         case 0: state.validation = .none("2~12자까지 입력할 수 있어요.")
           state.textFieldState = .accent
+          state.isEnabled = false
           return .send(.delegate(.nameChanged("")))
         case 1:
           state.validation = .invalid("이름이 너무 짧습니다")
           state.textFieldState = .error
+          state.isEnabled = false
           return .send(.delegate(.nameChanged("")))
         case 2...12:
           state.validation = .valid
           state.textFieldState = .accent
+          state.isEnabled = true
           return .send(.delegate(.nameChanged(name)))
         default:
           state.validation = .invalid("이름이 너무 깁니다")
           state.textFieldState = .error
+          state.isEnabled = false
           return .send(.delegate(.nameChanged("")))
         }
       case let .injectedFocus(focus):

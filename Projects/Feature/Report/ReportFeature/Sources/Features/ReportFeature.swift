@@ -32,20 +32,15 @@ public struct ReportFeature {
     /// `nextButton`의 텍스트 (`시작하기`, `다음`, `확인`)
     var nextButtonText: String = "시작하기"
     
-    var reportModel: ReportModel?
+    var reportModel: ReportModel = ReportModel()
     
     public struct ReportModel: Equatable {
       /// 신고할 위치
-      public var location: ReportMapPoint
+      public var location: ReportMapPoint?
       /// 신고할 이름
-      public var name: String = ""
+      public var name: String?
       /// 신고할 종류
-      public var kind: String = ""
-      public init(
-        location: ReportMapPoint
-      ) {
-        self.location = location
-      }
+      public var kind: String?
     }
     public init() {}
   }
@@ -107,28 +102,22 @@ public struct ReportFeature {
         }
       case let .nextButtonIsEnabled(isEnabled):
         state.nextButtonState = isEnabled ? .normal : .disabled
+        print("nextButtonState: \(state.nextButtonState)")
         return .none
       case let .didAppearStartReport(prevPage):
-        let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "시작하기"
-        return .send(.nextButtonIsEnabled(needToMakeEnabled))
+        return .send(.nextButtonIsEnabled(true))
       case let .didAppearMoveLocation(prevPage):
-        let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "다음"
-        if needToMakeEnabled {
-          return .merge([
-            .send(.writeName(.injectedFocus(false))),
-            .send(.nextButtonIsEnabled(needToMakeEnabled))
-          ])
-        } else {
-          return .send(.nextButtonIsEnabled(needToMakeEnabled))
-        }
+        return .merge([
+          .send(.writeName(.injectedFocus(false))),
+          .send(.nextButtonIsEnabled(state.moveLocation.isEnabled))
+        ])
       case let .didAppearWriteName(prevPage):
-        let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "다음"
         return .merge([
           .send(.writeName(.injectedFocus(true))),
-          .send(.nextButtonIsEnabled(needToMakeEnabled))
+          .send(.nextButtonIsEnabled(state.writeName.isEnabled))
         ])
       case let .didAppearSelectKind(prevPage):
         let needToMakeEnabled = prevPage > state.currentPage
@@ -138,14 +127,14 @@ public struct ReportFeature {
       case let .moveLocation(.delegate(action)):
         switch action {
         case let .centerChanged(location):
-          state.reportModel?.location = location
+          state.reportModel.location = location
           return .send(.nextButtonIsEnabled(true))
         }
       /// `WriteNameFeature`의 `Delegate`처리
       case let .writeName(.delegate(action)):
         switch action {
         case let .nameChanged(name):
-          state.reportModel?.name = name
+          state.reportModel.name = name
           return .send(.nextButtonIsEnabled(!name.isEmpty))
         }
       case .binding:

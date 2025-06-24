@@ -24,6 +24,8 @@ public struct MoveLocationFeature {
     public var centerLocation: ReportMapPoint? = nil
     /// 중앙 좌표 ➔ 역지오코딩 결과로 보여줄 주소 문자열
     public var address: String = ""
+    
+    public var isEnabled: Bool = false
   }
   
   public enum Action: BindableAction, Equatable {
@@ -44,11 +46,12 @@ public struct MoveLocationFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
-        // 사용자의 위치를 가져와서 초기화
+        state.isEnabled = false
         return moveUserLocation()
       case let .centerChanged(point):
         state.centerLocation = point
         state.address = "\(point.latitude), \(point.longitude)"
+        state.isEnabled = true
         return .send(.delegate(.centerChanged(point)))
       case let .initUserLocation(location):
         state.userLocation = location

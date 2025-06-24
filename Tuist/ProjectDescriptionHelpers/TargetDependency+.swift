@@ -38,12 +38,14 @@ public enum Data: String, ModuleRepresentable {
 }
 
 public enum Core: String, ModuleRepresentable {
+  case Umbrella = ""
   case DesignKit
   case NetworkKit
   public var typePath: String { "Core" }
 }
 
 public enum Shared: String, ModuleRepresentable {
+  case Umbrella = ""
   case ThirdParty
   case Utility
   case KeyChain
@@ -87,13 +89,15 @@ extension TargetDependencyDelegate {
     )
   }
   
-  /// Core나 Shared는 `Projects/Core/DesignKit` 또는 `Projects/Shared/ThirdParty`와 같이 경로가 단순합니다.
+  /// Core나 Shared는 `Projects/Core` 또는 `Projects/Shared`와 같이 경로가 단순합니다.
   private static func makeProjectDependency<T: ModuleRepresentable>(
     for target: T
   ) -> TargetDependency {
+    let addPath = target.rawValue.isEmpty ? "" : "/\(target)"
+    let targetName = target.rawValue.isEmpty ? target.typePath : target.rawValue
     return .project(
-      target: "\(target)",
-      path: .relativeToRoot("./Projects/\(target.typePath)/\(target)")
+      target: "\(targetName)",
+      path: .relativeToRoot("./Projects/\(target.typePath)\(addPath)")
     )
   }
   
@@ -124,11 +128,13 @@ extension TargetDependency {
   }
   
   public struct Core: TargetDependencyDelegate {
+    public static let Umbrella = Self.project(.core(.Umbrella))
     public static let DesignKit = Self.project(.core(.DesignKit))
     public static let NetworkKit = Self.project(.core(.NetworkKit))
   }
   
   public struct Shared: TargetDependencyDelegate {
+    public static let Umbrella = Self.project(.shared(.Umbrella))
     public static let ThirdParty = Self.project(.shared(.ThirdParty))
     public static let Utility = Self.project(.shared(.Utility))
     public static let KeyChain = Self.project(.shared(.KeyChain))

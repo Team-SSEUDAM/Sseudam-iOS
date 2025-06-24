@@ -21,7 +21,10 @@ let project = Project(
       bundleId: "Sseudam.a2bo.ios.core.networkKit",
       deploymentTargets: .iOS("17.0"),
       infoPlist: .extendingDefault(with: [:]),
-      sources: ["Sources/**"]
+      sources: ["Sources/**"],
+      dependencies: [
+        .Shared.Umbrella
+      ]
     )
   ]
 )

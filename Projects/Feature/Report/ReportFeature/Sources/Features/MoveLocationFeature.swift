@@ -8,6 +8,7 @@
 
 import ComposableArchitecture
 import Utility
+import ReportDomainInterface
 
 @Reducer
 public struct MoveLocationFeature {

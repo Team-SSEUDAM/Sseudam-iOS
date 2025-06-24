@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import ReportDomainInterface
 import DesignKit
 
 @Reducer
@@ -32,16 +33,8 @@ public struct ReportFeature {
     /// `nextButton`의 텍스트 (`시작하기`, `다음`, `확인`)
     var nextButtonText: String = "시작하기"
     
-    var reportModel: ReportModel = ReportModel()
+    var reportModel: ReportBody = ReportBody()
     
-    public struct ReportModel: Equatable {
-      /// 신고할 위치
-      public var location: ReportMapPoint?
-      /// 신고할 이름
-      public var name: String?
-      /// 신고할 종류
-      public var kind: String?
-    }
     public init() {}
   }
 

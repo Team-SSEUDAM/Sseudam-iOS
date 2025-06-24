@@ -29,25 +29,40 @@ public struct SelectPhotoView: View {
             .font(FontSet.Body.body3)
             .foregroundColor(ColorSet.Text.Secondary)
         }
-        Rectangle()
-          .fill(ColorSet.Background.Secondary)
-          .aspectRatio(1, contentMode: .fit)
-          .clipShape(RoundedRectangle(cornerRadius: .Number16))
-          .overlay(
-            Icon(
-              image: .arrowCircleUp,
-              size: .Number64,
-              renderingMode: .template
+        if store.isCameraPreviewPresented {
+          CameraPreviewView
+            .clipShape(RoundedRectangle(cornerRadius: .Number16))
+        } else {
+          Rectangle()
+            .fill(ColorSet.Background.Secondary)
+            .aspectRatio(1, contentMode: .fit)
+            .clipShape(RoundedRectangle(cornerRadius: .Number16))
+            .overlay(
+              Icon(
+                image: .arrowCircleUp,
+                size: .Number64,
+                renderingMode: .template
+              )
+              .foregroundColor(ColorSet.Gray._200)
             )
-            .foregroundColor(ColorSet.Gray._200)
-          )
-          .onTapGesture {
-            store.send(.centerButtonTapped)
-          }
+            .onTapGesture {
+              store.send(.centerButtonTapped)
+            }
+        }
       }
       .padding(.horizontal, .Number16)
       .padding(.vertical, .Number24)
       Spacer()
+    }
+  }
+  
+  @ViewBuilder
+  private var CameraPreviewView: some View {
+    CameraPreviewRepresentable(
+      session: $store.session
+    )
+    .onAppear {
+      store.send(.startCameraSession)
     }
   }
 }

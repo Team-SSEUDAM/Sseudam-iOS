@@ -6,7 +6,11 @@
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
+import AVFoundation
+import SwiftUI
 import ComposableArchitecture
+
+import Utility
 
 @Reducer
 public struct SelectPhotoFeature {
@@ -19,7 +23,9 @@ public struct SelectPhotoFeature {
   public struct State: Equatable {
     
     public var isEnabled: Bool = false
-    
+    public var isCameraPreviewPresented: Bool = false
+    public var cameraService: CameraService?
+    public var session: AVCaptureSession?
     public init() { }
   }
   
@@ -28,6 +34,8 @@ public struct SelectPhotoFeature {
     case delegate(Delegate)
     
     case centerButtonTapped
+    case openCameraPreview
+    case startCameraSession
     
     public enum Delegate: Equatable {
       case selectPhotoButtonTapped
@@ -40,6 +48,16 @@ public struct SelectPhotoFeature {
       switch action {
       case .centerButtonTapped:
         return .send(.delegate(.selectPhotoButtonTapped))
+      case .openCameraPreview:
+        state.isCameraPreviewPresented = true
+        return .none
+      case .startCameraSession:
+        let cameraService = CameraService()
+        state.cameraService = cameraService
+        state.session = state.cameraService?.session
+        return .run { send in
+          try await cameraService.setUpCamera()
+        }
       default: return .none
       }
     }

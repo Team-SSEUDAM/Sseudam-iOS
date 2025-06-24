@@ -175,7 +175,7 @@ public struct ReportFeature {
       case .destination(.presented(.confirmationDialog(.takePhotoButtonTapped))):
         state.destination = nil /// 다이얼로그 제거
         // TODO: - 사진 찍기 관련 로직 구현 및 action 전달
-        return .none
+        return .send(.selectPhoto(.openCameraPreview))
       case .destination(.presented(.confirmationDialog(.selectPhotoButtonTapped))):
         state.destination = nil /// 다이얼로그 제거
         // TODO: - 앨범 사진 선택 관련 로직 구현 및 action 전달

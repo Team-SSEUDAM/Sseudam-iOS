@@ -16,11 +16,6 @@ public struct ReportFeature {
     
   }
   
-  public enum BackActionType {
-    case pop
-    case backToScroll
-  }
-  
   @ObservableState
   public struct State: Equatable {
     /// 현재 페이지 인덱스 (0: 시작화면, 1: 위치 선택, 2: 이름 작성, 3: 종류 선택, 4: 사진 촬영)
@@ -32,34 +27,50 @@ public struct ReportFeature {
     /// 3번 화면인 `SelectKindFeature`의 상태
     var selectKind: SelectKindFeature.State = SelectKindFeature.State()
     
-    /// 초기화면: `.pop` | 이후 화면 플로우: `.backToScroll`
-    var backActionType: BackActionType = .pop
     /// `nextButton`의 활성화 여부
     var nextButtonState: PrimaryButtonState = .normal
     /// `nextButton`의 텍스트 (`시작하기`, `다음`, `확인`)
     var nextButtonText: String = "시작하기"
+    
+    var reportModel: ReportModel?
+    
+    public struct ReportModel: Equatable {
+      /// 신고할 위치
+      public var location: ReportMapPoint
+      /// 신고할 이름
+      public var name: String = ""
+      /// 신고할 종류
+      public var kind: String = ""
+      public init(
+        location: ReportMapPoint
+      ) {
+        self.location = location
+      }
+    }
     public init() {}
   }
 
   public enum Action: BindableAction, Equatable {
-    
-    case nextPageTapped
     case moveLocation(MoveLocationFeature.Action)
     case writeName(WriteNameFeature.Action)
     case selectKind(SelectKindFeature.Action)
     case binding(BindingAction<State>)
     
     /// 시작 화면이 나타날 때
-    case didAppearStartReport
+    case didAppearStartReport(Int)
     /// 위치 선택 화면이 나타날 때
-    case didAppearMoveLocation
+    case didAppearMoveLocation(Int)
     /// 이름 작성 화면이 나타날 때
-    case didAppearWriteName
+    case didAppearWriteName(Int)
     /// 종류 선택 화면이 나타날 때
-    case didAppearSelectKind
+    case didAppearSelectKind(Int)
     
-    case backButtonTapped(BackActionType)
+    case nextButtonIsEnabled(Bool)
+    case nextButtonTapped
+    
+    case backButtonTapped
     case pop
+    case backPageTapped
   }
 
   public var body: some ReducerOf<Self> {
@@ -69,39 +80,50 @@ public struct ReportFeature {
     Scope(state: \.selectKind, action: \.selectKind) { SelectKindFeature() }
     Reduce { state, action in
       switch action {
-      case let .backButtonTapped(type):
-        switch type {
-        case .pop:
-          return .send(.pop)
-        case .backToScroll:
-          // TODO: 현재 Scroll의 ContentOffset에 따라서, 이전 화면으로 offset을 조정해야 함
-          return .none
-        }
-      case .nextPageTapped:
-        state.currentPage = min(state.currentPage + 1, 3) /// `페이지 전체 갯수 - 1`
+      case .backButtonTapped:
         switch state.currentPage {
-        case 0: return .send(.didAppearStartReport)
-        case 1: return .send(.didAppearMoveLocation)
-        case 2: return .send(.didAppearWriteName)
-        case 3: return .send(.didAppearSelectKind)
+        case 0: return .send(.pop) /// RecordFeature에서 처리
+        default: return .send(.backPageTapped)
+        }
+      case .backPageTapped:
+        let oldValue = state.currentPage
+        state.currentPage = max(state.currentPage - 1, 0)
+        switch state.currentPage {
+        case 0: return .send(.didAppearStartReport(oldValue))
+        case 1: return .send(.didAppearMoveLocation(oldValue))
+        case 2: return .send(.didAppearWriteName(oldValue))
+        case 3: return .send(.didAppearSelectKind(oldValue))
         default: return .none
         }
-      case .didAppearStartReport:
-        state.nextButtonState = .disabled
+      case .nextButtonTapped:
+        let oldValue = state.currentPage
+        state.currentPage = min(state.currentPage + 1, 3)
+        switch state.currentPage {
+        case 0: return .send(.didAppearStartReport(oldValue))
+        case 1: return .send(.didAppearMoveLocation(oldValue))
+        case 2: return .send(.didAppearWriteName(oldValue))
+        case 3: return .send(.didAppearSelectKind(oldValue))
+        default: return .none
+        }
+      case let .nextButtonIsEnabled(isEnabled):
+        state.nextButtonState = isEnabled ? .normal : .disabled
+        return .none
+      case let .didAppearStartReport(prevPage):
+        let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "시작하기"
-        return .none
-      case .didAppearMoveLocation:
-        state.nextButtonState = .disabled
+        return .send(.nextButtonIsEnabled(needToMakeEnabled))
+      case let .didAppearMoveLocation(prevPage):
+        let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "다음"
-        return .none
-      case .didAppearWriteName:
-        state.nextButtonState = .disabled
+        return .send(.nextButtonIsEnabled(needToMakeEnabled))
+      case let .didAppearWriteName(prevPage):
+        let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "다음"
-        return .none
-      case .didAppearSelectKind:
-        state.nextButtonState = .disabled
+        return .send(.nextButtonIsEnabled(needToMakeEnabled))
+      case let .didAppearSelectKind(prevPage):
+        let needToMakeEnabled = prevPage > state.currentPage
         state.nextButtonText = "다음"
-        return .none
+        return .send(.nextButtonIsEnabled(needToMakeEnabled))
       case .binding:
         return .none
         default: return .none

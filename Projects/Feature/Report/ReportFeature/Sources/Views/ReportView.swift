@@ -70,7 +70,7 @@ public struct ReportView: View {
     NavigationBar(
       backContent: {
         TouchArea(image: .leftChevron) {
-          store.send(.backButtonTapped(.pop))
+          store.send(.backButtonTapped)
         }
       }
     )
@@ -83,7 +83,7 @@ public struct ReportView: View {
       size: .large,
       state: $store.nextButtonState
     ) {
-      store.send(.nextPageTapped)
+      store.send(.nextButtonTapped)
     }
   }
 }

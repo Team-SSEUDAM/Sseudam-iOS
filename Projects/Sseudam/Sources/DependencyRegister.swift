@@ -17,6 +17,11 @@ import AuthDomain
 import AuthDataInterface
 import AuthData
 
+import UserDomainInterface
+import UserDomain
+import UserDataInterface
+import UserData
+
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
 struct DependencyRegister {
@@ -24,6 +29,9 @@ struct DependencyRegister {
   func injection() {
     let homeRepository = HomeRepository.live
     let authRepository = AuthRepository.test
+    let userReoository = UserRepository.test
+    
+    // MARK: - Home
     
     HomeUseCaseRegister(
       provider: {
@@ -31,10 +39,17 @@ struct DependencyRegister {
       }
     )
     
+    // MARK: - Auth
+    
     AppleLoginUseCaseRegister {
       AppleLoginUseCase.test(repository: authRepository)
     }
     
+    // MARK: - User
+    
+    CheckNicknameValidUseCaseRegister {
+      CheckNicknameValidateUseCase.test(repository: userReoository)
+    }
     
   }
 }

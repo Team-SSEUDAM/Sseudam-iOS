@@ -36,12 +36,13 @@ public struct NickNameInputView: View {
         }
         
         Spacer()
+        SnackBar(message: $store.errorToastMessage, {})
         PrimaryButton(
           title: "완료",
           size: .large,
           state: store.nicknameValid.isValid ? .normal : .disabled
         ) {
-          
+          store.send(.completeButtonTapped)
         }
         .padding(.vertical, .Number16)
       }

@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import UserDomainInterface
 
 @Reducer
 public struct NickNameInputFeature {
@@ -18,6 +19,7 @@ public struct NickNameInputFeature {
     var nickname: String = ""
     var nicknameValid: NickNameInputValid = .none
     var focusKeyboard: Bool = false
+    var errorToastMessage: String? = nil
     public init() {}
   }
   
@@ -27,7 +29,11 @@ public struct NickNameInputFeature {
     case showKeyboard(Bool)
     case checkValidNickName(String)
     case nicknameValidMessage(NickNameInputValid)
+    case completeButtonTapped
+    case errorToastMessage(String)
   }
+  
+  @Dependency(\.CheckNicknameValidateUseCase) var checkNicknameValidateUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -35,16 +41,28 @@ public struct NickNameInputFeature {
       switch action {
       case .binding(\.nickname):
         return .send(.checkValidNickName(state.nickname))
+        
       case .onAppear:
         return .send(.showKeyboard(true))
+        
       case let .showKeyboard(isShow):
         state.focusKeyboard = isShow
         return .none
+        
       case let .checkValidNickName(nickname):
         return .send(.nicknameValidMessage(checkNicknameValid(nickname)))
+        
       case let .nicknameValidMessage(type):
         state.nicknameValid = type
         return .none
+        
+      case .completeButtonTapped:
+        return checkDuplicatedNickname(state.nickname)
+        
+      case let .errorToastMessage(message):
+        state.errorToastMessage = message
+        return .none
+        
       default: return .none
       }
     }
@@ -65,5 +83,22 @@ extension NickNameInputFeature {
       }
     }
     return inputValid
+  }
+  
+  private func checkDuplicatedNickname(_ nickname: String) -> Effect<Action> {
+    return .run { send in
+      do {
+        let result = try await checkNicknameValidateUseCase.execute(nickname)
+        if result.isValid { // 닉네임 유효 -> 이동
+          
+        } else {
+          await send(.nicknameValidMessage(.duplicate))
+        }
+        
+      } catch {
+        await send(.errorToastMessage("회원가입에 실패했어요.."))
+      }
+    }
+      
   }
 }

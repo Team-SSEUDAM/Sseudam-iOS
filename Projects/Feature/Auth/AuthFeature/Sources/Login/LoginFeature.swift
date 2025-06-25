@@ -53,33 +53,38 @@ public struct LoginFeature {
         return .send(.appleLoginRequest)
           .throttle(id: ID.throttle, for: 0.3, scheduler: mainQueue, latest: false)
       case .appleLoginRequest:
-        return .run { send in
-          do {
-            // 애플로그인 요청
-            if let result = try await AppleLoginHelper.requestAuthorization() {
-              if let email = result.email {
-                KeyChainService.save(email, forKey: .email)
-              }
-              print(result)
-              do {
-                let data = try await appleLoginUseCase.execute(result.idToken)
-                if data.isTempToken {
-                  return await send(.requestLogin)
-                }
-              } catch {
-                return await send(.delegate(.dismiss))
-              }
-              
-            }
-          } catch {
-            print("[AppleLogin Failure] ", error.localizedDescription)
-          }
-        }
+        return requestAppleLogin()
       case .requestLogin:
         // TODO: - 로그인 api 연결
         return .send(.delegate(.presentSignUp))
         
       default: return .none
+      }
+    }
+  }
+  
+  
+  private func requestAppleLogin() -> Effect<Action> {
+    return .run { send in
+      do {
+        // 애플로그인 요청
+        if let result = try await AppleLoginHelper.requestAuthorization() {
+          if let email = result.email {
+            KeyChainService.save(email, forKey: .email)
+          }
+          print(result)
+          do {
+            let data = try await appleLoginUseCase.execute(result.idToken)
+            if data.isTempToken {
+              return await send(.requestLogin)
+            }
+          } catch {
+            return await send(.delegate(.dismiss))
+          }
+          
+        }
+      } catch {
+        print("[AppleLogin Failure] ", error.localizedDescription)
       }
     }
   }

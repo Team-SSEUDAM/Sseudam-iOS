@@ -12,8 +12,7 @@ import ProjectDescriptionHelpers
 let project = Project.makeStaticLibraryProject(
   for: Domain.User,
   dependencies: [
-    .Shared.ThirdParty,
-    .Shared.Utility
+    .Core.Umbrella
   ],
   nameSuffix: "Interface"
 )

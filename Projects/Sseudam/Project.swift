@@ -33,6 +33,9 @@ let project = Project.makeApp(
     .Features.TrashDetail,
     .Features.Auth,
     .Domain.Auth.Implement,
-    .Data.Auth.Implement
+    .Data.Auth.Implement,
+    
+    .Domain.User.Implement,
+    .Data.User.Implement
   ]
 )

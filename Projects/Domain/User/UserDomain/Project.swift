@@ -1,7 +1,7 @@
 //
-//  AuthProject.swift
+//  UserProject.swift
 //
-//  Auth
+//  UserDomain
 //
 //  Created by JiYeon
 //
@@ -9,10 +9,9 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-let project = Project.makeFeature(
-  for: Feature.Auth,
+let project = Project.makeDynamicFrameworkProject(
+  for: Domain.User,
   dependencies: [
-    .Domain.Auth.Interface,
     .Domain.User.Interface
   ]
 )

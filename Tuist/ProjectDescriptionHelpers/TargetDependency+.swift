@@ -31,12 +31,14 @@ public enum Feature: String, ModuleRepresentable {
 public enum Domain: String, ModuleRepresentable {
   case Home
   case Auth
+  case User
   public var typePath: String { "Domain" }
 }
 
 public enum Data: String, ModuleRepresentable {
   case Home
   case Auth
+  case User
   public var typePath: String { "Data" }
 }
 
@@ -126,6 +128,10 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.Auth, isInterface: true))
       public static let Implement = Self.project(.domain(.Auth))
     }
+    public struct User: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.User, isInterface: true))
+      public static let Implement = Self.project(.domain(.User))
+    }
   }
   
   public struct Data: TargetDependencyDelegate {
@@ -136,6 +142,10 @@ extension TargetDependency {
     public struct Auth: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Auth, isInterface: true))
       public static let Implement = Self.project(.data(.Auth))
+    }
+    public struct User: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.User, isInterface: true))
+      public static let Implement = Self.project(.data(.User))
     }
   }
   

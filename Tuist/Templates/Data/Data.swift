@@ -29,7 +29,7 @@ let dataTemplate = Template(
     ),
     // dto
     .file(
-      path: "\(DataPath)/\(name)DataInterface/Sources/Entity/\(name)Entity.swift",
+      path: "\(DataPath)/\(name)DataInterface/Sources/DTO/\(name)DTO.swift",
       templatePath: "data_dto.stencil"
     ),
     // implement project

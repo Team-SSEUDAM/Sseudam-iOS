@@ -9,7 +9,7 @@
 import Foundation
 import {{ feature }}DomainInterface
 import {{ feature }}DataInterface
-import Core
+import NetworkKit
 
 public extension {{ feature }}Repository {
   static var live: {{ feature }}Repository {

@@ -6,6 +6,7 @@
 //  Created by yongin
 //
 
+import SwiftUI
 import ComposableArchitecture
 import ReportDomainInterface
 import DesignKit
@@ -174,14 +175,16 @@ public struct ReportFeature {
         return .none
       case .destination(.presented(.confirmationDialog(.takePhotoButtonTapped))):
         state.destination = nil /// 다이얼로그 제거
-        // TODO: - 사진 찍기 관련 로직 구현 및 action 전달
+        state.destination = .camera(CameraPickerFeature.State())
         return .send(.selectPhoto(.openCameraPreview))
       case .destination(.presented(.confirmationDialog(.selectPhotoButtonTapped))):
         state.destination = nil /// 다이얼로그 제거
+        state.destination = .photoLibraryPicker(PhotoLibraryPickerFeature.State())
         // TODO: - 앨범 사진 선택 관련 로직 구현 및 action 전달
         return .none
       case .destination(.presented(.confirmationDialog(.selectPhotoFromLibraryButtonTapped))):
         state.destination = nil /// 다이얼로그 제거
+        state.destination = .fileDocumentPicker(FileDocumentPickerFeature.State())
         // TODO: - 파일에서 사진 선택 관련 로직 구현 및 action 전달
         return .none
       case .binding:
@@ -197,11 +200,15 @@ public struct ReportFeature {
 
 extension ReportFeature {
   @Reducer
-  public enum Destination: Equatable {
+  public enum Destination {
     case addCompleteReport
     case confirmationDialog(ConfirmationDialogState<ReportFeature.Action.PhotoConfirmationDialog>)
+    case camera(CameraPickerFeature)
+    case photoLibraryPicker(PhotoLibraryPickerFeature)
+    case fileDocumentPicker(FileDocumentPickerFeature)
   }
 }
+
 
 extension ReportFeature.Destination.Action: Equatable { }
 extension ReportFeature.Destination.State: Equatable { }

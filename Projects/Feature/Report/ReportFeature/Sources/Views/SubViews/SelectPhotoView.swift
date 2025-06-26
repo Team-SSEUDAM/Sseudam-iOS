@@ -73,7 +73,7 @@ public struct SelectPhotoView: View {
       size: .Number64,
       renderingMode: .template
     )
-    .foregroundColor(ColorSet.Gray._200)  // 아이콘 색상
+    .foregroundColor(ColorSet.Gray._200)
   }
   
   @ViewBuilder

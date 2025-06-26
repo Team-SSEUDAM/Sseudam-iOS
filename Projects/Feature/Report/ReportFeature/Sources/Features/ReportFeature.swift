@@ -30,6 +30,7 @@ public struct ReportFeature {
     var nextButtonText: String = "시작하기"
     
     var reportModel: ReportBody = ReportBody()
+    var selectedPhoto: UIImage? = nil
     
     public init() {}
   }
@@ -150,7 +151,11 @@ public struct ReportFeature {
       /// `SelectPhotoFeature`의 `Delegate`처리
       case let .selectPhoto(.delegate(action)):
         if state.currentPage != 4 { return .none }
-        return .none
+        switch action {
+        case let .photoSelected(photo):
+          state.selectedPhoto = photo /// 사진은, 일반적인 ReportBody에 담지 않고, presignedURL로 별도 처리
+          return .send(.nextButtonIsEnabled(true))
+        }
       case .binding:
         return .none
         default: return .none

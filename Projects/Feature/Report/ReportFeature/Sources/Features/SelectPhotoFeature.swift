@@ -45,7 +45,9 @@ public struct SelectPhotoFeature {
     
     case willAppearPhotoConfirmationDialog
     
-    public enum Delegate: Equatable { }
+    public enum Delegate: Equatable {
+      case photoSelected(UIImage) /// 사진이 선택되었을 때
+    }
   }
   
   public var body: some ReducerOf<Self> {
@@ -56,8 +58,8 @@ public struct SelectPhotoFeature {
         return .send(.willAppearPhotoConfirmationDialog)
       case let .photoTaken(image):
         state.selectedPhoto = image /// 선택된 사진 저장
-        state.isEnabled = true /// 사진이 선택되었으므로, 다음 버튼 활성화
-        return .none
+        state.isEnabled = true /// 사진이 선택되었으므로, 버튼 활성화
+        return .send(.delegate(.photoSelected(image)))
       case .willAppearPhotoConfirmationDialog:
         state.destination = .confirmationDialog(.makePhotoConfirmationDialog)
         return .none

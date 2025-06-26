@@ -32,7 +32,6 @@ public struct SelectPhotoFeature {
     public enum PhotoConfirmationDialog: Equatable {
       case takePhotoButtonTapped
       case selectPhotoButtonTapped
-      case selectPhotoFromLibraryButtonTapped
     }
     
     case destination(PresentationAction<Destination.Action>)
@@ -70,24 +69,16 @@ public struct SelectPhotoFeature {
       case .destination(.presented(.confirmationDialog(.selectPhotoButtonTapped))):
         state.destination = .photoLibraryPicker(PhotoLibraryPickerFeature.State())
         return .none
-      case .destination(.presented(.confirmationDialog(.selectPhotoFromLibraryButtonTapped))):
-        state.destination = .fileDocumentPicker(FileDocumentPickerFeature.State())
-        return .none
       /// 각 화면에서 사진 선택 과정을 진행 후, delegate로 처리되는 action
       case let .destination(.presented(.camera(.delegate(.photoTaken(photo))))):
         return .send(.photoTaken(photo))
       case let .destination(.presented(.photoLibraryPicker(.delegate(.photoSelected(photo))))):
-        return .send(.photoTaken(photo))
-      case let .destination(.presented(.fileDocumentPicker(.delegate(.fileSelected(photo))))):
         return .send(.photoTaken(photo))
       case .destination(.presented(.camera(.delegate(.cancelled)))):
         state.destination = nil /// 카메라 화면 제거
         return .none
       case .destination(.presented(.photoLibraryPicker(.delegate(.cancelled)))):
         state.destination = nil /// 사진 선택 화면 제거
-        return .none
-      case .destination(.presented(.fileDocumentPicker(.delegate(.cancelled)))):
-        state.destination = nil /// 파일 선택 화면 제거
         return .none
       case .binding:
         return .none
@@ -107,7 +98,6 @@ extension SelectPhotoFeature {
     case confirmationDialog(ConfirmationDialogState<SelectPhotoFeature.Action.PhotoConfirmationDialog>)
     case camera(CameraPickerFeature)
     case photoLibraryPicker(PhotoLibraryPickerFeature)
-    case fileDocumentPicker(FileDocumentPickerFeature)
   }
 }
 
@@ -120,7 +110,6 @@ extension ConfirmationDialogState where Action == SelectPhotoFeature.Action.Phot
   } actions: {
     ButtonState(action: .takePhotoButtonTapped) { TextState("사진 찍기") }
     ButtonState(action: .selectPhotoButtonTapped) { TextState("사진 보관함에서 선택") }
-    ButtonState(action: .selectPhotoFromLibraryButtonTapped) { TextState("파일에서 선택") }
     ButtonState(role: .cancel) { TextState("취소") }
   }
 }

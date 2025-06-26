@@ -43,8 +43,27 @@ public struct DocumentPickerRepresentable: UIViewControllerRepresentable {
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
       guard let url = urls.first else { return }
       
-      if let image = UIImage(contentsOfFile: url.path) {
-        parent.onImagePicked(image)
+      // 1) 보안 범위 접근 시작
+      guard url.startAccessingSecurityScopedResource() else {
+        print("[DocumentPicker] 보안 범위 접근 불가")
+        parent.onCancel()
+        return
+      }
+      defer {
+        url.stopAccessingSecurityScopedResource()
+      }
+      
+      do {
+        let data = try Data(contentsOf: url)
+        if let image = UIImage(data: data) {
+          parent.onImagePicked(image)
+        } else {
+          print("[DocumentPicker] 이미지 디코딩 실패")
+          parent.onCancel()
+        }
+      } catch {
+        print("[DocumentPicker] 데이터 읽기 오류:", error)
+        parent.onCancel()
       }
     }
     

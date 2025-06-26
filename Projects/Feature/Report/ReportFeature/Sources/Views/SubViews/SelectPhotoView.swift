@@ -29,55 +29,67 @@ public struct SelectPhotoView: View {
             .font(FontSet.Body.body3)
             .foregroundColor(ColorSet.Text.Secondary)
         }
-        if store.selectedPhoto != nil {
-          selectedPhotoView
-        } else {
-          defaultPhotoView
-        }
+        photoImageView
+          .aspectRatio(1, contentMode: .fit)
+          .clipShape(RoundedRectangle(cornerRadius: .Number16))
+          .onTapGesture { store.send(.centerButtonTapped) }
       }
       .padding(.horizontal, .Number16)
       .padding(.vertical, .Number24)
       Spacer()
     }
-    .fullScreenCover(item: $store.scope(state: \.destination?.camera, action: \.destination.camera)) { store in
+    .fullScreenCover(
+      item: $store.scope(state: \.destination?.camera, action: \.destination.camera)
+    ) { store in
       CameraPickerView(store: store)
     }
-    .confirmationDialog($store.scope(state: \.destination?.confirmationDialog, action: \.destination.confirmationDialog))
-    .sheet(item: $store.scope(state: \.destination?.photoLibraryPicker, action: \.destination.photoLibraryPicker)) { store in
+    .fullScreenCover(
+      item: $store.scope(state: \.destination?.photoLibraryPicker, action: \.destination.photoLibraryPicker)
+    ) { store in
       PhotoLibraryPickerView(store: store)
     }
+    .confirmationDialog($store.scope(state: \.destination?.confirmationDialog, action: \.destination.confirmationDialog))
     .sheet(item: $store.scope(state: \.destination?.fileDocumentPicker, action: \.destination.fileDocumentPicker)) { store in
       FileDocumentPickerView(store: store)
     }
   }
   
   @ViewBuilder
-  public var defaultPhotoView: some View {
-    Rectangle()
-      .fill(ColorSet.Background.Secondary)
-      .aspectRatio(1, contentMode: .fit)
-      .clipShape(RoundedRectangle(cornerRadius: .Number16))
-      .overlay(
-        Icon(
-          image: .arrowCircleUp,
-          size: .Number64,
-          renderingMode: .template
-        )
-        .foregroundColor(ColorSet.Gray._200)
-      )
-      .onTapGesture {
-        store.send(.centerButtonTapped)
+  private var photoImageView: some View {
+    ZStack {
+      ColorSet.Background.Secondary
+      if let uiImage = store.selectedPhoto {
+        selectedPhotoView(uiImage: uiImage)
+      } else {
+        defaultPhotoView
       }
+    }
   }
   
   @ViewBuilder
-  public var selectedPhotoView: some View {
-    Image(uiImage: store.selectedPhoto ?? UIImage())
-      .resizable()
-      .aspectRatio(1, contentMode: .fit)
-      .clipShape(RoundedRectangle(cornerRadius: .Number16))
-      .onTapGesture {
-        store.send(.centerButtonTapped)
-      }
+  private var defaultPhotoView: some View {
+    Icon(
+      image: .arrowCircleUp,
+      size: .Number64,
+      renderingMode: .template
+    )
+    .foregroundColor(ColorSet.Gray._200)  // 아이콘 색상
   }
+  
+  @ViewBuilder
+  private func selectedPhotoView(uiImage: UIImage) -> some View {
+    Image(uiImage: uiImage)
+      .resizable()
+      .aspectRatio(contentMode: .fit)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+  }
+}
+
+#Preview {
+  SelectPhotoView(
+    store: Store(
+      initialState: SelectPhotoFeature.State(),
+      reducer: { SelectPhotoFeature() }
+    )
+  )
 }

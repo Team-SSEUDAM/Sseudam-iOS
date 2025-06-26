@@ -27,10 +27,7 @@ public struct CameraPickerFeature {
   
   public var body: some ReducerOf<Self> {
     Reduce { state, action in
-      switch action {
-      case .delegate:
-        return .none
-      }
+      return .none
     }
   }
 }

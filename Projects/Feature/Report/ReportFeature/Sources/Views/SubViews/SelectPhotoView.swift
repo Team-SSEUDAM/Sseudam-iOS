@@ -49,5 +49,15 @@ public struct SelectPhotoView: View {
       .padding(.vertical, .Number24)
       Spacer()
     }
+    .confirmationDialog($store.scope(state: \.destination?.confirmationDialog, action: \.destination.confirmationDialog))
+    .sheet(item: $store.scope(state: \.destination?.camera, action: \.destination.camera)) { store in
+      CameraPickerView(store: store)
+    }
+    .sheet(item: $store.scope(state: \.destination?.photoLibraryPicker, action: \.destination.photoLibraryPicker)) { store in
+      PhotoLibraryPickerView(store: store)
+    }
+    .sheet(item: $store.scope(state: \.destination?.fileDocumentPicker, action: \.destination.fileDocumentPicker)) { store in
+      FileDocumentPickerView(store: store)
+    }
   }
 }

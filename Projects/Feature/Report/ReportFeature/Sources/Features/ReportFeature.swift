@@ -20,8 +20,6 @@ public struct ReportFeature {
   
   @ObservableState
   public struct State: Equatable {
-    @Presents var destination: Destination.State?
-    
     var currentPage: Int = 0
     var moveLocation: MoveLocationFeature.State = MoveLocationFeature.State()
     var writeName: WriteNameFeature.State = WriteNameFeature.State()
@@ -37,16 +35,6 @@ public struct ReportFeature {
   }
 
   public enum Action: BindableAction, Equatable {
-    
-    @CasePathable
-    public enum PhotoConfirmationDialog: Equatable {
-      case takePhotoButtonTapped
-      case selectPhotoButtonTapped
-      case selectPhotoFromLibraryButtonTapped
-    }
-    
-    case destination(PresentationAction<Destination.Action>)
-    
     case moveLocation(MoveLocationFeature.Action)
     case writeName(WriteNameFeature.Action)
     case selectKind(SelectKindFeature.Action)
@@ -63,8 +51,6 @@ public struct ReportFeature {
     case didAppearSelectKind
     /// 사진 선택 화면이 나타날 때
     case didAppearSelectPhoto
-    
-    case willAppearPhotoConfirmationDialog
     
     case nextButtonIsEnabled(Bool)
     case nextButtonTapped
@@ -164,59 +150,11 @@ public struct ReportFeature {
       /// `SelectPhotoFeature`의 `Delegate`처리
       case let .selectPhoto(.delegate(action)):
         if state.currentPage != 4 { return .none }
-        switch action {
-        case .centerButtonTapped:
-          return .send(.willAppearPhotoConfirmationDialog)
-        }
-      /// - 바텀 다이얼로그 관련 action 처리
-      case .willAppearPhotoConfirmationDialog:
-        state.destination = .confirmationDialog(.makePhotoConfirmationDialog)
-        return .none
-      case .destination(.presented(.confirmationDialog(.takePhotoButtonTapped))):
-        state.destination = nil /// 다이얼로그 제거 후 카메라 화면으로 이동
-        state.destination = .camera(CameraPickerFeature.State())
-        return .none
-      case .destination(.presented(.confirmationDialog(.selectPhotoButtonTapped))):
-        state.destination = nil /// 다이얼로그 제거 후 사진 선택 화면으로 이동
-        state.destination = .photoLibraryPicker(PhotoLibraryPickerFeature.State())
-        return .none
-      case .destination(.presented(.confirmationDialog(.selectPhotoFromLibraryButtonTapped))):
-        state.destination = nil /// 다이얼로그 제거 후 파일 선택 화면으로 이동
-        state.destination = .fileDocumentPicker(FileDocumentPickerFeature.State())
         return .none
       case .binding:
         return .none
         default: return .none
       }
     }
-    .ifLet(\.$destination, action: \.destination) {
-      Destination.body
-    }
-  }
-}
-
-extension ReportFeature {
-  @Reducer
-  public enum Destination {
-    case addCompleteReport
-    case confirmationDialog(ConfirmationDialogState<ReportFeature.Action.PhotoConfirmationDialog>)
-    case camera(CameraPickerFeature)
-    case photoLibraryPicker(PhotoLibraryPickerFeature)
-    case fileDocumentPicker(FileDocumentPickerFeature)
-  }
-}
-
-
-extension ReportFeature.Destination.Action: Equatable { }
-extension ReportFeature.Destination.State: Equatable { }
-
-extension ConfirmationDialogState where Action == ReportFeature.Action.PhotoConfirmationDialog {
-  public static let makePhotoConfirmationDialog = Self {
-    TextState("")
-  } actions: {
-    ButtonState(action: .takePhotoButtonTapped) { TextState("사진 찍기") }
-    ButtonState(action: .selectPhotoButtonTapped) { TextState("사진 보관함에서 선택") }
-    ButtonState(action: .selectPhotoFromLibraryButtonTapped) { TextState("파일에서 선택") }
-    ButtonState(role: .cancel) { TextState("취소") }
   }
 }

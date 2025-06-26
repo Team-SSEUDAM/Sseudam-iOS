@@ -9,14 +9,15 @@
 import Foundation
 import AuthDomainInterface
 import AuthDataInterface
-//import Core
+import NetworkKit
 
 public extension AuthRepository {
-  static var test: AuthRepository {
+  static func live(networker: NetworkKit) -> AuthRepository {
     AuthRepository(fetchData: {
       return
     }, requestAppleLogin: { token in
-      return .init(isTempToken: true, accessToKen: "ㅇㅇ", refreshToken: "ㅇㅇ")
+      let endpoint = AuthEndpoint.appleLogin(body: .init(token: token))
+      return try await networker.execute(with: endpoint, timeout: 60).toEntity()
       
     })
   }

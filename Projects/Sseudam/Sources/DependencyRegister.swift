@@ -21,14 +21,15 @@ import UserDomainInterface
 import UserDomain
 import UserDataInterface
 import UserData
-
+import NetworkKit
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
 struct DependencyRegister {
   /// UseCase에 Repository 주입
   func injection() {
+    let netwoker = NetworkKit()
     let homeRepository = HomeRepository.live
-    let authRepository = AuthRepository.test
+    let authRepository = AuthRepository.live(networker: netwoker)
     let userReoository = UserRepository.test
     
     // MARK: - Home
@@ -42,7 +43,11 @@ struct DependencyRegister {
     // MARK: - Auth
     
     AppleLoginUseCaseRegister {
-      AppleLoginUseCase.test(repository: authRepository)
+      AppleLoginUseCase.live(repository: authRepository)
+    }
+    
+    TokenSaveUseCaseRegister {
+      TokenSaveUseCase.live()
     }
     
     // MARK: - User

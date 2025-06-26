@@ -26,7 +26,7 @@ public struct LoginFeature {
     case closeButtonTapped
     case appleLoginTapped
     case appleLoginRequest
-    case requestLogin
+    case presentSignUp
     case delegate(Delegate)
   }
   
@@ -41,6 +41,7 @@ public struct LoginFeature {
   
   @Dependency(\.mainQueue) var mainQueue
   @Dependency(\.AppleLoginUseCase) var appleLoginUseCase
+  @Dependency(\.TokenSaveUseCase) var tokenSaveUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -52,17 +53,17 @@ public struct LoginFeature {
       case .appleLoginTapped:
         return .send(.appleLoginRequest)
           .throttle(id: ID.throttle, for: 0.3, scheduler: mainQueue, latest: false)
+        
       case .appleLoginRequest:
         return requestAppleLogin()
-      case .requestLogin:
-        // TODO: - 로그인 api 연결
+        
+      case .presentSignUp:
         return .send(.delegate(.presentSignUp))
         
       default: return .none
       }
     }
   }
-  
   
   private func requestAppleLogin() -> Effect<Action> {
     return .run { send in
@@ -75,8 +76,11 @@ public struct LoginFeature {
           print(result)
           do {
             let data = try await appleLoginUseCase.execute(result.idToken)
+            await tokenSaveUseCase.execute(data)
             if data.isTempToken {
-              return await send(.requestLogin)
+              return await send(.presentSignUp)
+            } else {
+              await send(.delegate(.dismiss))
             }
           } catch {
             return await send(.delegate(.dismiss))

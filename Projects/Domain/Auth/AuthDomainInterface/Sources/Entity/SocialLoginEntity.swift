@@ -10,12 +10,12 @@ import Foundation
 
 public struct SocialLoginEntity: Sendable, Equatable {
   public let isTempToken: Bool
-  public let accessToKen: String
+  public let accessToken: String
   public let refreshToken: String
   
   public init(isTempToken: Bool, accessToKen: String, refreshToken: String) {
     self.isTempToken = isTempToken
-    self.accessToKen = accessToKen
+    self.accessToken = accessToKen
     self.refreshToken = refreshToken
   }
 }

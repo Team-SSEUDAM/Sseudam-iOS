@@ -8,16 +8,15 @@
 
 import Foundation
 import AuthDomainInterface
+import NetworkKit
 
-public struct LoginDTO {
+public struct SocialLoginDTO: DTO {
   public var isTemporaryToken: Bool
   public var accessToken: String
   public var refreshToken: String
-  
-  
 }
 
-extension LoginDTO {
+extension SocialLoginDTO {
   public func toEntity() throws -> SocialLoginEntity {
     return .init(
       isTempToken: isTemporaryToken,

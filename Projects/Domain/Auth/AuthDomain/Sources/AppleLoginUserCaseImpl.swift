@@ -1,5 +1,5 @@
 //
-//  AppleLoginUserCaseImpl.swift
+//  AppleLoginUseCaseImpl.swift
 //  AuthDomain
 //
 //  Created by Jiyeon on 6/24/25.
@@ -10,7 +10,7 @@ import Foundation
 import AuthDomainInterface
 
 extension AppleLoginUseCase {
-  public static func test(repository: AuthRepository) -> AppleLoginUseCase {
+  public static func live(repository: AuthRepository) -> AppleLoginUseCase {
     .init { token in
       try await repository.requestAppleLogin(token)
     }

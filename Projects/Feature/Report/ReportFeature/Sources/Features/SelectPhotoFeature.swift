@@ -59,38 +59,33 @@ public struct SelectPhotoFeature {
       case let .photoTaken(image):
         state.selectedPhoto = image /// 선택된 사진 저장
         state.isEnabled = true /// 사진이 선택되었으므로, 버튼 활성화
+        state.destination = nil /// 현재 화면 제거
         return .send(.delegate(.photoSelected(image)))
       case .willAppearPhotoConfirmationDialog:
         state.destination = .confirmationDialog(.makePhotoConfirmationDialog)
         return .none
       case .destination(.presented(.confirmationDialog(.takePhotoButtonTapped))):
-        state.destination = nil /// 다이얼로그 제거 후 카메라 화면으로 이동
         state.destination = .camera(CameraPickerFeature.State())
         return .none
       case .destination(.presented(.confirmationDialog(.selectPhotoButtonTapped))):
-        state.destination = nil /// 다이얼로그 제거 후 사진 선택 화면으로 이동
         state.destination = .photoLibraryPicker(PhotoLibraryPickerFeature.State())
         return .none
       case .destination(.presented(.confirmationDialog(.selectPhotoFromLibraryButtonTapped))):
-        state.destination = nil /// 다이얼로그 제거 후 파일 선택 화면으로 이동
         state.destination = .fileDocumentPicker(FileDocumentPickerFeature.State())
         return .none
       /// 각 화면에서 사진 선택 과정을 진행 후, delegate로 처리되는 action
       case let .destination(.presented(.camera(.delegate(.photoTaken(photo))))):
-        state.destination = nil /// 카메라 화면 제거
+        return .send(.photoTaken(photo))
+      case let .destination(.presented(.photoLibraryPicker(.delegate(.photoSelected(photo))))):
+        return .send(.photoTaken(photo))
+      case let .destination(.presented(.fileDocumentPicker(.delegate(.fileSelected(photo))))):
         return .send(.photoTaken(photo))
       case .destination(.presented(.camera(.delegate(.cancelled)))):
         state.destination = nil /// 카메라 화면 제거
         return .none
-      case let .destination(.presented(.photoLibraryPicker(.delegate(.photoSelected(photo))))):
-        state.destination = nil /// 사진 선택 화면 제거
-        return .send(.photoTaken(photo))
       case .destination(.presented(.photoLibraryPicker(.delegate(.cancelled)))):
         state.destination = nil /// 사진 선택 화면 제거
         return .none
-      case let .destination(.presented(.fileDocumentPicker(.delegate(.fileSelected(photo))))):
-        state.destination = nil /// 파일 선택 화면 제거
-        return .send(.photoTaken(photo))
       case .destination(.presented(.fileDocumentPicker(.delegate(.cancelled)))):
         state.destination = nil /// 파일 선택 화면 제거
         return .none

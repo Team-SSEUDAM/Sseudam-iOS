@@ -27,6 +27,12 @@ import UserDomainInterface
 import UserDomain
 import UserDataInterface
 import UserData
+
+import TrashSpotDomainInterface
+import TrashSpotDomain
+import TrashSpotDataInterface
+import TrashSpotData
+
 import NetworkKit
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
@@ -37,11 +43,13 @@ struct DependencyRegister {
     let homeRepository = HomeRepository.live
     let authRepository = AuthRepository.live(networker: networker)
     let userReoository = UserRepository.live(networker: networker)
+    let trashSpotRepository = TrashSpotRepository.live(networker: netwoker)
     
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live
 
     // MARK: - Home
+      
     HomeUseCaseRegister(
       provider: {
         HomeUseCase.live(repository: homeRepository)
@@ -102,6 +110,10 @@ struct DependencyRegister {
     
     SearchAreaUseCaseRegister {
       SearchAreaUseCase.live(repository: userReoository)
+    }
+    
+    FetchTrashSpotUseCaseRegister {
+      FetchTrashSpotUseCase.live(repository: trashSpotRepository)
     }
     
   }

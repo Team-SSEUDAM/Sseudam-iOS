@@ -32,5 +32,8 @@ let project = Project.makeApp(
   dependencies: [
     .Features.Umbrella,
     .Data.Umbrella
+    
+    // .Domain.TrashSpot.Implement,
+    // .Data.TrashSpot.Implement
   ]
 )

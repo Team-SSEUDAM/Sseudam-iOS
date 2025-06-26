@@ -10,6 +10,7 @@ import ComposableArchitecture
 import HomeDomainInterface
 
 import ReportFeature
+import TrashSpotDomainInterface
 import DesignKit
 
 @Reducer
@@ -21,7 +22,7 @@ public struct HomeFeature {
   public struct State: Equatable {
     public var location: LocationFeature.State = .init()
     public var requestMapBounds: Bool = false
-    public var trashItems: [TrashItem] = []
+    public var trashItems: [TrashSpot] = []
     public var trashType: TrashType? = nil
     public var researchButtonEnable: Bool = false
     public var isNeedDeleteMarker: Bool = false
@@ -37,7 +38,7 @@ public struct HomeFeature {
     
     case requestMapBounds(Bool)
     case fetchTrashItems([MapPoint])
-    case storeTrashItems([TrashItem])
+    case storeTrashItems([TrashSpot])
     case filterTapped(TrashType?)
     case researchButtonEnable(Bool)
     case markerTapped(Int?)
@@ -57,7 +58,8 @@ public struct HomeFeature {
   }
   
   @Dependency(\.HomeUseCase) var homeUseCase
-
+  @Dependency(\.FetchTrashSpotUseCase) var fetchTrashSpotUseCase
+  
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Scope(state: \.location, action: \.location) {
@@ -93,6 +95,7 @@ public struct HomeFeature {
         return fetchTrashItem(bounds: bounds, type: state.trashType)
         
       case let .storeTrashItems(items):
+        print("storeTrashItems ", items.count)
         state.trashItems.removeAll()
         state.trashItems = items
         return .none
@@ -140,10 +143,22 @@ extension HomeFeature {
   
   // TODO: - trash spot API 연결
   private func fetchTrashItem(bounds: [MapPoint], type: TrashType?) -> Effect<Action> {
-    if let _ = type {
-      return .send(.storeTrashItems(sampleData2))
+    return .run { send in
+      let parameter: FetchTrashSpotParameter = .init(
+        region: nil,
+        type: type?.rawValue,
+        swLat: bounds[0].latitude,
+        swLng: bounds[0].longitude,
+        neLat: bounds[1].latitude,
+        neLng: bounds[1].longitude
+      )
+      do {
+        let result = try await fetchTrashSpotUseCase.execute(parameter)
+        return await send(.storeTrashItems(result))
+      } catch {
+        
+      }
     }
-    return .none
   }
 }
 

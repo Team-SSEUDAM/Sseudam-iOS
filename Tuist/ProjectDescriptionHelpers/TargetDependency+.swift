@@ -38,6 +38,7 @@ public enum Domain: String, ModuleRepresentable {
   case NMReverseGeocoding
   case Suggestion
   case Report
+  case TrashSpot
   public var typePath: String { "Domain" }
 }
 
@@ -49,6 +50,7 @@ public enum Data: String, ModuleRepresentable {
   case NMReverseGeocoding
   case Suggestion
   case Report
+  case TrashSpot
   public var typePath: String { "Data" }
 }
 
@@ -165,6 +167,10 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.Report, isInterface: true))
       public static let Implement = Self.project(.domain(.Report))
     }
+    public struct TrashSpot: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.TrashSpot, isInterface: true))
+      public static let Implement = Self.project(.domain(.TrashSpot))
+    }
   }
   
   public struct Data: TargetDependencyDelegate {
@@ -193,6 +199,10 @@ extension TargetDependency {
     public struct Report: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Report, isInterface: true))
       public static let Implement = Self.project(.data(.Report))
+    }
+    public struct TrashSpot: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.TrashSpot, isInterface: true))
+      public static let Implement = Self.project(.data(.TrashSpot))
     }
   }
   

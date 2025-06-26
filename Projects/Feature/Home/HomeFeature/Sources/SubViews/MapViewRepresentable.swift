@@ -8,7 +8,7 @@
 
 import SwiftUI
 import UIKit
-import HomeDomainInterface
+import TrashSpotDomainInterface
 import Utility
 import NMapsMap
 
@@ -18,7 +18,7 @@ struct MapViewRepresentable: UIViewRepresentable {
   /// 현재 지도 범위 요청 플래그
   @Binding var requestMapBounds: Bool
   /// 지도에 나타나는 쓰레기통 아이템 리스트
-  @Binding var trashItems: [TrashItem]
+  @Binding var trashItems: [TrashSpot]
   /// 지도 움직임 여부
   @Binding var isMapMove: Bool
   
@@ -38,7 +38,7 @@ struct MapViewRepresentable: UIViewRepresentable {
     view.showZoomControls = false
     view.mapView.positionMode = .direction
     view.mapView.zoomLevel = 16
-    view.mapView.minZoomLevel = 9
+    view.mapView.minZoomLevel = 8
     view.mapView.maxZoomLevel = 20
     view.mapView.isIndoorMapEnabled = false
     view.showIndoorLevelPicker = false
@@ -138,7 +138,7 @@ extension MapViewRepresentable {
     }
   }
   
-  private func markerTapEvent(to marker: NMFMarker, data: TrashItem, context: Context) {
+  private func markerTapEvent(to marker: NMFMarker, data: TrashSpot, context: Context) {
     if marker == context.coordinator.activeMarker { return }
     marker.iconImage = data.trashType.activePinImage
     context.coordinator.markerTapEvent(marker: marker, data: data)
@@ -168,18 +168,18 @@ extension MapViewRepresentable {
 extension MapViewRepresentable {
   
   /// 지도에 마커 보여주기
-  private func presentMarkers(_ view: NMFNaverMapView, items: [TrashItem], context: Context) {
-    
+  private func presentMarkers(_ view: NMFNaverMapView, items: [TrashSpot], context: Context) {
+    print(#function, items.count)
     if context.coordinator.trashItems != items {
       deleteDrawMarker(context: context)
     }
     // 카메라 이동
-    let mid = averageCenter(of: items.map { $0.point })
+    let mid = averageCenter(of: items.map { $0.location })
     moveCamera(view, to: mid, zoomLevel: view.mapView.cameraPosition.zoom)
     
     // 그리기
     let markers: [NMFMarker] = items.map { item in
-      let point = NMGLatLng(lat: item.point.latitude, lng: item.point.longitude)
+      let point = NMGLatLng(lat: item.location.latitude, lng: item.location.longitude)
       
       let marker = drawMarker(view, to: point, icon: item.trashType.inactiveImage)
       marker.mapView = view.mapView
@@ -187,7 +187,7 @@ extension MapViewRepresentable {
       marker.touchHandler = { (overlay: NMFOverlay) -> Bool in
         guard let marker = overlay as? NMFMarker else { return true }
         markerTapEvent(to: marker, data: item, context: context)
-        moveCamera(view, to: item.point)
+        moveCamera(view, to: item.location)
         return true
       }
       return marker

@@ -14,6 +14,8 @@ let project = Project.makeFeature(
   dependencies: [
     .Features.Report,
     .Domain.Umbrella
+    .Domain.Home.Interface,
+    .Domain.TrashSpot.Interface
   ]
 )
 

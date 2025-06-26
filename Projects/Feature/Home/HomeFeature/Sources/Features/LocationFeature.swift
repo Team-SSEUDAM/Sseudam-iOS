@@ -8,7 +8,7 @@
 
 import ComposableArchitecture
 import Utility
-import HomeDomainInterface
+import TrashSpotDomainInterface
 
 @Reducer
 public struct LocationFeature {

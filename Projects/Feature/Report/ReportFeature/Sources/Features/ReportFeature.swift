@@ -165,27 +165,24 @@ public struct ReportFeature {
       case let .selectPhoto(.delegate(action)):
         if state.currentPage != 4 { return .none }
         switch action {
-        case .selectPhotoButtonTapped:
+        case .centerButtonTapped:
           return .send(.willAppearPhotoConfirmationDialog)
         }
-        
       /// - 바텀 다이얼로그 관련 action 처리
       case .willAppearPhotoConfirmationDialog:
         state.destination = .confirmationDialog(.makePhotoConfirmationDialog)
         return .none
       case .destination(.presented(.confirmationDialog(.takePhotoButtonTapped))):
-        state.destination = nil /// 다이얼로그 제거
+        state.destination = nil /// 다이얼로그 제거 후 카메라 화면으로 이동
         state.destination = .camera(CameraPickerFeature.State())
-        return .send(.selectPhoto(.openCameraPreview))
+        return .none
       case .destination(.presented(.confirmationDialog(.selectPhotoButtonTapped))):
-        state.destination = nil /// 다이얼로그 제거
+        state.destination = nil /// 다이얼로그 제거 후 사진 선택 화면으로 이동
         state.destination = .photoLibraryPicker(PhotoLibraryPickerFeature.State())
-        // TODO: - 앨범 사진 선택 관련 로직 구현 및 action 전달
         return .none
       case .destination(.presented(.confirmationDialog(.selectPhotoFromLibraryButtonTapped))):
-        state.destination = nil /// 다이얼로그 제거
+        state.destination = nil /// 다이얼로그 제거 후 파일 선택 화면으로 이동
         state.destination = .fileDocumentPicker(FileDocumentPickerFeature.State())
-        // TODO: - 파일에서 사진 선택 관련 로직 구현 및 action 전달
         return .none
       case .binding:
         return .none

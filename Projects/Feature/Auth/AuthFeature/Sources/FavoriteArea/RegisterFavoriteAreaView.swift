@@ -36,13 +36,14 @@ public struct RegisterFavoriteAreaView: View {
           state: .constant(.accent),
           isFocused: $store.focusKeyboard
         )
-        Spacer()
+        SearchItemList(items: store.searchItems)
+        .frame(maxHeight: .infinity)
         PrimaryButton(
           title: "완료",
           size: .large,
           state: .normal
         ) { }
-        .padding(.vertical, .Number16)
+          .padding(.vertical, .Number16)
       }
       .padding(.horizontal, .Number16)
     }
@@ -51,6 +52,35 @@ public struct RegisterFavoriteAreaView: View {
       store.send(.onAppear)
     }
     
+  }
+  
+  @ViewBuilder
+  private func SearchItemList(items: [String]) -> some View {
+    if !items.isEmpty {
+      ScrollView(showsIndicators: true) {
+        LazyVStack(spacing: .Number0) {
+          ForEach(items, id: \.self) { area in
+            Text(area)
+              .font(FontSet.Body.body2)
+              .foregroundStyle(ColorSet.Text.Primary)
+              .frame(maxWidth: .infinity, alignment: .leading)
+              .padding(.vertical, .Number12)
+              .background(Color.white)
+              .contentShape(Rectangle())
+              .onTapGesture {
+                store.send(.selectArea(area))
+              }
+          }
+        }
+      }
+      
+      .background(.white)
+      .animation(.easeInOut, value: items.count)
+      .transition(.opacity)
+    } else {
+      // 입력 전엔 공간 차지하지 않음
+      Spacer()
+    }
   }
   
 }

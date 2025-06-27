@@ -17,6 +17,8 @@ public struct RegisterFavoriteAreaFeature {
   public struct State: Equatable {
     var area: String = ""
     var focusKeyboard: Bool = false
+    var searchItems: [String] = []
+    
     public init() {}
   }
   
@@ -25,6 +27,9 @@ public struct RegisterFavoriteAreaFeature {
     case onAppear
     case showKeyboard(Bool)
     case dismiss
+    case searchKeyword(String)
+    case updateSearchAreaItems([String])
+    case selectArea(String)
   }
   
   @Dependency(\.dismiss) var dismiss
@@ -42,11 +47,22 @@ public struct RegisterFavoriteAreaFeature {
         return .none
         
       case .binding(\.area):
-        let keyword = state.area
+        return .send(.searchKeyword(state.area))
+        
+      case let .searchKeyword(keyword):
         return .run { send in
-          let result = try await searchAddressUseCase.execute(keyword)
-          print("🔍 검색 결과:", result)
+          let list = try await searchAddressUseCase.execute(keyword)
+          await send(.updateSearchAreaItems(list))
         }
+        
+      case let .updateSearchAreaItems(items):
+        state.searchItems = items
+        return .none
+        
+      case let .selectArea(area):
+        state.area = area
+        state.searchItems = []
+        return .none
         
       case .dismiss:
         return .run { _ in

@@ -39,15 +39,16 @@ public struct NickNameInputFeature {
     case path(StackActionOf<NavigationPath>)
     case errorToastMessage(String)
     case loadAddress
-  }
-  
-  public enum SignUpPath: Equatable {
-    case registerArea
+    case delegate(Delegate)
   }
   
   @Reducer(state: .equatable, action: .equatable)
   public enum NavigationPath {
     case registerArea(RegisterFavoriteAreaFeature)
+  }
+  
+  public enum Delegate {
+    case dismiss
   }
   
   @Dependency(\.CheckNicknameValidateUseCase) var checkNicknameValidateUseCase
@@ -103,6 +104,10 @@ public struct NickNameInputFeature {
       case let .errorToastMessage(message):
         state.errorToastMessage = message
         return .none
+        
+      case .path(.element(id: let id, action: .registerArea(.delegate(.dismiss)))):
+
+        return .send(.delegate(.dismiss))
         
       default: return .none
       }

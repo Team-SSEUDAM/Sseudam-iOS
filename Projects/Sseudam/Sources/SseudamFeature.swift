@@ -45,6 +45,7 @@ struct SseudamFeature {
   enum ModalDestination {
     case login(LoginFeature)
     case signUp(NickNameInputFeature)
+    case complete(SignUpCompleteFeature)
   }
   
   var body: some ReducerOf<Self> {
@@ -75,11 +76,11 @@ struct SseudamFeature {
         if isPresent, let email = email {
           state.modal = .signUp(NickNameInputFeature.State(email: email))
         } else {
-          state.modal = nil
+          state.modal = .complete(SignUpCompleteFeature.State())
         }
         return .none
         
-      // login delegate
+        // login delegate
       case let .modal(.presented(.login(action))):
         switch action {
         case .delegate(.dismiss):
@@ -95,6 +96,14 @@ struct SseudamFeature {
           
         default: return .none
         }
+        
+      case let .modal(.presented(.signUp(action))):
+        switch action {
+        case .delegate(.dismiss):
+          return .send(.presentNickname(false, nil))
+        default: return .none
+        }
+      
         
         
         

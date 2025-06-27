@@ -10,6 +10,7 @@ import ComposableArchitecture
 import UserDomainInterface
 import AuthDomainInterface
 import KeyChain
+import UserDefaults
 
 @Reducer
 public struct RegisterFavoriteAreaFeature {
@@ -42,7 +43,13 @@ public struct RegisterFavoriteAreaFeature {
     case signUp
     case completeButtonTapped
     case errorToastMessage(String)
+    case delegate(Delegate)
   }
+  
+  public enum Delegate: Equatable {
+    case dismiss
+  }
+  
   
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.SearchAddressUseCase) var searchAddressUseCase
@@ -91,6 +98,8 @@ public struct RegisterFavoriteAreaFeature {
         return .run { send in
           do {
             try await signUpUseCase.execute(email, nickname, area)
+            UserDefaultsKeys.username = nickname
+            await send(.delegate(.dismiss))
           } catch {
             await send(.errorToastMessage("회원가입에 실패했어요"))
           }

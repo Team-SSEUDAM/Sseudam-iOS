@@ -20,6 +20,7 @@ public struct NickNameInputFeature {
     var nicknameValid: NickNameInputValid = .none
     var focusKeyboard: Bool = false
     var errorToastMessage: String? = nil
+    var path = StackState<NavigationPath.State>()
     public init() {}
   }
   
@@ -30,7 +31,18 @@ public struct NickNameInputFeature {
     case checkValidNickName(String)
     case nicknameValidMessage(NickNameInputValid)
     case completeButtonTapped
+    case moveToRegisterArea
+    case path(StackActionOf<NavigationPath>)
     case errorToastMessage(String)
+  }
+  
+  public enum SignUpPath: Equatable {
+    case registerArea
+  }
+  
+  @Reducer(state: .equatable, action: .equatable)
+  public enum NavigationPath {
+    case registerArea(RegisterFavoriteAreaFeature)
   }
   
   @Dependency(\.CheckNicknameValidateUseCase) var checkNicknameValidateUseCase
@@ -56,6 +68,10 @@ public struct NickNameInputFeature {
         state.nicknameValid = type
         return .none
         
+      case .moveToRegisterArea:
+        state.path.append(.registerArea(RegisterFavoriteAreaFeature.State()))
+        return .none
+        
       case .completeButtonTapped:
         return checkDuplicatedNickname(state.nickname)
         
@@ -66,6 +82,7 @@ public struct NickNameInputFeature {
       default: return .none
       }
     }
+    .forEach(\.path, action: \.path)
   }
 }
 
@@ -90,7 +107,7 @@ extension NickNameInputFeature {
       do {
         let result = try await checkNicknameValidateUseCase.execute(nickname)
         if result.isValid { // 닉네임 유효 -> 이동
-          
+          await(send(.moveToRegisterArea))
         } else {
           await send(.nicknameValidMessage(.duplicate))
         }

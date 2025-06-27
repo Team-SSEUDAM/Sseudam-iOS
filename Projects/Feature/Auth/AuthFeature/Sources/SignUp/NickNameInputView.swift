@@ -19,7 +19,7 @@ public struct NickNameInputView: View {
   }
   
   public var body: some View {
-    NavigationStack {
+    NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
       VStack(alignment: .leading) {
         Text("닉네임을 입력해주세요")
           .font(FontSet.Heading.heading1)
@@ -51,6 +51,16 @@ public struct NickNameInputView: View {
       .onAppear {
         store.send(.onAppear)
       }
+      
+    } destination: { store in
+      switch store.case {
+      case .registerArea(let store):
+        RegisterFavoriteAreaView(store: store)
+      }
     }
+    .onAppear {
+      store.send(.onAppear)
+    }
+    .navigationBarHidden(true)
   }
 }

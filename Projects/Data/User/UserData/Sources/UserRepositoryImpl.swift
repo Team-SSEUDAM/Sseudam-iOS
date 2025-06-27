@@ -9,14 +9,16 @@
 import Foundation
 import UserDomainInterface
 import UserDataInterface
-import Core
+import NetworkKit
 
 public extension UserRepository {
-  static var test: UserRepository {
+  static func live(networker: NetworkKit) -> UserRepository {
     let cache = LocationCache()
+    
     return UserRepository(
       checkNicknameValidate: { nickname in
-        return .init(isValid: true, message: "")
+        let endpoint = UserEndPoint.nicknameValid(body: .init(nickname: nickname))
+        return try await networker.execute(with: endpoint, timeout: 60).toEntity()
       }, loadLocationList: {
         await cache.load()
       }, fetchLocationList: {

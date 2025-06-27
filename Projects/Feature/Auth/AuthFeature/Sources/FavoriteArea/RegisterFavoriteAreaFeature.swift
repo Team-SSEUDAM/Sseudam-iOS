@@ -8,6 +8,8 @@
 
 import ComposableArchitecture
 import UserDomainInterface
+import AuthDomainInterface
+import KeyChain
 
 @Reducer
 public struct RegisterFavoriteAreaFeature {
@@ -15,11 +17,18 @@ public struct RegisterFavoriteAreaFeature {
   
   @ObservableState
   public struct State: Equatable {
+    var nickname: String
+    var email: String
     var area: String = ""
     var focusKeyboard: Bool = false
     var searchItems: [String] = []
     var isSelectItem: Bool = false
-    public init() {}
+    var errorToastMessage: String? = nil
+    
+    public init(email: String, nickname: String) {
+      self.email = email
+      self.nickname = nickname
+    }
   }
   
   public enum Action: BindableAction, Equatable {
@@ -30,10 +39,14 @@ public struct RegisterFavoriteAreaFeature {
     case searchKeyword(String)
     case updateSearchAreaItems([String])
     case selectArea(String)
+    case signUp
+    case completeButtonTapped
+    case errorToastMessage(String)
   }
   
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.SearchAddressUseCase) var searchAddressUseCase
+  @Dependency(\.SignUpUseCase) var signUpUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -70,6 +83,23 @@ public struct RegisterFavoriteAreaFeature {
         return .run { _ in
           await self.dismiss()
         }
+        
+      case .completeButtonTapped:
+        let email = state.email
+        let nickname = state.nickname
+        let area = state.area
+        return .run { send in
+          do {
+            try await signUpUseCase.execute(email, nickname, area)
+          } catch {
+            await send(.errorToastMessage("회원가입에 실패했어요"))
+          }
+        }
+      
+      case let .errorToastMessage(message):
+        state.errorToastMessage = message
+        return .none
+        
       default: return .none
       }
     }

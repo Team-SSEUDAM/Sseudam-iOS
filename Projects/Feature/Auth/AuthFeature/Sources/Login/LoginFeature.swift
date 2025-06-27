@@ -26,12 +26,12 @@ public struct LoginFeature {
     case closeButtonTapped
     case appleLoginTapped
     case appleLoginRequest
-    case presentSignUp
+    case presentSignUp(email: String?)
     case delegate(Delegate)
   }
   
   public enum Delegate: Equatable {
-    case presentSignUp
+    case presentSignUp(email: String?)
     case dismiss
   }
   
@@ -57,8 +57,8 @@ public struct LoginFeature {
       case .appleLoginRequest:
         return requestAppleLogin()
         
-      case .presentSignUp:
-        return .send(.delegate(.presentSignUp))
+      case let .presentSignUp(email):
+        return .send(.delegate(.presentSignUp(email: email)))
         
       default: return .none
       }
@@ -70,15 +70,17 @@ public struct LoginFeature {
       do {
         // 애플로그인 요청
         if let result = try await AppleLoginHelper.requestAuthorization() {
-          if let email = result.email {
+          var email: String? = result.email
+          if let email = email {
             KeyChainService.save(email, forKey: .email)
+          } else {
+            email = KeyChainService.read(forKey: .email)
           }
-          print(result)
           do {
             let data = try await appleLoginUseCase.execute(result.idToken)
             await tokenSaveUseCase.execute(data)
             if data.isTempToken {
-              return await send(.presentSignUp)
+              return await send(.presentSignUp(email: email))
             } else {
               await send(.delegate(.dismiss))
             }

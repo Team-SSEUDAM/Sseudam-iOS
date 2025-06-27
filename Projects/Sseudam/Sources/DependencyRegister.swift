@@ -30,7 +30,7 @@ struct DependencyRegister {
     let netwoker = NetworkKit()
     let homeRepository = HomeRepository.live
     let authRepository = AuthRepository.live(networker: netwoker)
-    let userReoository = UserRepository.test
+    let userReoository = UserRepository.live(networker: netwoker)
     
     // MARK: - Home
     
@@ -48,6 +48,10 @@ struct DependencyRegister {
     
     TokenSaveUseCaseRegister {
       TokenSaveUseCase.live()
+    }
+    
+    SignUpUseCaseRegister {
+      SignUpUseCase.live(repository: authRepository)
     }
     
     // MARK: - User

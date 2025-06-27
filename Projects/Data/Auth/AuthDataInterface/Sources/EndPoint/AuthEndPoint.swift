@@ -18,4 +18,12 @@ public struct AuthEndpoint: Sendable {
       parameters: .body(body)
     )
   }
+  
+  public static func signUp(body: SignUpBody) -> Endpoint<SignUpDTO> {
+    return Endpoint(
+      method: .post,
+      path: "/auth/social-signup",
+      parameters: .body(body)
+    )
+  }
 }

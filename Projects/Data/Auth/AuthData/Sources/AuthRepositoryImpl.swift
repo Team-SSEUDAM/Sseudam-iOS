@@ -13,12 +13,16 @@ import NetworkKit
 
 public extension AuthRepository {
   static func live(networker: NetworkKit) -> AuthRepository {
-    AuthRepository(fetchData: {
-      return
-    }, requestAppleLogin: { token in
-      let endpoint = AuthEndpoint.appleLogin(body: .init(token: token))
-      return try await networker.execute(with: endpoint, timeout: 60).toEntity()
-      
-    })
+    AuthRepository(
+      requestAppleLogin: { token in
+        let endpoint = AuthEndpoint.appleLogin(body: .init(token: token))
+        return try await networker.execute(with: endpoint, timeout: 60).toEntity()
+        
+      }, requestSignUp: { email, name, address in
+        let body: SignUpBody = .init(email: email, name: name, address: address)
+        let endpoint = AuthEndpoint.signUp(body: body)
+        return try await networker.execute(with: endpoint, timeout: 60).toEntity()
+      }
+    )
   }
 }

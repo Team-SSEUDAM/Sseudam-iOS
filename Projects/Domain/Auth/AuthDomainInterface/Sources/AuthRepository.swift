@@ -9,14 +9,22 @@
 import Foundation
 
 public struct AuthRepository {
-  public var fetchData: @Sendable () async throws -> Void
-  public var requestAppleLogin: @Sendable (String) async throws -> SocialLoginEntity
+  public var requestAppleLogin: @Sendable (_ token: String) async throws -> SocialLoginEntity
+  public var requestSignUp: @Sendable (
+    _ email: String,
+    _ nickname: String,
+    _ address: String
+  ) async throws -> Void
 
   public init(
-    fetchData: @Sendable @escaping () async throws -> Void,
-    requestAppleLogin: @Sendable @escaping (String) async throws -> SocialLoginEntity
+    requestAppleLogin: @Sendable @escaping (_ token: String) async throws -> SocialLoginEntity,
+    requestSignUp: @Sendable @escaping (
+      _ email: String,
+      _ nickname: String,
+      _ address: String
+    ) async throws -> Void
   ) {
-    self.fetchData = fetchData
     self.requestAppleLogin = requestAppleLogin
+    self.requestSignUp = requestSignUp
   }
 }

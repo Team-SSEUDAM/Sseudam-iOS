@@ -36,7 +36,7 @@ struct SseudamFeature {
     case mypageRoot(MyPageRootFeature.Action)
     
     case presentLogin(Bool)
-    case presentNickname(Bool)
+    case presentNickname(Bool, String?)
     case modal(PresentationAction<ModalDestination.Action>)
   }
   
@@ -71,8 +71,12 @@ struct SseudamFeature {
         state.modal = isPresent ? .login(LoginFeature.State()) : nil
         return .none
         
-      case let .presentNickname(isPresent):
-        state.modal = isPresent ? .signUp(NickNameInputFeature.State()) : nil
+      case let .presentNickname(isPresent, email):
+        if isPresent, let email = email {
+          state.modal = .signUp(NickNameInputFeature.State(email: email))
+        } else {
+          state.modal = nil
+        }
         return .none
         
       // login delegate
@@ -81,11 +85,11 @@ struct SseudamFeature {
         case .delegate(.dismiss):
           return .send(.presentLogin(false))
           
-        case .delegate(.presentSignUp):
+        case let .delegate(.presentSignUp(email)):
           return .run { send in
             await MainActor.run {
               send(.presentLogin(false))
-              send(.presentNickname(true))
+              send(.presentNickname(true, email))
             }
           }
           

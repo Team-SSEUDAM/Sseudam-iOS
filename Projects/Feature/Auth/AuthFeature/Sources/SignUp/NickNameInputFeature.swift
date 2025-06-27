@@ -16,12 +16,16 @@ public struct NickNameInputFeature {
   
   @ObservableState
   public struct State: Equatable {
+    var email: String
     var nickname: String = ""
     var nicknameValid: NickNameInputValid = .none
     var focusKeyboard: Bool = false
     var errorToastMessage: String? = nil
     var path = StackState<NavigationPath.State>()
-    public init() {}
+    
+    public init(email: String) {
+      self.email = email
+    }
   }
   
   public enum Action: BindableAction, Equatable {
@@ -51,7 +55,9 @@ public struct NickNameInputFeature {
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
-    Reduce { state, action in
+    Reduce {
+      state,
+      action in
       switch action {
       case .binding(\.nickname):
         return .send(.checkValidNickName(state.nickname))
@@ -81,7 +87,14 @@ public struct NickNameInputFeature {
         return .none
         
       case .moveToRegisterArea:
-        state.path.append(.registerArea(RegisterFavoriteAreaFeature.State()))
+        state.path.append(
+          .registerArea(
+            RegisterFavoriteAreaFeature.State(
+              email: state.email,
+              nickname: state.nickname
+            )
+          )
+        )
         return .none
         
       case .completeButtonTapped:

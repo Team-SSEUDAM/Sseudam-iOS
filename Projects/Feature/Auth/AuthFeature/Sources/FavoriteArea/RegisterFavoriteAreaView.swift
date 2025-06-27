@@ -30,15 +30,21 @@ public struct RegisterFavoriteAreaView: View {
         
         SearchTextView
         
-        SearchItemList(items: store.searchItems)
-          .frame(maxHeight: .infinity)
+        ZStack {
+          SearchItemList(items: store.searchItems)
+          VStack {
+            Spacer()
+            SnackBar(message: $store.errorToastMessage, {})
+          }
+        }
+        .frame(maxHeight: .infinity)
         
         PrimaryButton(
           title: "완료",
           size: .large,
           state: store.isSelectItem ? .normal : .disabled
         ) {
-          
+          store.send(.completeButtonTapped)
         }
           .padding(.Number16)
       }
@@ -95,7 +101,6 @@ public struct RegisterFavoriteAreaView: View {
       .animation(.easeInOut, value: items.count)
       .transition(.opacity)
     } else {
-      // 입력 전엔 공간 차지하지 않음
       Spacer()
     }
   }

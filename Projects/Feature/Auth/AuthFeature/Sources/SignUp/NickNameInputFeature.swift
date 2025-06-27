@@ -34,6 +34,7 @@ public struct NickNameInputFeature {
     case moveToRegisterArea
     case path(StackActionOf<NavigationPath>)
     case errorToastMessage(String)
+    case loadAddress
   }
   
   public enum SignUpPath: Equatable {
@@ -46,6 +47,7 @@ public struct NickNameInputFeature {
   }
   
   @Dependency(\.CheckNicknameValidateUseCase) var checkNicknameValidateUseCase
+  @Dependency(\.LoadAddressListUseCase) var loadAddressListUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -55,8 +57,18 @@ public struct NickNameInputFeature {
         return .send(.checkValidNickName(state.nickname))
         
       case .onAppear:
-        return .send(.showKeyboard(true))
         
+        return .run { send in
+          await MainActor.run {
+            send(.showKeyboard(true))
+            send(.loadAddress)
+          }
+        }
+        
+      case .loadAddress:
+        return .run { _ in
+          try await loadAddressListUseCase.execute()
+        }
       case let .showKeyboard(isShow):
         state.focusKeyboard = isShow
         return .none

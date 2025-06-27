@@ -41,8 +41,7 @@ public struct RegisterFavoriteAreaView: View {
           title: "완료",
           size: .large,
           state: .normal
-        ) {
-        }
+        ) { }
         .padding(.vertical, .Number16)
       }
       .padding(.horizontal, .Number16)

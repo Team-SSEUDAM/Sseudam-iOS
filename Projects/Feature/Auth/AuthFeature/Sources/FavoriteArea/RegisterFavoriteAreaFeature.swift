@@ -28,6 +28,7 @@ public struct RegisterFavoriteAreaFeature {
   }
   
   @Dependency(\.dismiss) var dismiss
+  @Dependency(\.SearchAddressUseCase) var searchAddressUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -39,6 +40,13 @@ public struct RegisterFavoriteAreaFeature {
       case let .showKeyboard(isShow):
         state.focusKeyboard = isShow
         return .none
+        
+      case .binding(\.area):
+        let keyword = state.area
+        return .run { send in
+          let result = try await searchAddressUseCase.execute(keyword)
+          print("🔍 검색 결과:", result)
+        }
         
       case .dismiss:
         return .run { _ in

@@ -56,5 +56,13 @@ struct DependencyRegister {
       CheckNicknameValidateUseCase.test(repository: userReoository)
     }
     
+    LoadAddressListUseCaseRegister {
+      LoadAddressListUseCase.live(repository: userReoository)
+    }
+    
+    SearchAddressUseCaseRegister {
+      SearchAddressUseCase.live(repository: userReoository)
+    }
+    
   }
 }

@@ -18,7 +18,7 @@ public struct RegisterFavoriteAreaFeature {
     var area: String = ""
     var focusKeyboard: Bool = false
     var searchItems: [String] = []
-    
+    var isSelectItem: Bool = false
     public init() {}
   }
   
@@ -47,6 +47,7 @@ public struct RegisterFavoriteAreaFeature {
         return .none
         
       case .binding(\.area):
+        state.isSelectItem = false
         return .send(.searchKeyword(state.area))
         
       case let .searchKeyword(keyword):
@@ -62,6 +63,7 @@ public struct RegisterFavoriteAreaFeature {
       case let .selectArea(area):
         state.area = area
         state.searchItems = []
+        state.isSelectItem = true
         return .none
         
       case .dismiss:

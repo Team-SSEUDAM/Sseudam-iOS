@@ -38,6 +38,7 @@ struct SseudamFeature {
     case presentLogin(Bool)
     case presentNickname(Bool, String?)
     case presentSignUpComplete(Bool)
+    case changeLoginState(Bool)
     case modal(PresentationAction<ModalDestination.Action>)
     
   }

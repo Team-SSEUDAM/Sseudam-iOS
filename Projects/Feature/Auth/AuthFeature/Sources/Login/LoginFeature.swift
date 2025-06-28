@@ -33,6 +33,7 @@ public struct LoginFeature {
   public enum Delegate: Equatable {
     case presentSignUp(email: String?)
     case dismiss
+    case complete
   }
   
   public enum ID: Hashable {
@@ -82,7 +83,7 @@ public struct LoginFeature {
             if data.isTempToken {
               return await send(.presentSignUp(email: email))
             } else {
-              await send(.delegate(.dismiss))
+              await send(.delegate(.complete))
             }
           } catch {
             return await send(.delegate(.dismiss))

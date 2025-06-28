@@ -9,6 +9,7 @@
 import SwiftUI
 import ComposableArchitecture
 import AuthFeature
+import DesignKit
 
 struct MyPageRootView: View {
   
@@ -20,11 +21,36 @@ struct MyPageRootView: View {
   
   var body: some View {
     VStack {
-      Text("MyPage")
-      Button("log in") {
-        store.send(.requestLogin(true, .mypage))
+      if !store.state.isLoggedIn {
+        requireLoginView
+      } else {
+        Text("로그인~")
       }
+      
+      
     }
   }
   
+  // TODO: - mypage 모듈 안으로 옮기기
+  @ViewBuilder
+  private var requireLoginView: some View {
+    VStack(alignment: .center, spacing: .Number16) {
+      Spacer()
+      Text("로그인이 필요해요")
+        .font(FontSet.Heading.heading3)
+        .foregroundStyle(ColorSet.Text.Primary)
+      Text("로그인하면 나의 제보, 인증 내역을 관리할 수 있어요.")
+        .font(FontSet.Body.body3)
+        .foregroundStyle(ColorSet.Text.Secondary)
+        PrimaryButton(
+          title: "로그인하러 가기",
+          size: .large,
+          state: .normal) {
+            store.send(.requestLogin(true, .mypage))
+          }
+          .frame(width: 129)
+      
+      Spacer()
+    }
+  }
 }

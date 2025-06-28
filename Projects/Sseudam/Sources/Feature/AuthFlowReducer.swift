@@ -18,8 +18,6 @@ extension SseudamFeature {
     ) -> Effect<SseudamFeature.Action> {
       
       switch action {
-        
-        
       // Login 모달 delegate 처리
       case let .modal(.presented(.login(action))):
         switch action {
@@ -31,6 +29,8 @@ extension SseudamFeature {
             await send(.presentLogin(false))
             await send(.presentNickname(true, email))
           }
+        case .delegate(.complete):
+          return .send(.changeLoginState(true))
 
         default:
           return .none
@@ -50,11 +50,13 @@ extension SseudamFeature {
           return .none
         }
         
+      // 회원가입 완료 delegate 처리
       case let .modal(.presented(.complete(action))):
         switch action {
         case .delegate(.dismiss):
           state.modal = nil
-          return .none
+          return .send(.changeLoginState(true))
+          
         default: return .none
         }
 
@@ -75,6 +77,11 @@ extension SseudamFeature {
         state.modal = .complete(SignUpCompleteFeature.State())
         return .none
 
+      // 로그인 상태 각 탭에 전달
+      case let .changeLoginState(isLoggedIn):
+        return .run { send in
+          await send(.mypageRoot(.loginState(isLoggedIn)))
+        }
       default:
         return .none
       }

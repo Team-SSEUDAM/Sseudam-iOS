@@ -15,16 +15,7 @@ extension NMReverseGeoCodeUseCase {
   ) -> NMReverseGeoCodeUseCase {
     .init { input in
       let entity = try await repository.reverseGeoCode(input)
-      
-      if let road = entity.roadAddress, !road.isEmpty {
-        return road
-      }
-      
-      let convertLocation = "\(entity.area1) \(entity.area2) \(entity.area3)"
-      if let checkLast = entity.area4 {
-        return "\(convertLocation) \(checkLast)"
-      }
-      return convertLocation
+      return entity
     }
   }
 }

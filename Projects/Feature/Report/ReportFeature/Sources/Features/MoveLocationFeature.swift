@@ -38,10 +38,10 @@ public struct MoveLocationFeature {
     case initUserLocation(ReportMapPoint)
     
     case reverseGeoCode(ReportMapPoint)
-    case reverseGeoCodeResult(Result<String, NetworkError>)
+    case reverseGeoCodeResult(Result<NMGeoCodeReverseEntity, NetworkError>)
     
     public enum Delegate: Equatable {
-      case centerChanged(_ point: ReportMapPoint?, _ address: String)
+      case centerChanged(_ point: ReportMapPoint?, _ entity: NMGeoCodeReverseEntity?)
     }
   }
   
@@ -61,8 +61,8 @@ public struct MoveLocationFeature {
         return .run { send in
           do {
             let input = NMReverseGeoCodeInput(latitude: point.latitude, longitude: point.longitude)
-            let address = try await reverseGeoCodeUseCase.execute(input)
-            await send(.reverseGeoCodeResult(.success(address)))
+            let entity = try await reverseGeoCodeUseCase.execute(input)
+            await send(.reverseGeoCodeResult(.success(entity)))
           } catch is CancellationError {
             await send(.reverseGeoCodeResult(.failure(.taskCancelled)))
           } catch {
@@ -71,17 +71,17 @@ public struct MoveLocationFeature {
         }
       case let .reverseGeoCodeResult(result):
         switch result {
-        case let .success(address):
-          state.address = address
+        case let .success(entity):
+          state.address = convertReverseGeoCodeToAddress(entity)
           state.isEnabled = true
           if let point = state.centerLocation {
-            return .send(.delegate(.centerChanged(point, address)))
+            return .send(.delegate(.centerChanged(point, entity)))
           }
         case let .failure(error):
           state.address = "현재 위치 정보를 가져올 수 없습니다."
           state.isEnabled = false
         }
-        return .send(.delegate(.centerChanged(nil, "")))
+        return .send(.delegate(.centerChanged(nil, nil)))
       case let .initUserLocation(location):
         state.userLocation = location
         return .none
@@ -100,5 +100,15 @@ extension MoveLocationFeature {
         await send(.initUserLocation(userLocation))
       }
     }
+  }
+  
+  private func convertReverseGeoCodeToAddress(_ entity: NMGeoCodeReverseEntity) -> String {
+    if let road = entity.roadAddress, !road.isEmpty { return road }
+    
+    let convertLocation = "\(entity.area1) \(entity.area2) \(entity.area3)"
+    if let checkLast = entity.area4 {
+      return "\(convertLocation) \(checkLast)"
+    }
+    return convertLocation
   }
 }

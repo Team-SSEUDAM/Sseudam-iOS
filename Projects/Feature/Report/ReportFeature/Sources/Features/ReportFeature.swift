@@ -30,9 +30,9 @@ public struct ReportFeature {
     var nextButtonText: String = "시작하기"
     
     /// 제보하기에 담길 데이터
-    var centerPoint: ReportMapPoint?
-    var fullAdress: String = ""
     var spotName: String = ""
+    var centerPoint: ReportMapPoint?
+    var nmReverseGeoCodeEntity: NMGeoCodeReverseEntity?
     var trashType: String = ""
     
     var selectedPhoto: UIImage? = nil
@@ -60,6 +60,7 @@ public struct ReportFeature {
     
     case nextButtonIsEnabled(Bool)
     case nextButtonTapped
+    case reportButtonTapped
     
     case backButtonTapped
     case pop
@@ -90,6 +91,7 @@ public struct ReportFeature {
         default: return .none
         }
       case .nextButtonTapped:
+        if state.currentPage == 4 { return .send(.reportButtonTapped) }
         state.currentPage = min(state.currentPage + 1, 4)
         switch state.currentPage {
         case 0: return .send(.didAppearStartReport)
@@ -132,10 +134,10 @@ public struct ReportFeature {
       case let .moveLocation(.delegate(action)):
         if state.currentPage != 1 { return .none }
         switch action {
-        case let .centerChanged(location, address):
+        case let .centerChanged(location, entity):
           state.centerPoint = location
-          state.fullAdress = address
-          return .send(.nextButtonIsEnabled(location != nil))
+          state.nmReverseGeoCodeEntity = entity
+          return .send(.nextButtonIsEnabled(location != nil && entity != nil))
         }
       /// `WriteNameFeature`의 `Delegate`처리
       case let .writeName(.delegate(action)):
@@ -161,6 +163,10 @@ public struct ReportFeature {
           state.selectedPhoto = photo /// 사진은, 일반적인 ReportBody에 담지 않고, presignedURL로 별도 처리
           return .send(.nextButtonIsEnabled(true))
         }
+      case .reportButtonTapped:
+        // TODO: 제보하기 버튼이 눌렸을 때, 실제 제보하기 기능 호출
+        
+        return .none
       case .binding:
         return .none
         default: return .none

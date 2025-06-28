@@ -11,8 +11,9 @@ import AuthDomainInterface
 
 extension SignUpUseCase {
   public static func live(repository: AuthRepository) -> SignUpUseCase {
-    .init { email, nickname, address in
-      try await repository.requestSignUp(email, nickname, address)
+    .init { input in
+      
+      try await repository.requestSignUp(input)
     }
   }
   

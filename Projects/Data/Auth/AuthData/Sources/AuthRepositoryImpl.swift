@@ -18,8 +18,13 @@ public extension AuthRepository {
         let endpoint = AuthEndpoint.appleLogin(body: .init(token: token))
         return try await networker.execute(with: endpoint, timeout: 60).toEntity()
         
-      }, requestSignUp: { email, name, address in
-        let body: SignUpBody = .init(email: email, name: name, address: address)
+      },
+      requestSignUp: { input in
+        let body: SignUpBody = .init(
+          email: input.email,
+          name: input.nickname,
+          address: input.address
+        )
         let endpoint = AuthEndpoint.signUp(body: body)
         return try await networker.execute(with: endpoint, timeout: 60).toEntity()
       }

@@ -9,18 +9,10 @@
 import Foundation
 
 public struct SignUpUseCase {
-  public var execute: @Sendable (
-    _ email: String,
-    _ nickname: String,
-    _ address: String
-  ) async throws -> Void
+  public var execute: @Sendable (SignUpInput) async throws -> Void
   
   public init(
-    execute: @Sendable @escaping (
-      _ email: String,
-      _ nickname: String,
-      _ address: String
-    ) async throws -> Void
+    execute: @Sendable @escaping (SignUpInput) async throws -> Void
   ) {
     self.execute = execute
   }

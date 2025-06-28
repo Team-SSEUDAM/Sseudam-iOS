@@ -59,7 +59,9 @@ public struct RegisterFavoriteAreaFeature {
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
-    Reduce { state, action in
+    Reduce {
+      state,
+      action in
       switch action {
       case .onAppear:
         return .send(.showKeyboard(true))
@@ -104,7 +106,12 @@ public struct RegisterFavoriteAreaFeature {
         let area = state.area
         return .run { send in
           do {
-            try await signUpUseCase.execute(email, nickname, area)
+            let input: SignUpInput = .init(
+              email: email,
+              nickname: nickname,
+              address: area
+            )
+            try await signUpUseCase.execute(input)
             UserDefaultsKeys.username = nickname
             UserDefaultsKeys.isLoggedIn = true
             await send(.deleteAreaList)

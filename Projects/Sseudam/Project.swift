@@ -34,8 +34,8 @@ let project = Project.makeApp(
     .Features.Report,
     .Features.TrashDetail,
     .Domain.Home.Implement,
-    .Domain.Report.Implement,
+    .Domain.Suggestion.Implement,
     .Data.Home.Implement,
-    .Data.Report.Implement
+    .Data.Suggestion.Implement
   ]
 )

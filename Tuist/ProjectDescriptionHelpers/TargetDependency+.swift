@@ -30,12 +30,14 @@ public enum Feature: String, ModuleRepresentable {
 
 public enum Domain: String, ModuleRepresentable {
   case Home
+  case Suggestion
   case Report
   public var typePath: String { "Domain" }
 }
 
 public enum Data: String, ModuleRepresentable {
   case Home
+  case Suggestion
   case Report
   public var typePath: String { "Data" }
 }
@@ -123,6 +125,11 @@ extension TargetDependency {
       public static let Implement = Self.project(.domain(.Home))
     }
     
+    public struct Suggestion: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Suggestion, isInterface: true))
+      public static let Implement = Self.project(.domain(.Suggestion))
+    }
+    
     public struct Report: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.Report, isInterface: true))
       public static let Implement = Self.project(.domain(.Report))
@@ -133,6 +140,11 @@ extension TargetDependency {
     public struct Home: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Home, isInterface: true))
       public static let Implement = Self.project(.data(.Home))
+    }
+    
+    public struct Suggestion: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Suggestion, isInterface: true))
+      public static let Implement = Self.project(.data(.Suggestion))
     }
     
     public struct Report: TargetDependencyDelegate {

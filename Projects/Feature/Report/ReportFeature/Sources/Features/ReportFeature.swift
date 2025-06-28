@@ -68,7 +68,6 @@ public struct ReportFeature {
     Scope(state: \.selectKind, action: \.selectKind) { SelectKindFeature() }
     Scope(state: \.selectPhoto, action: \.selectPhoto) { SelectPhotoFeature() }
     Reduce { state, action in
-      print("😢 ReportFeature Action: \(action)")
       switch action {
       case .backButtonTapped:
         switch state.currentPage {
@@ -130,7 +129,7 @@ public struct ReportFeature {
         switch action {
         case let .centerChanged(location):
           state.reportModel.location = location
-          return .send(.nextButtonIsEnabled(true))
+          return .send(.nextButtonIsEnabled(location != nil))
         }
       /// `WriteNameFeature`의 `Delegate`처리
       case let .writeName(.delegate(action)):

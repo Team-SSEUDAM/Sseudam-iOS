@@ -37,10 +37,15 @@ public struct MoveLocationFeature {
     case centerChanged(ReportMapPoint)
     case initUserLocation(ReportMapPoint)
     
+    case reverseGeoCode(ReportMapPoint)
+    case reverseGeoCodeResult(Result<String, NetworkError>)
+    
     public enum Delegate: Equatable {
-      case centerChanged(ReportMapPoint)
+      case centerChanged(ReportMapPoint?)
     }
   }
+  
+  @Dependency(\.NMReverseGeoCodeUseCase) var reverseGeoCodeUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -51,9 +56,32 @@ public struct MoveLocationFeature {
         return moveUserLocation()
       case let .centerChanged(point):
         state.centerLocation = point
-        state.address = "\(point.latitude), \(point.longitude)"
-        state.isEnabled = true
-        return .send(.delegate(.centerChanged(point)))
+        return .send(.reverseGeoCode(point))
+      case let .reverseGeoCode(point):
+        return .run { send in
+          do {
+            let input = NMReverseGeoCodeInput(latitude: point.latitude, longitude: point.longitude)
+            let address = try await reverseGeoCodeUseCase.execute(input)
+            await send(.reverseGeoCodeResult(.success(address)))
+          } catch is CancellationError {
+            await send(.reverseGeoCodeResult(.failure(.taskCancelled)))
+          } catch {
+            await send(.reverseGeoCodeResult(.failure(.customError(message: error.localizedDescription))))
+          }
+        }
+      case let .reverseGeoCodeResult(result):
+        switch result {
+        case let .success(address):
+          state.address = address
+          state.isEnabled = true
+          if let point = state.centerLocation {
+            return .send(.delegate(.centerChanged(point)))
+          }
+        case let .failure(error):
+          state.address = "현재 위치 정보를 가져올 수 없습니다."
+          state.isEnabled = false
+        }
+        return .send(.delegate(.centerChanged(nil)))
       case let .initUserLocation(location):
         state.userLocation = location
         return .none

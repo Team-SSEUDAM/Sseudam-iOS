@@ -39,6 +39,7 @@ public struct RegisterFavoriteAreaFeature {
     case dismiss
     case searchKeyword(String)
     case updateSearchAreaItems([String])
+    case deleteAreaList
     case selectArea(String)
     case signUp
     case completeButtonTapped
@@ -54,6 +55,7 @@ public struct RegisterFavoriteAreaFeature {
   @Dependency(\.dismiss) var dismiss
   @Dependency(\.SearchAddressUseCase) var searchAddressUseCase
   @Dependency(\.SignUpUseCase) var signUpUseCase
+  @Dependency(\.DeleteAddressListUseCase) var deleteAddressListUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -80,6 +82,11 @@ public struct RegisterFavoriteAreaFeature {
         state.searchItems = items
         return .none
         
+      case .deleteAreaList:
+        return .run { _ in
+          try await deleteAddressListUseCase.execute()
+        }
+        
       case let .selectArea(area):
         state.area = area
         state.searchItems = []
@@ -100,6 +107,7 @@ public struct RegisterFavoriteAreaFeature {
             try await signUpUseCase.execute(email, nickname, area)
             UserDefaultsKeys.username = nickname
             UserDefaultsKeys.isLoggedIn = true
+            await send(.deleteAreaList)
             await send(.delegate(.dismiss))
           } catch {
             await send(.errorToastMessage("회원가입에 실패했어요"))

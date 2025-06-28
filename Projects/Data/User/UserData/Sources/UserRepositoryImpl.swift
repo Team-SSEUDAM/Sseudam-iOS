@@ -23,6 +23,8 @@ public extension UserRepository {
         await cache.load()
       }, fetchLocationList: {
         await cache.fetchList()
+      }, deleteLocationList: {
+        await cache.deleteAll()
       }
     )
   }

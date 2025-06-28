@@ -44,10 +44,8 @@ extension SseudamFeature {
             await send(.presentNickname(false, nil))
           }
         case .delegate(.complete):
-          return .run { send in
-            await send(.presentNickname(false, nil))
-            await send(.presentSignUpComplete(true))
-          }
+          return .send(.presentSignUpComplete(true))
+          
         default:
           return .none
         }

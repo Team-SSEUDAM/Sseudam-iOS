@@ -64,6 +64,10 @@ struct DependencyRegister {
       LoadAddressListUseCase.live(repository: userReoository)
     }
     
+    DeleteAddressListUseCaseRegister {
+      DeleteAddressListUseCase.live(repository: userReoository)
+    }
+    
     SearchAddressUseCaseRegister {
       SearchAddressUseCase.live(repository: userReoository)
     }

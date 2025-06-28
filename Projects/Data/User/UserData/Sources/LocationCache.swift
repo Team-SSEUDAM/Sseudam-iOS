@@ -22,20 +22,23 @@ actor LocationCache {
   
   func deleteAll() {
     list.removeAll()
+    if list.isEmpty {
+      print("✅ 지역 리스트 삭제 완료")
+    }
   }
   
   private func loadJsonData(from bundle: Bundle = Bundle(for: LocationCache.self)) {
     guard let url = bundle.url(forResource: "administrative_area_list", withExtension: "json") else {
-      print("❌ URL 못찾음")
+      print("❌ 지역 리스트 URL 못찾음")
       return
     }
     
     do {
       let loaded = try JSONDecoder().decode([String].self, from: try Data(contentsOf: url))
       self.list = loaded.map { String($0) }
-      print("✅ 성공적으로 불러옴, 총 \(loaded.count)개")
+      print("✅ 지역 리스트 성공적으로 불러옴, 총 \(loaded.count)개")
     } catch {
-      print("❌ 로드 실패: \(error)")
+      print("❌ 지역 리스트 로드 실패: \(error)")
     }
   }
   

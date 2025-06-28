@@ -12,7 +12,7 @@ import ProjectDescriptionHelpers
 let project = Project.makeFeature(
   for: Feature.Report,
   dependencies: [
-    .Domain.Suggestion.Interface
+    .Domain.Umbrella
   ]
 )
 

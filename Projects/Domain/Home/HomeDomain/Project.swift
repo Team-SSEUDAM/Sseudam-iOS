@@ -9,7 +9,7 @@
 import ProjectDescription
 import ProjectDescriptionHelpers
 
-let project = Project.makeDynamicFrameworkProject(
+let project = Project.makeStaticLibraryProject(
   for: Domain.Home,
   dependencies: [
     .Domain.Home.Interface

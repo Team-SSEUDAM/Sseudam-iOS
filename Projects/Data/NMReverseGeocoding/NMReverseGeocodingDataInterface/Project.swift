@@ -12,7 +12,7 @@ import ProjectDescriptionHelpers
 let project = Project.makeStaticLibraryProject(
   for: Data.NMReverseGeocoding,
   dependencies: [
-    .Domain.NMReverseGeocoding.Interface
+    .Domain.Umbrella
   ],
   nameSuffix: "Interface"
 )

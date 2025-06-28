@@ -30,14 +30,7 @@ let project = Project.makeApp(
     "BASE_URL": "$(BASE_URL)"
   ],
   dependencies: [
-    .Features.Home,
-    .Features.Report,
-    .Features.TrashDetail,
-    .Domain.Home.Implement,
-    .Domain.Suggestion.Implement,
-    .Domain.NMReverseGeocoding.Implement,
-    .Data.Home.Implement,
-    .Data.Suggestion.Implement,
-    .Data.NMReverseGeocoding.Implement,
+    .Features.Umbrella,
+    .Data.Umbrella
   ]
 )

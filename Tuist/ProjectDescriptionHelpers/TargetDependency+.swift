@@ -14,14 +14,15 @@ public protocol ModuleRepresentable: RawRepresentable where RawValue == String {
 
 public enum Module {
   case feature(Feature)
-  case domain(Domain, isInterface: Bool = false)
-  case data(Data, isInterface: Bool = false)
+  case domain(Domain, isInterface: Bool? = false)
+  case data(Data, isInterface: Bool? = false)
   case core(Core)
   case shared(Shared)
   case spm(SPM)
 }
 
 public enum Feature: String, ModuleRepresentable {
+  case Umbrella = ""
   case Home
   case TrashDetail
   case Report
@@ -29,6 +30,7 @@ public enum Feature: String, ModuleRepresentable {
 }
 
 public enum Domain: String, ModuleRepresentable {
+  case Umbrella = ""
   case Home
   case NMReverseGeocoding
   case Suggestion
@@ -37,6 +39,7 @@ public enum Domain: String, ModuleRepresentable {
 }
 
 public enum Data: String, ModuleRepresentable {
+  case Umbrella = ""
   case Home
   case NMReverseGeocoding
   case Suggestion
@@ -71,9 +74,15 @@ protocol TargetDependencyDelegate { }
 extension TargetDependencyDelegate {
   public static func project(_ module: Module) -> TargetDependency {
     switch module {
-    case let .feature(feature): return makeProjectDependency(for: feature, removeAddPath: true)
-    case let .domain(domain, isInterface): return makeProjectDependency(for: domain, isInterface: isInterface)
-    case let .data(data, isInterface): return makeProjectDependency(for: data, isInterface: isInterface)
+    case let .feature(feature):
+      if feature == .Umbrella { return makeProjectDependency(for: feature) }
+      return makeProjectDependency(for: feature, removeAddPath: true)
+    case let .domain(domain, isInterface):
+      if let isInterface = isInterface { return makeProjectDependency(for: domain, isInterface: isInterface) }
+      return makeProjectDependency(for: domain)
+    case let .data(data, isInterface):
+      if let isInterface = isInterface { return makeProjectDependency(for: data, isInterface: isInterface) }
+      return makeProjectDependency(for: data)
     case let .core(core): return makeProjectDependency(for: core)
     case let .shared(shared): return makeProjectDependency(for: shared)
     case let .spm(spm): return makeSPMDependency(for: spm)
@@ -116,12 +125,16 @@ extension TargetDependencyDelegate {
 
 extension TargetDependency {
   public struct Features: TargetDependencyDelegate {
+    public static let Umbrella = Self.project(.feature(.Umbrella))
+    
     public static let Home = Self.project(.feature(.Home))
     public static let Report = Self.project(.feature(.Report))
     public static let TrashDetail = Self.project(.feature(.TrashDetail))
   }
   
   public struct Domain: TargetDependencyDelegate {
+    public static let Umbrella = Self.project(.domain(.Umbrella, isInterface: nil))
+    
     public struct Home: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.Home, isInterface: true))
       public static let Implement = Self.project(.domain(.Home))
@@ -144,6 +157,8 @@ extension TargetDependency {
   }
   
   public struct Data: TargetDependencyDelegate {
+    public static let Umbrella = Self.project(.data(.Umbrella, isInterface: nil))
+    
     public struct Home: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Home, isInterface: true))
       public static let Implement = Self.project(.data(.Home))

@@ -135,7 +135,9 @@ public extension Target {
     dependencies: [TargetDependency] = []
   ) -> Target {
     let targetName = module.rawValue + module.typePath + nameSuffix
-    let sourcesPath = module is Feature ? "./\(targetName)/Sources/**" : "./Sources/**"
+    var sourcesPath = ""
+    if let feature = module as? Feature, feature != .Umbrella { sourcesPath = "./\(targetName)/Sources/**" }
+    else { sourcesPath = "./Sources/**" }
     return target(
       name: targetName,
       destinations: .iOS,

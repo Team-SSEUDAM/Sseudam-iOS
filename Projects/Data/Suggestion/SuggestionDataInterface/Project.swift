@@ -12,7 +12,7 @@ import ProjectDescriptionHelpers
 let project = Project.makeStaticLibraryProject(
   for: Data.Suggestion,
   dependencies: [
-    .Domain.Suggestion.Interface
+    .Domain.Umbrella
   ],
   nameSuffix: "Interface"
 )

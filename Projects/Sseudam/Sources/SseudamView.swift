@@ -12,6 +12,7 @@ import ComposableArchitecture
 import HomeFeature
 import TrashDetailFeature
 import AuthFeature
+import UserDefaults
 
 struct SseudamView: View {
   @Bindable var store: StoreOf<SseudamFeature> = Store(
@@ -49,6 +50,9 @@ struct SseudamView: View {
     }
     .fullScreenCover(item: $store.scope(state: \.modal?.signUp, action: \.modal.signUp)) { store in
       NickNameInputView(store: store)
+    }
+    .fullScreenCover(item: $store.scope(state: \.modal?.complete, action: \.modal.complete)) { store in
+      SignUpCompleteView(store: store)
     }
     .transaction { transaction in
       transaction.disablesAnimations = true

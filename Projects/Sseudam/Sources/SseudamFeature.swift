@@ -37,7 +37,9 @@ struct SseudamFeature {
     
     case presentLogin(Bool)
     case presentNickname(Bool, String?)
+    case presentSignUpComplete(Bool)
     case modal(PresentationAction<ModalDestination.Action>)
+    
   }
   
   /// 모달로 띄우기 위한 뷰
@@ -68,50 +70,12 @@ struct SseudamFeature {
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):
         return .send(.presentLogin(isPresent))
         
-      case let .presentLogin(isPresent):
-        state.modal = isPresent ? .login(LoginFeature.State()) : nil
-        return .none
-        
-      case let .presentNickname(isPresent, email):
-        if isPresent, let email = email {
-          state.modal = .signUp(NickNameInputFeature.State(email: email))
-        } else {
-          state.modal = .complete(SignUpCompleteFeature.State())
-        }
-        return .none
-        
-        // login delegate
-      case let .modal(.presented(.login(action))):
-        switch action {
-        case .delegate(.dismiss):
-          return .send(.presentLogin(false))
-          
-        case let .delegate(.presentSignUp(email)):
-          return .run { send in
-            await MainActor.run {
-              send(.presentLogin(false))
-              send(.presentNickname(true, email))
-            }
-          }
-          
-        default: return .none
-        }
-        
-      case let .modal(.presented(.signUp(action))):
-        switch action {
-        case .delegate(.dismiss):
-          return .send(.presentNickname(false, nil))
-        default: return .none
-        }
-      
-        
-        
         
       default: return .none
       }
     }
     .ifLet(\.$modal, action: \.modal)
-    
+    Reduce(AuthFlowReducer())
   }
   
 }

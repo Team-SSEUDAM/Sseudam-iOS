@@ -35,7 +35,7 @@ public struct LoginView: View {
         TitleView
         Spacer()
         VStack(spacing: .Number16) {
-          KakaoLogin
+//          KakaoLogin
           AppleLogin
         }
         .padding(.Number16)

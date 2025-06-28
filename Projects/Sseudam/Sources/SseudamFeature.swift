@@ -64,6 +64,7 @@ struct SseudamFeature {
       case let .selectTab(tab):
         state.selectedTab = tab
         return .none
+        
       case let .homeRoot(.delegate(.hiddenTabBar(isHidden))):
         state.isTabbarHidden = (isHidden)
         return .none
@@ -76,7 +77,7 @@ struct SseudamFeature {
       }
     }
     .ifLet(\.$modal, action: \.modal)
-    Reduce(AuthFlowReducer())
+    Reduce(AuthFlowFeature())
   }
   
 }

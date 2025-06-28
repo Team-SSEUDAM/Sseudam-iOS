@@ -11,7 +11,7 @@ import AuthFeature
 
 
 extension SseudamFeature {
-  struct AuthFlowReducer: Reducer {
+  struct AuthFlowFeature: Reducer {
     func reduce(
       into state: inout SseudamFeature.State,
       action: SseudamFeature.Action

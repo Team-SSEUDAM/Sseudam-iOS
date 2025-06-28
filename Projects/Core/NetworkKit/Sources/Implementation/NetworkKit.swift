@@ -106,7 +106,7 @@ extension NetworkKit {
     response: URLResponse,
     endpoint: any APIRequestable
   ) async throws -> R {
-    print(data)
+    
     guard let httpResponse = response as? HTTPURLResponse else {
       throw throwError(
         FoundationError.failedToCasting(

@@ -1,5 +1,5 @@
 //
-//  DeleteAddressListUseCaseImpl.swift
+//  DeleteAreaListUseCaseImpl.swift
 //  UserDomain
 //
 //  Created by Jiyeon on 6/28/25.

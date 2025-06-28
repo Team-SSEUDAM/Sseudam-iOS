@@ -137,7 +137,7 @@ extension NickNameInputFeature {
       do {
         let result = try await checkNicknameValidateUseCase.execute(nickname)
         if result.isValid { // 닉네임 유효 -> 이동
-          await(send(.moveToRegisterArea))
+          await send(.moveToRegisterArea)
         } else {
           await send(.nicknameValidMessage(.duplicate))
         }

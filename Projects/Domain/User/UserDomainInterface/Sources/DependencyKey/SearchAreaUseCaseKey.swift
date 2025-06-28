@@ -1,5 +1,5 @@
 //
-//  SearchAddressUseCaseKey.swift
+//  SearchAreaUseCaseKey.swift
 //  UserDomainInterface
 //
 //  Created by Jiyeon on 6/27/25.

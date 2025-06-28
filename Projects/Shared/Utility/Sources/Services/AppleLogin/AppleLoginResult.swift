@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct AppleLoginResult: Equatable {
+public struct AppleLoginResult: Equatable, Sendable {
   public let idToken: String
   public let email: String?
   public let name: String?

@@ -1,5 +1,5 @@
 //
-//  LoadAddressListUseCaseImpl.swift
+//  LoadAreaListUseCaseImpl.swift
 //  UserDomain
 //
 //  Created by Jiyeon on 6/27/25.

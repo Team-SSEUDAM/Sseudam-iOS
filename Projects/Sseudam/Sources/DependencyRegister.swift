@@ -27,10 +27,10 @@ import NetworkKit
 struct DependencyRegister {
   /// UseCase에 Repository 주입
   func injection() {
-    let netwoker = NetworkKit()
+    let networker = NetworkKit()
     let homeRepository = HomeRepository.live
-    let authRepository = AuthRepository.live(networker: netwoker)
-    let userReoository = UserRepository.live(networker: netwoker)
+    let authRepository = AuthRepository.live(networker: networker)
+    let userReoository = UserRepository.live(networker: networker)
     
     // MARK: - Home
     

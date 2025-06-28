@@ -41,7 +41,7 @@ public struct MoveLocationFeature {
     case reverseGeoCodeResult(Result<String, NetworkError>)
     
     public enum Delegate: Equatable {
-      case centerChanged(ReportMapPoint?)
+      case centerChanged(_ point: ReportMapPoint?, _ address: String)
     }
   }
   
@@ -75,13 +75,13 @@ public struct MoveLocationFeature {
           state.address = address
           state.isEnabled = true
           if let point = state.centerLocation {
-            return .send(.delegate(.centerChanged(point)))
+            return .send(.delegate(.centerChanged(point, address)))
           }
         case let .failure(error):
           state.address = "현재 위치 정보를 가져올 수 없습니다."
           state.isEnabled = false
         }
-        return .send(.delegate(.centerChanged(nil)))
+        return .send(.delegate(.centerChanged(nil, "")))
       case let .initUserLocation(location):
         state.userLocation = location
         return .none

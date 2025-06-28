@@ -29,7 +29,12 @@ public struct ReportFeature {
     var nextButtonState: PrimaryButtonState = .normal
     var nextButtonText: String = "시작하기"
     
-    var reportModel: ReportBody = ReportBody()
+    /// 제보하기에 담길 데이터
+    var centerPoint: ReportMapPoint?
+    var fullAdress: String = ""
+    var spotName: String = ""
+    var trashType: String = ""
+    
     var selectedPhoto: UIImage? = nil
     
     public init() {}
@@ -127,24 +132,25 @@ public struct ReportFeature {
       case let .moveLocation(.delegate(action)):
         if state.currentPage != 1 { return .none }
         switch action {
-        case let .centerChanged(location):
-          state.reportModel.location = location
+        case let .centerChanged(location, address):
+          state.centerPoint = location
+          state.fullAdress = address
           return .send(.nextButtonIsEnabled(location != nil))
         }
       /// `WriteNameFeature`의 `Delegate`처리
       case let .writeName(.delegate(action)):
         if state.currentPage != 2 { return .none }
         switch action {
-        case let .nameChanged(name):
-          state.reportModel.name = name
-          return .send(.nextButtonIsEnabled(!name.isEmpty))
+        case let .nameChanged(spotName):
+          state.spotName = spotName
+          return .send(.nextButtonIsEnabled(!spotName.isEmpty))
         }
       /// `SelectKindFeature`의 `Delegate`처리
       case let .selectKind(.delegate(action)):
         if state.currentPage != 3 { return .none }
         switch action {
-        case let .didSelectKind(kind):
-          state.reportModel.kind = kind
+        case let .didSelectKind(trashType):
+          state.trashType = trashType
           return .send(.nextButtonIsEnabled(true))
         }
       /// `SelectPhotoFeature`의 `Delegate`처리

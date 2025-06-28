@@ -35,7 +35,9 @@ let project = Project.makeApp(
     .Features.TrashDetail,
     .Domain.Home.Implement,
     .Domain.Suggestion.Implement,
+    .Domain.NMReverseGeocoding.Implement,
     .Data.Home.Implement,
-    .Data.Suggestion.Implement
+    .Data.Suggestion.Implement,
+    .Data.NMReverseGeocoding.Implement,
   ]
 )

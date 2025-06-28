@@ -16,6 +16,7 @@ public typealias HTTPParameters = [String: Any]
 public enum APIHeaderType {
   case plain
   case authorization(String?)
+  case custom([String: String])
 }
 
 public enum HTTPRequestParameter {
@@ -75,6 +76,8 @@ public extension APIRequestable {
   
   fileprivate func configureHeaders() -> HTTPHeaders {
     switch headers {
+    case let .custom(customHeaders):
+      return customHeaders
     case .plain:
       return ["Content-Type": "application/json"]
     case let .authorization(token):

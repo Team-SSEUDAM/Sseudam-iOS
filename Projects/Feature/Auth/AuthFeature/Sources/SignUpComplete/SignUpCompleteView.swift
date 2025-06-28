@@ -43,9 +43,11 @@ public struct SignUpCompleteView: View {
       Text("\(store.state.nickname ?? "")님,\n만나서 반가워요!")
         .font(FontSet.Heading.heading1)
         .foregroundStyle(ColorSet.Text.Primary)
+        .multilineTextAlignment(.center)
       Text("쓰담과 함께하는 올바른 환경 습관,\n지금 시작해볼까요?")
         .font(FontSet.Body.body3)
         .foregroundStyle(ColorSet.Text.Secondary)
+        .multilineTextAlignment(.center)
     }
   }
 }

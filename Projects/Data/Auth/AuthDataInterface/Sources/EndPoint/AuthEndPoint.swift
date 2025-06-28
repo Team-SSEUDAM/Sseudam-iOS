@@ -9,6 +9,7 @@
 import Foundation
 import AuthDomainInterface
 import NetworkKit
+import UserDefaults
 
 public struct AuthEndpoint: Sendable {
   public static func appleLogin(body: SocialLoginBody) -> Endpoint<SocialLoginDTO> {
@@ -20,7 +21,9 @@ public struct AuthEndpoint: Sendable {
   }
   
   public static func signUp(body: SignUpBody) -> Endpoint<SignUpDTO> {
+    let accessToken = UserDefaultsKeys.accessToken
     return Endpoint(
+      headers: .authorization(accessToken),
       method: .post,
       path: "/auth/social-signup",
       parameters: .body(body)

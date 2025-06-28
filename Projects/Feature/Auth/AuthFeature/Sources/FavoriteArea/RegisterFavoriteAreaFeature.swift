@@ -99,6 +99,7 @@ public struct RegisterFavoriteAreaFeature {
           do {
             try await signUpUseCase.execute(email, nickname, area)
             UserDefaultsKeys.username = nickname
+            UserDefaultsKeys.isLoggedIn = true
             await send(.delegate(.dismiss))
           } catch {
             await send(.errorToastMessage("회원가입에 실패했어요"))

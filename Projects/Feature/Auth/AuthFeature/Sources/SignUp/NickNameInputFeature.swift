@@ -49,6 +49,7 @@ public struct NickNameInputFeature {
   
   public enum Delegate {
     case dismiss
+    case complete
   }
   
   @Dependency(\.CheckNicknameValidateUseCase) var checkNicknameValidateUseCase
@@ -105,9 +106,8 @@ public struct NickNameInputFeature {
         state.errorToastMessage = message
         return .none
         
-      case .path(.element(id: let id, action: .registerArea(.delegate(.dismiss)))):
-
-        return .send(.delegate(.dismiss))
+      case .path(.element(id: _, action: .registerArea(.delegate(.dismiss)))):
+        return .send(.delegate(.complete))
         
       default: return .none
       }

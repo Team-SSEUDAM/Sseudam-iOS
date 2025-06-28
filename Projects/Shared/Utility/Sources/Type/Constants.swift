@@ -10,4 +10,6 @@ import Foundation
 
 public enum Constants {
   public static let base_url = Bundle.main.infoDictionary?["BASE_URL"] as? String
+  public static let NM_CLIENT_ID = Bundle.main.infoDictionary?["NMCLIENTID"] as? String
+  public static let NM_CLIENT_SECRET = Bundle.main.infoDictionary?["NMCLIENTSECRET"] as? String
 }

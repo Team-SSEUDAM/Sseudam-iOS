@@ -13,17 +13,17 @@ import NetworkKit
 
 public extension UserRepository {
   static func live(networker: NetworkKit) -> UserRepository {
-    let cache = LocationCache()
+    let cache = AreaListCache()
     
     return UserRepository(
       checkNicknameValidate: { nickname in
         let endpoint = UserEndPoint.nicknameValid(body: .init(nickname: nickname))
         return try await networker.execute(with: endpoint, timeout: 60).toEntity()
-      }, loadLocationList: {
+      }, loadAreaList: {
         await cache.load()
-      }, fetchLocationList: {
+      }, fetchAreaList: {
         await cache.fetchList()
-      }, deleteLocationList: {
+      }, deleteAreaList: {
         await cache.deleteAll()
       }
     )

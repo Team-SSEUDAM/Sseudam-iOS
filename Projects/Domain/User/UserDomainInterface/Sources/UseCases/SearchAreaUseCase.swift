@@ -1,5 +1,5 @@
 //
-//  SearchAddressUseCase.swift
+//  SearchAreaUseCase.swift
 //  UserDomainInterface
 //
 //  Created by Jiyeon on 6/27/25.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct SearchAddressUseCase {
+public struct SearchAreaUseCase {
   public var execute: @Sendable (String) async throws -> [String]
   
   public init(execute: @Sendable @escaping (String) async throws -> [String]) {

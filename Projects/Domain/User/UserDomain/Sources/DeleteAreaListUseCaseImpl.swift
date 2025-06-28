@@ -9,10 +9,10 @@
 import Foundation
 import UserDomainInterface
 
-extension DeleteAddressListUseCase {
-  public static func live(repository: UserRepository) -> DeleteAddressListUseCase {
+extension DeleteAreaListUseCase {
+  public static func live(repository: UserRepository) -> DeleteAreaListUseCase {
     .init {
-      return try await repository.deleteLocationList()
+      return try await repository.deleteAreaList()
     }
   }
 }

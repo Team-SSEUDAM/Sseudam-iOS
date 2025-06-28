@@ -7,7 +7,7 @@
 //
 import Foundation
 
-actor LocationCache {
+actor AreaListCache {
   
   private var list: [String] = []
   
@@ -27,7 +27,7 @@ actor LocationCache {
     }
   }
   
-  private func loadJsonData(from bundle: Bundle = Bundle(for: LocationCache.self)) {
+  private func loadJsonData(from bundle: Bundle = Bundle(for: AreaListCache.self)) {
     guard let url = bundle.url(forResource: "administrative_area_list", withExtension: "json") else {
       print("❌ 지역 리스트 URL 못찾음")
       return

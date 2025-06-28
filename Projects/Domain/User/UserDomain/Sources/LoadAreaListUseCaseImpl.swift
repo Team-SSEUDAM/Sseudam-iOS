@@ -9,10 +9,10 @@
 import Foundation
 import UserDomainInterface
 
-extension LoadAddressListUseCase {
-  public static func live(repository: UserRepository) -> LoadAddressListUseCase {
+extension LoadAreaListUseCase {
+  public static func live(repository: UserRepository) -> LoadAreaListUseCase {
     .init {
-      return try await repository.loadLocationList()
+      return try await repository.loadAreaList()
     }
   }
 }

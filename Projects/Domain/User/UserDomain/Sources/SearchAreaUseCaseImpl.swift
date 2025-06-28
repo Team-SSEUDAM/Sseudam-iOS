@@ -9,12 +9,12 @@
 import Foundation
 import UserDomainInterface
 
-extension SearchAddressUseCase {
-  public static func live(repository: UserRepository) -> SearchAddressUseCase {
+extension SearchAreaUseCase {
+  public static func live(repository: UserRepository) -> SearchAreaUseCase {
     .init { keyword in
-      let allList = try await repository.fetchLocationList()
+      let allList = try await repository.fetchAreaList()
       guard !keyword.isEmpty else { return [] }
-      return filterLocationList(list: allList, keyword: keyword)
+      return filterAreaList(list: allList, keyword: keyword)
       
     }
   }
@@ -22,7 +22,7 @@ extension SearchAddressUseCase {
 
 // MARK: - Filter Helper
 
-fileprivate func filterLocationList(list: [String], keyword: String) -> [String] {
+fileprivate func filterAreaList(list: [String], keyword: String) -> [String] {
   return list
     .map { address -> (score: Int, value: String) in
       let score = calculateSimilarityScore(text: address, query: keyword)

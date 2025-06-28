@@ -53,9 +53,9 @@ public struct RegisterFavoriteAreaFeature {
   
   
   @Dependency(\.dismiss) var dismiss
-  @Dependency(\.SearchAddressUseCase) var searchAddressUseCase
+  @Dependency(\.SearchAreaUseCase) var searchAreaUseCase
   @Dependency(\.SignUpUseCase) var signUpUseCase
-  @Dependency(\.DeleteAddressListUseCase) var deleteAddressListUseCase
+  @Dependency(\.DeleteAreaListUseCase) var deleteAreaListUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -74,7 +74,7 @@ public struct RegisterFavoriteAreaFeature {
         
       case let .searchKeyword(keyword):
         return .run { send in
-          let list = try await searchAddressUseCase.execute(keyword)
+          let list = try await searchAreaUseCase.execute(keyword)
           await send(.updateSearchAreaItems(list))
         }
         
@@ -84,7 +84,7 @@ public struct RegisterFavoriteAreaFeature {
         
       case .deleteAreaList:
         return .run { _ in
-          try await deleteAddressListUseCase.execute()
+          try await deleteAreaListUseCase.execute()
         }
         
       case let .selectArea(area):

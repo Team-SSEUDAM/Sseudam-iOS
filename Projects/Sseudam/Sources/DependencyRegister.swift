@@ -60,16 +60,16 @@ struct DependencyRegister {
       CheckNicknameValidateUseCase.test(repository: userReoository)
     }
     
-    LoadAddressListUseCaseRegister {
-      LoadAddressListUseCase.live(repository: userReoository)
+    LoadAreaListUseCaseRegister {
+      LoadAreaListUseCase.live(repository: userReoository)
     }
     
-    DeleteAddressListUseCaseRegister {
-      DeleteAddressListUseCase.live(repository: userReoository)
+    DeleteAreaListUseCaseRegister {
+      DeleteAreaListUseCase.live(repository: userReoository)
     }
     
-    SearchAddressUseCaseRegister {
-      SearchAddressUseCase.live(repository: userReoository)
+    SearchAreaUseCaseRegister {
+      SearchAreaUseCase.live(repository: userReoository)
     }
     
   }

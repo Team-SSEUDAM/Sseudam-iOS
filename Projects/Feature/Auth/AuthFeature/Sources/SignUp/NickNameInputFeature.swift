@@ -53,7 +53,7 @@ public struct NickNameInputFeature {
   }
   
   @Dependency(\.CheckNicknameValidateUseCase) var checkNicknameValidateUseCase
-  @Dependency(\.LoadAddressListUseCase) var loadAddressListUseCase
+  @Dependency(\.LoadAreaListUseCase) var loadAreaListUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -75,7 +75,7 @@ public struct NickNameInputFeature {
         
       case .loadAddress:
         return .run { _ in
-          try await loadAddressListUseCase.execute()
+          try await loadAreaListUseCase.execute()
         }
       case let .showKeyboard(isShow):
         state.focusKeyboard = isShow

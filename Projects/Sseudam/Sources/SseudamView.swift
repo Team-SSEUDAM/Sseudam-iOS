@@ -24,14 +24,18 @@ struct SseudamView: View {
   var body: some View {
     
     ZStack {
-      switch store.selectedTab {
-      case .home:
-        HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
-      case .myPet:
-        EmptyView()
-      case .myPage:
-        MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
-      }
+      HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
+         .opacity(store.selectedTab == .home ? 1 : 0)
+         .allowsHitTesting(store.selectedTab == .home)
+
+      EmptyView()
+         .opacity(store.selectedTab == .myPet ? 1 : 0)
+         .allowsHitTesting(store.selectedTab == .myPet)
+
+      MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
+         .opacity(store.selectedTab == .profile ? 1 : 0)
+         .allowsHitTesting(store.selectedTab == .profile)
+         
       VStack {
         Spacer()
         if !store.isTabbarHidden {

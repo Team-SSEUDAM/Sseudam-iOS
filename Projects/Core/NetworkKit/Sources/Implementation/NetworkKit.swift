@@ -116,6 +116,7 @@ extension NetworkKit {
         endpoint: endpoint
       )
     }
+    responseRawData(data, try endpoint.toURLRequest())
     
     // 401에러면서 토큰 재발급 요청이 아닌 경우 재발급 요청 수행
     if httpResponse.statusCode == 401 && !endpoint.isRefreshToken {
@@ -145,10 +146,16 @@ extension NetworkKit {
     
     do {
       let decoder = JSONDecoder()
+      if endpoint.isNotSseudamAPI { /// Sseudam API가 아닌 경우
+        let responseData = try decoder.decode(R.self, from: data)
+        responseRawData(data, try endpoint.toURLRequest())
+        return responseData
+      }
       let response = try decoder.decode(APIResponse<R>.self, from: data)
       responseSuccess(response, endpoint: endpoint)
       return response.data
-    } catch {
+    } catch let error {
+      print("Error decoding response: \(error)")
       throw throwError(
         FoundationError.failedToDecode(data),
         endpoint: endpoint
@@ -181,11 +188,25 @@ extension NetworkKit {
 }
 
 extension NetworkKit {
+  fileprivate func responseRawData(
+    _ data: Data,
+    _ request: URLRequest? = nil
+  ) {
+    print("""
+          ==========================================
+          ============== 📝 RESPONSE ================
+          \(String(data: data, encoding: .utf8) ?? "No response data")
+          ==========================================
+          \( request != nil ? "✔️ Request: \(request!.httpMethod ?? "GET") \(request!.url?.absoluteString ?? "")" : "" )
+          \( request != nil ? "✔️ Headers: \(request!.allHTTPHeaderFields ?? [:])" : "" )
+          """)
+  }
+  
   fileprivate func responseSuccess<R>(_ response: APIResponse<R>, endpoint: any APIRequestable) {
     print("""
           ==========================================
           ============== ✅ SUCCESS ================
-          ✔️ URL: \(endpoint.path)
+          ✔️ Path: \(endpoint.path)
           ✔️ Data: \(response.data)
           ==========================================
           """)
@@ -203,7 +224,7 @@ extension NetworkKit {
     print("""
           =========================================
           ============== 🚨 ERROR==================
-          ✔️ URL: \(endpoint.path)
+          ✔️ Path: \(endpoint.path)
           ✔️ Message: \(description)
           =========================================
           """)

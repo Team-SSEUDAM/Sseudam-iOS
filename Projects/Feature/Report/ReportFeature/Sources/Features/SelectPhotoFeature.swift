@@ -92,7 +92,7 @@ public struct SelectPhotoFeature {
 }
 
 extension SelectPhotoFeature {
-  @Reducer
+  @Reducer(state: .equatable, action: .equatable)
   public enum Destination {
     case addCompleteReport
     case confirmationDialog(ConfirmationDialogState<SelectPhotoFeature.Action.PhotoConfirmationDialog>)
@@ -100,9 +100,6 @@ extension SelectPhotoFeature {
     case photoLibraryPicker(PhotoLibraryPickerFeature)
   }
 }
-
-extension SelectPhotoFeature.Destination.Action: Equatable { }
-extension SelectPhotoFeature.Destination.State: Equatable { }
 
 extension ConfirmationDialogState where Action == SelectPhotoFeature.Action.PhotoConfirmationDialog {
   public static let makePhotoConfirmationDialog = Self {

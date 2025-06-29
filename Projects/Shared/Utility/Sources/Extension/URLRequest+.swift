@@ -21,6 +21,13 @@ public extension URLRequest {
     return urlRequest
   }
   
+  func setBody(_ body: Data?) throws -> URLRequest {
+    var urlRequest = self
+    guard let body = body else { throw FoundationError.invalidBody }
+    urlRequest.httpBody = body
+    return urlRequest
+  }
+  
   func setBody(_ body: Encodable?, encoder: JSONEncoder = JSONEncoder()) throws -> URLRequest {
     var urlRequest = self
     guard let body = body else { throw FoundationError.invalidBody }

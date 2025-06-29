@@ -22,6 +22,7 @@ public enum APIHeaderType {
 public enum HTTPRequestParameter {
   case query(_ query: Encodable?)
   case body(_ parameter: Encodable?)
+  case rawData(_ data: Data)
 }
 
 public enum HTTPMethod: String {
@@ -57,6 +58,7 @@ public extension APIRequestable {
       .appendingHeaders(configureHeaders())
     if let parameters = self.parameters {
       switch parameters {
+      case let .rawData(data): urlRequest = try urlRequest.setBody(data)
       case let .body(body): urlRequest = try urlRequest.setBody(body)
       case .query: break
       }

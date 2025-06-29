@@ -43,6 +43,7 @@ public struct RegisterFavoriteAreaFeature {
     case selectArea(String)
     case signUp
     case completeButtonTapped
+    case successSignUp(nickname: String)
     case errorToastMessage(String)
     case delegate(Delegate)
   }
@@ -101,26 +102,20 @@ public struct RegisterFavoriteAreaFeature {
         }
         
       case .completeButtonTapped:
-        let email = state.email
-        let nickname = state.nickname
-        let area = state.area
+        return signUp(
+          email: state.email,
+          nickname: state.nickname,
+          area: state.area
+        )
+        
+      case let .successSignUp(nickname):
+        UserDefaultsKeys.username = nickname
+        UserDefaultsKeys.isLoggedIn = true
         return .run { send in
-          do {
-            let input: SignUpInput = .init(
-              email: email,
-              nickname: nickname,
-              address: area
-            )
-            try await signUpUseCase.execute(input)
-            UserDefaultsKeys.username = nickname
-            UserDefaultsKeys.isLoggedIn = true
-            await send(.deleteAreaList)
-            await send(.delegate(.dismiss))
-          } catch {
-            await send(.errorToastMessage("회원가입에 실패했어요"))
-          }
+          await send(.deleteAreaList)
+          await send(.delegate(.dismiss))
         }
-      
+        
       case let .errorToastMessage(message):
         state.errorToastMessage = message
         return .none
@@ -130,5 +125,19 @@ public struct RegisterFavoriteAreaFeature {
     }
   }
   
-  
+  private func signUp(email: String, nickname: String, area: String) -> Effect<Action> {
+    return .run { send in
+      do {
+        let input: SignUpInput = .init(
+          email: email,
+          nickname: nickname,
+          address: area
+        )
+        try await signUpUseCase.execute(input)
+        await send(.successSignUp(nickname: nickname))
+      } catch {
+        await send(.errorToastMessage("회원가입에 실패했어요"))
+      }
+    }
+  }
 }

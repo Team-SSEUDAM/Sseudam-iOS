@@ -28,7 +28,6 @@ public struct NetworkKit: NetworkKitProtocol, Sendable {
         let (data, response) = try await self.session.data(for: request)
         return try await self.handleResponse(data: data, response: response, endpoint: endpoint)
       }
-      
       group.addTask { // 타임아웃 체크 전용 Task
         try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
         throw throwError(NetworkError.timeout(timeout), endpoint: endpoint)
@@ -116,7 +115,6 @@ extension NetworkKit {
         endpoint: endpoint
       )
     }
-    
     // 401에러면서 토큰 재발급 요청이 아닌 경우 재발급 요청 수행
     if httpResponse.statusCode == 401 && !endpoint.isRefreshToken {
       return try await refreshTokenAndRetry(for: endpoint)

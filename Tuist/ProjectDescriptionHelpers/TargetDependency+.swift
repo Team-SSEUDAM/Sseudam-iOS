@@ -24,16 +24,21 @@ public enum Module {
 public enum Feature: String, ModuleRepresentable {
   case Home
   case TrashDetail
+  case Auth
   public var typePath: String { "Feature" }
 }
 
 public enum Domain: String, ModuleRepresentable {
   case Home
+  case Auth
+  case User
   public var typePath: String { "Domain" }
 }
 
 public enum Data: String, ModuleRepresentable {
   case Home
+  case Auth
+  case User
   public var typePath: String { "Data" }
 }
 
@@ -111,6 +116,7 @@ extension TargetDependency {
   public struct Features: TargetDependencyDelegate {
     public static let Home = Self.project(.feature(.Home))
     public static let TrashDetail = Self.project(.feature(.TrashDetail))
+    public static let Auth = Self.project(.feature(.Auth))
   }
   
   public struct Domain: TargetDependencyDelegate {
@@ -118,12 +124,28 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.Home, isInterface: true))
       public static let Implement = Self.project(.domain(.Home))
     }
+    public struct Auth: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Auth, isInterface: true))
+      public static let Implement = Self.project(.domain(.Auth))
+    }
+    public struct User: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.User, isInterface: true))
+      public static let Implement = Self.project(.domain(.User))
+    }
   }
   
   public struct Data: TargetDependencyDelegate {
     public struct Home: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Home, isInterface: true))
       public static let Implement = Self.project(.data(.Home))
+    }
+    public struct Auth: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Auth, isInterface: true))
+      public static let Implement = Self.project(.data(.Auth))
+    }
+    public struct User: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.User, isInterface: true))
+      public static let Implement = Self.project(.data(.User))
     }
   }
   

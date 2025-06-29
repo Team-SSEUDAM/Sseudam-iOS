@@ -11,6 +11,8 @@ import DesignKit
 import ComposableArchitecture
 import HomeFeature
 import TrashDetailFeature
+import AuthFeature
+import UserDefaults
 
 struct SseudamView: View {
   @Bindable var store: StoreOf<SseudamFeature> = Store(
@@ -27,8 +29,8 @@ struct SseudamView: View {
         HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
       case .myPet:
         EmptyView()
-      case .profile:
-        EmptyView()
+      case .myPage:
+        MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
       }
       VStack {
         Spacer()
@@ -43,6 +45,18 @@ struct SseudamView: View {
       
     }
     .ignoresSafeArea(edges: .bottom)
+    .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in
+      LoginView(store: store)
+    }
+    .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.signUp, action: \.authFlow.modal.signUp)) { store in
+      NickNameInputView(store: store)
+    }
+    .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.complete, action: \.authFlow.modal.complete)) { store in
+      SignUpCompleteView(store: store)
+    }
+    .transaction { transaction in
+      transaction.disablesAnimations = true
+    }
   }
 }
 

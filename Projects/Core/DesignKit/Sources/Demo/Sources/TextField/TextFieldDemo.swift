@@ -36,7 +36,8 @@ struct TextFieldDemo: View {
       CustomTextField(
         placeholder: "이건 플레이스홀더입니다",
         text: $text,
-        state: $state
+        state: $state,
+        isFocused: .constant(false)
       ) {
         Text("이건 설명입니다")
       }

@@ -8,7 +8,7 @@
 
 import Foundation
 
-public enum NetworkError: Error, LocalizedError, Sendable {
+public enum NetworkError: Error, LocalizedError, Sendable, Equatable {
   
   case invalidStatusCode(Int)
   case timeout(TimeInterval)

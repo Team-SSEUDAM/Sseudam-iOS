@@ -8,20 +8,23 @@
 
 import SwiftUI
 
-public enum PrimaryButtonState {
+public enum PrimaryButtonState: Equatable {
   case normal, disabled, error
+  case custom(bg: Color, text: Color)
   
   public var backgroundColor: Color {
     switch self {
     case .normal: return ColorSet.Component.Primary
     case .disabled: return ColorSet.Component.Disabled
     case .error: return ColorSet.Component.Error
+    case let .custom(bg, _): return bg
     }
   }
   
   public var textColor: Color {
     switch self {
     case .disabled: return ColorSet.Text.Disabled
+    case let .custom(_ , text): return text
     default: return ColorSet.Text.Inverse
     }
   }

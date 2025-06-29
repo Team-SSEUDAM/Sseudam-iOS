@@ -30,7 +30,12 @@ let project = Project.makeApp(
     .Features.Home,
     .Domain.Home.Implement,
     .Data.Home.Implement,
+    .Features.TrashDetail,
+    .Features.Auth,
+    .Domain.Auth.Implement,
+    .Data.Auth.Implement,
     
-    .Features.TrashDetail
+    .Domain.User.Implement,
+    .Data.User.Implement
   ]
 )

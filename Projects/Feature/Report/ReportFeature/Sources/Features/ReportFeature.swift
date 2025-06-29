@@ -8,7 +8,8 @@
 
 import SwiftUI
 import ComposableArchitecture
-import ReportDomainInterface
+import Utility
+import NMReverseGeocodingDomainInterface
 import DesignKit
 
 @Reducer
@@ -31,7 +32,7 @@ public struct ReportFeature {
     
     /// 제보하기에 담길 데이터
     var spotName: String = ""
-    var centerPoint: ReportMapPoint?
+    var centerPoint: Coordinates?
     var nmReverseGeoCodeEntity: NMGeoCodeReverseEntity?
     var trashType: String = ""
     

@@ -8,7 +8,7 @@
 
 import ComposableArchitecture
 import Utility
-import ReportDomainInterface
+import NMReverseGeocodingDomainInterface
 
 @Reducer
 public struct MoveLocationFeature {
@@ -20,9 +20,9 @@ public struct MoveLocationFeature {
   @ObservableState
   public struct State: Equatable {
     /// MapView 에 바인딩해 줄 기본 위치(예: Home에서 받은 defaultLocation)
-    public var userLocation: ReportMapPoint? = nil
+    public var userLocation: Coordinates? = nil
     /// 카메라 Idle 시점의 실제 중앙 좌표
-    public var centerLocation: ReportMapPoint? = nil
+    public var centerLocation: Coordinates? = nil
     /// 중앙 좌표 ➔ 역지오코딩 결과로 보여줄 주소 문자열
     public var address: String = ""
     
@@ -34,14 +34,14 @@ public struct MoveLocationFeature {
     case delegate(Delegate)
     case onAppear
     /// 카메라가 Idle(멈춤) 상태일 때 델리게이트로부터 전달된 좌표
-    case centerChanged(ReportMapPoint)
-    case initUserLocation(ReportMapPoint)
+    case centerChanged(Coordinates)
+    case initUserLocation(Coordinates)
     
-    case reverseGeoCode(ReportMapPoint)
+    case reverseGeoCode(Coordinates)
     case reverseGeoCodeResult(Result<NMGeoCodeReverseEntity, NetworkError>)
     
     public enum Delegate: Equatable {
-      case centerChanged(_ point: ReportMapPoint?, _ entity: NMGeoCodeReverseEntity?)
+      case centerChanged(_ point: Coordinates?, _ entity: NMGeoCodeReverseEntity?)
     }
   }
   
@@ -96,7 +96,7 @@ extension MoveLocationFeature {
   private func moveUserLocation() -> Effect<Action> {
     return .run { send in
       if let location = await LocationService.shared.userLocation {
-        let userLocation = ReportMapPoint(latitude: location.0, longitude: location.1)
+        let userLocation = Coordinates(latitude: location.0, longitude: location.1)
         await send(.initUserLocation(userLocation))
       }
     }

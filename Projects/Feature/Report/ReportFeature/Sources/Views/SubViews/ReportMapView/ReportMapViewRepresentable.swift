@@ -13,11 +13,11 @@ import NMapsMap
 import ReportDomainInterface
 
 struct ReportMapViewRepresentable: UIViewRepresentable {
-  @Binding var userLocation: ReportMapPoint?
+  @Binding var userLocation: Coordinates?
   
-  var onCenterCoordinateChange: (@Sendable (ReportMapPoint) -> Void)? = nil
+  var onCenterCoordinateChange: (@Sendable (Coordinates) -> Void)? = nil
   
-  private let defaultPoint = ReportMapPoint(latitude: 37.50545, longitude: 127.10143)
+  private let defaultPoint = Coordinates(latitude: 37.50545, longitude: 127.10143)
   
   func makeUIView(context: Context) -> NMFNaverMapView {
     let view = NMFNaverMapView()
@@ -52,7 +52,7 @@ struct ReportMapViewRepresentable: UIViewRepresentable {
   // 카메라 이동 헬퍼
   private func moveCamera(
     _ view: NMFNaverMapView,
-    to point: ReportMapPoint,
+    to point: Coordinates,
     zoomLevel: Double = 16
   ) {
     let coord = NMGLatLng(lat: point.latitude, lng: point.longitude)
@@ -64,7 +64,7 @@ struct ReportMapViewRepresentable: UIViewRepresentable {
 
 extension ReportMapViewRepresentable {
   func onReceive(
-    _ onCenterCoordinateChange: @escaping @Sendable (ReportMapPoint) -> Void
+    _ onCenterCoordinateChange: @escaping @Sendable (Coordinates) -> Void
   ) -> Self {
     var map = self
     map.onCenterCoordinateChange = onCenterCoordinateChange

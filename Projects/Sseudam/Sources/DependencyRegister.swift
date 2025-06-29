@@ -8,13 +8,13 @@
 
 
 import HomeDomainInterface
-import ReportDomainInterface
+import NMReverseGeocodingDomainInterface
 import HomeDomain
-import ReportDomain
-import HomeDataInterface
+import NMReverseGeocodingDomain
+import NMReverseGeocodingDataInterface
 import ReportDataInterface
 import HomeData
-import ReportData
+import NMReverseGeocodingData
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
 struct DependencyRegister {

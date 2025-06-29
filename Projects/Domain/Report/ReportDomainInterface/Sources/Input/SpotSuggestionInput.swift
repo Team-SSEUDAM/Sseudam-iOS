@@ -7,6 +7,8 @@
 //
 
 import Foundation
+import Utility
+import NMReverseGeocodingDomainInterface
 
 public struct SpotSuggestionInput: Codable, Equatable {
   public let spotName: String
@@ -19,7 +21,7 @@ public struct SpotSuggestionInput: Codable, Equatable {
   
   public init(
     spotName: String,
-    centerPoint: ReportMapPoint,
+    centerPoint: Coordinates,
     nmReverseGeoCode: NMGeoCodeReverseEntity,
     trashType: String
   ) {

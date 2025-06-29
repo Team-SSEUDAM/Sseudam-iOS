@@ -36,7 +36,7 @@ extension ReportMapViewRepresentable {
       isMovingByGesture = false
       
       let target = mapView.cameraPosition.target
-      let center = ReportMapPoint(
+      let center = Coordinates(
         latitude: target.lat.rounded(to: 6),
         longitude: target.lng.rounded(to: 6)
       )

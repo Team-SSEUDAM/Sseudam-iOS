@@ -1,15 +1,15 @@
 //
-//  NMReverseGeoCodeRepositoryImpl.swift
-//  ReportData
+//  NMReverseGeocodingRepositoryImpl.swift
 //
-//  Created by 조용인 on 6/28/25.
-//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
+//  NMReverseGeocoding
+//
+//  Created by yongin
 //
 
 import Foundation
 import NetworkKit
-import ReportDomainInterface
-import ReportDataInterface
+import NMReverseGeocodingDomainInterface
+import NMReverseGeocodingDataInterface
 
 public extension NMReverseGeoCodeRepository {
   static var live: NMReverseGeoCodeRepository {

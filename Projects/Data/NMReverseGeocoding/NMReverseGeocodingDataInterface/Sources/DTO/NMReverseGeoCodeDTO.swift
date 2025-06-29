@@ -1,14 +1,15 @@
 //
 //  NMReverseGeoCodeDTO.swift
-//  Report
+//  NMReverseGeocodingDataInterface
 //
-//  Created by yongin
+//  Created by 조용인 on 6/29/25.
+//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
 import Foundation
 import NetworkKit
 import Utility
-import ReportDomainInterface
+import NMReverseGeocodingDomainInterface
 
 public struct NMReverseGeoCodeDTO: DTO {
   

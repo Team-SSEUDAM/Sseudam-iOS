@@ -10,6 +10,7 @@ import SwiftUI
 import ComposableArchitecture
 import Utility
 import NMReverseGeocodingDomainInterface
+import SuggestionDomainInterface
 import DesignKit
 
 @Reducer
@@ -21,6 +22,8 @@ public struct ReportFeature {
   
   @ObservableState
   public struct State: Equatable {
+    @Presents var destination: Destination.State?
+    
     var currentPage: Int = 0
     var moveLocation: MoveLocationFeature.State = MoveLocationFeature.State()
     var writeName: WriteNameFeature.State = WriteNameFeature.State()
@@ -42,11 +45,19 @@ public struct ReportFeature {
   }
 
   public enum Action: BindableAction, Equatable {
+    @CasePathable
+    public enum Alert: Equatable { }
+    
+    case destination(PresentationAction<Destination.Action>)
+    
     case moveLocation(MoveLocationFeature.Action)
     case writeName(WriteNameFeature.Action)
     case selectKind(SelectKindFeature.Action)
     case selectPhoto(SelectPhotoFeature.Action)
     case binding(BindingAction<State>)
+    
+    case spotSuggestionResult(Result<String, NetworkError>)
+    case postSpotImage(String)
     
     /// 시작 화면이 나타날 때
     case didAppearStartReport
@@ -67,6 +78,8 @@ public struct ReportFeature {
     case pop
     case backPageTapped
   }
+  
+  @Dependency(\.SpotSuggestionUseCase) var spotSuggestionUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -74,7 +87,9 @@ public struct ReportFeature {
     Scope(state: \.writeName, action: \.writeName) { WriteNameFeature() }
     Scope(state: \.selectKind, action: \.selectKind) { SelectKindFeature() }
     Scope(state: \.selectPhoto, action: \.selectPhoto) { SelectPhotoFeature() }
-    Reduce { state, action in
+    Reduce {
+      state,
+      action in
       switch action {
       case .backButtonTapped:
         switch state.currentPage {
@@ -131,7 +146,7 @@ public struct ReportFeature {
         return .merge([
           .send(.nextButtonIsEnabled(state.selectPhoto.isEnabled))
         ])
-      /// `MoveLocationFeature`의 `Delegate`처리
+        /// `MoveLocationFeature`의 `Delegate`처리
       case let .moveLocation(.delegate(action)):
         if state.currentPage != 1 { return .none }
         switch action {
@@ -140,7 +155,7 @@ public struct ReportFeature {
           state.nmReverseGeoCodeEntity = entity
           return .send(.nextButtonIsEnabled(location != nil && entity != nil))
         }
-      /// `WriteNameFeature`의 `Delegate`처리
+        /// `WriteNameFeature`의 `Delegate`처리
       case let .writeName(.delegate(action)):
         if state.currentPage != 2 { return .none }
         switch action {
@@ -148,7 +163,7 @@ public struct ReportFeature {
           state.spotName = spotName
           return .send(.nextButtonIsEnabled(!spotName.isEmpty))
         }
-      /// `SelectKindFeature`의 `Delegate`처리
+        /// `SelectKindFeature`의 `Delegate`처리
       case let .selectKind(.delegate(action)):
         if state.currentPage != 3 { return .none }
         switch action {
@@ -156,7 +171,7 @@ public struct ReportFeature {
           state.trashType = trashType
           return .send(.nextButtonIsEnabled(true))
         }
-      /// `SelectPhotoFeature`의 `Delegate`처리
+        /// `SelectPhotoFeature`의 `Delegate`처리
       case let .selectPhoto(.delegate(action)):
         if state.currentPage != 4 { return .none }
         switch action {
@@ -166,12 +181,67 @@ public struct ReportFeature {
         }
       case .reportButtonTapped:
         // TODO: 제보하기 버튼이 눌렸을 때, 실제 제보하기 기능 호출
-        
+        return spotSuggestionEffect(state: state, useCase: spotSuggestionUseCase)
+      case let .spotSuggestionResult(result):
+        switch result {
+        case let .success(prisignedURL):
+          // TODO: presignedURL로 사진 업로드
+          print("Presigned URL: \(prisignedURL)")
+          return .send(.pop) /// RecordFeature에서 처리
+        case let .failure(error):
+          let message = error.localizedDescription
+          state.destination = .alert(.occuredError(message))
+          return .none
+        }
+      case .destination(.dismiss):
+        state.destination = nil
         return .none
       case .binding:
         return .none
         default: return .none
       }
+    }
+  }
+}
+
+public extension ReportFeature {
+  func spotSuggestionEffect(
+    state: Self.State,
+    useCase: SpotSuggestionUseCase
+  ) -> Effect<Action> {
+    .run { send in
+      do {
+        let entity = try await useCase.execute(
+          state.spotName,
+          state.centerPoint,
+          state.nmReverseGeoCodeEntity,
+          state.trashType
+        )
+        await send(.spotSuggestionResult(.success(entity)))
+      } catch is CancellationError {
+        await send(.spotSuggestionResult(.failure(.taskCancelled)))
+      } catch {
+        await send(.spotSuggestionResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
+
+}
+
+extension ReportFeature {
+  @Reducer(state: .equatable, action: .equatable)
+  public enum Destination {
+    case alert(AlertState<ReportFeature.Action.Alert>)
+  }
+}
+
+
+extension AlertState where Action == ReportFeature.Action.Alert {
+  static func occuredError(_ message: String) -> Self {
+    Self {
+      TextState("제보하기 도중에 오류가 발생했습니다.")
+    } message: {
+      TextState(message)
     }
   }
 }

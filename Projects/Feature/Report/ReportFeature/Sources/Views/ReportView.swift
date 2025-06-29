@@ -65,6 +65,7 @@ public struct ReportView: View {
       }
     }
     .background(ColorSet.Background.Primary)
+    .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
   }
   
   

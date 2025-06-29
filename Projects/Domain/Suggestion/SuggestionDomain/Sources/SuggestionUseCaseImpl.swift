@@ -8,6 +8,7 @@
 
 import Foundation
 import SuggestionDomainInterface
+import NMReverseGeocodingDomainInterface
 
 extension SpotSuggestionUseCase {
   public static func live(repository: SpotSuggestionRepository) -> SpotSuggestionUseCase {

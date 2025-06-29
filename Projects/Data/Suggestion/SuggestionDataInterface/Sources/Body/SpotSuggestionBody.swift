@@ -11,11 +11,11 @@ import SuggestionDomainInterface
 
 public struct SpotSuggestionBody: Encodable, Equatable {
   public let spotName: String
-  public let latitude: Double
-  public let longitude: Double
-  public let region: String
-  public let city: String
-  public let site: String
+  public let latitude: Double?
+  public let longitude: Double?
+  public let region: String?
+  public let city: String?
+  public let site: String?
   public let trashType: String
   
   public init(

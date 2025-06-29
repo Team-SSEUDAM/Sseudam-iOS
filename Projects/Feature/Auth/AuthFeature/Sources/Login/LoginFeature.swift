@@ -25,7 +25,8 @@ public struct LoginFeature {
     case binding(BindingAction<State>)
     case closeButtonTapped
     case appleLoginTapped
-    case appleLoginRequest
+    case requestAppleLoginAuthroization
+    case appleLoginServerRequest(token: String, email: String?)
     case presentSignUp(email: String?)
     case delegate(Delegate)
   }
@@ -52,11 +53,14 @@ public struct LoginFeature {
         return .send(.delegate(.dismiss))
         
       case .appleLoginTapped:
-        return .send(.appleLoginRequest)
+        return .send(.requestAppleLoginAuthroization)
           .throttle(id: ID.throttle, for: 0.3, scheduler: mainQueue, latest: false)
         
-      case .appleLoginRequest:
-        return requestAppleLogin()
+      case .requestAppleLoginAuthroization:
+        return requestAppleLoginAuthroization()
+        
+      case let .appleLoginServerRequest(token, email):
+        return requestAppleLogin(token: token, email: email)
         
       case let .presentSignUp(email):
         return .send(.delegate(.presentSignUp(email: email)))
@@ -66,7 +70,23 @@ public struct LoginFeature {
     }
   }
   
-  private func requestAppleLogin() -> Effect<Action> {
+  private func requestAppleLogin(token: String, email: String?) -> Effect<Action> {
+    return .run { send in
+      do {
+        let data = try await appleLoginUseCase.execute(token)
+        await tokenSaveUseCase.execute(data)
+        if data.isTempToken {
+          return await send(.presentSignUp(email: email))
+        } else {
+          await send(.delegate(.complete))
+        }
+      } catch {
+        return await send(.delegate(.dismiss))
+      }
+    }
+  }
+  
+  private func requestAppleLoginAuthroization() -> Effect<Action> {
     return .run { send in
       do {
         // 애플로그인 요청
@@ -77,18 +97,7 @@ public struct LoginFeature {
           } else {
             email = KeyChainService.read(forKey: .email)
           }
-          do {
-            let data = try await appleLoginUseCase.execute(result.idToken)
-            await tokenSaveUseCase.execute(data)
-            if data.isTempToken {
-              return await send(.presentSignUp(email: email))
-            } else {
-              await send(.delegate(.complete))
-            }
-          } catch {
-            return await send(.delegate(.dismiss))
-          }
-          
+          await send(.appleLoginServerRequest(token: result.idToken, email: email))
         }
       } catch {
         print("[AppleLogin Failure] ", error.localizedDescription)

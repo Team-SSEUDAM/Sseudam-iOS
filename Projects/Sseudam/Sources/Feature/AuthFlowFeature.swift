@@ -29,8 +29,12 @@ extension SseudamFeature {
             await send(.presentLogin(false))
             await send(.presentNickname(true, email))
           }
+          
         case .delegate(.complete):
-          return .send(.changeLoginState(true))
+          return .run { send in
+            await send(.changeLoginState(true))
+            await send(.presentLogin(false))
+          }
 
         default:
           return .none

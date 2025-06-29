@@ -6,15 +6,17 @@
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
+import HomeDomain
+import NMReverseGeocodingDomain
+import SuggestionDomain
 
 import HomeDomainInterface
 import NMReverseGeocodingDomainInterface
-import HomeDomain
-import NMReverseGeocodingDomain
-import NMReverseGeocodingDataInterface
-import ReportDataInterface
+import SuggestionDomainInterface
+
 import HomeData
 import NMReverseGeocodingData
+import SuggestionData
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
 struct DependencyRegister {
@@ -22,6 +24,8 @@ struct DependencyRegister {
   func injection() {
     let homeRepository = HomeRepository.live
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
+    let suggestionRepository = SpotSuggestionRepository.live
+    
     HomeUseCaseRegister(
       provider: {
         HomeUseCase.live(repository: homeRepository)
@@ -30,6 +34,11 @@ struct DependencyRegister {
     NMReverseGeoCodeUseCaseRegister(
       provider: {
         NMReverseGeoCodeUseCase.live(repository: nmGeometryRepository)
+      }
+    )
+    SpotSuggestionUseCaseRegister(
+      provider: {
+        SpotSuggestionUseCase.live(repository: suggestionRepository)
       }
     )
     

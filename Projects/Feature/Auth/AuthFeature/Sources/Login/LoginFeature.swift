@@ -17,7 +17,7 @@ public struct LoginFeature {
   
   @ObservableState
   public struct State: Equatable {
-    
+    var email: String? = nil
     public init() {}
   }
   
@@ -27,8 +27,10 @@ public struct LoginFeature {
     case appleLoginTapped
     case requestAppleLoginAuthroization
     case appleLoginServerRequest(token: String, email: String?)
-    case presentSignUp(email: String?)
+    case presentSignUp
     case delegate(Delegate)
+    case loginResult(Result<SocialLoginEntity, NetworkError>)
+    case storeEmail(String?)
   }
   
   public enum Delegate: Equatable {
@@ -62,11 +64,34 @@ public struct LoginFeature {
       case let .appleLoginServerRequest(token, email):
         return requestAppleLogin(token: token, email: email)
         
-      case let .presentSignUp(email):
-        return .send(.delegate(.presentSignUp(email: email)))
+      case .presentSignUp:
+        return .send(.delegate(.presentSignUp(email: state.email)))
+        
+      case let .loginResult(result):
+        return handleLoginResult(result: result)
+        
+      case let .storeEmail(email):
+        state.email = email
+        return .none
         
       default: return .none
       }
+    }
+  }
+  
+  private func handleLoginResult(result: Result<SocialLoginEntity, NetworkError>) -> Effect<Action> {
+    switch result {
+    case let .success(data):
+      return .run { send in
+        await tokenSaveUseCase.execute(data)
+        if data.isTempToken {
+          return await send(.presentSignUp)
+        } else {
+          await send(.delegate(.complete))
+        }
+      }
+    case .failure(_):
+      return .send(.delegate(.dismiss))
     }
   }
   
@@ -74,14 +99,9 @@ public struct LoginFeature {
     return .run { send in
       do {
         let data = try await appleLoginUseCase.execute(token)
-        await tokenSaveUseCase.execute(data)
-        if data.isTempToken {
-          return await send(.presentSignUp(email: email))
-        } else {
-          await send(.delegate(.complete))
-        }
-      } catch {
-        return await send(.delegate(.dismiss))
+        await send(.loginResult(.success(data)))
+      } catch let error as NetworkError {
+        await send(.loginResult(.failure(error)))
       }
     }
   }
@@ -97,6 +117,7 @@ public struct LoginFeature {
           } else {
             email = KeyChainService.read(forKey: .email)
           }
+          await send(.storeEmail(email))
           await send(.appleLoginServerRequest(token: result.idToken, email: email))
         }
       } catch {

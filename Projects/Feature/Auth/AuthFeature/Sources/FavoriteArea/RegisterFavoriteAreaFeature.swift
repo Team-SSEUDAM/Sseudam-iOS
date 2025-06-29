@@ -11,6 +11,7 @@ import UserDomainInterface
 import AuthDomainInterface
 import KeyChain
 import UserDefaults
+import Utility
 
 @Reducer
 public struct RegisterFavoriteAreaFeature {
@@ -45,6 +46,7 @@ public struct RegisterFavoriteAreaFeature {
     case completeButtonTapped
     case successSignUp(nickname: String)
     case errorToastMessage(String)
+    case signUpResult(Result<String, NetworkError>)
     case delegate(Delegate)
   }
   
@@ -108,6 +110,14 @@ public struct RegisterFavoriteAreaFeature {
           area: state.area
         )
         
+      case let .signUpResult(result):
+        switch result {
+        case let .success(nickname):
+          return .send(.successSignUp(nickname: nickname))
+        case let .failure(error):
+          return .send(.errorToastMessage("회원가입에 실패했어요."))
+        }
+        
       case let .successSignUp(nickname):
         UserDefaultsKeys.username = nickname
         UserDefaultsKeys.isLoggedIn = true
@@ -115,7 +125,7 @@ public struct RegisterFavoriteAreaFeature {
           await send(.deleteAreaList)
           await send(.delegate(.dismiss))
         }
-        
+
       case let .errorToastMessage(message):
         state.errorToastMessage = message
         return .none
@@ -134,9 +144,9 @@ public struct RegisterFavoriteAreaFeature {
           address: area
         )
         try await signUpUseCase.execute(input)
-        await send(.successSignUp(nickname: nickname))
-      } catch {
-        await send(.errorToastMessage("회원가입에 실패했어요"))
+        await send(.signUpResult(.success((nickname))))
+      } catch let error as NetworkError {
+        await send(.signUpResult(.failure(error)))
       }
     }
   }

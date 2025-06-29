@@ -9,14 +9,40 @@
 import ComposableArchitecture
 import AuthFeature
 
-
-extension SseudamFeature {
-  struct AuthFlowFeature: Reducer {
-    func reduce(
-      into state: inout SseudamFeature.State,
-      action: SseudamFeature.Action
-    ) -> Effect<SseudamFeature.Action> {
-      
+@Reducer
+struct AuthFlowFeature {
+  @ObservableState
+  struct State {
+    var isLoginPresent: Bool = false
+    @Presents var modal: ModalDestination.State?
+  }
+  
+  enum Action: BindableAction, Equatable {
+    case binding(BindingAction<State>)
+    
+    case presentLogin(Bool)
+    case presentNickname(Bool, String?)
+    case presentSignUpComplete(Bool)
+    case changeLoginState(Bool)
+    case modal(PresentationAction<ModalDestination.Action>)
+    case delegate(Delegate)
+  }
+  
+  enum Delegate: Equatable {
+    case changeLoginState(Bool)
+  }
+  
+  /// 모달로 띄우기 위한 뷰
+  @Reducer(state: .equatable, action: .equatable)
+  enum ModalDestination {
+    case login(LoginFeature)
+    case signUp(NickNameInputFeature)
+    case complete(SignUpCompleteFeature)
+  }
+  
+  var body: some ReducerOf<Self> {
+    BindingReducer()
+    Reduce { state, action in
       switch action {
       // Login 모달 delegate 처리
       case let .modal(.presented(.login(action))):
@@ -84,11 +110,14 @@ extension SseudamFeature {
       // 로그인 상태 각 탭에 전달
       case let .changeLoginState(isLoggedIn):
         return .run { send in
-          await send(.mypageRoot(.loginState(isLoggedIn)))
+          await send(.delegate(.changeLoginState(isLoggedIn)))
         }
+        
       default:
         return .none
       }
+      
     }
+    .ifLet(\.$modal, action: \.modal)
   }
 }

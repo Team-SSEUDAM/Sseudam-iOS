@@ -21,11 +21,10 @@ struct SseudamFeature {
   struct State {
     var selectedTab: TabBarItem = .home
     var isTabbarHidden: Bool = false
-    var isLoginPresent: Bool = false
     
     var homeRoot: HomeRootFeature.State = .init()
     var mypageRoot: MyPageRootFeature.State = .init()
-    @Presents var modal: ModalDestination.State?
+    var authFlow: AuthFlowFeature.State? = nil
   }
   
   enum Action: BindableAction, Equatable {
@@ -34,21 +33,9 @@ struct SseudamFeature {
     
     case homeRoot(HomeRootFeature.Action)
     case mypageRoot(MyPageRootFeature.Action)
+    case authFlow(AuthFlowFeature.Action)
     
-    case presentLogin(Bool)
-    case presentNickname(Bool, String?)
-    case presentSignUpComplete(Bool)
-    case changeLoginState(Bool)
-    case modal(PresentationAction<ModalDestination.Action>)
     
-  }
-  
-  /// 모달로 띄우기 위한 뷰
-  @Reducer(state: .equatable, action: .equatable)
-  enum ModalDestination {
-    case login(LoginFeature)
-    case signUp(NickNameInputFeature)
-    case complete(SignUpCompleteFeature)
   }
   
   var body: some ReducerOf<Self> {
@@ -70,14 +57,19 @@ struct SseudamFeature {
         return .none
         
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):
-        return .send(.presentLogin(isPresent))
+        state.authFlow = isPresent ? .init() : nil
+        return .send(.authFlow(.presentLogin(isPresent)))
         
-        
+      case let .authFlow(.delegate(.changeLoginState(isLoggedIn))):
+        return .run { send in
+          await send(.mypageRoot(.loginState(isLoggedIn)))
+        }
       default: return .none
       }
     }
-    .ifLet(\.$modal, action: \.modal)
-    Reduce(AuthFlowFeature())
+    .ifLet(\.authFlow, action: \.authFlow) {
+      AuthFlowFeature()
+    }
   }
   
 }

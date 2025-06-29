@@ -45,13 +45,13 @@ struct SseudamView: View {
       
     }
     .ignoresSafeArea(edges: .bottom)
-    .fullScreenCover(item: $store.scope(state: \.modal?.login, action: \.modal.login)) { store in
+    .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in
       LoginView(store: store)
     }
-    .fullScreenCover(item: $store.scope(state: \.modal?.signUp, action: \.modal.signUp)) { store in
+    .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.signUp, action: \.authFlow.modal.signUp)) { store in
       NickNameInputView(store: store)
     }
-    .fullScreenCover(item: $store.scope(state: \.modal?.complete, action: \.modal.complete)) { store in
+    .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.complete, action: \.authFlow.modal.complete)) { store in
       SignUpCompleteView(store: store)
     }
     .transaction { transaction in

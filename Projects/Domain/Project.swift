@@ -14,6 +14,8 @@ let project = Project.makeStaticLibraryProject(
     .Domain.Home.Implement,
     .Domain.Report.Implement,
     .Domain.NMReverseGeocoding.Implement,
-    .Domain.Suggestion.Implement
+    .Domain.Suggestion.Implement,
+    .Domain.Auth.Implement,
+    .Domain.User.Implement
   ]
 )

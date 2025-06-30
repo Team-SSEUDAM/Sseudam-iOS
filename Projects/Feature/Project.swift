@@ -13,7 +13,8 @@ let project = Project.makeStaticLibraryProject(
   dependencies: [
     .Features.Home,
     .Features.Report,
-    .Features.TrashDetail
+    .Features.TrashDetail,
+    .Features.Auth
   ]
 )
 

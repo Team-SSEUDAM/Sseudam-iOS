@@ -152,17 +152,15 @@ extension TargetDependency {
     public struct User: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.User, isInterface: true))
       public static let Implement = Self.project(.domain(.User))
-    
+    }
     public struct NMReverseGeocoding: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.NMReverseGeocoding, isInterface: true))
       public static let Implement = Self.project(.domain(.NMReverseGeocoding))
     }
-    
     public struct Suggestion: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.Suggestion, isInterface: true))
       public static let Implement = Self.project(.domain(.Suggestion))
     }
-    
     public struct Report: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.Report, isInterface: true))
       public static let Implement = Self.project(.domain(.Report))
@@ -183,17 +181,15 @@ extension TargetDependency {
     public struct User: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.User, isInterface: true))
       public static let Implement = Self.project(.data(.User))
-    
+    }
     public struct NMReverseGeocoding: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.NMReverseGeocoding, isInterface: true))
       public static let Implement = Self.project(.data(.NMReverseGeocoding))
     }
-    
     public struct Suggestion: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Suggestion, isInterface: true))
       public static let Implement = Self.project(.data(.Suggestion))
     }
-    
     public struct Report: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Report, isInterface: true))
       public static let Implement = Self.project(.data(.Report))

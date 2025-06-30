@@ -12,7 +12,7 @@ import ProjectDescriptionHelpers
 let project = Project.makeStaticLibraryProject(
   for: Data.Auth,
   dependencies: [
-    .Domain.Auth.Interface
+    .Domain.Umbrella
   ],
   nameSuffix: "Interface"
 )

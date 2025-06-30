@@ -23,4 +23,15 @@ public enum SuggestionEndpoint: Sendable {
       parameters: .body(body)
     )
   }
+  
+  public static func getSpotNameValidation(
+    body: SpotNameValidateBody
+  ) -> Endpoint<Bool> {
+    return Endpoint(
+      headers: .authorization(UserDefaultsKeys.accessToken),
+      method: .post,
+      path: "/suggestions/validate",
+      parameters: .body(body)
+    )
+  }
 }

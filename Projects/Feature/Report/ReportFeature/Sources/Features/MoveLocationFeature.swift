@@ -58,17 +58,7 @@ public struct MoveLocationFeature {
         state.centerLocation = point
         return .send(.reverseGeoCode(point))
       case let .reverseGeoCode(point):
-        return .run { send in
-          do {
-            let input = NMReverseGeoCodeInput(latitude: point.latitude, longitude: point.longitude)
-            let entity = try await reverseGeoCodeUseCase.execute(input)
-            await send(.reverseGeoCodeResult(.success(entity)))
-          } catch is CancellationError {
-            await send(.reverseGeoCodeResult(.failure(.taskCancelled)))
-          } catch {
-            await send(.reverseGeoCodeResult(.failure(.customError(message: error.localizedDescription))))
-          }
-        }
+        return reverseGeoCodeEffect(point)
       case let .reverseGeoCodeResult(result):
         switch result {
         case let .success(entity):
@@ -111,4 +101,21 @@ extension MoveLocationFeature {
     }
     return convertLocation
   }
+  
+  private func reverseGeoCodeEffect(
+    _ point: Coordinates
+  ) -> Effect<Action> {
+    return .run { send in
+      do {
+        let input = NMReverseGeoCodeInput(latitude: point.latitude, longitude: point.longitude)
+        let entity = try await reverseGeoCodeUseCase.execute(input)
+        await send(.reverseGeoCodeResult(.success(entity)))
+      } catch is CancellationError {
+        await send(.reverseGeoCodeResult(.failure(.taskCancelled)))
+      } catch {
+        await send(.reverseGeoCodeResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
+  
 }

@@ -41,6 +41,8 @@ public struct ReportFeature {
     
     var selectedPhoto: UIImage? = nil
     
+    /// 서버 검증 관련 상태
+    var isServerValidating: Bool = false
     public init() {}
   }
 
@@ -111,8 +113,11 @@ public struct ReportFeature {
         default: return .none
         }
       case .nextButtonTapped:
+        /// 다음 페이지로 넘어가기 전에 현재 페이지에서 검증 action
         if state.currentPage == 4 { return .send(.reportButtonTapped) }
+        if state.currentPage == 2 { return .send(.writeName(.validateNameFromServer)) }
         state.currentPage = min(state.currentPage + 1, 4)
+        /// 다음 페이지에 따라 적절한 action을 보냄
         switch state.currentPage {
         case 0: return .send(.didAppearStartReport)
         case 1: return .send(.didAppearMoveLocation)
@@ -165,7 +170,17 @@ public struct ReportFeature {
         switch action {
         case let .nameValidationChanged(isValid, name):
           state.spotName = name
-          return .send(.nextButtonIsEnabled(isValid))
+          state.isServerValidating = false
+          return .send(.nextButtonIsEnabled(isValid && !state.isServerValidating))
+        case let .serverValidationCompleted(isValid, name):
+          state.spotName = name
+          state.isServerValidating = false
+          if isValid {
+            state.currentPage = min(state.currentPage + 1, 4)
+            return .send(.didAppearSelectKind)
+          } else {
+            return .send(.nextButtonIsEnabled(false))
+          }
         }
         /// `SelectKindFeature`의 `Delegate`처리
       case let .selectKind(.delegate(action)):
@@ -184,6 +199,13 @@ public struct ReportFeature {
           state.selectedPhoto = photo /// 사진은, 일반적인 ReportBody에 담지 않고, presignedURL로 별도 처리
           return .send(.nextButtonIsEnabled(true))
         }
+        /// 서버 검증 시작 시 버튼 상태 업데이트
+      case .writeName(.validateNameFromServer):
+        if state.currentPage == 2 {
+          state.isServerValidating = true
+          return .send(.nextButtonIsEnabled(false))
+        }
+        return .none
       case .reportButtonTapped:
         return spotSuggestionEffect(state: state, useCase: spotSuggestionUseCase)
       case let .postSpotImage(prisignedURL):
@@ -210,7 +232,7 @@ public struct ReportFeature {
         return .none
       case .binding:
         return .none
-        default: return .none
+      default: return .none
       }
     }
     .ifLet(\.$destination, action: \.destination) {

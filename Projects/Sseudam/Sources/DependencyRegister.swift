@@ -66,6 +66,12 @@ struct DependencyRegister {
       }
     )
     
+    SpotNameValidateUseCaseRegister(
+      provider: {
+        SpotNameValidateUseCase.live(repository: suggestionRepository)
+      }
+    )
+    
     // MARK: - Auth
     
     AppleLoginUseCaseRegister {

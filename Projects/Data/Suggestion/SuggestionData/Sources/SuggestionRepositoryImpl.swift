@@ -20,6 +20,11 @@ public extension SpotSuggestionRepository {
         return try await NetworkKit().execute(with: endpoint).toEntity()
       }, putSpotImage: { input in
         return try await NetworkKit().upload(with: input.presignedUrl, data: input.image)
+      } ,
+      getSpotValidation: { input in
+        let body = SpotNameValidateBody(input)
+        let endpoint = SuggestionEndpoint.getSpotNameValidation(body: body)
+        return try await NetworkKit().execute(with: endpoint)
       }
     )
   }

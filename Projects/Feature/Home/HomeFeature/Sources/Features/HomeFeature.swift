@@ -148,13 +148,8 @@ extension HomeFeature {
 }
 
 extension HomeFeature {
-  @Reducer
+  @Reducer(state: .equatable, action: .equatable)
   public enum Path {
     case reportView(ReportFeature)
   }
 }
-
-extension HomeFeature.Path.State: Equatable { }
-extension HomeFeature.Path.Action: Equatable { }
-  
-  

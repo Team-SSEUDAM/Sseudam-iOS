@@ -7,8 +7,9 @@
 //
 
 import SwiftUI
-import DesignKit
 import ComposableArchitecture
+import DesignKit
+import Utility
 
 @Reducer
 public struct WriteNameFeature {
@@ -22,13 +23,16 @@ public struct WriteNameFeature {
     case tooLong            // error2: 13자 이상일때
     case containsSpecialChar // error3: 특수문자 + 이모지 포함
     case startsWithSpace    // error4: 공백으로 시작
+    case alreadyUsing        // 이미 사용중인 쓰레기통 이름일 때
+    case serverError        // 서버 통신 과정에서 오류
+    case checking           // 서버 검증 중
     case empty              // 초기 상태
     
     /// 에러 메시지 반환
     var message: String {
       switch self {
       case .valid:
-        return ""
+        return "사용 가능한 쓰레기통 이름이에요."
       case .tooShort:
         return "쓰레기통 이름은 2자 이상 입력해주세요."
       case .tooLong:
@@ -37,6 +41,12 @@ public struct WriteNameFeature {
         return "쓰레기통 이름은 특수문자나 이모지 사용이 불가능해요."
       case .startsWithSpace:
         return "쓰레기통 이름은 공백으로 시작할 수 없어요."
+      case .alreadyUsing:
+        return "이미 사용중인 쓰레기통 이름이에요."
+      case .serverError:
+        return "서버와의 통신에 문제가 발생했어요. 잠시 후 다시 시도해주세요."
+      case .checking:
+        return "쓰레기통 이름을 확인하고 있어요..."
       case .empty:
         return "2~12자까지 입력할 수 있어요."
       }
@@ -47,8 +57,10 @@ public struct WriteNameFeature {
       switch self {
       case .valid:
         return .accent
-      case .tooShort, .tooLong, .containsSpecialChar, .startsWithSpace:
+      case .tooShort, .tooLong, .containsSpecialChar, .startsWithSpace, .alreadyUsing, .serverError:
         return .error
+      case .checking:
+        return .accent
       case .empty:
         return .normal
       }
@@ -57,6 +69,11 @@ public struct WriteNameFeature {
     /// 버튼 활성화 여부
     var isButtonEnabled: Bool {
       return self == .valid
+    }
+    
+    /// 로딩 상태 여부
+    var isLoading: Bool {
+      return self == .checking
     }
   }
   
@@ -82,6 +99,11 @@ public struct WriteNameFeature {
     public var errorMessage: String {
       validationResult.message
     }
+    
+    /// 로딩 상태
+    public var isLoading: Bool {
+      validationResult.isLoading
+    }
   }
   
   public enum Action: BindableAction, Equatable {
@@ -89,11 +111,16 @@ public struct WriteNameFeature {
     case validateName(String)
     case focusChanged(Bool)
     case delegate(Delegate)
+    case validateNameFromServer
+    case validateNameResult(Result<Bool, NetworkError>)
     
     public enum Delegate: Equatable {
       case nameValidationChanged(isValid: Bool, name: String)
+      case serverValidationCompleted(isValid: Bool, name: String)
     }
   }
+  
+  @Dependency(\.SpotNameValidateUseCase) var spotNameValidateUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -101,27 +128,83 @@ public struct WriteNameFeature {
       switch action {
       case .binding(\.name):
         return .send(.validateName(state.name))
+        
       case let .validateName(name):
         let previousResult = state.validationResult
-        state.validationResult = validateNameInput(name)
+        // 서버 검증 중이 아닐 때만 클라이언트 검증 수행
+        if state.validationResult != .checking {
+          state.validationResult = validateNameInput(name)
+        }
+        
         /// 유효성 검사 결과가 변경되었을 때만 delegate 호출
         if previousResult != state.validationResult {
-          return .send(.delegate(.nameValidationChanged(
-            isValid: state.isButtonEnabled,
-            name: state.isButtonEnabled ? name : ""
-          )))
+          return .send(
+            .delegate(
+              .nameValidationChanged(
+                isValid: state.isButtonEnabled,
+                name: state.isButtonEnabled ? name : ""
+              )
+            )
+          )
         }
         return .none
+        
       case let .focusChanged(isFocused):
         state.isFocused = isFocused
         return .none
+        
+      case .validateNameFromServer:
+        // 클라이언트 검증부터 수행
+        let clientValidationResult = validateNameInput(state.name)
+        if clientValidationResult != .valid {
+          // 클라이언트 검증 실패 시 서버 호출하지 않음
+          return .send(.delegate(.serverValidationCompleted(isValid: false, name: "")))
+        }
+        
+        // 클라이언트 검증 통과 시 서버 검증 수행
+        state.validationResult = .checking
+        return .merge([
+          .send(.delegate(.nameValidationChanged(isValid: false, name: ""))),
+          spotNameValidateEffect(state.name)
+        ])
+        
+      case let .validateNameResult(result):
+        switch result {
+        case .success(let isValid):
+          state.validationResult = isValid ? .valid : .alreadyUsing
+          let finalName = isValid ? state.name : ""
+          return .send(.delegate(.serverValidationCompleted(isValid: isValid, name: finalName)))
+          
+        case .failure:
+          state.validationResult = .serverError
+          return .send(.delegate(.serverValidationCompleted(isValid: false, name: "")))
+        }
+        
       default:
         return .none
       }
     }
   }
+}
+
+extension WriteNameFeature {
   
-  /// 닉네임 유효성 검사 로직
+  private func spotNameValidateEffect(
+    _ name: String
+  ) -> Effect<Action> {
+    return .run { send in
+      do {
+        let isValid = try await spotNameValidateUseCase.execute(name)
+        await send(.validateNameResult(.success(isValid)))
+      } catch is CancellationError {
+        await send(.validateNameResult(.failure(.taskCancelled)))
+      } catch {
+        await send(.validateNameResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
+  
+  /// 닉네임 유효성 검사 로직 (클라이언트 검증)
   /// 우선순위: error1(길이 부족) > error2(길이 초과) > error3(특수문자/이모지) > error4(공백으로 시작)
   private func validateNameInput(_ name: String) -> NameValidationResult {
     /// 빈 문자열

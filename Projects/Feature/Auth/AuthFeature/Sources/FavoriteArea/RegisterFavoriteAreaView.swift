@@ -19,41 +19,53 @@ public struct RegisterFavoriteAreaView: View {
   }
   
   public var body: some View {
-    VStack(alignment: .leading) {
-      NavigationBar(backContent:  {
-        TouchArea(image: .leftChevron) {
-          store.send(.dismiss)
-        }
-      })
-      VStack(alignment: .leading)  {
-        Title
-        
-        SearchTextView
-        
-        ZStack {
-          SearchItemList(items: store.searchItems)
-          VStack {
-            Spacer()
-            SnackBar(message: $store.errorToastMessage, {})
+    ZStack {
+      Color.white
+        .ignoresSafeArea()
+      VStack(alignment: .leading) {
+        NavigationBar(backContent:  {
+          TouchArea(image: .leftChevron) {
+            store.send(.dismiss)
           }
-        }
-        .frame(maxHeight: .infinity)
+        })
+        content
         
-        PrimaryButton(
-          title: "완료",
-          size: .large,
-          state: store.isSelectItem ? .normal : .disabled
-        ) {
-          store.send(.completeButtonTapped)
-        }
-          .padding(.Number16)
       }
-      
+      .navigationBarHidden(true)
     }
-    .navigationBarHidden(true)
     .onAppear {
       store.send(.onAppear)
     }
+  }
+  
+  @ViewBuilder
+  private var content: some View {
+    VStack(alignment: .leading)  {
+      Title
+      SearchTextView
+      ZStack {
+        SearchItemList(items: store.searchItems)
+        VStack {
+          Spacer()
+          SnackBar(message: $store.errorToastMessage, {})
+        }
+      }
+      .frame(maxHeight: .infinity)
+      completeButton
+      
+    }
+  }
+  
+  @ViewBuilder
+  private var completeButton: some View {
+    PrimaryButton(
+      title: "완료",
+      size: .large,
+      state: store.isSelectItem ? .normal : .disabled
+    ) {
+      store.send(.completeButtonTapped)
+    }
+      .padding(.Number16)
   }
   
   @ViewBuilder

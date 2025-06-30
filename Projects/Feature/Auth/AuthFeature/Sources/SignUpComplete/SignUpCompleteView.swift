@@ -19,21 +19,25 @@ public struct SignUpCompleteView: View {
   }
   
   public var body: some View {
-    VStack {
-      VStack(alignment: .center, spacing: .Number16) {
-        Spacer()
-        // TODO: - 앱 로고 이미지로 바꾸기
-        RoundedRectangle(cornerRadius: .Number8)
-          .frame(width: 200, height: 200)
-          .foregroundStyle(ColorSet.Background.Secondary)
-        TitleView
-        Spacer()
-        PrimaryButton(title: "쓰담 시작하기", size: .large, state: .normal, {
-          store.send(.startButtonTapped)
-        })
-        .padding(.Number16)
+    ZStack {
+      Color.white
+        .ignoresSafeArea()
+      VStack {
+        VStack(alignment: .center, spacing: .Number16) {
+          Spacer()
+          // TODO: - 앱 로고 이미지로 바꾸기
+          RoundedRectangle(cornerRadius: .Number8)
+            .frame(width: 200, height: 200)
+            .foregroundStyle(ColorSet.Background.Secondary)
+          TitleView
+          Spacer()
+          PrimaryButton(title: "쓰담 시작하기", size: .large, state: .normal, {
+            store.send(.startButtonTapped)
+          })
+          .padding(.Number16)
+        }
+        
       }
-      
     }
   }
   

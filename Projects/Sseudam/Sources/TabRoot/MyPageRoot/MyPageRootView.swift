@@ -20,14 +20,16 @@ struct MyPageRootView: View {
   }
   
   var body: some View {
-    VStack {
-      if !store.state.isLoggedIn {
-        requireLoginView
-      } else {
-        Text("로그인~")
+    ZStack {
+      Color.white
+        .ignoresSafeArea()
+      VStack {
+        if !store.state.isLoggedIn {
+          requireLoginView
+        } else {
+          Text("로그인~")
+        }
       }
-      
-      
     }
   }
   

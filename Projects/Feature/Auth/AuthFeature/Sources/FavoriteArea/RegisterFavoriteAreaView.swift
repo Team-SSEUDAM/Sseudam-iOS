@@ -40,9 +40,9 @@ public struct RegisterFavoriteAreaView: View {
         .frame(maxHeight: .infinity)
         
         PrimaryButton(
-          title: "완료",
+          title: .constant("완료"),
           size: .large,
-          state: store.isSelectItem ? .normal : .disabled
+          state: store.isSelectItem ? .constant(.normal) : .constant(.disabled)
         ) {
           store.send(.completeButtonTapped)
         }

@@ -38,9 +38,9 @@ public struct NickNameInputView: View {
         Spacer()
         SnackBar(message: $store.errorToastMessage, {})
         PrimaryButton(
-          title: "완료",
+          title: .constant("완료"),
           size: .large,
-          state: store.nicknameValid.isValid ? .normal : .disabled
+          state: store.nicknameValid.isValid ? .constant(.normal) : .constant(.disabled)
         ) {
           store.send(.completeButtonTapped)
         }

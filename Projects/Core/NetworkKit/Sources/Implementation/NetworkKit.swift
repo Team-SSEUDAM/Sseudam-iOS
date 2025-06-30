@@ -184,7 +184,6 @@ extension NetworkKit {
       let decoder = JSONDecoder()
       if endpoint.isNotSseudamAPI { /// Sseudam API가 아닌 경우
         let responseData = try decoder.decode(R.self, from: data)
-        responseRawData(data, try endpoint.toURLRequest())
         return responseData
       }
       let response = try decoder.decode(APIResponse<R>.self, from: data)

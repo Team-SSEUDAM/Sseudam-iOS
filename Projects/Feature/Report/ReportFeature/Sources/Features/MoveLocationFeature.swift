@@ -77,7 +77,7 @@ public struct MoveLocationFeature {
           if let point = state.centerLocation {
             return .send(.delegate(.centerChanged(point, entity)))
           }
-        case let .failure(error):
+        case .failure:
           state.address = "현재 위치 정보를 가져올 수 없습니다."
           state.isEnabled = false
         }

@@ -130,19 +130,19 @@ public struct ReportFeature {
       case .didAppearMoveLocation:
         state.nextButtonText = "다음"
         return .merge([
-          .send(.writeName(.injectedFocus(false))),
+          .send(.writeName(.isFocused(false))),
           .send(.nextButtonIsEnabled(state.moveLocation.isEnabled))
         ])
       case .didAppearWriteName:
         state.nextButtonText = "다음"
         return .merge([
-          .send(.writeName(.injectedFocus(true))),
+          .send(.writeName(.isFocused(true))),
           .send(.nextButtonIsEnabled(state.writeName.isEnabled))
         ])
       case .didAppearSelectKind:
         state.nextButtonText = "다음"
         return .merge([
-          .send(.writeName(.injectedFocus(false))),
+          .send(.writeName(.isFocused(false))),
           .send(.nextButtonIsEnabled(state.selectKind.isEnabled))
         ])
       case .didAppearSelectPhoto:

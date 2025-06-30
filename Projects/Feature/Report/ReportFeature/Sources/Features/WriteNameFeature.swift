@@ -28,7 +28,7 @@ public struct WriteNameFeature {
   public struct State: Equatable {
     public var name: String = ""
     public var textFieldState: CustomTextFieldState = .normal
-    public var injectedFocus: Bool = false
+    public var isFocused: Bool = false
     public var isEnabled: Bool = false
     public var validation: TestFieldValidation = .none("2~12자까지 입력할 수 있어요.")
     public init() {
@@ -39,7 +39,7 @@ public struct WriteNameFeature {
     case binding(BindingAction<State>)
     case delegate(Delegate)
     case checkValidName(String)
-    case injectedFocus(Bool)
+    case isFocused(Bool)
     
     public enum Delegate: Equatable {
       case nameChanged(String)
@@ -74,8 +74,8 @@ public struct WriteNameFeature {
           state.isEnabled = false
           return .send(.delegate(.nameChanged("")))
         }
-      case let .injectedFocus(focus):
-        state.injectedFocus = focus
+      case let .isFocused(focus):
+        state.isFocused = focus
         return .none
       default: return .none
       }

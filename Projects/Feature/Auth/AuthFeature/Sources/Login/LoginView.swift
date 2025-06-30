@@ -62,12 +62,14 @@ public struct LoginView: View {
       icon: {
         Icon(image: .apple, size: .Number20, color: .white)
       },
-      title: "Apple로 계속하기",
+      title: .constant("Apple로 계속하기"),
       size: .large,
-      state: .custom(
+      state: .constant(
+          .custom(
         bg: ColorSet.SocialLogin.Apple,
         text: .white
-      )) {
+      ))
+    ) {
         store.send(.appleLoginTapped)
     }
   }
@@ -78,13 +80,13 @@ public struct LoginView: View {
       icon: {
         Icon(image: .kakao, size: .Number20, color: ColorSet.Gray._1000)
       },
-      title: "카카오로 계속하기",
+      title: .constant("카카오로 계속하기"),
       size: .large,
-      state: .custom(
-        bg: ColorSet.SocialLogin.Kakao,
-        text: ColorSet.Text.Primary
-      )) {
-      
-    }
+      state: .constant(
+        .custom(
+          bg: ColorSet.SocialLogin.Kakao,
+          text: ColorSet.Text.Primary
+        ))
+    ) { }
   }
 }

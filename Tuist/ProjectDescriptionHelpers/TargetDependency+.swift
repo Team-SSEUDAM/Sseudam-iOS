@@ -25,6 +25,7 @@ public enum Feature: String, ModuleRepresentable {
   case Umbrella = ""
   case Home
   case TrashDetail
+  case Auth
   case Report
   public var typePath: String { "Feature" }
 }
@@ -32,6 +33,8 @@ public enum Feature: String, ModuleRepresentable {
 public enum Domain: String, ModuleRepresentable {
   case Umbrella = ""
   case Home
+  case Auth
+  case User
   case NMReverseGeocoding
   case Suggestion
   case Report
@@ -41,6 +44,8 @@ public enum Domain: String, ModuleRepresentable {
 public enum Data: String, ModuleRepresentable {
   case Umbrella = ""
   case Home
+  case Auth
+  case User
   case NMReverseGeocoding
   case Suggestion
   case Report
@@ -130,6 +135,7 @@ extension TargetDependency {
     public static let Home = Self.project(.feature(.Home))
     public static let Report = Self.project(.feature(.Report))
     public static let TrashDetail = Self.project(.feature(.TrashDetail))
+    public static let Auth = Self.project(.feature(.Auth))
   }
   
   public struct Domain: TargetDependencyDelegate {
@@ -139,6 +145,13 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.Home, isInterface: true))
       public static let Implement = Self.project(.domain(.Home))
     }
+    public struct Auth: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Auth, isInterface: true))
+      public static let Implement = Self.project(.domain(.Auth))
+    }
+    public struct User: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.User, isInterface: true))
+      public static let Implement = Self.project(.domain(.User))
     
     public struct NMReverseGeocoding: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.NMReverseGeocoding, isInterface: true))
@@ -163,6 +176,13 @@ extension TargetDependency {
       public static let Interface = Self.project(.data(.Home, isInterface: true))
       public static let Implement = Self.project(.data(.Home))
     }
+    public struct Auth: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Auth, isInterface: true))
+      public static let Implement = Self.project(.data(.Auth))
+    }
+    public struct User: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.User, isInterface: true))
+      public static let Implement = Self.project(.data(.User))
     
     public struct NMReverseGeocoding: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.NMReverseGeocoding, isInterface: true))

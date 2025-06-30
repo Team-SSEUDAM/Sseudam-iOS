@@ -57,7 +57,6 @@ public struct SnackBar: View {
           .padding(.trailing, .Number12)
         }
         .opacity(boxOpacity)
-        .padding(.Number16)
         .clipped()
       }
     }

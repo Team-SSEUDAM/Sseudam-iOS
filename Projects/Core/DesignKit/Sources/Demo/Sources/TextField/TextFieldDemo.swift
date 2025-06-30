@@ -37,7 +37,7 @@ struct TextFieldDemo: View {
         placeholder: "이건 플레이스홀더입니다",
         text: $text,
         state: $state,
-        injectedFocus: .constant(false)
+        isFocused: .constant(false)
       ) {
         Text("이건 설명입니다")
       }

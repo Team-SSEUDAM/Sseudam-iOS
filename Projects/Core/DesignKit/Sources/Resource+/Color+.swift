@@ -103,5 +103,10 @@ extension DesignKitAsset {
       public static let Pressed = ColorSet.Gray._1000.opacity(0.12)
       public static let Error = ColorSet.SubColor.red
     }
+    
+    public struct SocialLogin: Sendable {
+      public static let Kakao = DesignKitAsset.Colors.kakao.swiftUIColor
+      public static let Apple = ColorSet.Gray._1000
+    }
   }
 }

@@ -18,14 +18,30 @@ import HomeData
 import NMReverseGeocodingData
 import SuggestionData
 
+import AuthDomainInterface
+import AuthDomain
+import AuthDataInterface
+import AuthData
+
+import UserDomainInterface
+import UserDomain
+import UserDataInterface
+import UserData
+import NetworkKit
+
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
 struct DependencyRegister {
   /// UseCase에 Repository 주입
   func injection() {
+    let networker = NetworkKit()
     let homeRepository = HomeRepository.live
+    let authRepository = AuthRepository.live(networker: networker)
+    let userReoository = UserRepository.live(networker: networker)
+    
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live
-    
+
+    // MARK: - Home
     HomeUseCaseRegister(
       provider: {
         HomeUseCase.live(repository: homeRepository)
@@ -49,6 +65,38 @@ struct DependencyRegister {
         UploadSpotImageUseCase.live(repository: suggestionRepository)
       }
     )
+    
+    // MARK: - Auth
+    
+    AppleLoginUseCaseRegister {
+      AppleLoginUseCase.live(repository: authRepository)
+    }
+    
+    TokenSaveUseCaseRegister {
+      TokenSaveUseCase.live()
+    }
+    
+    SignUpUseCaseRegister {
+      SignUpUseCase.live(repository: authRepository)
+    }
+    
+    // MARK: - User
+    
+    CheckNicknameValidUseCaseRegister {
+      CheckNicknameValidateUseCase.test(repository: userReoository)
+    }
+    
+    LoadAreaListUseCaseRegister {
+      LoadAreaListUseCase.live(repository: userReoository)
+    }
+    
+    DeleteAreaListUseCaseRegister {
+      DeleteAreaListUseCase.live(repository: userReoository)
+    }
+    
+    SearchAreaUseCaseRegister {
+      SearchAreaUseCase.live(repository: userReoository)
+    }
     
   }
 }

@@ -21,7 +21,8 @@ let project = Project(
       bundleId: "Sseudam.a2bo.ios.Utility",
       deploymentTargets: .iOS("17.0"),
       infoPlist: .extendingDefault(with: [:]),
-      sources: ["Sources/**"]
+      sources: ["Sources/**"],
+      resources: ["Resources/**"]
     )
   ]
 )

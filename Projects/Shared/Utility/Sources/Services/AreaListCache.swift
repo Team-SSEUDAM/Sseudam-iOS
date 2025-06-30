@@ -1,34 +1,37 @@
 //
-//  LocationCache.swift
-//  UserData
+//  AreaListCache.swift
+//  Utility
 //
-//  Created by Jiyeon on 6/27/25.
+//  Created by Jiyeon on 6/30/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
+
 import Foundation
 
-actor AreaListCache {
+public actor AreaListCache {
   
   private var list: [String] = []
   
-  func load() {
+  public init(){}
+  
+  public func load() {
     guard list.isEmpty else { return }
     loadJsonData()
   }
   
-  func fetchList() -> [String] {
+  public func fetchList() -> [String] {
     return list
   }
   
-  func deleteAll() {
+  public func deleteAll() {
     list.removeAll()
     if list.isEmpty {
       print("✅ 지역 리스트 삭제 완료")
     }
   }
   
-  private func loadJsonData(from bundle: Bundle = Bundle(for: AreaListCache.self)) {
-    guard let url = bundle.url(forResource: "administrative_area_list", withExtension: "json") else {
+  private func loadJsonData() {
+    guard let url = Bundle.module.url(forResource: "administrative_area_list", withExtension: "json") else {
       print("❌ 지역 리스트 URL 못찾음")
       return
     }

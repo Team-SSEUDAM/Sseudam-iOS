@@ -59,7 +59,7 @@ public struct NickNameInputView: View {
   @ViewBuilder
   private var CompleteButton: some View {
     PrimaryButton(
-      title: "완료",
+      title: "다음",
       size: .large,
       state: store.nicknameValid.isValid ? .normal : .disabled
     ) {

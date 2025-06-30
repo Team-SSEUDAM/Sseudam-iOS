@@ -38,18 +38,3 @@ public struct Endpoint<R>: APIRequestable where R: Decodable & Sendable {
     self.isNotSseudamAPI = isNotSseudamAPI
   }
 }
-
-public extension Endpoint {
-  static func presignedURL(_ url: String, with data: Data) -> Endpoint<EmptyResponse> {
-    return .init(
-      headers: .custom([
-        "Content-Type": "image/jpeg"
-      ]),
-      method: .put,
-      baseURL: url,
-      path: "",
-      parameters: .rawData(data)
-    )
-  }
-}
-  

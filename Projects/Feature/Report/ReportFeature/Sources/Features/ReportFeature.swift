@@ -57,7 +57,10 @@ public struct ReportFeature {
     case binding(BindingAction<State>)
     
     case spotSuggestionResult(Result<String, NetworkError>)
+    case uploadSpotImageResult(Result<String, NetworkError>)
     case postSpotImage(String)
+    
+    case errorOccured(message: String)
     
     /// 시작 화면이 나타날 때
     case didAppearStartReport
@@ -80,6 +83,7 @@ public struct ReportFeature {
   }
   
   @Dependency(\.SpotSuggestionUseCase) var spotSuggestionUseCase
+  @Dependency(\.UploadSpotImageUseCase) var uploadSpotImageUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -176,23 +180,31 @@ public struct ReportFeature {
         if state.currentPage != 4 { return .none }
         switch action {
         case let .photoSelected(photo):
+          print("Photo Size: \(photo.size)")
           state.selectedPhoto = photo /// 사진은, 일반적인 ReportBody에 담지 않고, presignedURL로 별도 처리
           return .send(.nextButtonIsEnabled(true))
         }
       case .reportButtonTapped:
-        // TODO: 제보하기 버튼이 눌렸을 때, 실제 제보하기 기능 호출
         return spotSuggestionEffect(state: state, useCase: spotSuggestionUseCase)
+      case let .postSpotImage(prisignedURL):
+        return uploadSpotImageEffect(state, prisignedURL, uploadSpotImageUseCase)
       case let .spotSuggestionResult(result):
         switch result {
         case let .success(prisignedURL):
-          // TODO: presignedURL로 사진 업로드
-          print("Presigned URL: \(prisignedURL)")
-          return .send(.pop) /// RecordFeature에서 처리
+          return .send(.postSpotImage(prisignedURL))
         case let .failure(error):
-          let message = error.localizedDescription
-          state.destination = .alert(.occuredError(message))
-          return .none
+          return .send(.errorOccured(message: error.localizedDescription))
         }
+      case let .uploadSpotImageResult(result):
+        switch result {
+        case .success:
+          return .send(.pop)
+        case let .failure(error):
+          return .send(.errorOccured(message: error.localizedDescription))
+        }
+      case let .errorOccured(message):
+        state.destination = .alert(.occuredError(message))
+        return .none
       case .destination(.dismiss):
         state.destination = nil
         return .none
@@ -222,6 +234,26 @@ public extension ReportFeature {
         await send(.spotSuggestionResult(.failure(.taskCancelled)))
       } catch {
         await send(.spotSuggestionResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
+  
+  func uploadSpotImageEffect(
+    _ state: Self.State,
+    _ url: String,
+    _ useCase: UploadSpotImageUseCase
+  ) -> Effect<Action> {
+    .run { send in
+      do {
+        guard let image = state.selectedPhoto else {
+          throw NetworkError.customError(message: "이미지를 선택해주세요.")
+        }
+        try await useCase.execute(image, url)
+        await send(.uploadSpotImageResult(.success("성공"))) /// 임시 메시지
+      } catch is CancellationError {
+        await send(.uploadSpotImageResult(.failure(.taskCancelled)))
+      } catch {
+        await send(.uploadSpotImageResult(.failure(.customError(message: error.localizedDescription))))
       }
     }
   }

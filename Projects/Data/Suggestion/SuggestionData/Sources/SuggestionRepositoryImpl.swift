@@ -18,6 +18,8 @@ public extension SpotSuggestionRepository {
         let body = SpotSuggestionBody(input)
         let endpoint = SuggestionEndpoint.postSpotSuggestion(body: body)
         return try await NetworkKit().execute(with: endpoint).toEntity()
+      }, putSpotImage: { input in
+        return try await NetworkKit().upload(with: input.presignedUrl, data: input.image)
       }
     )
   }

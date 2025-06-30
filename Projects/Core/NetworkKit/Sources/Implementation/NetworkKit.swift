@@ -18,6 +18,45 @@ public struct NetworkKit: NetworkKitProtocol, Sendable {
     self.session = session
   }
   
+  public func upload(
+    with url: String,
+    data: Data,
+    timeout: TimeInterval = 30.0
+  ) async throws -> Void {
+    try await withThrowingTaskGroup(of: Void.self) { group in
+      group.addTask {
+        var request = URLRequest(url: URL(string: url)!)
+        request.httpMethod = "PUT"
+        request.setValue("image/jpeg", forHTTPHeaderField: "Content-Type")
+        request.setValue("", forHTTPHeaderField: "Expect")
+        
+        let (_, response) = try await self.session.upload(for: request, from: data)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200..<300).contains(httpResponse.statusCode) else {
+          throw throwError(NetworkError.customError(message: response.description))
+        }
+      }
+      
+      group.addTask {
+        try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
+        throw throwError(NetworkError.timeout(timeout))
+      }
+      
+      do {
+        if let _ = try await group.next() {
+          group.cancelAll()
+          return
+        } else {
+          throw throwError(FoundationError.taskFailed)
+        }
+      } catch is CancellationError {
+        group.cancelAll()
+        throw throwError(FoundationError.taskCancelled)
+      }
+    }
+  }
+  
   public func execute<E: APIRequestable>(
     with endpoint: E,
     timeout: TimeInterval = 30.0
@@ -212,7 +251,10 @@ extension NetworkKit {
           """)
   }
   
-  fileprivate func throwError(_ error: Error, endpoint: any APIRequestable) -> Error {
+  fileprivate func throwError(
+    _ error: Error,
+    endpoint: (any APIRequestable)? = nil
+  ) -> Error {
     var description: String = error.localizedDescription
     if let error = error as? NetworkError {
       description = error.errorDescription
@@ -224,7 +266,7 @@ extension NetworkKit {
     print("""
           =========================================
           ============== 🚨 ERROR==================
-          ✔️ Path: \(endpoint.path)
+          ✔️ Path: \(endpoint?.path ?? "PUT")
           ✔️ Message: \(description)
           =========================================
           """)

@@ -36,9 +36,17 @@ struct DependencyRegister {
         NMReverseGeoCodeUseCase.live(repository: nmGeometryRepository)
       }
     )
+    
+    /// Suggestion
     SpotSuggestionUseCaseRegister(
       provider: {
         SpotSuggestionUseCase.live(repository: suggestionRepository)
+      }
+    )
+    
+    UploadSpotImageUseCaseRegister(
+      provider: {
+        UploadSpotImageUseCase.live(repository: suggestionRepository)
       }
     )
     

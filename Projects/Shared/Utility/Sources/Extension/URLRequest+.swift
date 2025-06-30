@@ -17,7 +17,7 @@ public extension URLRequest {
   
   func appendingHeaders(_ headers: [String: String]) -> URLRequest {
     var urlRequest = self
-    headers.forEach { urlRequest.addValue($1, forHTTPHeaderField: $0) }
+    headers.forEach { urlRequest.setValue($1, forHTTPHeaderField: $0) }
     return urlRequest
   }
   

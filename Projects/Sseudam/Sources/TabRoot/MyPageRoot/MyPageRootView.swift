@@ -28,6 +28,7 @@ struct MyPageRootView: View {
           requireLoginView
         } else {
           Text("로그인~")
+            .foregroundStyle(ColorSet.Text.Primary)
         }
       }
     }

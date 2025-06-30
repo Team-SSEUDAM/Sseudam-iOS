@@ -48,10 +48,7 @@ public struct NMGeoCodeReverseEntity: Equatable, Codable {
   /// 시/도 + 구 + 나머지 (건물명 제거된 roadAddress 기준)
   public var site: String {
     // 괄호 제거 (건물명 제거)
-    let roadWithoutBuilding = roadAddress?.components(separatedBy: " (").first ?? ""
-    return [region, city, roadWithoutBuilding]
-      .filter { !$0.isEmpty }
-      .joined(separator: " ")
+    return roadAddress?.components(separatedBy: " (").first ?? ""
   }
   
   public init(

@@ -10,39 +10,88 @@ import SwiftUI
 import DesignKit
 import ComposableArchitecture
 
-
 @Reducer
 public struct WriteNameFeature {
   
-  public init() {
-    
-  }
+  public init() {}
   
-  public enum TestFieldValidation: Equatable {
+  /// 닉네임 유효성 검사 결과
+  public enum NameValidationResult: Equatable {
     case valid
-    case invalid(String)
-    case none(String)
+    case tooShort           // error1: 0~1자 일때
+    case tooLong            // error2: 13자 이상일때
+    case containsSpecialChar // error3: 특수문자 + 이모지 포함
+    case startsWithSpace    // error4: 공백으로 시작
+    case empty              // 초기 상태
+    
+    /// 에러 메시지 반환
+    var message: String {
+      switch self {
+      case .valid:
+        return ""
+      case .tooShort:
+        return "쓰레기통 이름은 2자 이상 입력해주세요."
+      case .tooLong:
+        return "쓰레기통 이름은 12자 이하로 입력해주세요."
+      case .containsSpecialChar:
+        return "쓰레기통 이름은 특수문자나 이모지 사용이 불가능해요."
+      case .startsWithSpace:
+        return "쓰레기통 이름은 공백으로 시작할 수 없어요."
+      case .empty:
+        return "2~12자까지 입력할 수 있어요."
+      }
+    }
+    
+    /// TextField 상태 반환
+    var textFieldState: CustomTextFieldState {
+      switch self {
+      case .valid:
+        return .accent
+      case .tooShort, .tooLong, .containsSpecialChar, .startsWithSpace:
+        return .error
+      case .empty:
+        return .normal
+      }
+    }
+    
+    /// 버튼 활성화 여부
+    var isButtonEnabled: Bool {
+      return self == .valid
+    }
   }
   
   @ObservableState
   public struct State: Equatable {
     public var name: String = ""
-    public var textFieldState: CustomTextFieldState = .normal
+    public var validationResult: NameValidationResult = .empty
     public var isFocused: Bool = false
-    public var isEnabled: Bool = false
-    public var validation: TestFieldValidation = .none("2~12자까지 입력할 수 있어요.")
-    public init() {
+    
+    public init() {}
+    
+    /// 현재 텍스트필드 상태
+    public var textFieldState: CustomTextFieldState {
+      validationResult.textFieldState
+    }
+    
+    /// 버튼 활성화 여부
+    public var isButtonEnabled: Bool {
+      validationResult.isButtonEnabled
+    }
+    
+    /// 에러 메시지
+    public var errorMessage: String {
+      validationResult.message
     }
   }
   
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    case validateName(String)
+    case focusChanged(Bool)
     case delegate(Delegate)
-    case checkValidName(String)
-    case isFocused(Bool)
     
     public enum Delegate: Equatable {
-      case nameChanged(String)
+      case nameValidationChanged(isValid: Bool, name: String)
     }
   }
   
@@ -51,34 +100,54 @@ public struct WriteNameFeature {
     Reduce { state, action in
       switch action {
       case .binding(\.name):
-        return .send(.checkValidName(state.name))
-      case let .checkValidName(name):
-        switch name.count {
-        case 0: state.validation = .none("2~12자까지 입력할 수 있어요.")
-          state.textFieldState = .accent
-          state.isEnabled = false
-          return .send(.delegate(.nameChanged("")))
-        case 1:
-          state.validation = .invalid("이름이 너무 짧습니다")
-          state.textFieldState = .error
-          state.isEnabled = false
-          return .send(.delegate(.nameChanged("")))
-        case 2...12:
-          state.validation = .valid
-          state.textFieldState = .accent
-          state.isEnabled = true
-          return .send(.delegate(.nameChanged(name)))
-        default:
-          state.validation = .invalid("이름이 너무 깁니다")
-          state.textFieldState = .error
-          state.isEnabled = false
-          return .send(.delegate(.nameChanged("")))
+        return .send(.validateName(state.name))
+      case let .validateName(name):
+        let previousResult = state.validationResult
+        state.validationResult = validateNameInput(name)
+        /// 유효성 검사 결과가 변경되었을 때만 delegate 호출
+        if previousResult != state.validationResult {
+          return .send(.delegate(.nameValidationChanged(
+            isValid: state.isButtonEnabled,
+            name: state.isButtonEnabled ? name : ""
+          )))
         }
-      case let .isFocused(focus):
-        state.isFocused = focus
         return .none
-      default: return .none
+      case let .focusChanged(isFocused):
+        state.isFocused = isFocused
+        return .none
+      default:
+        return .none
       }
+    }
+  }
+  
+  /// 닉네임 유효성 검사 로직
+  /// 우선순위: error1(길이 부족) > error2(길이 초과) > error3(특수문자/이모지) > error4(공백으로 시작)
+  private func validateNameInput(_ name: String) -> NameValidationResult {
+    /// 빈 문자열
+    if name.isEmpty { return .empty}
+    /// error4: 공백으로 시작 (우선순위 4)
+    if name.hasPrefix(" ") { return .startsWithSpace }
+    /// error1: 0~1자 (우선순위 1)
+    if name.count < 2 { return .tooShort }
+    /// error2: 13자 이상 (우선순위 2)
+    if name.count > 12 { return .tooLong }
+    /// error3: 특수문자 + 이모지 포함 (우선순위 3)
+    if containsInvalidCharacters(name) { return .containsSpecialChar }
+    /// 모든 검사 통과
+    return .valid
+  }
+  
+  /// 특수문자 및 이모지 포함 여부 검사
+  private func containsInvalidCharacters(_ text: String) -> Bool {
+    // 허용되는 문자: 한글, 영문, 숫자, 공백
+    let allowedCharacterSet = CharacterSet.alphanumerics
+      .union(.whitespacesAndNewlines)
+      .union(CharacterSet(charactersIn: "가-힣ㄱ-ㅎㅏ-ㅣ"))
+    
+    // 입력된 텍스트에서 허용되지 않는 문자가 있는지 확인
+    return text.unicodeScalars.contains { scalar in
+      !allowedCharacterSet.contains(scalar)
     }
   }
 }

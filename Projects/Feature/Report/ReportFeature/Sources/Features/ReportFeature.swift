@@ -130,19 +130,19 @@ public struct ReportFeature {
       case .didAppearMoveLocation:
         state.nextButtonText = "다음"
         return .merge([
-          .send(.writeName(.isFocused(false))),
+          .send(.writeName(.focusChanged(false))),
           .send(.nextButtonIsEnabled(state.moveLocation.isEnabled))
         ])
       case .didAppearWriteName:
         state.nextButtonText = "다음"
         return .merge([
-          .send(.writeName(.isFocused(true))),
-          .send(.nextButtonIsEnabled(state.writeName.isEnabled))
+          .send(.writeName(.focusChanged(true))),
+          .send(.nextButtonIsEnabled(state.writeName.isButtonEnabled))
         ])
       case .didAppearSelectKind:
         state.nextButtonText = "다음"
         return .merge([
-          .send(.writeName(.isFocused(false))),
+          .send(.writeName(.focusChanged(false))),
           .send(.nextButtonIsEnabled(state.selectKind.isEnabled))
         ])
       case .didAppearSelectPhoto:
@@ -163,9 +163,9 @@ public struct ReportFeature {
       case let .writeName(.delegate(action)):
         if state.currentPage != 2 { return .none }
         switch action {
-        case let .nameChanged(spotName):
-          state.spotName = spotName
-          return .send(.nextButtonIsEnabled(!spotName.isEmpty))
+        case let .nameValidationChanged(isValid, name):
+          state.spotName = name
+          return .send(.nextButtonIsEnabled(isValid))
         }
         /// `SelectKindFeature`의 `Delegate`처리
       case let .selectKind(.delegate(action)):
@@ -212,6 +212,9 @@ public struct ReportFeature {
         return .none
         default: return .none
       }
+    }
+    .ifLet(\.$destination, action: \.destination) {
+      Destination.body
     }
   }
 }

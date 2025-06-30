@@ -26,14 +26,10 @@ public struct WriteNameView: View {
       CustomTextField(
         placeholder: "지하철 역 4번 출구, OO카페 맞은편",
         text: $store.name,
-        state: $store.textFieldState,
+        state: .constant(store.textFieldState),
         isFocused: $store.isFocused
       ) {
-        switch store.validation {
-        case let .invalid(errorMessage): Text(errorMessage)
-        case let .none(placeholder): Text(placeholder)
-        case .valid: Text("")
-        }
+        Text(store.errorMessage)
       }
       Spacer()
     }

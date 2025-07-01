@@ -38,6 +38,7 @@ public struct ReportFeature {
     var centerPoint: Coordinates?
     var nmReverseGeoCodeEntity: NMGeoCodeReverseEntity?
     var trashType: String = ""
+    var isNavigationBarHidden = false
     
     var selectedPhoto: UIImage? = nil
     
@@ -74,6 +75,8 @@ public struct ReportFeature {
     case didAppearSelectKind
     /// 사진 선택 화면이 나타날 때
     case didAppearSelectPhoto
+    /// 제보가 완료되었을 때
+    case didAppearComplete
     
     case nextButtonIsEnabled(Bool)
     case nextButtonTapped
@@ -114,9 +117,9 @@ public struct ReportFeature {
         }
       case .nextButtonTapped:
         /// 다음 페이지로 넘어가기 전에 현재 페이지에서 검증 action
-        if state.currentPage == 4 { return .send(.reportButtonTapped) }
         if state.currentPage == 2 { return .send(.writeName(.validateNameFromServer)) }
-        state.currentPage = min(state.currentPage + 1, 4)
+        if state.currentPage == 5 { return .send(.pop) }
+        state.currentPage = min(state.currentPage + 1, 5)
         /// 다음 페이지에 따라 적절한 action을 보냄
         switch state.currentPage {
         case 0: return .send(.didAppearStartReport)
@@ -124,6 +127,7 @@ public struct ReportFeature {
         case 2: return .send(.didAppearWriteName)
         case 3: return .send(.didAppearSelectKind)
         case 4: return .send(.didAppearSelectPhoto)
+        case 5: return .send(.didAppearComplete)
         default: return .none
         }
       case let .nextButtonIsEnabled(isEnabled):
@@ -151,10 +155,14 @@ public struct ReportFeature {
           .send(.nextButtonIsEnabled(state.selectKind.isEnabled))
         ])
       case .didAppearSelectPhoto:
-        state.nextButtonText = "제보하기"
+        state.nextButtonText = "완료"
         return .merge([
           .send(.nextButtonIsEnabled(state.selectPhoto.isEnabled))
         ])
+      case .didAppearComplete:
+        state.isNavigationBarHidden = true
+        state.nextButtonText = "확인"
+        return .send(.nextButtonIsEnabled(true))
         /// `MoveLocationFeature`의 `Delegate`처리
       case let .moveLocation(.delegate(action)):
         if state.currentPage != 1 { return .none }
@@ -195,8 +203,7 @@ public struct ReportFeature {
         if state.currentPage != 4 { return .none }
         switch action {
         case let .photoSelected(photo):
-          print("Photo Size: \(photo.size)")
-          state.selectedPhoto = photo /// 사진은, 일반적인 ReportBody에 담지 않고, presignedURL로 별도 처리
+          state.selectedPhoto = photo
           return .send(.nextButtonIsEnabled(true))
         }
         /// 서버 검증 시작 시 버튼 상태 업데이트
@@ -220,7 +227,7 @@ public struct ReportFeature {
       case let .uploadSpotImageResult(result):
         switch result {
         case .success:
-          return .send(.pop)
+          return .send(.nextButtonTapped) /// 완료 페이지로 이동
         case let .failure(error):
           return .send(.errorOccured(message: error.localizedDescription))
         }

@@ -51,6 +51,13 @@ public struct ReportView: View {
               )
               .frame(width: geo.size.width)
               .id(4)
+              SpotSuggestionCompleteView(
+                image: .addSpot,
+                title: "제보가 완료되었어요!",
+                description:"심사는 1-2일이 소요되며,\n승인되면 15쓰담을 추가 적립 받아요."
+              )
+              .frame(width: geo.size.width)
+              .id(5)
             }
           }
           .onChange(of: store.currentPage) { prev, next in
@@ -75,8 +82,10 @@ public struct ReportView: View {
   private var navigationBar: some View {
     NavigationBar(
       backContent: {
-        TouchArea(image: .leftChevron) {
-          store.send(.backButtonTapped)
+        if !store.isNavigationBarHidden {
+          TouchArea(image: .leftChevron) {
+            store.send(.backButtonTapped)
+          }
         }
       }
     )
@@ -89,7 +98,8 @@ public struct ReportView: View {
       size: .large,
       state: $store.nextButtonState
     ) {
-      store.send(.nextButtonTapped)
+      if store.currentPage == 4 { store.send(.reportButtonTapped) }
+      else { store.send(.nextButtonTapped) }
     }
   }
 }

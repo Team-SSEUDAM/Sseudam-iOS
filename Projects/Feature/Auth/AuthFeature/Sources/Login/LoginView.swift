@@ -18,29 +18,32 @@ public struct LoginView: View {
   }
   
   public var body: some View {
-    VStack {
-      NavigationBar(
-        closeContent: {
-          TouchArea(image: .close) {
-            store.send(.closeButtonTapped)
+    ZStack {
+      ColorSet.Background.Primary
+        .ignoresSafeArea()
+      VStack {
+        NavigationBar(
+          closeContent: {
+            TouchArea(image: .close) {
+              store.send(.closeButtonTapped)
+            }
           }
+        )
+        VStack(alignment: .center, spacing: .Number16) {
+          Spacer()
+          // TODO: - 앱 로고 이미지로 바꾸기
+          RoundedRectangle(cornerRadius: .Number8)
+            .frame(width: .Number100, height: .Number100)
+            .foregroundStyle(ColorSet.Background.Secondary)
+          TitleView
+          Spacer()
+          VStack(spacing: .Number16) {
+            AppleLogin
+          }
+          .padding(.Number16)
         }
-      )
-      VStack(alignment: .center, spacing: .Number16) {
-        Spacer()
-        // TODO: - 앱 로고 이미지로 바꾸기
-        RoundedRectangle(cornerRadius: .Number8)
-          .frame(width: .Number100, height: .Number100)
-          .foregroundStyle(ColorSet.Background.Secondary)
-        TitleView
-        Spacer()
-        VStack(spacing: .Number16) {
-//          KakaoLogin
-          AppleLogin
-        }
-        .padding(.Number16)
+        
       }
-      
     }
   }
   

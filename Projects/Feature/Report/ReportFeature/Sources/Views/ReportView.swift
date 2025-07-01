@@ -89,6 +89,7 @@ public struct ReportView: View {
         }
       }
     )
+    .blockBackToSwipe()
   }
   
   @ViewBuilder

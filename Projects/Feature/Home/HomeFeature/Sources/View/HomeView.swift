@@ -55,6 +55,9 @@ public struct HomeView: View {
       /// 네비게이션 path의 `newValue`가 0이 되면 탭바는 등장
       if newValue.count == 0 { store.send(.delegate(.needToHiddenTabBar(false))) }
     }
+    .transaction { transaction in
+      transaction.disablesAnimations = false
+    }
   }
   
   @ViewBuilder

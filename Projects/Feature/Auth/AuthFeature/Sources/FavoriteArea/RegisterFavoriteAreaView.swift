@@ -20,7 +20,7 @@ public struct RegisterFavoriteAreaView: View {
   
   public var body: some View {
     ZStack {
-      Color.white
+      ColorSet.Background.Primary
         .ignoresSafeArea()
       VStack(alignment: .leading) {
         NavigationBar(backContent:  {
@@ -100,7 +100,7 @@ public struct RegisterFavoriteAreaView: View {
               .frame(maxWidth: .infinity, alignment: .leading)
               .padding(.vertical, .Number12)
               .padding(.horizontal, .Number16)
-              .background(Color.white)
+              .background(ColorSet.Background.Primary)
               .contentShape(Rectangle())
               .onTapGesture {
                 store.send(.selectArea(area))

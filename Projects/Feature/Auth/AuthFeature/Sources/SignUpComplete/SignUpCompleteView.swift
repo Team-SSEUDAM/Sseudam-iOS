@@ -20,7 +20,7 @@ public struct SignUpCompleteView: View {
   
   public var body: some View {
     ZStack {
-      Color.white
+      ColorSet.Background.Primary
         .ignoresSafeArea()
       VStack {
         VStack(alignment: .center, spacing: .Number16) {

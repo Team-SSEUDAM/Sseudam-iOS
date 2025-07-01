@@ -21,7 +21,7 @@ struct MyPageRootView: View {
   
   var body: some View {
     ZStack {
-      Color.white
+      ColorSet.Background.Primary
         .ignoresSafeArea()
       VStack {
         if !store.state.isLoggedIn {

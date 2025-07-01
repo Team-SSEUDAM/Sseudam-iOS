@@ -20,7 +20,7 @@ public struct NickNameInputView: View {
   
   public var body: some View {
     ZStack {
-      Color.white
+      ColorSet.Background.Primary
         .ignoresSafeArea()
       NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
         content

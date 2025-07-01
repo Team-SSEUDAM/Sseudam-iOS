@@ -79,7 +79,6 @@ public struct CropImageView: View {
         imageRatio: calculateImageRatio()
       )
     }
-    .background(ColorSet.Component.Error.opacity(0.3))
     .onAppear {
       let center = CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2)
       store.send(.setGridSize(cropSize))

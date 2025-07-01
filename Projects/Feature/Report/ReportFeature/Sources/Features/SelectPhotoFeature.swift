@@ -22,7 +22,8 @@ public struct SelectPhotoFeature {
   @ObservableState
   public struct State: Equatable {
     @Presents var destination: Destination.State?
-    public var selectedPhoto: UIImage? = nil /// 선택된 사진
+    public var selectedPhoto: UIImage? = nil /// 최종 선택된 사진 (크롭 완료)
+    public var originalPhoto: UIImage? = nil /// 원본 사진 (크롭 전)
     public var isEnabled: Bool = false
     public init() { }
   }
@@ -41,7 +42,8 @@ public struct SelectPhotoFeature {
     
     case centerButtonTapped /// 1. 사진이 없을 떄, 2. 사진이 있을 떄
     case photoTaken(UIImage) /// 사진이 선택되었을 때
-    
+    case photoCropped(UIImage) /// 크롭이 완료되었을 때
+        
     case willAppearPhotoConfirmationDialog
     
     public enum Delegate: Equatable {
@@ -56,10 +58,14 @@ public struct SelectPhotoFeature {
       case .centerButtonTapped:
         return .send(.willAppearPhotoConfirmationDialog)
       case let .photoTaken(image):
-        state.selectedPhoto = image /// 선택된 사진 저장
-        state.isEnabled = true /// 사진이 선택되었으므로, 버튼 활성화
-        state.destination = nil /// 현재 화면 제거
-        return .send(.delegate(.photoSelected(image)))
+        state.originalPhoto = image
+        state.destination = .cropImage(CropImageFeature.State(originalImage: image))
+        return .none
+      case let .photoCropped(croppedImage):
+        state.selectedPhoto = croppedImage
+        state.isEnabled = true
+        state.destination = nil
+        return .send(.delegate(.photoSelected(croppedImage)))
       case .willAppearPhotoConfirmationDialog:
         state.destination = .confirmationDialog(.makePhotoConfirmationDialog)
         return .none
@@ -80,9 +86,16 @@ public struct SelectPhotoFeature {
       case .destination(.presented(.photoLibraryPicker(.delegate(.cancelled)))):
         state.destination = nil /// 사진 선택 화면 제거
         return .none
+        /// 크롭 화면에서의 delegate 처리
+      case let .destination(.presented(.cropImage(.delegate(.imageCropped(croppedImage))))):
+        return .send(.photoCropped(croppedImage))
+      case .destination(.presented(.cropImage(.delegate(.cancelled)))):
+        state.originalPhoto = nil
+        state.destination = nil
+        return .none
       case .binding:
         return .none
-        default: return .none
+      default: return .none
       }
     }
     .ifLet(\.$destination, action: \.destination) {
@@ -98,6 +111,7 @@ extension SelectPhotoFeature {
     case confirmationDialog(ConfirmationDialogState<SelectPhotoFeature.Action.PhotoConfirmationDialog>)
     case camera(CameraPickerFeature)
     case photoLibraryPicker(PhotoLibraryPickerFeature)
+    case cropImage(CropImageFeature)
   }
 }
 

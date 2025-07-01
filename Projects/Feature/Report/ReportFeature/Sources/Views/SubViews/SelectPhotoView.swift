@@ -48,6 +48,11 @@ public struct SelectPhotoView: View {
     ) { store in
       PhotoLibraryPickerView(store: store)
     }
+    .fullScreenCover(
+      item: $store.scope(state: \.destination?.cropImage, action: \.destination.cropImage)
+    ) { store in
+      CropImageView(store: store)
+    }
     .confirmationDialog($store.scope(state: \.destination?.confirmationDialog, action: \.destination.confirmationDialog))
   }
   

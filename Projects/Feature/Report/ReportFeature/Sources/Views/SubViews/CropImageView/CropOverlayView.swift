@@ -9,12 +9,22 @@
 import SwiftUI
 import DesignKit
 
-
 public struct CropOverlayView: View {
-  private let cropSize: CGFloat
+  @Binding var gridSize: CGFloat
+  @Binding var gridPosition: CGPoint
+  private let proxy: GeometryProxy
+  private let imageRatio: CGSize
   
-  public init(cropSize: CGFloat) {
-    self.cropSize = cropSize
+  public init(
+    gridSize: Binding<CGFloat>,
+    gridPosition: Binding<CGPoint>,
+    proxy: GeometryProxy,
+    imageRatio: CGSize
+  ) {
+    self._gridSize = gridSize
+    self._gridPosition = gridPosition
+    self.proxy = proxy
+    self.imageRatio = imageRatio
   }
   
   public var body: some View {
@@ -27,45 +37,65 @@ public struct CropOverlayView: View {
             .fill(Color.black)
             .overlay(
               Rectangle()
-                .frame(width: cropSize, height: cropSize)
+                .frame(width: gridSize, height: gridSize)
+                .position(gridPosition)
                 .blendMode(.destinationOut)
             )
         )
         .allowsHitTesting(false)
       
-      /// 크롭 프레임
-      Rectangle()
-        .stroke(ColorSet.Gray._0, lineWidth: .Number1)
-        .frame(width: cropSize, height: cropSize)
-        .allowsHitTesting(false)
-      
-      /// 코너 격자
-      ForEach(0..<4) { index in
-        let position = cornerPosition(for: index, size: cropSize)
-        let correction = cornerCorrection(for: index)
-        CornerDecoration(position: position, correction: correction)
+      ZStack {
+        /// 크롭 박스
+        Rectangle()
+          .stroke(ColorSet.Gray._0, lineWidth: .Number1)
+          .contentShape(Rectangle())
+          .frame(width: gridSize, height: gridSize)
+        /// 코너 격자 장식
+        ForEach(Corner.allCases, id: \.self) { corner in
+          CornerDecoration(
+            position: corner.point(for: gridSize),
+            correction: corner.correction
+          )
+        }
       }
-    }
-  }
-  
-  private func cornerPosition(for index: Int, size: CGFloat) -> (x: CGFloat, y: CGFloat) {
-    switch index {
-    case 0: return (-size/2, -size/2) // 좌상단
-    case 1: return (size/2, -size/2)  // 우상단
-    case 2: return (size/2, size/2)   // 우하단
-    case 3: return (-size/2, size/2)  // 좌하단
-    default: return (0, 0)
-    }
-  }
-  
-  private func cornerCorrection(for index: Int) -> (x: CGFloat, y: CGFloat) {
-    switch index {
-    case 0: return (-1, -1) // 좌상단
-    case 1: return (1, -1)  // 우상단
-    case 2: return (1, 1)   // 우하단
-    case 3: return (-1,1)  // 좌하단
-    default: return (0, 0)
+      .frame(width: gridSize, height: gridSize)
+      .position(gridPosition)
+      .gesture(
+        DragGesture()
+          .onChanged { v in
+            let imageHeight = imageRatio.height * gridSize
+            let imageTop = (proxy.size.height - imageHeight) / 2
+            let imageBottom = imageTop + imageHeight
+            let halfGrid = gridSize / 2
+            gridPosition.y = min(imageBottom - halfGrid, max(imageTop + halfGrid, v.location.y))
+          }
+      )
     }
   }
 }
 
+private enum Corner: CaseIterable {
+  case topLeft, topRight, bottomRight, bottomLeft
+  
+  var sign: CGPoint {
+    switch self {
+    case .topLeft:     return CGPoint(x: -1, y: -1)
+    case .topRight:    return CGPoint(x:  1, y: -1)
+    case .bottomRight: return CGPoint(x:  1, y:  1)
+    case .bottomLeft:  return CGPoint(x: -1, y:  1)
+    }
+  }
+  
+  func point(for size: CGFloat) -> (x: CGFloat, y: CGFloat) {
+    (sign.x * size/2, sign.y * size/2)
+  }
+  
+  var correction: (x: CGFloat, y: CGFloat) {
+    switch self {
+    case .topLeft: return (-1, -1)
+    case .topRight: return (1, -1)
+    case .bottomRight: return (1, 1)
+    case .bottomLeft: return (-1,1)
+    }
+  }
+}

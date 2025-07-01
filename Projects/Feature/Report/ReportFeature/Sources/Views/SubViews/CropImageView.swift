@@ -78,11 +78,12 @@ public struct CropImageView: View {
         proxy: proxy,
         imageRatio: calculateImageRatio()
       )
-    }
-    .onAppear {
-      let center = CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2)
-      store.send(.setGridSize(cropSize))
-      store.send(.setGridPosition(center))
+      .onAppear {
+        let center = CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2)
+        store.send(.setGridSize(cropSize))
+        store.send(.setGridPosition(center))
+        store.send(.setImageAreaSize(proxy.size))
+      }
     }
   }
   

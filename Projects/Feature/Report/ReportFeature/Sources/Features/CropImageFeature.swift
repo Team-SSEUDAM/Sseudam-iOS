@@ -19,9 +19,7 @@ public struct CropImageFeature {
     public var originalImage: UIImage
     public var croppedImage: UIImage?
     
-    public var imageScale: CGFloat = 1.0
-    public var imageOffset: CGSize = .zero
-    
+    public var imageAreaSize: CGSize = .zero
     public var gridSize: CGFloat = 300.0
     public var gridPosition: CGPoint = .zero
     
@@ -34,8 +32,10 @@ public struct CropImageFeature {
     case binding(BindingAction<State>)
     case delegate(Delegate)
     case viewDidAppear
+    
     case setGridSize(CGFloat)
     case setGridPosition(CGPoint)
+    case setImageAreaSize(CGSize)
     
     case gridSizeChanged(CGFloat)
     case gridOffsetChanged(CGSize)
@@ -63,17 +63,19 @@ public struct CropImageFeature {
       case let .setGridPosition(position):
         state.gridPosition = position
         return .none
+      case let .setImageAreaSize(size):
+        state.imageAreaSize = size
+        return .none
       case .confirmCrop:
         return .send(.performCrop)
       case .performCrop:
         let state = state
         return .run { send in
-          // 크롭 작업 수행
           let cropImage = await CropImageFeature.cropImage(
             state.originalImage,
-            cropSize: state.gridSize,
-            imageScale: state.imageScale,
-            imageOffset: state.imageOffset
+            gridSize: state.gridSize,
+            gridPosition: state.gridPosition,
+            containerSize: state.imageAreaSize
           )
           await send(.cropCompleted(cropImage))
         }
@@ -91,93 +93,65 @@ public struct CropImageFeature {
 
 // MARK: - Image Cropping Logic
 extension CropImageFeature {
-  /// 이미지를 크롭하는 함수
-  /// - Parameters:
-  ///   - image: 원본 이미지
-  ///   - cropSize: 크롭 영역의 크기 (정사각형)
-  ///   - imageScale: 이미지의 현재 스케일
-  ///   - imageOffset: 이미지의 현재 오프셋
-  /// - Returns: 크롭된 이미지
   @MainActor
   private static func cropImage(
     _ image: UIImage,
-    cropSize: CGFloat,
-    imageScale: CGFloat,
-    imageOffset: CGSize
+    gridSize: CGFloat,
+    gridPosition: CGPoint,
+    containerSize: CGSize
   ) -> UIImage {
-    guard let cgImage = image.cgImage else { return image }
+    // 이미지의 실제 표시 크기 (orientation 적용된)
+    let imageSize = image.size
+    let imageAspectRatio = imageSize.width / imageSize.height
     
-    // 이미지의 실제 크기
-    let imageWidth = CGFloat(cgImage.width)
-    let imageHeight = CGFloat(cgImage.height)
-    
-    // 화면에 표시되는 이미지의 크기 계산 (스케일 적용 전)
-    let aspectRatio = imageWidth / imageHeight
+    // 컨테이너에 맞춰진 이미지의 표시 크기 계산
+    let containerAspectRatio = containerSize.width / containerSize.height
     let displayedImageSize: CGSize
+    let displayedImageOrigin: CGPoint
     
-    if aspectRatio > 1 {
-      // 가로가 더 긴 이미지
-      displayedImageSize = CGSize(
-        width: cropSize,
-        height: cropSize / aspectRatio
-      )
+    if imageAspectRatio > containerAspectRatio {
+      let width = containerSize.width
+      let height = width / imageAspectRatio
+      displayedImageSize = CGSize(width: width, height: height)
+      displayedImageOrigin = CGPoint(x: 0, y: (containerSize.height - height) / 2)
     } else {
-      // 세로가 더 긴 이미지
-      displayedImageSize = CGSize(
-        width: cropSize * aspectRatio,
-        height: cropSize
-      )
+      let height = containerSize.height
+      let width = height * imageAspectRatio
+      displayedImageSize = CGSize(width: width, height: height)
+      displayedImageOrigin = CGPoint(x: (containerSize.width - width) / 2, y: 0)
     }
     
-    // 스케일이 적용된 표시 크기
-    let scaledDisplaySize = CGSize(
-      width: displayedImageSize.width * imageScale,
-      height: displayedImageSize.height * imageScale
+    // 스케일 계산
+    let scale = imageSize.width / displayedImageSize.width
+    
+    // 그리드 영역 계산
+    let gridOrigin = CGPoint(
+      x: (gridPosition.x - gridSize / 2 - displayedImageOrigin.x) * scale,
+      y: (gridPosition.y - gridSize / 2 - displayedImageOrigin.y) * scale
     )
     
-    // 화면 좌표에서 실제 이미지 좌표로 변환하는 스케일
-    let displayToImageScale = CGSize(
-      width: imageWidth / scaledDisplaySize.width,
-      height: imageHeight / scaledDisplaySize.height
-    )
-    
-    // 크롭 영역의 좌상단 점 계산 (화면 좌표계)
-    // 크롭 프레임은 화면 중앙에 고정되어 있고, 이미지가 offset만큼 이동했음
-    let cropOriginInDisplay = CGPoint(
-      x: (scaledDisplaySize.width - cropSize) / 2 - imageOffset.width,
-      y: (scaledDisplaySize.height - cropSize) / 2 - imageOffset.height
-    )
-    
-    // 실제 이미지 좌표계로 변환
     let cropRect = CGRect(
-      x: cropOriginInDisplay.x * displayToImageScale.width,
-      y: cropOriginInDisplay.y * displayToImageScale.height,
-      width: cropSize * displayToImageScale.width,
-      height: cropSize * displayToImageScale.height
+      x: gridOrigin.x,
+      y: gridOrigin.y,
+      width: gridSize * scale,
+      height: gridSize * scale
     )
     
-    // 크롭 영역이 이미지 범위를 벗어나지 않도록 조정
-    let clampedRect = CGRect(
-      x: max(0, min(imageWidth - cropRect.width, cropRect.origin.x)),
-      y: max(0, min(imageHeight - cropRect.height, cropRect.origin.y)),
-      width: min(imageWidth - max(0, cropRect.origin.x), cropRect.width),
-      height: min(imageHeight - max(0, cropRect.origin.y), cropRect.height)
-    )
+    // UIGraphicsImageRenderer를 사용한 크롭
+    let format = UIGraphicsImageRendererFormat()
+    format.scale = image.scale
+    format.opaque = false
     
-    // 크롭 수행
-    guard let croppedCGImage = cgImage.cropping(to: clampedRect) else { return image }
+    let renderer = UIGraphicsImageRenderer(size: CGSize(width: gridSize * scale, height: gridSize * scale), format: format)
     
-    // UIImage 생성
-    let croppedImage = UIImage(
-      cgImage: croppedCGImage,
-      scale: 1.0,
-      orientation: image.imageOrientation
-    )
+    let croppedImage = renderer.image { context in
+      // 크롭 영역만큼 이동시켜서 그리기
+      image.draw(at: CGPoint(x: -cropRect.origin.x, y: -cropRect.origin.y))
+    }
     
-    // 정사각형으로 리사이즈 (고해상도 유지)
     return resizeToSquare(croppedImage, targetSize: 1080)
   }
-
+  
   /// 이미지를 정사각형으로 리사이즈 (개선된 버전)
   private static func resizeToSquare(_ image: UIImage, targetSize: CGFloat) -> UIImage {
     let size = CGSize(width: targetSize, height: targetSize)

@@ -10,6 +10,7 @@ import Foundation
 import UserDomainInterface
 import UserDataInterface
 import NetworkKit
+import Utility
 
 public extension UserRepository {
   static func live(networker: NetworkKit) -> UserRepository {

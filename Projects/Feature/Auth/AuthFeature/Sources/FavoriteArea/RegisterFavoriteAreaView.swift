@@ -19,41 +19,52 @@ public struct RegisterFavoriteAreaView: View {
   }
   
   public var body: some View {
-    VStack(alignment: .leading) {
-      NavigationBar(backContent:  {
-        TouchArea(image: .leftChevron) {
-          store.send(.dismiss)
-        }
-      })
-      VStack(alignment: .leading)  {
-        Title
-        
-        SearchTextView
-        
-        ZStack {
-          SearchItemList(items: store.searchItems)
-          VStack {
-            Spacer()
-            SnackBar(message: $store.errorToastMessage, {})
+    ZStack {
+      ColorSet.Background.Primary
+        .ignoresSafeArea()
+      VStack(alignment: .leading) {
+        NavigationBar(backContent:  {
+          TouchArea(image: .leftChevron) {
+            store.send(.dismiss)
           }
-        }
-        .frame(maxHeight: .infinity)
-        
-        PrimaryButton(
-          title: .constant("완료"),
-          size: .large,
-          state: store.isSelectItem ? .constant(.normal) : .constant(.disabled)
-        ) {
-          store.send(.completeButtonTapped)
-        }
-          .padding(.Number16)
+        })
+        content
       }
-      
+      .navigationBarHidden(true)
     }
-    .navigationBarHidden(true)
     .onAppear {
       store.send(.onAppear)
     }
+  }
+  
+  @ViewBuilder
+  private var content: some View {
+    VStack(alignment: .leading)  {
+      Title
+      SearchTextView
+      ZStack {
+        SearchItemList(items: store.searchItems)
+        VStack {
+          Spacer()
+          SnackBar(message: $store.errorToastMessage, {})
+        }
+      }
+      .frame(maxHeight: .infinity)
+      completeButton
+      
+    }
+  }
+  
+  @ViewBuilder
+  private var completeButton: some View {
+    PrimaryButton(
+      title: .constant("완료"),
+      size: .large,
+      state: store.isSelectItem ? .constant(.normal) : .constant(.disabled)
+    ) {
+      store.send(.completeButtonTapped)
+    }
+      .padding(.Number16)
   }
   
   @ViewBuilder
@@ -88,7 +99,7 @@ public struct RegisterFavoriteAreaView: View {
               .frame(maxWidth: .infinity, alignment: .leading)
               .padding(.vertical, .Number12)
               .padding(.horizontal, .Number16)
-              .background(Color.white)
+              .background(ColorSet.Background.Primary)
               .contentShape(Rectangle())
               .onTapGesture {
                 store.send(.selectArea(area))

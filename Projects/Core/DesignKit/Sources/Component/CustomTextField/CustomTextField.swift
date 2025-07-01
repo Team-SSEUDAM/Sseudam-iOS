@@ -47,27 +47,45 @@ public struct CustomTextField<Subject: View, Description: View>: View {
   private var content: some View {
     VStack(alignment: .leading, spacing: .Number6) {
       subject()
-      TextField(placeholder, text: $text)
-        .focused($internalFocused)
-        .font(FontSet.Body.body2)
-        .foregroundColor(state == .disabled ? ColorSet.Text.Tertiary : ColorSet.Text.Primary)
-        .padding(.Number12)
-        .overlay(
-          RoundedRectangle(cornerRadius: .Number10)
-          .inset(by: 0.5)
-          .stroke(state.borderColor, lineWidth: .Number1)
-        )
-        .onChange(of: isFocused) { _, newValue in
-          internalFocused = newValue
-        }
-        .onChange(of: internalFocused) { _, newValue in
-          if isFocused != newValue {
-            isFocused = newValue
-          }
-        }
+      ZStack(alignment: .leading) {
+        placeholderView
+        textField
+      }
       description()
         .foregroundStyle(state == .error ? ColorSet.Text.Error : ColorSet.Text.Tertiary)
         .font(FontSet.Body.body3)
+    }
+  }
+  
+  @ViewBuilder
+  private var textField: some View {
+    TextField("", text: $text)
+      .focused($internalFocused)
+      .font(FontSet.Body.body2)
+      .foregroundColor(state == .disabled ? ColorSet.Text.Tertiary : ColorSet.Text.Primary)
+      .padding(.Number12)
+      .overlay(
+        RoundedRectangle(cornerRadius: .Number10)
+        .inset(by: 0.5)
+        .stroke(state.borderColor, lineWidth: .Number1)
+      )
+      .onChange(of: isFocused) { _, newValue in
+        internalFocused = newValue
+      }
+      .onChange(of: internalFocused) { _, newValue in
+        if isFocused != newValue {
+          isFocused = newValue
+        }
+      }
+  }
+  
+  @ViewBuilder
+  private var placeholderView: some View {
+    if text.isEmpty {
+      Text(placeholder)
+        .foregroundColor(ColorSet.Text.Tertiary)
+        .font(FontSet.Body.body2)
+        .padding(.Number12)
     }
   }
 }

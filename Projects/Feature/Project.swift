@@ -14,7 +14,11 @@ let project = Project.makeStaticLibraryProject(
     .Features.Home,
     .Features.Report,
     .Features.TrashDetail,
-    .Features.Auth
+    .Features.Auth,
+    .Features.SelectSpotCategory,
+    .Features.SelectSpotImage,
+    .Features.SelectSpotLocation,
+    .Features.SelectSpotName
   ]
 )
 

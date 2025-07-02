@@ -71,6 +71,7 @@ public enum Shared: String, ModuleRepresentable {
 public enum SPM: String, ModuleRepresentable {
   case TCA = "ComposableArchitecture"
   case NMapsMap = "NMapsMap"
+  case DotLottie = "DotLottie"
   public var typePath: String { "SPM" }
 }
 
@@ -213,6 +214,7 @@ extension TargetDependency {
   public struct SPM: TargetDependencyDelegate {
     public static let TCA = Self.project(.spm(.TCA))
     public static let NMapsMap = Self.project(.spm(.NMapsMap))
+    public static let DotLottie = Self.project(.spm(.DotLottie))
   }
 }
 

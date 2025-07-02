@@ -23,8 +23,7 @@ public struct WriteNameFeature {
     case tooLong            // error2: 13자 이상일때
     case containsSpecialChar // error3: 특수문자 + 이모지 포함
     case startsWithSpace    // error4: 공백으로 시작
-    case alreadyUsing        // 이미 사용중인 쓰레기통 이름일 때
-    case serverError        // 서버 통신 과정에서 오류
+    case serverError(String?)        // 서버 통신 과정에서 오류
     case checking           // 서버 검증 중
     case empty              // 초기 상태
     
@@ -41,10 +40,8 @@ public struct WriteNameFeature {
         return "쓰레기통 이름은 특수문자나 이모지 사용이 불가능해요."
       case .startsWithSpace:
         return "쓰레기통 이름은 공백으로 시작할 수 없어요."
-      case .alreadyUsing:
-        return "이미 사용중인 쓰레기통 이름이에요."
-      case .serverError:
-        return "서버와의 통신에 문제가 발생했어요. 잠시 후 다시 시도해주세요."
+      case let .serverError(errorMessage):
+        return errorMessage ?? self.defaultErrorMessage
       case .checking:
         return "쓰레기통 이름을 확인하고 있어요..."
       case .empty:
@@ -52,12 +49,14 @@ public struct WriteNameFeature {
       }
     }
     
+    var defaultErrorMessage: String { return "서버 통신에 실패했어요. 잠시 후 다시 시도해주세요." }
+    
     /// TextField 상태 반환
     var textFieldState: CustomTextFieldState {
       switch self {
       case .valid:
         return .accent
-      case .tooShort, .tooLong, .containsSpecialChar, .startsWithSpace, .alreadyUsing, .serverError:
+      case .tooShort, .tooLong, .containsSpecialChar, .startsWithSpace, .serverError:
         return .error
       case .checking:
         return .accent
@@ -142,11 +141,15 @@ public struct WriteNameFeature {
       case let .validateNameResult(result):
         switch result {
         case let .success(isValid):
-          state.validationResult = isValid ? .valid : .alreadyUsing
-          return .send(.delegate(.serverValidationCompleted(isValid: isValid, name: state.name)))
+          state.validationResult = .valid
+          return .send(.delegate(.serverValidationCompleted(isValid: true, name: state.name)))
           
-        case .failure:
-          state.validationResult = .serverError
+        case let .failure(networkError):
+          switch networkError {
+          case let .serverError(errorMessage, code):
+            state.validationResult = .serverError(errorMessage)
+          default: state.validationResult = .serverError(nil)
+          }
           return .send(.delegate(.serverValidationCompleted(isValid: false, name: "")))
         }
         
@@ -166,10 +169,14 @@ extension WriteNameFeature {
       do {
         let isValid = try await spotNameValidateUseCase.execute(name)
         await send(.validateNameResult(.success(isValid)))
-      } catch is CancellationError {
-        await send(.validateNameResult(.failure(.taskCancelled)))
       } catch {
-        await send(.validateNameResult(.failure(.customError(message: error.localizedDescription))))
+        if let networkError = error as? NetworkError {
+          await send(.validateNameResult(.failure(networkError)))
+        } else if error is CancellationError {
+          await send(.validateNameResult(.failure(.taskCancelled)))
+        } else {
+          await send(.validateNameResult(.failure(.customError(message: error.localizedDescription))))
+        }
       }
     }
   }

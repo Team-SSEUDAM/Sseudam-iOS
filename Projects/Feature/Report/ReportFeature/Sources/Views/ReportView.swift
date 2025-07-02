@@ -10,6 +10,7 @@ import SwiftUI
 import ComposableArchitecture
 import DotLottie
 import SelectSpotCategoryFeature
+import SelectSpotImageFeature
 import DesignKit
 
 public struct ReportView: View {
@@ -47,7 +48,7 @@ public struct ReportView: View {
               )
               .frame(width: geo.size.width)
               .id(3)
-              SelectPhotoView(
+              SelectSpotImageView(
                 store: store.scope(state: \.child.selectPhoto, action: \.child.selectPhoto)
               )
               .frame(width: geo.size.width)

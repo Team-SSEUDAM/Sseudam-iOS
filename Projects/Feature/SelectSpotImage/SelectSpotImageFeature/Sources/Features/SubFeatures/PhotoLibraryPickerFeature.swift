@@ -1,8 +1,8 @@
 //
 //  PhotoLibraryPickerFeature.swift
-//  ReportFeature
+//  SelectSpotImageFeature
 //
-//  Created by 조용인 on 6/26/25.
+//  Created by 조용인 on 7/2/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 

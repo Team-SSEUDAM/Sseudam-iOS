@@ -1,8 +1,8 @@
 //
 //  CropOverlayView.swift
-//  ReportFeature
+//  SelectSpotImageFeature
 //
-//  Created by 조용인 on 7/1/25.
+//  Created by 조용인 on 7/2/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
@@ -52,7 +52,7 @@ public struct CropOverlayView: View {
           .frame(width: gridSize, height: gridSize)
         /// 코너 격자 장식
         ForEach(Corner.allCases, id: \.self) { corner in
-          CornerDecoration(
+          CropCornerDecorationView(
             position: corner.point(for: gridSize),
             correction: corner.correction
           )

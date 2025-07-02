@@ -1,9 +1,9 @@
 //
-//  SelectPhotoFeature.swift
-//  ReportFeature
+//  SelectSpotImageFeature.swift
 //
-//  Created by 조용인 on 6/24/25.
-//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
+//  SelectSpotImage
+//
+//  Created by yongin
 //
 
 import AVFoundation
@@ -13,7 +13,7 @@ import ComposableArchitecture
 import Utility
 
 @Reducer
-public struct SelectPhotoFeature {
+public struct SelectSpotImageFeature {
   
   public init() {
     
@@ -116,18 +116,18 @@ public struct SelectPhotoFeature {
   }
 }
 
-extension SelectPhotoFeature {
+extension SelectSpotImageFeature {
   @Reducer(state: .equatable, action: .equatable)
   public enum Destination {
     case addCompleteReport
-    case confirmationDialog(ConfirmationDialogState<SelectPhotoFeature.Action.PhotoConfirmationDialog>)
+    case confirmationDialog(ConfirmationDialogState<SelectSpotImageFeature.Action.PhotoConfirmationDialog>)
     case camera(CameraPickerFeature)
     case photoLibraryPicker(PhotoLibraryPickerFeature)
     case cropImage(CropImageFeature)
   }
 }
 
-extension ConfirmationDialogState where Action == SelectPhotoFeature.Action.PhotoConfirmationDialog {
+extension ConfirmationDialogState where Action == SelectSpotImageFeature.Action.PhotoConfirmationDialog {
   public static let makePhotoConfirmationDialog = Self {
     TextState("")
   } actions: {

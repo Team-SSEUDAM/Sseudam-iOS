@@ -1,9 +1,9 @@
 //
-//  SelectPhotoView.swift
-//  ReportFeature
+//  SelectSpotImageView.swift
 //
-//  Created by 조용인 on 6/24/25.
-//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
+//  SelectSpotImage
+//
+//  Created by yongin
 //
 
 import SwiftUI
@@ -11,10 +11,10 @@ import ComposableArchitecture
 
 import DesignKit
 
-public struct SelectPhotoView: View {
-  @Bindable var store: StoreOf<SelectPhotoFeature>
+public struct SelectSpotImageView: View {
+  @Bindable var store: StoreOf<SelectSpotImageFeature>
   
-  public init(store: StoreOf<SelectPhotoFeature>) {
+  public init(store: StoreOf<SelectSpotImageFeature>) {
     self.store = store
   }
   
@@ -85,13 +85,4 @@ public struct SelectPhotoView: View {
       .aspectRatio(contentMode: .fit)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
   }
-}
-
-#Preview {
-  SelectPhotoView(
-    store: Store(
-      initialState: SelectPhotoFeature.State(),
-      reducer: { SelectPhotoFeature() }
-    )
-  )
 }

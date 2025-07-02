@@ -43,6 +43,7 @@ public struct HomeFeature {
     case location(LocationFeature.Action)
     
     case requestMapBounds(Bool)
+    case requestExpandedMapBounds([MapPoint])
     case fetchTrashItems([MapPoint])
     case fetchTrashItemsResult(Result<[TrashSpot], NetworkError>)
     case storeTrashItems([TrashSpot])
@@ -62,6 +63,7 @@ public struct HomeFeature {
     case reportButtonTapped
     case presentDetailView(Bool)
     case requestExpandedMapBounds([MapPoint])
+    
     
     case showToastMessage(String?)
     case presentDetailView(Bool, id: Int? = nil)
@@ -105,8 +107,11 @@ public struct HomeFeature {
       case let .requestMapBounds(isRequest):
         state.requestMapBounds = isRequest
         state.researchButtonEnable = false
-        // TODO: - 현위치 검색 api 요청
         return .none
+        
+      case let .requestExpandedMapBounds(bounds):
+          let expandedBounds = expandBounds(bounds, ratio: 0.35) // 확장비율 조정
+          return .send(.fetchTrashItems(expandedBounds))
         
       case let .fetchTrashItems(bounds):
         state.lastSearchedBounds = bounds
@@ -143,7 +148,7 @@ public struct HomeFeature {
         } else { // 확장 검색 후에도 없음
           state.isFirstLoad = false
           state.isExpandedRetry = false
-          return .send(.showToastMessage("이 근방에는 쓰레기통이 없어요.\n지도를 움직여 다른 위치를 확인해보세요"))
+          return .send(.showToastMessage("이 근방에는 쓰레기통이 없어요.\n지도를 움직여 다른 위치를 확인해보세요!"))
         }
         
       case .expandSearch:
@@ -152,10 +157,6 @@ public struct HomeFeature {
         } else {
           return .none
         }
-        
-      case let .requestExpandedMapBounds(bounds):
-          let expandedBounds = expandBounds(bounds, ratio: 0.35) // 확장비율 조정
-          return .send(.fetchTrashItems(expandedBounds))
         
       case let .markerTapped(id):
         return .send(.presentDetailView(id != .none, id: id))

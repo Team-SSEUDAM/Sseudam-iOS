@@ -26,7 +26,10 @@ extension ReportMapViewRepresentable {
       cameraIsChangingByReason reason: Int
     ) {
       if reason == NMFMapChangedByGesture || reason == NMFMapChangedByControl {
-        isMovingByGesture = true
+        if !isMovingByGesture {
+          isMovingByGesture = true
+          Task { @MainActor in parent.onMapMovingStarted?() }
+        }
       }
     }
     

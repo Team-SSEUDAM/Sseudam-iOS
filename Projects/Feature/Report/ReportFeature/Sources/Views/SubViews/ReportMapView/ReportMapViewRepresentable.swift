@@ -16,6 +16,7 @@ struct ReportMapViewRepresentable: UIViewRepresentable {
   @Binding var userLocation: Coordinates?
   
   var onCenterCoordinateChange: (@Sendable (Coordinates) -> Void)? = nil
+  var onMapMovingStarted: (() -> Void)? = nil
   
   private let defaultPoint = Coordinates(latitude: 37.50545, longitude: 127.10143)
   
@@ -68,6 +69,14 @@ extension ReportMapViewRepresentable {
   ) -> Self {
     var map = self
     map.onCenterCoordinateChange = onCenterCoordinateChange
+    return map
+  }
+  
+  func onMapMovingStarted(
+    _ onMapMovingStarted: @escaping () -> Void
+  ) -> Self {
+    var map = self
+    map.onMapMovingStarted = onMapMovingStarted
     return map
   }
 }

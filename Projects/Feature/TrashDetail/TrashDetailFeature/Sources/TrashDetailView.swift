@@ -18,7 +18,17 @@ public struct TrashDetailView: View {
   }
   
   public var body: some View {
-//    EmptyDataView
+    if store.isEmptyList {
+      EmptyDataView
+    } else {
+      DetailContent
+    }
+    
+  }
+  
+  @ViewBuilder
+  private var DetailContent: some View {
+    
     
     VStack(spacing: .Number16) {
       HStack(spacing: .Number16) {
@@ -36,7 +46,6 @@ public struct TrashDetailView: View {
     }
     .padding(.horizontal, .Number16)
     .padding(.vertical, .Number20)
-    
   }
   
   @ViewBuilder

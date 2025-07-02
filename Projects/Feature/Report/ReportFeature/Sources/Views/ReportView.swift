@@ -8,7 +8,8 @@
 
 import SwiftUI
 import ComposableArchitecture
-
+import DotLottie
+import SelectSpotCategoryFeature
 import DesignKit
 
 public struct ReportView: View {
@@ -41,7 +42,7 @@ public struct ReportView: View {
               )
               .frame(width: geo.size.width)
               .id(2)
-              SelectKindView(
+              SelectSpotCategoryView(
                 store: store.scope(state: \.child.selectKind, action: \.child.selectKind)
               )
               .frame(width: geo.size.width)
@@ -95,6 +96,13 @@ public struct ReportView: View {
   @ViewBuilder
   private var nextButton: some View {
     PrimaryButton(
+      loadingView: {
+        DotLottieAnimation(
+          fileName: "loading",
+          config: AnimationConfig(autoplay: true, loop: true)
+        ).view()
+      },
+      isLoading: $store.isLoading,
       title: $store.nextButtonText,
       size: .large,
       state: $store.nextButtonState

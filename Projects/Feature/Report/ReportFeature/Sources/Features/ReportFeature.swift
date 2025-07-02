@@ -11,6 +11,9 @@ import ComposableArchitecture
 import Utility
 import NMReverseGeocodingDomainInterface
 import SuggestionDomainInterface
+
+import SelectSpotCategoryFeature
+
 import DesignKit
 
 @Reducer
@@ -263,7 +266,7 @@ public struct Child {
   public struct State: Equatable {
     var moveLocation: MoveLocationFeature.State = MoveLocationFeature.State()
     var writeName: WriteNameFeature.State = WriteNameFeature.State()
-    var selectKind: SelectKindFeature.State = SelectKindFeature.State()
+    var selectKind: SelectSpotCategoryFeature.State = SelectSpotCategoryFeature.State()
     var selectPhoto: SelectPhotoFeature.State = SelectPhotoFeature.State()
     
     public init() {}
@@ -272,7 +275,7 @@ public struct Child {
   public enum Action: Equatable {
     case moveLocation(MoveLocationFeature.Action)
     case writeName(WriteNameFeature.Action)
-    case selectKind(SelectKindFeature.Action)
+    case selectKind(SelectSpotCategoryFeature.Action)
     case selectPhoto(SelectPhotoFeature.Action)
     case delegate(Delegate)
     
@@ -280,7 +283,7 @@ public struct Child {
     public enum Delegate: Equatable {
       case moveLocation(MoveLocationFeature.Action.Delegate)
       case writeName(WriteNameFeature.Action.Delegate)
-      case selectKind(SelectKindFeature.Action.Delegate)
+      case selectKind(SelectSpotCategoryFeature.Action.Delegate)
       case selectPhoto(SelectPhotoFeature.Action.Delegate)
     }
   }
@@ -293,7 +296,7 @@ public struct Child {
       WriteNameFeature()
     }
     Scope(state: \.selectKind, action: \.selectKind) {
-      SelectKindFeature()
+      SelectSpotCategoryFeature()
     }
     Scope(state: \.selectPhoto, action: \.selectPhoto) {
       SelectPhotoFeature()
@@ -387,10 +390,10 @@ private extension ReportFeature {
     }
   }
   
-  /// `SelectKindFeature(쓰레기 종류 선택)` Delegate 처리
+  /// `SelectSpotCategoryFeature(쓰레기 종류 선택)` Delegate 처리
   func handleSelectKindDelegate(
     state: inout State,
-    action: SelectKindFeature.Action.Delegate
+    action: SelectSpotCategoryFeature.Action.Delegate
   ) -> Effect<Action> {
     guard state.currentPage == 3 else { return .none }
     

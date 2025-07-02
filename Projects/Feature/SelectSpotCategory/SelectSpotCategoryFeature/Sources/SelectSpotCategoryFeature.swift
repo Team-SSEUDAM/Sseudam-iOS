@@ -6,7 +6,10 @@
 //  Created by yongin
 //
 
+import SwiftUI
+import DesignKit
 import ComposableArchitecture
+
 
 @Reducer
 public struct SelectSpotCategoryFeature {
@@ -15,21 +18,41 @@ public struct SelectSpotCategoryFeature {
     
   }
   
+  public enum SelectedKind: String, Equatable {
+    case normal = "GENERAL"
+    case recycle = "RECYCLE"
+  }
+  
   @ObservableState
   public struct State: Equatable {
-    
-    public init() {}
+    public var selectedNormal: CheckBoxButtonState = .normal
+    public var selectedRecycle: CheckBoxButtonState = .normal
+    public var isEnabled: Bool = false
+    public init() {
+    }
   }
-
+  
   public enum Action: BindableAction, Equatable {
+    case delegate(Delegate)
     case binding(BindingAction<State>)
+    case selectedKind(SelectedKind)
+    
+    public enum Delegate: Equatable {
+      case didSelectKind(String)
+    }
   }
-
+  
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
       switch action {
-        default: return .none
+      case let .selectedKind(kind):
+        state.selectedNormal = kind == .normal ? .selected : .normal
+        state.selectedRecycle = kind == .recycle ? .selected : .normal
+        state.isEnabled = true
+        return .send(.delegate(.didSelectKind(kind.rawValue)))
+        
+      default: return .none
       }
     }
   }

@@ -154,26 +154,13 @@ public struct WriteNameFeature {
         return .none
         
       case .validateNameFromServer:
-        // 클라이언트 검증부터 수행
-        let clientValidationResult = validateNameInput(state.name)
-        if clientValidationResult != .valid {
-          // 클라이언트 검증 실패 시 서버 호출하지 않음
-          return .send(.delegate(.serverValidationCompleted(isValid: false, name: "")))
-        }
-        
-        // 클라이언트 검증 통과 시 서버 검증 수행
-        state.validationResult = .checking
-        return .merge([
-          .send(.delegate(.nameValidationChanged(isValid: false, name: ""))),
-          spotNameValidateEffect(state.name)
-        ])
+        return spotNameValidateEffect(state.name)
         
       case let .validateNameResult(result):
         switch result {
         case .success(let isValid):
           state.validationResult = isValid ? .valid : .alreadyUsing
-          let finalName = isValid ? state.name : ""
-          return .send(.delegate(.serverValidationCompleted(isValid: isValid, name: finalName)))
+          return .send(.delegate(.serverValidationCompleted(isValid: isValid, name: state.name)))
           
         case .failure:
           state.validationResult = .serverError

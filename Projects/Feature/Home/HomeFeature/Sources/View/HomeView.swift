@@ -39,6 +39,7 @@ public struct HomeView: View {
           }
           BottomButtonView
         }
+        .padding(.horizontal, .Number16)
       }
       .onAppear {
         store.send(.onAppear)

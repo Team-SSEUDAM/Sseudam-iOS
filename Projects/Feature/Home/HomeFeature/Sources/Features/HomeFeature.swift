@@ -119,14 +119,13 @@ public struct HomeFeature {
         case let .failure(error):
           return .send(.showToastMessage(error.localizedDescription))
         }
+        
       case let .storeTrashItems(items):
         state.trashItems.removeAll()
         state.trashItems = items
         if items.isEmpty {
           return .send(.emptyTrashItems)
-
-        } else {
-          // 데이터 있으면 바텀시트 내리기
+        } else { // 데이터 있으면 바텀시트 내리기
           return .send(.presentDetailView(false))
         }
         
@@ -144,7 +143,6 @@ public struct HomeFeature {
         } else { // 확장 검색 후에도 없음
           state.isFirstLoad = false
           state.isExpandedRetry = false
-          
           return .send(.showToastMessage("이 근방에는 쓰레기통이 없어요.\n지도를 움직여 다른 위치를 확인해보세요"))
         }
         

@@ -41,6 +41,7 @@ public struct MoveLocationFeature {
     case reverseGeoCodeResult(Result<NMGeoCodeReverseEntity, NetworkError>)
     
     public enum Delegate: Equatable {
+      case nowCalculateReverseGeoCode(Bool)
       case centerChanged(_ point: Coordinates?, _ entity: NMGeoCodeReverseEntity?)
     }
   }
@@ -63,19 +64,21 @@ public struct MoveLocationFeature {
         return reverseGeoCodeEffect(point)
         
       case let .reverseGeoCodeResult(result):
+        var point: Coordinates? = nil, entity: NMGeoCodeReverseEntity? = nil
         switch result {
-        case let .success(entity):
-          state.address = convertReverseGeoCodeToAddress(entity)
+        case let .success(rawEntity):
+          state.address = convertReverseGeoCodeToAddress(rawEntity)
           state.isEnabled = true
-          if let point = state.centerLocation {
-            return .send(.delegate(.centerChanged(point, entity)))
-          }
+          entity = rawEntity
+          if let center = state.centerLocation { point = center }
         case .failure:
           state.address = "현재 위치 정보를 가져올 수 없습니다."
           state.isEnabled = false
         }
-        return .send(.delegate(.centerChanged(nil, nil)))
-        
+        return .run { [point = point, entity = entity] send in
+          await send(.delegate(.nowCalculateReverseGeoCode(false)))
+          await send(.delegate(.centerChanged(point, entity)))
+        }
       case let .initUserLocation(location):
         state.userLocation = location
         return .none
@@ -111,6 +114,7 @@ extension MoveLocationFeature {
   ) -> Effect<Action> {
     return .run { send in
       do {
+        await send(.delegate(.nowCalculateReverseGeoCode(true)))
         let input = NMReverseGeoCodeInput(latitude: point.latitude, longitude: point.longitude)
         let entity = try await reverseGeoCodeUseCase.execute(input)
         await send(.reverseGeoCodeResult(.success(entity)))

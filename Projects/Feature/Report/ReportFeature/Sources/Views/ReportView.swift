@@ -8,7 +8,7 @@
 
 import SwiftUI
 import ComposableArchitecture
-
+import DotLottie
 import DesignKit
 
 public struct ReportView: View {
@@ -95,6 +95,13 @@ public struct ReportView: View {
   @ViewBuilder
   private var nextButton: some View {
     PrimaryButton(
+      loadingView: {
+        DotLottieAnimation(
+          fileName: "loading",
+          config: AnimationConfig(autoplay: true, loop: true)
+        ).view()
+      },
+      isLoading: $store.isLoading,
       title: $store.nextButtonText,
       size: .large,
       state: $store.nextButtonState

@@ -32,6 +32,7 @@ public struct ReportFeature {
     
     var nextButtonState: PrimaryButtonState = .normal
     var nextButtonText: String = "시작하기"
+    var isLoading: Bool = false /// 다음 버튼의 로딩 상태
     
     /// 제보하기에 담길 데이터
     var spotName: String = ""
@@ -42,8 +43,6 @@ public struct ReportFeature {
     
     var selectedPhoto: UIImage? = nil
     
-    /// 서버 검증 관련 상태
-    var isServerValidating: Bool = false
     public init() {}
   }
   
@@ -59,10 +58,12 @@ public struct ReportFeature {
     case selectPhoto(SelectPhotoFeature.Action)
     case binding(BindingAction<State>)
     
+    
     case spotSuggestionResult(Result<String, NetworkError>)
     case uploadSpotImageResult(Result<String, NetworkError>)
     case postSpotImage(String)
     
+    case setIsLoading(Bool)
     case errorOccured(message: String)
     
     /// 시작 화면이 나타날 때
@@ -80,7 +81,9 @@ public struct ReportFeature {
     
     case nextButtonIsEnabled(Bool)
     case nextButtonTapped
-    case reportButtonTapped
+    case validateSpotNameButtonTapped /// 이름 작성 화면에서, 서버검증 요청
+    case reportButtonTapped /// 제보하기 화면에서, 서버 검증 요청
+    
     
     case backButtonTapped
     case pop
@@ -119,7 +122,7 @@ public struct ReportFeature {
         
       case .nextButtonTapped:
         /// 다음 페이지로 넘어가기 전에 현재 페이지에서 검증 action
-        if state.currentPage == 2 { return .send(.writeName(.validateNameFromServer)) }
+        if state.currentPage == 2 { return .send(.validateSpotNameButtonTapped) }
         if state.currentPage == 5 { return .send(.pop) }
         state.currentPage = min(state.currentPage + 1, 5)
         /// 다음 페이지에 따라 적절한 action을 보냄
@@ -171,12 +174,16 @@ public struct ReportFeature {
       case .didAppearComplete:
         state.isNavigationBarHidden = true
         state.nextButtonText = "확인"
-        return .send(.nextButtonIsEnabled(true))
-        
+        return .run { send in
+          await send(.nextButtonIsEnabled(true))
+          await send(.setIsLoading(false))
+        }
         /// `MoveLocationFeature`의 `Delegate`처리
       case let .moveLocation(.delegate(action)):
         if state.currentPage != 1 { return .none }
         switch action {
+        case let .nowCalculateReverseGeoCode(isLoading):
+          return .send(.setIsLoading(isLoading))
         case let .centerChanged(location, entity):
           state.centerPoint = location
           state.nmReverseGeoCodeEntity = entity
@@ -187,16 +194,13 @@ public struct ReportFeature {
       case let .writeName(.delegate(action)):
         if state.currentPage != 2 { return .none }
         switch action {
-        case let .nameValidationChanged(isValid, name):
+        case let .localValidationCompleted(isValid, name):
           state.spotName = name
-          state.isServerValidating = false
-          return .send(.nextButtonIsEnabled(isValid && !state.isServerValidating))
-          
+          return .send(.nextButtonIsEnabled(isValid))
         case let .serverValidationCompleted(isValid, name):
           state.spotName = name
-          state.isServerValidating = false
           if isValid {
-            state.currentPage = min(state.currentPage + 1, 4)
+            state.currentPage = 3
             return .send(.didAppearSelectKind)
           } else {
             return .send(.nextButtonIsEnabled(false))
@@ -221,13 +225,11 @@ public struct ReportFeature {
           return .send(.nextButtonIsEnabled(true))
         }
         
-        /// 서버 검증 시작 시 버튼 상태 업데이트
-      case .writeName(.validateNameFromServer):
-        if state.currentPage == 2 {
-          state.isServerValidating = true
-          return .send(.nextButtonIsEnabled(false))
+      case .validateSpotNameButtonTapped:
+        return .run { send in
+          await send(.setIsLoading(true))
+          await send(.writeName(.validateNameFromServer))
         }
-        return .none
         
       case .reportButtonTapped:
         return spotSuggestionEffect(state: state, useCase: spotSuggestionUseCase)
@@ -253,6 +255,11 @@ public struct ReportFeature {
         
       case let .errorOccured(message):
         state.destination = .alert(.occuredError(message))
+        return .send(.setIsLoading(false))
+        
+      case let .setIsLoading(isLoading):
+        state.nextButtonState = isLoading ? .loading : state.nextButtonState
+        state.isLoading = isLoading
         return .none
         
       case .destination(.dismiss):
@@ -277,6 +284,7 @@ public extension ReportFeature {
   ) -> Effect<Action> {
     .run { send in
       do {
+        await send(.setIsLoading(true))
         let entity = try await useCase.execute(
           state.spotName,
           state.centerPoint,

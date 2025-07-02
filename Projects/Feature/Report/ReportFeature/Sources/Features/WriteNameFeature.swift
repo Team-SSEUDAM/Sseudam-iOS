@@ -108,14 +108,13 @@ public struct WriteNameFeature {
   
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
-    case validateName(String)
     case focusChanged(Bool)
     case delegate(Delegate)
     case validateNameFromServer
     case validateNameResult(Result<Bool, NetworkError>)
     
     public enum Delegate: Equatable {
-      case nameValidationChanged(isValid: Bool, name: String)
+      case localValidationCompleted(isValid: Bool, name: String)
       case serverValidationCompleted(isValid: Bool, name: String)
     }
   }
@@ -126,29 +125,13 @@ public struct WriteNameFeature {
     BindingReducer()
     Reduce { state, action in
       switch action {
-      case .binding(\.name):
-        return .send(.validateName(state.name))
-        
-      case let .validateName(name):
+      case .binding(\.name): /// 이름이 바뀔 때 는, local 검증을 수행
+        if state.validationResult == .checking { return .none }
         let previousResult = state.validationResult
-        // 서버 검증 중이 아닐 때만 클라이언트 검증 수행
-        if state.validationResult != .checking {
-          state.validationResult = validateNameInput(name)
-        }
-        
-        /// 유효성 검사 결과가 변경되었을 때만 delegate 호출
-        if previousResult != state.validationResult {
-          return .send(
-            .delegate(
-              .nameValidationChanged(
-                isValid: state.isButtonEnabled,
-                name: state.isButtonEnabled ? name : ""
-              )
-            )
-          )
-        }
-        return .none
-        
+        state.validationResult = validateNameInput(state.name)
+        if previousResult == state.validationResult { return .none }
+        return .send(.delegate(.localValidationCompleted(isValid: state.isButtonEnabled, name: state.name)))
+      
       case let .focusChanged(isFocused):
         state.isFocused = isFocused
         return .none
@@ -170,7 +153,7 @@ public struct WriteNameFeature {
         
       case let .validateNameResult(result):
         switch result {
-        case .success(let isValid):
+        case let .success(isValid):
           state.validationResult = isValid ? .valid : .alreadyUsing
           let finalName = isValid ? state.name : ""
           return .send(.delegate(.serverValidationCompleted(isValid: isValid, name: finalName)))
@@ -194,6 +177,7 @@ extension WriteNameFeature {
   ) -> Effect<Action> {
     return .run { send in
       do {
+        await send(.delegate(.startValidate))
         let isValid = try await spotNameValidateUseCase.execute(name)
         await send(.validateNameResult(.success(isValid)))
       } catch is CancellationError {

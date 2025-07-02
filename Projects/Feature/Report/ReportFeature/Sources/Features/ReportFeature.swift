@@ -12,6 +12,7 @@ import Utility
 import NMReverseGeocodingDomainInterface
 import SuggestionDomainInterface
 
+import SelectSpotImageFeature
 import SelectSpotCategoryFeature
 
 import DesignKit
@@ -267,7 +268,7 @@ public struct Child {
     var moveLocation: MoveLocationFeature.State = MoveLocationFeature.State()
     var writeName: WriteNameFeature.State = WriteNameFeature.State()
     var selectKind: SelectSpotCategoryFeature.State = SelectSpotCategoryFeature.State()
-    var selectPhoto: SelectPhotoFeature.State = SelectPhotoFeature.State()
+    var selectPhoto: SelectSpotImageFeature.State = SelectSpotImageFeature.State()
     
     public init() {}
   }
@@ -276,7 +277,7 @@ public struct Child {
     case moveLocation(MoveLocationFeature.Action)
     case writeName(WriteNameFeature.Action)
     case selectKind(SelectSpotCategoryFeature.Action)
-    case selectPhoto(SelectPhotoFeature.Action)
+    case selectPhoto(SelectSpotImageFeature.Action)
     case delegate(Delegate)
     
     @CasePathable
@@ -284,7 +285,7 @@ public struct Child {
       case moveLocation(MoveLocationFeature.Action.Delegate)
       case writeName(WriteNameFeature.Action.Delegate)
       case selectKind(SelectSpotCategoryFeature.Action.Delegate)
-      case selectPhoto(SelectPhotoFeature.Action.Delegate)
+      case selectPhoto(SelectSpotImageFeature.Action.Delegate)
     }
   }
   
@@ -299,7 +300,7 @@ public struct Child {
       SelectSpotCategoryFeature()
     }
     Scope(state: \.selectPhoto, action: \.selectPhoto) {
-      SelectPhotoFeature()
+      SelectSpotImageFeature()
     }
     
     Reduce { state, action in
@@ -407,7 +408,7 @@ private extension ReportFeature {
   /// `SelectPhotoFeature(사진 선택)` Delegate 처리
   func handleSelectPhotoDelegate(
     state: inout State,
-    action: SelectPhotoFeature.Action.Delegate
+    action: SelectSpotImageFeature.Action.Delegate
   ) -> Effect<Action> {
     guard state.currentPage == 4 else { return .none }
     

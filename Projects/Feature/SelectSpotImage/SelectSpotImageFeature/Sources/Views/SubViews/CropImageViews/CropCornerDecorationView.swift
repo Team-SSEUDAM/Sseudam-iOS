@@ -1,15 +1,15 @@
 //
-//  CornerDecorationVewi.swift
-//  ReportFeature
+//  CropCornerDecorationView.swift
+//  SelectSpotImageFeature
 //
-//  Created by 조용인 on 7/1/25.
+//  Created by 조용인 on 7/2/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
 import SwiftUI
 import DesignKit
 
-public struct CornerDecoration: View {
+public struct CropCornerDecorationView: View {
   private let position: (x: CGFloat, y: CGFloat)
   private let correction: (x: CGFloat, y: CGFloat)
   

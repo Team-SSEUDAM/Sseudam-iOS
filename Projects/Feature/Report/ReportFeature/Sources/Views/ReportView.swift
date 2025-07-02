@@ -9,6 +9,7 @@
 import SwiftUI
 import ComposableArchitecture
 import DotLottie
+import SelectSpotCategoryFeature
 import DesignKit
 
 public struct ReportView: View {
@@ -41,7 +42,7 @@ public struct ReportView: View {
               )
               .frame(width: geo.size.width)
               .id(2)
-              SelectKindView(
+              SelectSpotCategoryView(
                 store: store.scope(state: \.child.selectKind, action: \.child.selectKind)
               )
               .frame(width: geo.size.width)

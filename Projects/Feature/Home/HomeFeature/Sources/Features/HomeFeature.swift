@@ -29,6 +29,10 @@ public struct HomeFeature {
     public var isPresentDetail: Bool = false
     
     public var path = StackState<Path.State>()
+    
+    public var isFirstLoad: Bool = true
+    public var isExpandedRetry: Bool = false
+    public var lastSearchedBounds: [MapPoint]? = nil
     public init() {}
   }
 
@@ -39,9 +43,14 @@ public struct HomeFeature {
     case requestMapBounds(Bool)
     case fetchTrashItems([MapPoint])
     case storeTrashItems([TrashSpot])
+    case emptyTrashItems
+    case firstLoadSearch
+    case expandSearch
+    
     case filterTapped(TrashType?)
     case researchButtonEnable(Bool)
     case markerTapped(Int?)
+    
     case deleteActiveMarker
     case onAppear
     
@@ -49,12 +58,16 @@ public struct HomeFeature {
     
     case reportButtonTapped
     case presentDetailView(Bool)
+    case requestExpandedMapBounds([MapPoint])
+    
+    case presentDetailView(Bool, id: Int? = nil)
     case delegate(Delegate)
   }
   
   public enum Delegate: Equatable {
-    case presentDetailView(Bool)
     case needToHiddenTabBar(Bool)
+    case presentDetailView(Bool, id: Int?)
+    case noDataInDetailView
   }
   
   @Dependency(\.HomeUseCase) var homeUseCase
@@ -92,16 +105,51 @@ public struct HomeFeature {
         return .none
         
       case let .fetchTrashItems(bounds):
+        state.lastSearchedBounds = bounds
         return fetchTrashItem(bounds: bounds, type: state.trashType)
         
       case let .storeTrashItems(items):
-        print("storeTrashItems ", items.count)
         state.trashItems.removeAll()
         state.trashItems = items
-        return .none
+        if items.isEmpty {
+          return .send(.emptyTrashItems)
+
+        } else {
+          // 데이터 있으면 바텀시트 내리기
+          return .send(.presentDetailView(false))
+        }
+        
+      case .emptyTrashItems:
+        if state.isFirstLoad {
+          return .send(.firstLoadSearch)
+        } else { // 바텀시트 띄우기
+          return .send(.presentDetailView(true, id: nil))
+        }
+        
+      case .firstLoadSearch:
+        if !state.isExpandedRetry { // 1회 확장 검색 시도
+          state.isExpandedRetry = true
+          return .send(.expandSearch)
+        } else { // 확장 검색 후에도 없음
+          state.isFirstLoad = false
+          state.isExpandedRetry = false
+          // TODO: - Toast 띄우기
+          return .none
+        }
+        
+      case .expandSearch:
+        if let lastBounds = state.lastSearchedBounds {
+          return .send(.requestExpandedMapBounds(lastBounds))
+        } else {
+          return .none
+        }
+        
+      case let .requestExpandedMapBounds(bounds):
+          let expandedBounds = expandBounds(bounds, ratio: 0.35) // 확장비율 조정
+          return .send(.fetchTrashItems(expandedBounds))
         
       case let .markerTapped(id):
-        return .send(.presentDetailView(id != .none))
+        return .send(.presentDetailView(id != .none, id: id))
         
       case .deleteActiveMarker:
         state.isNeedDeleteMarker = true
@@ -111,17 +159,18 @@ public struct HomeFeature {
         
       case let .location(.delegate(.requestMapBounds(isRequest))):
         return .send(.requestMapBounds(isRequest))
-
+        
         // MARK: - Send Action to HomeRoot
       case .reportButtonTapped:
         state.path.append(.reportView(ReportFeature.State()))
         return .send(.delegate(.needToHiddenTabBar(true)))
-      case let .presentDetailView(isPresent):
+        
+      case let .presentDetailView(isPresent, id):
         state.isPresentDetail = isPresent
         return .run { send in
           await MainActor.run {
             send(.delegate(.needToHiddenTabBar(isPresent)))
-            send(.delegate(.presentDetailView(isPresent)))
+            send(.delegate(.presentDetailView(isPresent, id: id)))
           }
         }
         
@@ -141,7 +190,6 @@ public struct HomeFeature {
 
 extension HomeFeature {
   
-  // TODO: - trash spot API 연결
   private func fetchTrashItem(bounds: [MapPoint], type: TrashType?) -> Effect<Action> {
     return .run { send in
       let parameter: FetchTrashSpotParameter = .init(
@@ -159,6 +207,24 @@ extension HomeFeature {
         
       }
     }
+  }
+  
+  /// 지도 범위 확장
+  private func expandBounds(_ bounds: [MapPoint], ratio: Double) -> [MapPoint] {
+      guard bounds.count == 2 else { return bounds }
+      let sw = bounds[0]
+      let ne = bounds[1]
+      let latDelta = ne.latitude - sw.latitude
+      let lngDelta = ne.longitude - sw.longitude
+      let newSW = MapPoint(
+          latitude: sw.latitude - latDelta * ratio,
+          longitude: sw.longitude - lngDelta * ratio
+      )
+      let newNE = MapPoint(
+          latitude: ne.latitude + latDelta * ratio,
+          longitude: ne.longitude + lngDelta * ratio
+      )
+      return [newSW, newNE]
   }
 }
 

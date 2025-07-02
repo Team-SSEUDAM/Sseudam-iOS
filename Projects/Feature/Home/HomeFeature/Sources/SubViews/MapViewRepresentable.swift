@@ -11,6 +11,7 @@ import UIKit
 import TrashSpotDomainInterface
 import Utility
 import NMapsMap
+import CoreGraphics
 
 struct MapViewRepresentable: UIViewRepresentable {
   
@@ -37,7 +38,6 @@ struct MapViewRepresentable: UIViewRepresentable {
     let view = NMFNaverMapView()
     view.showZoomControls = false
     view.mapView.positionMode = .direction
-    view.mapView.zoomLevel = 16
     view.mapView.minZoomLevel = 8
     view.mapView.maxZoomLevel = 20
     view.mapView.isIndoorMapEnabled = false
@@ -59,16 +59,9 @@ struct MapViewRepresentable: UIViewRepresentable {
     }
     
     // 지도 범위 요청
-    if requestMapBounds {
-      if context.coordinator.isInitialBounds {
-        context.coordinator.configInitialMove(
-          uiView.mapView,
-          requestMapBounds: requestMapBounds
-        )
-      } else {
-        currentVisibleBounds(on: uiView.mapView)
-        requestMapBounds = false
-      }
+    if requestMapBounds, !context.coordinator.isInitialBounds {
+      currentVisibleBounds(on: uiView.mapView)
+      requestMapBounds = false
     }
     
     if context.coordinator.trashItems != trashItems {
@@ -90,21 +83,9 @@ struct MapViewRepresentable: UIViewRepresentable {
   }
 }
 
-// MARK: - Map Control
+// MARK: - Map Event
 
 extension MapViewRepresentable {
-  
-  /// 카메라 이동 메서드
-  private func moveCamera(_ view: NMFNaverMapView, to point: MapPoint?, zoomLevel: Double = 16) {
-    if let point = point {
-      let coord = NMGLatLng(lat: point.latitude, lng: point.longitude)
-      let cameraUpdate = NMFCameraUpdate(scrollTo: coord, zoomTo: zoomLevel)
-      cameraUpdate.animation = .easeOut
-      cameraUpdate.animationDuration = 1
-      
-      view.mapView.moveCamera(cameraUpdate)
-    }
-  }
   
   private func moveLocation(_ view: NMFNaverMapView, to location: MapPoint, context: Context) {
     let cameraPosition = view.mapView.cameraPosition.target
@@ -150,11 +131,11 @@ extension MapViewRepresentable {
   /// 여러 마커의 중간지점 찾는 메서드
   private func averageCenter(of points: [MapPoint]) -> MapPoint? {
     guard !points.isEmpty else { return nil }
-
+    
     let total = points.reduce((lat: 0.0, lon: 0.0)) { result, point in
       (result.lat + point.latitude, result.lon + point.longitude)
     }
-
+    
     let count = Double(points.count)
     return MapPoint(
       latitude: total.lat / count,
@@ -173,9 +154,9 @@ extension MapViewRepresentable {
     if context.coordinator.trashItems != items {
       deleteDrawMarker(context: context)
     }
+    
     // 카메라 이동
-    let mid = averageCenter(of: items.map { $0.location })
-    moveCamera(view, to: mid, zoomLevel: view.mapView.cameraPosition.zoom)
+    moveCameraForShowMarker(view, items: items, context: context)
     
     // 그리기
     let markers: [NMFMarker] = items.map { item in
@@ -219,4 +200,93 @@ extension MapViewRepresentable {
       
     }
   }
+}
+
+// MARK: - 카메라 이동
+
+extension MapViewRepresentable {
+  
+  /// 카메라 이동 메서드
+  private func moveCamera(_ view: NMFNaverMapView, to point: MapPoint?, zoomLevel: Double = 16) {
+    if let point = point {
+      let coord = NMGLatLng(lat: point.latitude, lng: point.longitude)
+      let cameraUpdate = NMFCameraUpdate(scrollTo: coord, zoomTo: zoomLevel)
+      cameraUpdate.animation = .easeOut
+      cameraUpdate.animationDuration = 1
+      
+      view.mapView.moveCamera(cameraUpdate)
+    }
+  }
+  
+  /// 마커 보여줄 때 조건에 따라 카메라 이동 조절
+  private func moveCameraForShowMarker(
+    _ view: NMFNaverMapView,
+    items: [TrashSpot],
+    context: Context
+  ) {
+    // 카메라 이동
+    if !items.isEmpty  {
+      if context.coordinator.isFirstLoadData {
+        if items.count >= 20 {
+          let currentPosition = view.mapView.cameraPosition.target
+          let mapPoint: MapPoint = .init(
+            latitude: currentPosition.lat,
+            longitude: currentPosition.lng
+          )
+          moveCamera(view, to: mapPoint, zoomLevel: 17)
+        }
+        fitMarkersZoomOnly(view: view, items: items)
+        context.coordinator.isFirstLoadData = false
+      } else {
+        fitMarkersInCenter(view: view, items: items)
+      }
+    }
+  }
+  
+  /// 나타날 마커들의 가운데 지점으로 카메라 이동
+  private func fitMarkersInCenter(view: NMFNaverMapView, items: [TrashSpot]) {
+    let mid = averageCenter(of: items.map { $0.location })
+    moveCamera(view, to: mid, zoomLevel: view.mapView.cameraPosition.zoom)
+  }
+  
+  /// 모든 마커가 지도 상에 보이도록 카메라 및 줌 조정
+  private func fitMarkersZoomOnly(
+    view: NMFNaverMapView,
+    items: [TrashSpot],
+    bottomPadding: CGFloat = 83
+  ) {
+    guard !items.isEmpty else { return }
+    
+    let center = view.mapView.cameraPosition.target
+    let centerPoint = MapPoint(latitude: center.lat, longitude: center.lng)
+    let markerPoints = items.map { $0.location }
+    
+    // 가장 먼 거리(미터 단위)
+    let maxDistance = markerPoints.map { $0.distance(to: centerPoint) }.max() ?? 0
+    
+    // 실제로 보이는 지도 높이 계산
+    let mapViewHeight = view.frame.height
+    let padding: CGFloat = bottomPadding + 30 // 30은 여유치
+    let usableMapHeight = mapViewHeight - padding
+    guard usableMapHeight > 0 else { return }
+    
+    // 실제 지도 높이에 최대 거리가 다 들어오려면 필요한 zoomLevel 계산
+    // 지도 SDK 기준: 한 줌 단계마다 2배로 크기가 늘어남
+    let worldMeters: Double = 40075016.6855785
+    
+    // 비율: usable map 영역이 전체 중 차지하는 비율
+    let visibleRatio = Double(usableMapHeight / mapViewHeight)
+    // 한 화면에서 모든 마커가 다 보이려면 중심 기준 maxDistance*2 만큼 필요
+    let neededMeters = maxDistance * 2 / visibleRatio
+    
+    let targetZoom = log2(worldMeters / neededMeters)
+    // 제한(줌 너무 가까이/멀리 못 가게)
+    let clampedZoom = max(min(targetZoom, 21), 8)
+    
+    let cameraUpdate = NMFCameraUpdate(scrollTo: center, zoomTo: clampedZoom)
+    cameraUpdate.animation = .easeIn
+    cameraUpdate.animationDuration = 1.0
+    view.mapView.moveCamera(cameraUpdate)
+  }
+  
 }

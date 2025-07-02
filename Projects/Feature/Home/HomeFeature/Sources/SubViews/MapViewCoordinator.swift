@@ -19,6 +19,8 @@ extension MapViewRepresentable {
     
     var isInitialBounds: Bool = true
     
+    var isFirstLoadData: Bool = true
+    
     var trashItems: [TrashSpot] = []
     
     var markers: [NMFMarker] = []
@@ -50,7 +52,9 @@ extension MapViewRepresentable {
     }
     
     func mapViewCameraIdle(_ mapView: NMFMapView) {
-      configInitialMove(mapView, requestMapBounds: parent.requestMapBounds)
+      if isInitialBounds {
+        configInitialMove(mapView, requestMapBounds: parent.requestMapBounds)
+      }
     }
     
     

@@ -25,6 +25,7 @@ struct HomeRootFeature {
     case binding(BindingAction<State>)
     case home(HomeFeature.Action)
     case trashDetail(TrashDetailFeature.Action)
+    
     case delegate(Delegate)
   }
   
@@ -40,8 +41,8 @@ struct HomeRootFeature {
     Reduce { state, action in
       switch action {
         
-      case let .home(.delegate(.presentDetailView(isPresent))):
-        state.trashDetail = isPresent ? .init() : nil
+      case let .home(.delegate(.presentDetailView(isPresent, id))):
+        state.trashDetail = isPresent ? .init(id: id) : nil
         state.isPresentDetail = isPresent
         return .none
       case let .home(.delegate(.needToHiddenTabBar(isHidden))):

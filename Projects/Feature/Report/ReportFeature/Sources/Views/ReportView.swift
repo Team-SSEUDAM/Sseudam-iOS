@@ -32,22 +32,22 @@ public struct ReportView: View {
               .frame(width: geo.size.width)
               .id(0)
               MoveLocationView(
-                store: store.scope(state: \.moveLocation, action: \.moveLocation)
+                store: store.scope(state: \.child.moveLocation, action: \.child.moveLocation)
               )
               .frame(width: geo.size.width)
               .id(1)
               WriteNameView(
-                store: store.scope(state: \.writeName, action: \.writeName)
+                store: store.scope(state: \.child.writeName, action: \.child.writeName)
               )
               .frame(width: geo.size.width)
               .id(2)
               SelectKindView(
-                store: store.scope(state: \.selectKind, action: \.selectKind)
+                store: store.scope(state: \.child.selectKind, action: \.child.selectKind)
               )
               .frame(width: geo.size.width)
               .id(3)
               SelectPhotoView(
-                store: store.scope(state: \.selectPhoto, action: \.selectPhoto)
+                store: store.scope(state: \.child.selectPhoto, action: \.child.selectPhoto)
               )
               .frame(width: geo.size.width)
               .id(4)

@@ -25,10 +25,9 @@ public struct ReportFeature {
     @Presents var destination: Destination.State?
     
     var currentPage: Int = 0
-    var moveLocation: MoveLocationFeature.State = MoveLocationFeature.State()
-    var writeName: WriteNameFeature.State = WriteNameFeature.State()
-    var selectKind: SelectKindFeature.State = SelectKindFeature.State()
-    var selectPhoto: SelectPhotoFeature.State = SelectPhotoFeature.State()
+    
+    /// 각 페이지별 상태를 Child로 관리
+    var child: Child.State = Child.State()
     
     var nextButtonState: PrimaryButtonState = .normal
     var nextButtonText: String = "시작하기"
@@ -51,11 +50,7 @@ public struct ReportFeature {
     public enum Alert: Equatable { }
     
     case destination(PresentationAction<Destination.Action>)
-    
-    case moveLocation(MoveLocationFeature.Action)
-    case writeName(WriteNameFeature.Action)
-    case selectKind(SelectKindFeature.Action)
-    case selectPhoto(SelectPhotoFeature.Action)
+    case child(Child.Action)
     case binding(BindingAction<State>)
     
     
@@ -95,13 +90,13 @@ public struct ReportFeature {
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
-    Scope(state: \.moveLocation, action: \.moveLocation) { MoveLocationFeature() }
-    Scope(state: \.writeName, action: \.writeName) { WriteNameFeature() }
-    Scope(state: \.selectKind, action: \.selectKind) { SelectKindFeature() }
-    Scope(state: \.selectPhoto, action: \.selectPhoto) { SelectPhotoFeature() }
-    Reduce {
-      state,
-      action in
+    
+    // Child를 하나의 Scope로 관리
+    Scope(state: \.child, action: \.child) {
+      Child()
+    }
+    
+    Reduce { state, action in
       switch action {
       case .backButtonTapped:
         switch state.currentPage {
@@ -147,28 +142,28 @@ public struct ReportFeature {
       case .didAppearMoveLocation:
         state.nextButtonText = "다음"
         return .merge([
-          .send(.writeName(.focusChanged(false))),
-          .send(.nextButtonIsEnabled(state.moveLocation.isEnabled))
+          .send(.child(.writeName(.focusChanged(false)))),
+          .send(.nextButtonIsEnabled(state.child.moveLocation.isEnabled))
         ])
         
       case .didAppearWriteName:
         state.nextButtonText = "다음"
         return .merge([
-          .send(.writeName(.focusChanged(true))),
-          .send(.nextButtonIsEnabled(state.writeName.isButtonEnabled))
+          .send(.child(.writeName(.focusChanged(true)))),
+          .send(.nextButtonIsEnabled(state.child.writeName.isButtonEnabled))
         ])
         
       case .didAppearSelectKind:
         state.nextButtonText = "다음"
         return .merge([
-          .send(.writeName(.focusChanged(false))),
-          .send(.nextButtonIsEnabled(state.selectKind.isEnabled))
+          .send(.child(.writeName(.focusChanged(false)))),
+          .send(.nextButtonIsEnabled(state.child.selectKind.isEnabled))
         ])
         
       case .didAppearSelectPhoto:
         state.nextButtonText = "완료"
         return .merge([
-          .send(.nextButtonIsEnabled(state.selectPhoto.isEnabled))
+          .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
         ])
         
       case .didAppearComplete:
@@ -178,61 +173,37 @@ public struct ReportFeature {
           await send(.nextButtonIsEnabled(true))
           await send(.setIsLoading(false))
         }
-        /// `MoveLocationFeature`의 `Delegate`처리
-      case let .moveLocation(.delegate(action)):
-        if state.currentPage != 1 { return .none }
-        switch action {
-        case let .nowCalculateReverseGeoCode(isLoading):
-          return .send(.setIsLoading(isLoading))
-        case let .centerChanged(location, entity):
-          state.centerPoint = location
-          state.nmReverseGeoCodeEntity = entity
-          return .send(.nextButtonIsEnabled(location != nil && entity != nil))
+        
+        /// Child에서 오는 Delegate 처리
+      case let .child(.delegate(delegateAction)):
+        switch delegateAction {
+        case let .moveLocation(action): return handleMoveLocationDelegate(state: &state, action: action)
+        case let .writeName(action): return handleWriteNameDelegate(state: &state, action: action)
+        case let .selectKind(action): return handleSelectKindDelegate(state: &state, action: action)
+        case let .selectPhoto(action): return handleSelectPhotoDelegate(state: &state, action: action)
         }
         
-        /// `WriteNameFeature`의 `Delegate`처리
-      case let .writeName(.delegate(action)):
-        if state.currentPage != 2 { return .none }
-        switch action {
-        case let .localValidationCompleted(isValid, name):
-          state.spotName = name
-          return .send(.nextButtonIsEnabled(isValid))
-        case let .serverValidationCompleted(isValid, name):
-          state.spotName = name
-          if isValid {
-            state.currentPage = 3
-            return .send(.didAppearSelectKind)
-          } else {
-            return .send(.nextButtonIsEnabled(false))
-          }
-        }
+        // Child의 일반 Action들 처리 (delegate가 아닌 경우)
+      case .child(.moveLocation):
+        return .none
         
-        /// `SelectKindFeature`의 `Delegate`처리
-      case let .selectKind(.delegate(action)):
-        if state.currentPage != 3 { return .none }
-        switch action {
-        case let .didSelectKind(trashType):
-          state.trashType = trashType
-          return .send(.nextButtonIsEnabled(true))
-        }
+      case .child(.writeName):
+        return .none
         
-        /// `SelectPhotoFeature`의 `Delegate`처리
-      case let .selectPhoto(.delegate(action)):
-        if state.currentPage != 4 { return .none }
-        switch action {
-        case let .photoSelected(photo):
-          state.selectedPhoto = photo
-          return .send(.nextButtonIsEnabled(true))
-        }
+      case .child(.selectKind):
+        return .none
+        
+      case .child(.selectPhoto):
+        return .none
         
       case .validateSpotNameButtonTapped:
         return .run { send in
           await send(.setIsLoading(true))
-          await send(.writeName(.validateNameFromServer))
+          await send(.child(.writeName(.validateNameFromServer)))
         }
         
       case .reportButtonTapped:
-        return spotSuggestionEffect(state: state, useCase: spotSuggestionUseCase)
+        return spotSuggestionEffect(state, spotSuggestionUseCase)
         
       case let .postSpotImage(prisignedURL):
         return uploadSpotImageEffect(state, prisignedURL, uploadSpotImageUseCase)
@@ -241,6 +212,7 @@ public struct ReportFeature {
         switch result {
         case let .success(prisignedURL):
           return .send(.postSpotImage(prisignedURL))
+          
         case let .failure(error):
           return .send(.errorOccured(message: error.localizedDescription))
         }
@@ -249,6 +221,7 @@ public struct ReportFeature {
         switch result {
         case .success:
           return .send(.nextButtonTapped) /// 완료 페이지로 이동
+        
         case let .failure(error):
           return .send(.errorOccured(message: error.localizedDescription))
         }
@@ -266,9 +239,14 @@ public struct ReportFeature {
         state.destination = nil
         return .none
         
+      case .destination:
+        return .none
+        
       case .binding:
         return .none
-      default: return .none
+        
+      case .pop:
+        return .none
       }
     }
     .ifLet(\.$destination, action: \.destination) {
@@ -277,10 +255,172 @@ public struct ReportFeature {
   }
 }
 
+// MARK: - Child Reducer
+@Reducer
+public struct Child {
+  
+  @ObservableState
+  public struct State: Equatable {
+    var moveLocation: MoveLocationFeature.State = MoveLocationFeature.State()
+    var writeName: WriteNameFeature.State = WriteNameFeature.State()
+    var selectKind: SelectKindFeature.State = SelectKindFeature.State()
+    var selectPhoto: SelectPhotoFeature.State = SelectPhotoFeature.State()
+    
+    public init() {}
+  }
+  
+  public enum Action: Equatable {
+    case moveLocation(MoveLocationFeature.Action)
+    case writeName(WriteNameFeature.Action)
+    case selectKind(SelectKindFeature.Action)
+    case selectPhoto(SelectPhotoFeature.Action)
+    case delegate(Delegate)
+    
+    @CasePathable
+    public enum Delegate: Equatable {
+      case moveLocation(MoveLocationFeature.Action.Delegate)
+      case writeName(WriteNameFeature.Action.Delegate)
+      case selectKind(SelectKindFeature.Action.Delegate)
+      case selectPhoto(SelectPhotoFeature.Action.Delegate)
+    }
+  }
+  
+  public var body: some ReducerOf<Self> {
+    Scope(state: \.moveLocation, action: \.moveLocation) {
+      MoveLocationFeature()
+    }
+    Scope(state: \.writeName, action: \.writeName) {
+      WriteNameFeature()
+    }
+    Scope(state: \.selectKind, action: \.selectKind) {
+      SelectKindFeature()
+    }
+    Scope(state: \.selectPhoto, action: \.selectPhoto) {
+      SelectPhotoFeature()
+    }
+    
+    Reduce { state, action in
+      switch action {
+        /// MoveLocationFeature의 delegate를 부모로 전달
+      case let .moveLocation(.delegate(delegateAction)):
+        return .send(.delegate(.moveLocation(delegateAction)))
+        
+        /// WriteNameFeature의 delegate를 부모로 전달
+      case let .writeName(.delegate(delegateAction)):
+        return .send(.delegate(.writeName(delegateAction)))
+        
+        /// SelectKindFeature의 delegate를 부모로 전달
+      case let .selectKind(.delegate(delegateAction)):
+        return .send(.delegate(.selectKind(delegateAction)))
+        
+        /// SelectPhotoFeature의 delegate를 부모로 전달
+      case let .selectPhoto(.delegate(delegateAction)):
+        return .send(.delegate(.selectPhoto(delegateAction)))
+        
+        /// 일반 Action들은 각각의 Scope에서 처리되므로 여기서는 패스
+      case .moveLocation:
+        return .none
+        
+      case .writeName:
+        return .none
+        
+      case .selectKind:
+        return .none
+        
+      case .selectPhoto:
+        return .none
+        
+      case .delegate:
+        return .none
+      }
+    }
+  }
+}
+
+// MARK: - Delegate Handlers
+private extension ReportFeature {
+  
+  /// `MoveLocationFeature` Delegate 처리
+  func handleMoveLocationDelegate(
+    state: inout State,
+    action: MoveLocationFeature.Action.Delegate
+  ) -> Effect<Action> {
+    guard state.currentPage == 1 else { return .none }
+    
+    switch action {
+    case let .nowCalculateReverseGeoCode(isLoading):
+      return .send(.setIsLoading(isLoading))
+      
+    case let .centerChanged(location, entity):
+      state.centerPoint = location
+      state.nmReverseGeoCodeEntity = entity
+      return .send(.nextButtonIsEnabled(location != nil && entity != nil))
+    }
+  }
+  
+  /// `WriteNameFeature(쓰레기통 이름 작성)` Delegate 처리
+  func handleWriteNameDelegate(
+    state: inout State,
+    action: WriteNameFeature.Action.Delegate
+  ) -> Effect<Action> {
+    guard state.currentPage == 2 else { return .none }
+    
+    switch action {
+    case let .localValidationCompleted(isValid, name):
+      state.spotName = name
+      return .send(.nextButtonIsEnabled(isValid))
+      
+    case let .serverValidationCompleted(isValid, name):
+      state.spotName = name
+      if isValid {
+        state.currentPage = 3
+        return .run { send in
+          await send(.setIsLoading(false))
+          await send(.didAppearSelectKind)
+        }
+      } else {
+        return .run { send in
+          await send(.setIsLoading(false))
+          await send(.nextButtonIsEnabled(false))
+        }
+      }
+    }
+  }
+  
+  /// `SelectKindFeature(쓰레기 종류 선택)` Delegate 처리
+  func handleSelectKindDelegate(
+    state: inout State,
+    action: SelectKindFeature.Action.Delegate
+  ) -> Effect<Action> {
+    guard state.currentPage == 3 else { return .none }
+    
+    switch action {
+    case let .didSelectKind(trashType):
+      state.trashType = trashType
+      return .send(.nextButtonIsEnabled(true))
+    }
+  }
+  
+  /// `SelectPhotoFeature(사진 선택)` Delegate 처리
+  func handleSelectPhotoDelegate(
+    state: inout State,
+    action: SelectPhotoFeature.Action.Delegate
+  ) -> Effect<Action> {
+    guard state.currentPage == 4 else { return .none }
+    
+    switch action {
+    case let .photoSelected(photo):
+      state.selectedPhoto = photo
+      return .send(.nextButtonIsEnabled(true))
+    }
+  }
+}
+
+/// MARK: - 순수하게 `ReportFeature`에서 사용할 `Effect들
 public extension ReportFeature {
   func spotSuggestionEffect(
-    state: Self.State,
-    useCase: SpotSuggestionUseCase
+    _ state: Self.State,
+    _ useCase: SpotSuggestionUseCase
   ) -> Effect<Action> {
     .run { send in
       do {

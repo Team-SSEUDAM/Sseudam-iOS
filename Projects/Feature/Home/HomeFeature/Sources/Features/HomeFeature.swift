@@ -33,6 +33,7 @@ public struct HomeFeature {
     public var isFirstLoad: Bool = true
     public var isExpandedRetry: Bool = false
     public var lastSearchedBounds: [MapPoint]? = nil
+    public var toastMessage: String? = nil
     public init() {}
   }
 
@@ -60,6 +61,7 @@ public struct HomeFeature {
     case presentDetailView(Bool)
     case requestExpandedMapBounds([MapPoint])
     
+    case showToastMessage(String?)
     case presentDetailView(Bool, id: Int? = nil)
     case delegate(Delegate)
   }
@@ -133,8 +135,8 @@ public struct HomeFeature {
         } else { // 확장 검색 후에도 없음
           state.isFirstLoad = false
           state.isExpandedRetry = false
-          // TODO: - Toast 띄우기
-          return .none
+          
+          return .send(.showToastMessage("이 근방에는 쓰레기통이 없어요.\n지도를 움직여 다른 위치를 확인해보세요"))
         }
         
       case .expandSearch:
@@ -153,6 +155,10 @@ public struct HomeFeature {
         
       case .deleteActiveMarker:
         state.isNeedDeleteMarker = true
+        return .none
+        
+      case let .showToastMessage(message):
+        state.toastMessage = message
         return .none
         
         // MARK: - Receive LocationFeature delegate action

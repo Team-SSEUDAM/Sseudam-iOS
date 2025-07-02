@@ -34,6 +34,9 @@ public struct HomeView: View {
         VStack {
           TopButtonView
           Spacer()
+          SnackBar(message: $store.toastMessage) {
+            store.send(.showToastMessage(nil))
+          }
           BottomButtonView
         }
       }
@@ -83,10 +86,8 @@ public struct HomeView: View {
     HStack(spacing: .Number8) {
       if store.isPresentDetail {
         IconButton(icon: .leftChevron) {
-          
           store.send(.presentDetailView(false))
           store.send(.deleteActiveMarker)
-          
         }
       }
       TrashFilterView { type in

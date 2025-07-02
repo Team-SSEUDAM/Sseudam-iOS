@@ -73,7 +73,7 @@ public struct NetworkKit: NetworkKitProtocol, Sendable {
       }
       
       do {
-        if let result = try await group.next() { // 먼저 완료되는 task 결과 처리 후, 나머지는 모두 취소시킴.
+        if let result = try await group.next() {
           group.cancelAll()
           return result
         } else {
@@ -82,12 +82,15 @@ public struct NetworkKit: NetworkKitProtocol, Sendable {
             endpoint: endpoint
           )
         }
-      } catch {
+      } catch is CancellationError {
         group.cancelAll()
         throw throwError(
           FoundationError.taskCancelled,
           endpoint: endpoint
         )
+      } catch {
+        group.cancelAll()
+        throw error
       }
     }
   }
@@ -119,7 +122,7 @@ public struct NetworkKit: NetworkKitProtocol, Sendable {
         }
         
         do {
-          if let result = try await group.next() { // 먼저 완료되는 task 결과 처리 후, 나머지는 모두 취소시킴
+          if let result = try await group.next() {
             group.cancelAll()
             return result
           } else {
@@ -128,6 +131,12 @@ public struct NetworkKit: NetworkKitProtocol, Sendable {
               endpoint: endpoint
             )
           }
+        } catch is CancellationError {
+          group.cancelAll()
+          throw throwError(
+            FoundationError.taskCancelled,
+            endpoint: endpoint
+          )
         } catch {
           group.cancelAll()
           throw error
@@ -165,8 +174,8 @@ extension NetworkKit {
       case 400...599:
         throw throwError(
           NetworkError.serverError(
-            message: errorResponse.message,
-            code: httpResponse.statusCode
+            message: errorResponse.data.message,
+            code: errorResponse.status
           ),
           endpoint: endpoint
         )

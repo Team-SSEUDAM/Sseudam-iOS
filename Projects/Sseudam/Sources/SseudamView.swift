@@ -24,24 +24,14 @@ struct SseudamView: View {
   var body: some View {
     
     ZStack {
-      HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
-         .opacity(store.selectedTab == .home ? 1 : 0)
-         .allowsHitTesting(store.selectedTab == .home)
-
-      EmptyView()
-         .opacity(store.selectedTab == .myPet ? 1 : 0)
-         .allowsHitTesting(store.selectedTab == .myPet)
-
-      MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
-         .opacity(store.selectedTab == .profile ? 1 : 0)
-         .allowsHitTesting(store.selectedTab == .profile)
+      HomeView
+      PetView
+      MyPageView
          
       VStack {
         Spacer()
         if !store.isTabbarHidden {
-          CustomTabBar(
-            selectedTab: $store.selectedTab
-          ) {
+          CustomTabBar(selectedTab: $store.selectedTab) {
             store.send(.selectTab($0))
           }
         }
@@ -62,6 +52,25 @@ struct SseudamView: View {
       transaction.disablesAnimations = true
     }
   }
+  
+  private var HomeView: some View {
+    HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
+       .opacity(store.selectedTab == .home ? 1 : 0)
+       .allowsHitTesting(store.selectedTab == .home)
+  }
+  
+  private var PetView: some View {
+    EmptyView()
+       .opacity(store.selectedTab == .myPet ? 1 : 0)
+       .allowsHitTesting(store.selectedTab == .myPet)
+  }
+  
+  private var MyPageView: some View {
+    MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
+      .opacity(store.selectedTab == .myPage ? 1 : 0)
+      .allowsHitTesting(store.selectedTab == .myPage)
+  }
+  
 }
 
 #Preview {

@@ -43,7 +43,7 @@ struct DependencyRegister {
     let homeRepository = HomeRepository.live
     let authRepository = AuthRepository.live(networker: networker)
     let userReoository = UserRepository.live(networker: networker)
-    let trashSpotRepository = TrashSpotRepository.live(networker: netwoker)
+    let trashSpotRepository = TrashSpotRepository.live(networker: networker)
     
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live

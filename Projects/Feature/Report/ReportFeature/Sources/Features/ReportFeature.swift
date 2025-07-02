@@ -46,7 +46,7 @@ public struct ReportFeature {
     var isServerValidating: Bool = false
     public init() {}
   }
-
+  
   public enum Action: BindableAction, Equatable {
     @CasePathable
     public enum Alert: Equatable { }
@@ -89,7 +89,7 @@ public struct ReportFeature {
   
   @Dependency(\.SpotSuggestionUseCase) var spotSuggestionUseCase
   @Dependency(\.UploadSpotImageUseCase) var uploadSpotImageUseCase
-
+  
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Scope(state: \.moveLocation, action: \.moveLocation) { MoveLocationFeature() }
@@ -105,6 +105,7 @@ public struct ReportFeature {
         case 0: return .send(.pop) /// RecordFeature에서 처리
         default: return .send(.backPageTapped)
         }
+        
       case .backPageTapped:
         state.currentPage = max(state.currentPage - 1, 0)
         switch state.currentPage {
@@ -115,6 +116,7 @@ public struct ReportFeature {
         case 4: return .send(.didAppearSelectPhoto)
         default: return .none
         }
+        
       case .nextButtonTapped:
         /// 다음 페이지로 넘어가기 전에 현재 페이지에서 검증 action
         if state.currentPage == 2 { return .send(.writeName(.validateNameFromServer)) }
@@ -130,39 +132,47 @@ public struct ReportFeature {
         case 5: return .send(.didAppearComplete)
         default: return .none
         }
+        
       case let .nextButtonIsEnabled(isEnabled):
         state.nextButtonState = isEnabled ? .normal : .disabled
         return .none
+        
       case .didAppearStartReport:
         state.nextButtonText = "시작하기"
         return .send(.nextButtonIsEnabled(true))
+        
       case .didAppearMoveLocation:
         state.nextButtonText = "다음"
         return .merge([
           .send(.writeName(.focusChanged(false))),
           .send(.nextButtonIsEnabled(state.moveLocation.isEnabled))
         ])
+        
       case .didAppearWriteName:
         state.nextButtonText = "다음"
         return .merge([
           .send(.writeName(.focusChanged(true))),
           .send(.nextButtonIsEnabled(state.writeName.isButtonEnabled))
         ])
+        
       case .didAppearSelectKind:
         state.nextButtonText = "다음"
         return .merge([
           .send(.writeName(.focusChanged(false))),
           .send(.nextButtonIsEnabled(state.selectKind.isEnabled))
         ])
+        
       case .didAppearSelectPhoto:
         state.nextButtonText = "완료"
         return .merge([
           .send(.nextButtonIsEnabled(state.selectPhoto.isEnabled))
         ])
+        
       case .didAppearComplete:
         state.isNavigationBarHidden = true
         state.nextButtonText = "확인"
         return .send(.nextButtonIsEnabled(true))
+        
         /// `MoveLocationFeature`의 `Delegate`처리
       case let .moveLocation(.delegate(action)):
         if state.currentPage != 1 { return .none }
@@ -172,6 +182,7 @@ public struct ReportFeature {
           state.nmReverseGeoCodeEntity = entity
           return .send(.nextButtonIsEnabled(location != nil && entity != nil))
         }
+        
         /// `WriteNameFeature`의 `Delegate`처리
       case let .writeName(.delegate(action)):
         if state.currentPage != 2 { return .none }
@@ -180,6 +191,7 @@ public struct ReportFeature {
           state.spotName = name
           state.isServerValidating = false
           return .send(.nextButtonIsEnabled(isValid && !state.isServerValidating))
+          
         case let .serverValidationCompleted(isValid, name):
           state.spotName = name
           state.isServerValidating = false
@@ -190,6 +202,7 @@ public struct ReportFeature {
             return .send(.nextButtonIsEnabled(false))
           }
         }
+        
         /// `SelectKindFeature`의 `Delegate`처리
       case let .selectKind(.delegate(action)):
         if state.currentPage != 3 { return .none }
@@ -198,6 +211,7 @@ public struct ReportFeature {
           state.trashType = trashType
           return .send(.nextButtonIsEnabled(true))
         }
+        
         /// `SelectPhotoFeature`의 `Delegate`처리
       case let .selectPhoto(.delegate(action)):
         if state.currentPage != 4 { return .none }
@@ -206,6 +220,7 @@ public struct ReportFeature {
           state.selectedPhoto = photo
           return .send(.nextButtonIsEnabled(true))
         }
+        
         /// 서버 검증 시작 시 버튼 상태 업데이트
       case .writeName(.validateNameFromServer):
         if state.currentPage == 2 {
@@ -213,10 +228,13 @@ public struct ReportFeature {
           return .send(.nextButtonIsEnabled(false))
         }
         return .none
+        
       case .reportButtonTapped:
         return spotSuggestionEffect(state: state, useCase: spotSuggestionUseCase)
+        
       case let .postSpotImage(prisignedURL):
         return uploadSpotImageEffect(state, prisignedURL, uploadSpotImageUseCase)
+        
       case let .spotSuggestionResult(result):
         switch result {
         case let .success(prisignedURL):
@@ -224,6 +242,7 @@ public struct ReportFeature {
         case let .failure(error):
           return .send(.errorOccured(message: error.localizedDescription))
         }
+        
       case let .uploadSpotImageResult(result):
         switch result {
         case .success:
@@ -231,12 +250,15 @@ public struct ReportFeature {
         case let .failure(error):
           return .send(.errorOccured(message: error.localizedDescription))
         }
+        
       case let .errorOccured(message):
         state.destination = .alert(.occuredError(message))
         return .none
+        
       case .destination(.dismiss):
         state.destination = nil
         return .none
+        
       case .binding:
         return .none
       default: return .none
@@ -289,7 +311,7 @@ public extension ReportFeature {
       }
     }
   }
-
+  
 }
 
 extension ReportFeature {

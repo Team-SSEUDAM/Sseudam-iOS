@@ -57,17 +57,22 @@ public struct CropImageFeature {
       switch action {
       case .viewDidAppear:
         return .none
+        
       case let .setGridSize(size):
         state.gridSize = size
         return .none
+        
       case let .setGridPosition(position):
         state.gridPosition = position
         return .none
+        
       case let .setImageAreaSize(size):
         state.imageAreaSize = size
         return .none
+        
       case .confirmCrop:
         return .send(.performCrop)
+        
       case .performCrop:
         let state = state
         return .run { send in
@@ -79,9 +84,11 @@ public struct CropImageFeature {
           )
           await send(.cropCompleted(cropImage))
         }
+        
       case let .cropCompleted(croppedImage):
         state.croppedImage = croppedImage
         return .send(.delegate(.imageCropped(croppedImage)))
+        
       case .cancel:
         return .send(.delegate(.cancelled))
       default:

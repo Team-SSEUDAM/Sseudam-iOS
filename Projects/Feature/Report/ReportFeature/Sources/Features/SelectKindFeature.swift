@@ -51,6 +51,7 @@ public struct SelectKindFeature {
         state.selectedRecycle = kind == .recycle ? .selected : .normal
         state.isEnabled = true
         return .send(.delegate(.didSelectKind(kind.rawValue)))
+        
       default: return .none
       }
     }

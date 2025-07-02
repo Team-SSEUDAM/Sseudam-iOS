@@ -57,42 +57,54 @@ public struct SelectPhotoFeature {
       switch action {
       case .centerButtonTapped:
         return .send(.willAppearPhotoConfirmationDialog)
+        
       case let .photoTaken(image):
         state.originalPhoto = image
         state.destination = .cropImage(CropImageFeature.State(originalImage: image))
         return .none
+        
       case let .photoCropped(croppedImage):
         state.selectedPhoto = croppedImage
         state.isEnabled = true
         state.destination = nil
         return .send(.delegate(.photoSelected(croppedImage)))
+        
       case .willAppearPhotoConfirmationDialog:
         state.destination = .confirmationDialog(.makePhotoConfirmationDialog)
         return .none
+        
       case .destination(.presented(.confirmationDialog(.takePhotoButtonTapped))):
         state.destination = .camera(CameraPickerFeature.State())
         return .none
+        
       case .destination(.presented(.confirmationDialog(.selectPhotoButtonTapped))):
         state.destination = .photoLibraryPicker(PhotoLibraryPickerFeature.State())
         return .none
+        
       /// 각 화면에서 사진 선택 과정을 진행 후, delegate로 처리되는 action
       case let .destination(.presented(.camera(.delegate(.photoTaken(photo))))):
         return .send(.photoTaken(photo))
+        
       case let .destination(.presented(.photoLibraryPicker(.delegate(.photoSelected(photo))))):
         return .send(.photoTaken(photo))
+        
       case .destination(.presented(.camera(.delegate(.cancelled)))):
         state.destination = nil /// 카메라 화면 제거
         return .none
+        
       case .destination(.presented(.photoLibraryPicker(.delegate(.cancelled)))):
         state.destination = nil /// 사진 선택 화면 제거
         return .none
+        
         /// 크롭 화면에서의 delegate 처리
       case let .destination(.presented(.cropImage(.delegate(.imageCropped(croppedImage))))):
         return .send(.photoCropped(croppedImage))
+        
       case .destination(.presented(.cropImage(.delegate(.cancelled)))):
         state.originalPhoto = nil
         state.destination = nil
         return .none
+        
       case .binding:
         return .none
       default: return .none

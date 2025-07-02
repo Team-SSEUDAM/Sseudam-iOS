@@ -54,11 +54,14 @@ public struct MoveLocationFeature {
       case .onAppear:
         state.isEnabled = false
         return moveUserLocation()
+        
       case let .centerChanged(point):
         state.centerLocation = point
         return .send(.reverseGeoCode(point))
+        
       case let .reverseGeoCode(point):
         return reverseGeoCodeEffect(point)
+        
       case let .reverseGeoCodeResult(result):
         switch result {
         case let .success(entity):
@@ -72,6 +75,7 @@ public struct MoveLocationFeature {
           state.isEnabled = false
         }
         return .send(.delegate(.centerChanged(nil, nil)))
+        
       case let .initUserLocation(location):
         state.userLocation = location
         return .none

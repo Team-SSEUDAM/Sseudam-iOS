@@ -64,6 +64,7 @@ struct MapViewRepresentable: UIViewRepresentable {
       requestMapBounds = false
     }
     
+    // 새로운 trash data(nil 포함)
     if context.coordinator.trashItems != trashItems {
       deleteDrawMarker(context: context)
       if !trashItems.isEmpty {
@@ -71,6 +72,7 @@ struct MapViewRepresentable: UIViewRepresentable {
       }
     }
     
+    // 활성화 되어있는 마커 지우기
     if isNeedDeleteMarker,
        context.coordinator.activeMarker != nil {
       context.coordinator.resetActiveMarker()

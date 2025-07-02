@@ -42,19 +42,30 @@ public struct HomeFeature {
     case binding(BindingAction<State>)
     case location(LocationFeature.Action)
     
+    /// 범위 요청
     case requestMapBounds(Bool)
-    case requestExpandedMapBounds([MapPoint])
+    /// 쓰레기통 데이터 조회
     case fetchTrashItems([MapPoint])
+    /// 쓰레기통 데이터 조회 Result
     case fetchTrashItemsResult(Result<[TrashSpot], NetworkError>)
+    /// 쓰레기통 데이터 저장 및 처리
     case storeTrashItems([TrashSpot])
+    /// 쓰레기통 데이터가 없을 경우 처리
     case emptyTrashItems
+    /// 첫 진입 직후 아이템 검색
     case firstLoadSearch
+    /// 첫 진입 시 아이템 없을 경우 범위 확장
+    case requestExpandedMapBounds([MapPoint])
+    /// 확장 검색
     case expandSearch
     
+    /// 필터 버튼 탭
     case filterTapped(TrashType?)
+    /// 현 위치 재검색
     case researchButtonEnable(Bool)
+    /// 마커 탭 이벤트
     case markerTapped(Int?)
-    
+    /// 활성화 되어있는 마커 삭제
     case deleteActiveMarker
     case onAppear
     
@@ -84,7 +95,9 @@ public struct HomeFeature {
     Scope(state: \.location, action: \.location) {
       LocationFeature()
     }
-    Reduce { state, action in
+    Reduce {
+      state,
+      action in
       switch action {
       case .onAppear:
         return .run { send in
@@ -98,20 +111,15 @@ public struct HomeFeature {
       case let .filterTapped(type):
         // 위치 및 필터 변화 없는 반복 요청
         if type == state.trashType,
-            !state.researchButtonEnable {
+           !state.researchButtonEnable {
           return .none
         }
         state.trashType = type
         return .send(.requestMapBounds(true))
-      
-      case let .requestMapBounds(isRequest):
-        state.requestMapBounds = isRequest
-        state.researchButtonEnable = false
-        return .none
         
       case let .requestExpandedMapBounds(bounds):
-          let expandedBounds = expandBounds(bounds, ratio: 0.35) // 확장비율 조정
-          return .send(.fetchTrashItems(expandedBounds))
+        let expandedBounds = expandBounds(bounds, ratio: 0.35) // 확장비율 조정
+        return .send(.fetchTrashItems(expandedBounds))
         
       case let .fetchTrashItems(bounds):
         state.lastSearchedBounds = bounds
@@ -148,8 +156,16 @@ public struct HomeFeature {
         } else { // 확장 검색 후에도 없음
           state.isFirstLoad = false
           state.isExpandedRetry = false
-          return .send(.showToastMessage("이 근방에는 쓰레기통이 없어요.\n지도를 움직여 다른 위치를 확인해보세요!"))
+          return .send(
+            .showToastMessage("이 근방에는 쓰레기통이 없어요.\n지도를 움직여 다른 위치를 확인해보세요!")
+          )
         }
+        
+      case let .requestMapBounds(isRequest):
+        state.requestMapBounds = isRequest
+        state.researchButtonEnable = false
+        return .none
+        
         
       case .expandSearch:
         if let lastBounds = state.lastSearchedBounds {

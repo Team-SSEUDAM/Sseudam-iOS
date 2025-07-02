@@ -28,8 +28,6 @@ public struct TrashDetailView: View {
   
   @ViewBuilder
   private var DetailContent: some View {
-    
-    
     VStack(spacing: .Number16) {
       HStack(spacing: .Number16) {
         VStack(alignment: .leading, spacing: .Number8) {
@@ -78,8 +76,10 @@ public struct TrashDetailView: View {
     VStack(alignment: .leading, spacing: .Number4) {
       Text("푸른 수목원")
         .font(FontSet.Heading.heading3)
+        .foregroundStyle(ColorSet.Text.Primary)
       Text("서울특별시 구로구 항동 9-1")
         .font(FontSet.Body.body3)
+        .foregroundStyle(ColorSet.Text.Primary)
     }
   }
   

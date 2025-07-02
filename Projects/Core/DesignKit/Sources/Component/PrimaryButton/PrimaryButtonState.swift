@@ -9,12 +9,12 @@
 import SwiftUI
 
 public enum PrimaryButtonState: Equatable {
-  case normal, disabled, error
+  case normal, disabled, error, loading
   case custom(bg: Color, text: Color)
   
   public var backgroundColor: Color {
     switch self {
-    case .normal: return ColorSet.Component.Primary
+    case .normal, .loading: return ColorSet.Component.Primary
     case .disabled: return ColorSet.Component.Disabled
     case .error: return ColorSet.Component.Error
     case let .custom(bg, _): return bg

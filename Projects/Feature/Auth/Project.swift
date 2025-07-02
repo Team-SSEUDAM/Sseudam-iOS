@@ -12,8 +12,7 @@ import ProjectDescriptionHelpers
 let project = Project.makeFeature(
   for: Feature.Auth,
   dependencies: [
-    .Domain.Auth.Interface,
-    .Domain.User.Interface
+    .Domain.Umbrella
   ]
 )
 

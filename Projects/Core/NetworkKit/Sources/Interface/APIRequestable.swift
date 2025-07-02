@@ -16,11 +16,13 @@ public typealias HTTPParameters = [String: Any]
 public enum APIHeaderType {
   case plain
   case authorization(String?)
+  case custom([String: String])
 }
 
 public enum HTTPRequestParameter {
   case query(_ query: Encodable?)
   case body(_ parameter: Encodable?)
+  case rawData(_ data: Data)
 }
 
 public enum HTTPMethod: String {
@@ -39,6 +41,7 @@ public protocol APIRequestable {
   var path: String { get }
   var parameters: HTTPRequestParameter? { get }
   var isRefreshToken: Bool { get }
+  var isNotSseudamAPI: Bool { get }
   
   func toURLRequest() throws -> URLRequest
 }
@@ -46,6 +49,7 @@ public protocol APIRequestable {
 public extension APIRequestable {
   var headers: APIHeaderType { .plain }
   var isRefreshToken: Bool { return false }
+  var isNotSseudamAPI: Bool { return false }
   
   func toURLRequest() throws -> URLRequest {
     let url = try configureURL()
@@ -54,6 +58,7 @@ public extension APIRequestable {
       .appendingHeaders(configureHeaders())
     if let parameters = self.parameters {
       switch parameters {
+      case let .rawData(data): urlRequest = try urlRequest.setBody(data)
       case let .body(body): urlRequest = try urlRequest.setBody(body)
       case .query: break
       }
@@ -75,6 +80,8 @@ public extension APIRequestable {
   
   fileprivate func configureHeaders() -> HTTPHeaders {
     switch headers {
+    case let .custom(customHeaders):
+      return customHeaders
     case .plain:
       return ["Content-Type": "application/json"]
     case let .authorization(token):

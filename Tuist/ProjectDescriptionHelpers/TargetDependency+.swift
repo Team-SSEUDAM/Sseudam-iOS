@@ -14,31 +14,41 @@ public protocol ModuleRepresentable: RawRepresentable where RawValue == String {
 
 public enum Module {
   case feature(Feature)
-  case domain(Domain, isInterface: Bool = false)
-  case data(Data, isInterface: Bool = false)
+  case domain(Domain, isInterface: Bool? = false)
+  case data(Data, isInterface: Bool? = false)
   case core(Core)
   case shared(Shared)
   case spm(SPM)
 }
 
 public enum Feature: String, ModuleRepresentable {
+  case Umbrella = ""
   case Home
   case TrashDetail
   case Auth
+  case Report
   public var typePath: String { "Feature" }
 }
 
 public enum Domain: String, ModuleRepresentable {
+  case Umbrella = ""
   case Home
   case Auth
   case User
+  case NMReverseGeocoding
+  case Suggestion
+  case Report
   public var typePath: String { "Domain" }
 }
 
 public enum Data: String, ModuleRepresentable {
+  case Umbrella = ""
   case Home
   case Auth
   case User
+  case NMReverseGeocoding
+  case Suggestion
+  case Report
   public var typePath: String { "Data" }
 }
 
@@ -69,9 +79,15 @@ protocol TargetDependencyDelegate { }
 extension TargetDependencyDelegate {
   public static func project(_ module: Module) -> TargetDependency {
     switch module {
-    case let .feature(feature): return makeProjectDependency(for: feature, removeAddPath: true)
-    case let .domain(domain, isInterface): return makeProjectDependency(for: domain, isInterface: isInterface)
-    case let .data(data, isInterface): return makeProjectDependency(for: data, isInterface: isInterface)
+    case let .feature(feature):
+      if feature == .Umbrella { return makeProjectDependency(for: feature) }
+      return makeProjectDependency(for: feature, removeAddPath: true)
+    case let .domain(domain, isInterface):
+      if let isInterface = isInterface { return makeProjectDependency(for: domain, isInterface: isInterface) }
+      return makeProjectDependency(for: domain)
+    case let .data(data, isInterface):
+      if let isInterface = isInterface { return makeProjectDependency(for: data, isInterface: isInterface) }
+      return makeProjectDependency(for: data)
     case let .core(core): return makeProjectDependency(for: core)
     case let .shared(shared): return makeProjectDependency(for: shared)
     case let .spm(spm): return makeSPMDependency(for: spm)
@@ -114,12 +130,17 @@ extension TargetDependencyDelegate {
 
 extension TargetDependency {
   public struct Features: TargetDependencyDelegate {
+    public static let Umbrella = Self.project(.feature(.Umbrella))
+    
     public static let Home = Self.project(.feature(.Home))
+    public static let Report = Self.project(.feature(.Report))
     public static let TrashDetail = Self.project(.feature(.TrashDetail))
     public static let Auth = Self.project(.feature(.Auth))
   }
   
   public struct Domain: TargetDependencyDelegate {
+    public static let Umbrella = Self.project(.domain(.Umbrella, isInterface: nil))
+    
     public struct Home: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.Home, isInterface: true))
       public static let Implement = Self.project(.domain(.Home))
@@ -132,9 +153,23 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.User, isInterface: true))
       public static let Implement = Self.project(.domain(.User))
     }
+    public struct NMReverseGeocoding: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.NMReverseGeocoding, isInterface: true))
+      public static let Implement = Self.project(.domain(.NMReverseGeocoding))
+    }
+    public struct Suggestion: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Suggestion, isInterface: true))
+      public static let Implement = Self.project(.domain(.Suggestion))
+    }
+    public struct Report: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Report, isInterface: true))
+      public static let Implement = Self.project(.domain(.Report))
+    }
   }
   
   public struct Data: TargetDependencyDelegate {
+    public static let Umbrella = Self.project(.data(.Umbrella, isInterface: nil))
+    
     public struct Home: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Home, isInterface: true))
       public static let Implement = Self.project(.data(.Home))
@@ -146,6 +181,18 @@ extension TargetDependency {
     public struct User: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.User, isInterface: true))
       public static let Implement = Self.project(.data(.User))
+    }
+    public struct NMReverseGeocoding: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.NMReverseGeocoding, isInterface: true))
+      public static let Implement = Self.project(.data(.NMReverseGeocoding))
+    }
+    public struct Suggestion: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Suggestion, isInterface: true))
+      public static let Implement = Self.project(.data(.Suggestion))
+    }
+    public struct Report: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Report, isInterface: true))
+      public static let Implement = Self.project(.data(.Report))
     }
   }
   

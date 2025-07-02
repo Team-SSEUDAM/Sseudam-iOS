@@ -12,6 +12,7 @@ public extension CGFloat {
   static let Number0: CGFloat = 0
   static let Number1: CGFloat = 1
   static let Number2: CGFloat = 2
+  static let Number3: CGFloat = 3
   static let Number4: CGFloat = 4
   static let Number6: CGFloat = 6
   static let Number8: CGFloat = 8
@@ -22,6 +23,7 @@ public extension CGFloat {
   static let Number18: CGFloat = 18
   static let Number20: CGFloat = 20
   static let Number24: CGFloat = 24
+  static let Number26: CGFloat = 26
   static let Number28: CGFloat = 28
   static let Number30: CGFloat = 30
   static let Number32: CGFloat = 32
@@ -32,6 +34,7 @@ public extension CGFloat {
   static let Number72: CGFloat = 72
   static let Number80: CGFloat = 80
   static let Number100: CGFloat = 100
+  static let Number200: CGFloat = 200
   static let Number320: CGFloat = 320
   
   static let detailSheetHeight: CGFloat = 197

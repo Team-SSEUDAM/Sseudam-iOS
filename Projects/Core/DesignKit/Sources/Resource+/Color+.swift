@@ -68,6 +68,7 @@ extension DesignKitAsset {
       public static let Secondary = ColorSet.Gray._100
       public static let Error = ColorSet.SubColor.red
       public static let Accent = ColorSet.Mint._300
+      public static let Inverse = ColorSet.Gray._0
     }
     
     public struct Icon: Sendable {

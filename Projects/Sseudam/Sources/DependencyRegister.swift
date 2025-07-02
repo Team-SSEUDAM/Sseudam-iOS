@@ -6,11 +6,17 @@
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
+import HomeDomain
+import NMReverseGeocodingDomain
+import SuggestionDomain
 
 import HomeDomainInterface
-import HomeDomain
-import HomeDataInterface
+import NMReverseGeocodingDomainInterface
+import SuggestionDomainInterface
+
 import HomeData
+import NMReverseGeocodingData
+import SuggestionData
 
 import AuthDomainInterface
 import AuthDomain
@@ -32,11 +38,37 @@ struct DependencyRegister {
     let authRepository = AuthRepository.live(networker: networker)
     let userReoository = UserRepository.live(networker: networker)
     
+    let nmGeometryRepository = NMReverseGeoCodeRepository.live
+    let suggestionRepository = SpotSuggestionRepository.live
+
     // MARK: - Home
-    
     HomeUseCaseRegister(
       provider: {
         HomeUseCase.live(repository: homeRepository)
+      }
+    )
+    NMReverseGeoCodeUseCaseRegister(
+      provider: {
+        NMReverseGeoCodeUseCase.live(repository: nmGeometryRepository)
+      }
+    )
+    
+    /// Suggestion
+    SpotSuggestionUseCaseRegister(
+      provider: {
+        SpotSuggestionUseCase.live(repository: suggestionRepository)
+      }
+    )
+    
+    UploadSpotImageUseCaseRegister(
+      provider: {
+        UploadSpotImageUseCase.live(repository: suggestionRepository)
+      }
+    )
+    
+    SpotNameValidateUseCaseRegister(
+      provider: {
+        SpotNameValidateUseCase.live(repository: suggestionRepository)
       }
     )
     

@@ -8,6 +8,8 @@
 
 import ComposableArchitecture
 import HomeDomainInterface
+
+import ReportFeature
 import DesignKit
 
 @Reducer
@@ -24,6 +26,8 @@ public struct HomeFeature {
     public var researchButtonEnable: Bool = false
     public var isNeedDeleteMarker: Bool = false
     public var isPresentDetail: Bool = false
+    
+    public var path = StackState<Path.State>()
     public init() {}
   }
 
@@ -40,12 +44,16 @@ public struct HomeFeature {
     case deleteActiveMarker
     case onAppear
     
+    case path(StackActionOf<Path>)
+    
+    case reportButtonTapped
     case presentDetailView(Bool)
     case delegate(Delegate)
   }
   
   public enum Delegate: Equatable {
     case presentDetailView(Bool)
+    case needToHiddenTabBar(Bool)
   }
   
   @Dependency(\.HomeUseCase) var homeUseCase
@@ -102,13 +110,29 @@ public struct HomeFeature {
         return .send(.requestMapBounds(isRequest))
 
         // MARK: - Send Action to HomeRoot
-        
+      case .reportButtonTapped:
+        state.path.append(.reportView(ReportFeature.State()))
+        return .send(.delegate(.needToHiddenTabBar(true)))
       case let .presentDetailView(isPresent):
         state.isPresentDetail = isPresent
-        return .send(.delegate(.presentDetailView(isPresent)))
+        return .run { send in
+          await MainActor.run {
+            send(.delegate(.needToHiddenTabBar(isPresent)))
+            send(.delegate(.presentDetailView(isPresent)))
+          }
+        }
+        
+      case let .path(action):
+        switch action {
+        case .element(id: _, action: .reportView(.pop)):
+          state.path.removeLast()
+          return .none
+        default: return .none
+        }
       default: return .none
       }
     }
+    .forEach(\.path, action: \.path)
   }
 }
 
@@ -120,5 +144,12 @@ extension HomeFeature {
       return .send(.storeTrashItems(sampleData2))
     }
     return .none
+  }
+}
+
+extension HomeFeature {
+  @Reducer(state: .equatable, action: .equatable)
+  public enum Path {
+    case reportView(ReportFeature)
   }
 }

@@ -18,25 +18,25 @@ struct PrimaryButtonDemo: View {
     List {
       Section("일반 텍스트 버튼") {
         PrimaryButton(
-          title: "Label",
+          title: .constant("Label"),
           size: .large,
-          state: buttonState
+          state: $buttonState
         ) {
           print("Button Clicked")
         }
         
         PrimaryButton(
-          title: "Label",
+          title: .constant("Label"),
           size: .medium,
-          state: buttonState
+          state: $buttonState
         ) {
           print("Button Clicked")
         }
         
         PrimaryButton(
-          title: "Action",
+          title: .constant("Action"),
           size: .medium,
-          state: buttonState
+          state: $buttonState
         ) {
           print("Button Clicked")
         }
@@ -48,9 +48,9 @@ struct PrimaryButtonDemo: View {
             Icon(image: .addSpot, size: .Number20)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
-          title: "Label",
+          title: .constant("Label"),
           size: .large,
-          state: buttonState
+          state: $buttonState
         ) {
           print("Button Clicked")
         }
@@ -60,9 +60,9 @@ struct PrimaryButtonDemo: View {
             Icon(image: .addSpot, size: .Number16)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
-          title: "Label",
+          title: .constant("Label"),
           size: .medium,
-          state: .normal
+          state: .constant(.normal)
         ) {
           
           print("Button Clicked")
@@ -71,9 +71,9 @@ struct PrimaryButtonDemo: View {
       
       Section("비활성화 버튼") {
         PrimaryButton(
-          title: "Label",
+          title: .constant("Label"),
           size: .large,
-          state: disabledButtonState
+          state: $disabledButtonState
         ) {
           disabledButtonState = .disabled
         }
@@ -83,9 +83,9 @@ struct PrimaryButtonDemo: View {
             Icon(image: .addSpot, size: .Number20)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
-          title: "Label",
+          title: .constant("Label"),
           size: .large,
-          state: .disabled
+          state: .constant(.disabled)
         ) {
           print("Button Clicked")
         }
@@ -93,9 +93,9 @@ struct PrimaryButtonDemo: View {
       
       Section("에러 버튼") {
         PrimaryButton(
-          title: "Label",
+          title: .constant("Label"),
           size: .large,
-          state: .error
+          state: .constant(.error)
         ) {
           print("Button Clicked")
         }
@@ -105,9 +105,9 @@ struct PrimaryButtonDemo: View {
             Icon(image: .addSpot, size: .Number20)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
-          title: "Label",
+          title: .constant("Label"),
           size: .large,
-          state: errorButtonState
+          state: $errorButtonState
         ) {
           errorButtonState = .error
         }

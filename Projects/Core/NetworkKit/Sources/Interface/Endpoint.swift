@@ -18,6 +18,7 @@ public struct Endpoint<R>: APIRequestable where R: Decodable & Sendable {
   public let path: String
   public let parameters: HTTPRequestParameter?
   public let isRefreshToken: Bool
+  public let isNotSseudamAPI: Bool
   
   public init(
     headers: APIHeaderType = .plain,
@@ -25,7 +26,8 @@ public struct Endpoint<R>: APIRequestable where R: Decodable & Sendable {
     baseURL: String = Constants.base_url ?? "",
     path: String,
     parameters: HTTPRequestParameter? = nil,
-    isRefreshToken: Bool = false
+    isRefreshToken: Bool = false,
+    isNotSseudamAPI: Bool = false
   ) {
     self.headers = headers
     self.method = method
@@ -33,5 +35,6 @@ public struct Endpoint<R>: APIRequestable where R: Decodable & Sendable {
     self.path = path
     self.parameters = parameters
     self.isRefreshToken = isRefreshToken
+    self.isNotSseudamAPI = isNotSseudamAPI
   }
 }

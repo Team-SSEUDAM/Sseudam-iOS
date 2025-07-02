@@ -31,12 +31,14 @@ public struct SignUpCompleteView: View {
             .foregroundStyle(ColorSet.Background.Secondary)
           TitleView
           Spacer()
-          PrimaryButton(title: "쓰담 시작하기", size: .large, state: .normal, {
+          PrimaryButton(
+            title: .constant("쓰담 시작하기"), 
+            size: .large, 
+            state: .constant(.normal), {
             store.send(.startButtonTapped)
           })
           .padding(.Number16)
         }
-        
       }
     }
   }

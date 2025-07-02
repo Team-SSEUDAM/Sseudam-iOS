@@ -10,17 +10,38 @@ import SwiftUI
 
 public struct IconButton: View {
   
+  public enum ColorType {
+    case primary, accent
+    
+    var background: Color {
+      switch self {
+      case .primary: return ColorSet.Background.Primary
+      case .accent: return ColorSet.Mint._400
+      }
+    }
+    
+    var icon: Color {
+      switch self {
+      case .primary: return ColorSet.Icon.Primary
+      case .accent: return ColorSet.Icon.Inverse
+      }
+    }
+  }
+  
   public var icon: ImageSet
   public var action: () async -> Void
+  private let type: ColorType
   
   @State private var isPressed: Bool = false
   
   public init(
     icon: ImageSet,
+    type: ColorType = .primary,
     _ action: @escaping () async -> Void
   ) {
     self.icon = icon
     self.action = action
+    self.type = type
   }
   
   public var body: some View {
@@ -39,11 +60,18 @@ public struct IconButton: View {
   @ViewBuilder
   private var content: some View {
     Circle()
-      .fill(ColorSet.Background.Primary)
       .overlay {
-        Icon(image: icon, size: .Number28)
+        Icon(
+          image: icon,
+          size: .Number28,
+          renderingMode: .template
+        )
+          .foregroundColor(type.icon)
+          .backgroundColor(type.background)
       }
       .padding(.Number8)
+      .background(type.background)
+      .clipShape(Circle())
       .elevation(cornerRadius: .Number24)
       .overlay {
         if isPressed {

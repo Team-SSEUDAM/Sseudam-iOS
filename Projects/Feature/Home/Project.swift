@@ -12,7 +12,8 @@ import ProjectDescriptionHelpers
 let project = Project.makeFeature(
   for: Feature.Home,
   dependencies: [
-    .Domain.Home.Interface
+    .Features.Report,
+    .Domain.Umbrella
   ]
 )
 

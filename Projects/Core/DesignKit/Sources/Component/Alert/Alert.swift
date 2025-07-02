@@ -12,14 +12,14 @@ public struct Alert: View {
   
   private let type: AlertType
   private let isErrorType: Bool
-  private let closeAction: () async -> Void
-  private let acceptAction: () async -> Void
+  private let closeAction: @Sendable () -> Void
+  private let acceptAction: @Sendable () -> Void
   
   public init(
     type: AlertType,
     isErrorType: Bool = false,
-    closeAction: @escaping () async -> Void,
-    acceptAction: @escaping () async -> Void
+    closeAction: @escaping @Sendable () -> Void,
+    acceptAction: @escaping @Sendable () -> Void
   ) {
     self.type = type
     self.isErrorType = isErrorType
@@ -73,13 +73,13 @@ public struct Alert: View {
       SecondaryButton(
         title: type.cancel,
         size: .large
-      ) { await closeAction() }
+      ) { closeAction() }
       
       PrimaryButton(
-        title: type.accept,
+        title: .constant(type.accept),
         size: .large,
-        state: isErrorType ? .error : .normal
-      ) { await acceptAction() }
+        state: isErrorType ? .constant(.error) : .constant(.normal)
+      ) { acceptAction() }
     }
   }
 }

@@ -13,23 +13,34 @@ public struct Icon: View {
   public var image: ImageSet
   public var size: CGFloat
   public var color: Color
+  public var backgroundColor: Color
+  public var renderingMode: Image.TemplateRenderingMode
   
   public init(
     image: ImageSet,
     size: CGFloat = .Number20,
-    color: Color = ColorSet.Icon.Primary
+    renderingMode: Image.TemplateRenderingMode = .original,
+    color: Color = ColorSet.Icon.Primary,
+    backgroundColor: Color = .clear
   ) {
     self.image = image
     self.size = size
+    self.renderingMode = renderingMode
     self.color = color
+    self.backgroundColor = backgroundColor
   }
   
   public var body: some View {
     Image(asset: image.swiftUIImage)
-      .renderingMode(.template)
+      .renderingMode(renderingMode)
       .resizable()
       .scaledToFit()
       .frame(width: size, height: size)
       .foregroundColor(color)
+      .background(
+        Circle()
+          .fill(backgroundColor)
+          .frame(width: size, height: size)
+      )
   }
 }

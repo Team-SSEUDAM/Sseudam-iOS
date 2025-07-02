@@ -6,30 +6,24 @@
 //  Created by {{ author }}
 //
 
-import XCTest
+import Testing
 import ComposableArchitecture
-@testable import {{ feature }}Interface
 
-final class {{ feature }}UnitTests: XCTestCase {
+@testable import {{ feature }}
+
+@MainActor
+struct {{ feature }}FeatureTest {
+  @Test
+  func addTest() async {
+    let store = TestStore(
+      initialState: {{ feature }}Feature.State(),
+      reducer: { {{ feature }}Feature() }
+    )
     
-  func testIncrement() {
-    let store = TestStore(initialState: {{ feature }}Reducer.State()) {
-      {{ feature }}Reducer()
-    }
-
-    store.send(.increment) {
-      $0.count = 1
+    await store.send(\.addButtonTapped) {
+      $0.count += 1
     }
   }
-
-  func testDecrement() {
-    let store = TestStore(initialState: {{ feature }}Reducer.State()) {
-      {{ feature }}Reducer()
-    }
-
-    store.send(.decrement) {
-      $0.count = -1
-    }
-  }
+  
 }
 

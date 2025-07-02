@@ -19,4 +19,12 @@ public extension Icon {
     icon.color = color
     return icon
   }
+  
+  func backgroundColor(
+    _ color: Color
+  ) -> Self {
+    var icon = self
+    icon.backgroundColor = color
+    return icon
+  }
 }

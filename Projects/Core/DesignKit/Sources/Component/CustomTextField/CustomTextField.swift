@@ -36,7 +36,6 @@ public struct CustomTextField<Subject: View, Description: View>: View {
     self._state = state
     self._isFocused = isFocused
     self.description = description
-    
   }
   
   public var body: some View {

@@ -11,11 +11,11 @@ import SwiftUI
 public struct CustomTabBar: View {
   
   @Binding var selectedTab: TabBarItem
-  var onTabSelected: (TabBarItem) async -> Void
+  var onTabSelected: @Sendable (TabBarItem) -> Void
   
   public init(
     selectedTab: Binding<TabBarItem>,
-    _ onTabSelected: @escaping (TabBarItem) async -> Void
+    _ onTabSelected: @escaping @Sendable (TabBarItem) -> Void
   ) {
     self._selectedTab = selectedTab
     self.onTabSelected = onTabSelected
@@ -50,7 +50,7 @@ public struct CustomTabBar: View {
     }
     .padding(.vertical, .Number8)
     .frame(maxWidth: .infinity, maxHeight: 62)
-    .onTapGesture { Task { @MainActor in await onTabSelected(tab) } }
+    .onTapGesture { onTabSelected(tab) }
   }
 }
 

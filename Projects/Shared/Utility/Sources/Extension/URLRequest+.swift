@@ -17,7 +17,14 @@ public extension URLRequest {
   
   func appendingHeaders(_ headers: [String: String]) -> URLRequest {
     var urlRequest = self
-    headers.forEach { urlRequest.addValue($1, forHTTPHeaderField: $0) }
+    headers.forEach { urlRequest.setValue($1, forHTTPHeaderField: $0) }
+    return urlRequest
+  }
+  
+  func setBody(_ body: Data?) throws -> URLRequest {
+    var urlRequest = self
+    guard let body = body else { throw FoundationError.invalidBody }
+    urlRequest.httpBody = body
     return urlRequest
   }
   

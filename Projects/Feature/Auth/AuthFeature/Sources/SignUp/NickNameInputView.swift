@@ -59,9 +59,9 @@ public struct NickNameInputView: View {
   @ViewBuilder
   private var CompleteButton: some View {
     PrimaryButton(
-      title: "다음",
+      title: .constant("다음"),
       size: .large,
-      state: store.nicknameValid.isValid ? .normal : .disabled
+      state: store.nicknameValid.isValid ? .constant(.normal) : .constant(.disabled)
     ) {
       store.send(.completeButtonTapped)
     }

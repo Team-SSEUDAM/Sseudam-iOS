@@ -29,7 +29,6 @@ public struct RegisterFavoriteAreaView: View {
           }
         })
         content
-        
       }
       .navigationBarHidden(true)
     }
@@ -59,9 +58,9 @@ public struct RegisterFavoriteAreaView: View {
   @ViewBuilder
   private var completeButton: some View {
     PrimaryButton(
-      title: "완료",
+      title: .constant("완료"),
       size: .large,
-      state: store.isSelectItem ? .normal : .disabled
+      state: store.isSelectItem ? .constant(.normal) : .constant(.disabled)
     ) {
       store.send(.completeButtonTapped)
     }

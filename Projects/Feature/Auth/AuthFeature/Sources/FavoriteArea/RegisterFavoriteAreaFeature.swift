@@ -114,7 +114,7 @@ public struct RegisterFavoriteAreaFeature {
         switch result {
         case let .success(nickname):
           return .send(.successSignUp(nickname: nickname))
-        case let .failure(error):
+        case .failure:
           return .send(.errorToastMessage("회원가입에 실패했어요."))
         }
         

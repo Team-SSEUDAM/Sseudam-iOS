@@ -73,7 +73,7 @@ public extension Project {
       for: module,
       dependencies: [.target(name: name(for: module))]
     )
-    let feature = Target.makeDynamicFrameworkTarget(
+    let feature = Target.makeStaticLibraryTarget(
       for: module,
       dependencies: dependencies
     )

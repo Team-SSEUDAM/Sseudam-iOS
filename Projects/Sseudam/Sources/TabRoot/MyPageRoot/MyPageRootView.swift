@@ -45,13 +45,14 @@ struct MyPageRootView: View {
       Text("로그인하면 나의 제보, 인증 내역을 관리할 수 있어요.")
         .font(FontSet.Body.body3)
         .foregroundStyle(ColorSet.Text.Secondary)
-        PrimaryButton(
-          title: "로그인하러 가기",
-          size: .large,
-          state: .normal) {
-            store.send(.requestLogin(true, .mypage))
-          }
-          .frame(width: 129)
+      PrimaryButton(
+        title: .constant("로그인하러 가기"),
+        size: .large,
+        state: .constant(.normal)
+      ) {
+          store.send(.requestLogin(true, .mypage))
+        }
+        .frame(width: 129)
       
       Spacer()
     }

@@ -12,6 +12,7 @@ import HomeDomainInterface
 import ReportFeature
 import TrashSpotDomainInterface
 import DesignKit
+import Utility
 
 @Reducer
 public struct HomeFeature {
@@ -43,6 +44,7 @@ public struct HomeFeature {
     
     case requestMapBounds(Bool)
     case fetchTrashItems([MapPoint])
+    case fetchTrashItemsResult(Result<[TrashSpot], NetworkError>)
     case storeTrashItems([TrashSpot])
     case emptyTrashItems
     case firstLoadSearch
@@ -110,6 +112,13 @@ public struct HomeFeature {
         state.lastSearchedBounds = bounds
         return fetchTrashItem(bounds: bounds, type: state.trashType)
         
+      case let .fetchTrashItemsResult(result):
+        switch result {
+        case let .success(items):
+          return .send(.storeTrashItems(items))
+        case let .failure(error):
+          return .send(.showToastMessage(error.localizedDescription))
+        }
       case let .storeTrashItems(items):
         state.trashItems.removeAll()
         state.trashItems = items
@@ -208,9 +217,9 @@ extension HomeFeature {
       )
       do {
         let result = try await fetchTrashSpotUseCase.execute(parameter)
-        return await send(.storeTrashItems(result))
-      } catch {
-        
+        return await send(.fetchTrashItemsResult(.success(result)))
+      } catch let error as NetworkError {
+        return await send(.showToastMessage(error.localizedDescription))
       }
     }
   }

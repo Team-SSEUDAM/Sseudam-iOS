@@ -35,6 +35,9 @@ public struct MoveLocationView: View {
       .onReceive {
         store.send(.centerChanged($0))
       }
+      .onMapMovingStarted {
+        store.send(.onMapMovingStarted)
+      }
       .overlay(
         Icon(
           image: .normalTrashPin,

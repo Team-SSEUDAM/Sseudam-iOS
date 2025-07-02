@@ -35,6 +35,8 @@ public struct MoveLocationFeature {
     case onAppear
     /// 카메라가 Idle(멈춤) 상태일 때 델리게이트로부터 전달된 좌표
     case centerChanged(Coordinates)
+    /// 움직이기 시작 한 순가 -> 이 떄 부터, 로딩 시작
+    case onMapMovingStarted
     case initUserLocation(Coordinates)
     
     case reverseGeoCode(Coordinates)
@@ -55,6 +57,9 @@ public struct MoveLocationFeature {
       case .onAppear:
         state.isEnabled = false
         return moveUserLocation()
+      
+      case .onMapMovingStarted:
+        return .send(.delegate(.nowCalculateReverseGeoCode(true)))
         
       case let .centerChanged(point):
         state.centerLocation = point
@@ -114,7 +119,6 @@ extension MoveLocationFeature {
   ) -> Effect<Action> {
     return .run { send in
       do {
-        await send(.delegate(.nowCalculateReverseGeoCode(true)))
         let input = NMReverseGeoCodeInput(latitude: point.latitude, longitude: point.longitude)
         let entity = try await reverseGeoCodeUseCase.execute(input)
         await send(.reverseGeoCodeResult(.success(entity)))

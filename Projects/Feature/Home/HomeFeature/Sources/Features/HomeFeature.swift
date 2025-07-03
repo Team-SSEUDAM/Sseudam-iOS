@@ -13,11 +13,14 @@ import ReportFeature
 import TrashSpotDomainInterface
 import DesignKit
 import Utility
+import UIKit
 
 @Reducer
 public struct HomeFeature {
   
   public init() {}
+  
+  @Dependency(\.openURL) var openURL
   
   @ObservableState
   public struct State: Equatable {
@@ -41,6 +44,8 @@ public struct HomeFeature {
     case showToastMessage(String?)
     case presentDetailView(Bool, id: Int? = nil)
     case presentAlert(AlertType)
+    
+    case moveToSetting
     case delegate(Delegate)
   }
   
@@ -118,6 +123,13 @@ public struct HomeFeature {
         
       case let .presentAlert(alert):
         return .send(.delegate(.presentAlert(alert)))
+        
+      case .moveToSetting:
+        return .run { send in
+          if let url = URL(string: UIApplication.openSettingsURLString) {
+            await openURL(url)
+          }
+        }
         
       default: return .none
       }

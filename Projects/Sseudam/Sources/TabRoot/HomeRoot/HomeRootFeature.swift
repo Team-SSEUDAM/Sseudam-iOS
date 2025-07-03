@@ -54,12 +54,14 @@ struct HomeRootFeature {
         // MARK: - Alert
         
       case let .closeAlertAction(type):
-        print("close", type)
         return .none
         
       case let .acceptAlertAction(type):
-        print("accept", type)
-        return .none
+        switch type {
+        case .locationPermission:
+          return .send(.home(.moveToSetting))
+        default: return .none
+        }
         
         // MARK: - Receive HomeFeature Delegate Action
         

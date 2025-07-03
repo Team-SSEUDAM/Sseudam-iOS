@@ -1,9 +1,9 @@
 //
-//  MoveLocationFeature.swift
-//  ReportFeature
+//  SelectSpotLocationFeature.swift
 //
-//  Created by 조용인 on 6/20/25.
-//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
+//  SelectSpotLocation
+//
+//  Created by yongin
 //
 
 import ComposableArchitecture
@@ -11,7 +11,7 @@ import Utility
 import NMReverseGeocodingDomainInterface
 
 @Reducer
-public struct MoveLocationFeature {
+public struct SelectSpotLocationFeature {
   
   public init() {
     
@@ -27,6 +27,8 @@ public struct MoveLocationFeature {
     public var address: String = ""
     
     public var isEnabled: Bool = false
+    
+    public init() {}
   }
   
   public enum Action: BindableAction, Equatable {
@@ -93,7 +95,7 @@ public struct MoveLocationFeature {
   }
 }
 
-extension MoveLocationFeature {
+extension SelectSpotLocationFeature {
   
   private func moveUserLocation() -> Effect<Action> {
     return .run { send in

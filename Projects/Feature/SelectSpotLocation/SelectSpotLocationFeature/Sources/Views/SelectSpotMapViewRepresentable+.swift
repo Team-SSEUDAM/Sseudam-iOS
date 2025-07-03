@@ -1,8 +1,8 @@
 //
-//  MapViewCoordinator.swift
-//  ReportFeature
+//  SelectSpotMapViewRepresentable++.swift
+//  SelectSpotLocationFeature
 //
-//  Created by 조용인 on 6/20/25.
+//  Created by 조용인 on 7/3/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
@@ -11,12 +11,12 @@ import Utility
 import NMapsMap
 import ReportDomainInterface
 
-extension ReportMapViewRepresentable {
+extension SelectSpotMapViewRepresentable {
   class Coordinator: NSObject, NMFMapViewTouchDelegate, NMFMapViewCameraDelegate {
-    var parent: ReportMapViewRepresentable
+    var parent: SelectSpotMapViewRepresentable
     private var isMovingByGesture = false
     
-    init(_ parent: ReportMapViewRepresentable) {
+    init(_ parent: SelectSpotMapViewRepresentable) {
       self.parent = parent
     }
     

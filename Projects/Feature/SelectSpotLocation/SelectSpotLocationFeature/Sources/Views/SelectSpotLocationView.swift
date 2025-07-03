@@ -1,9 +1,9 @@
 //
-//  MoveLocationView.swift
-//  ReportFeature
+//  SelectSpotLocationView.swift
 //
-//  Created by 조용인 on 6/20/25.
-//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
+//  SelectSpotLocation
+//
+//  Created by yongin
 //
 
 import SwiftUI
@@ -11,10 +11,10 @@ import Utility
 import DesignKit
 import ComposableArchitecture
 
-public struct MoveLocationView: View {
-  @Bindable var store: StoreOf<MoveLocationFeature>
+public struct SelectSpotLocationView: View {
+  @Bindable var store: StoreOf<SelectSpotLocationFeature>
   
-  public init(store: StoreOf<MoveLocationFeature>) {
+  public init(store: StoreOf<SelectSpotLocationFeature>) {
     self.store = store
   }
   
@@ -29,7 +29,7 @@ public struct MoveLocationView: View {
           .foregroundStyle(ColorSet.Text.Secondary)
           .multilineTextAlignment(.leading)
       }
-      ReportMapViewRepresentable(
+      SelectSpotMapViewRepresentable(
         userLocation: $store.userLocation
       )
       .onReceive {
@@ -55,15 +55,4 @@ public struct MoveLocationView: View {
     .padding(.vertical, .Number24)
 
   }
-}
-
-#Preview {
-  MoveLocationView(
-    store: Store(
-      initialState: MoveLocationFeature.State(
-        userLocation: .init(latitude: 37.5665, longitude: 126.9784)
-      ),
-      reducer: { MoveLocationFeature() }
-    )
-  )
 }

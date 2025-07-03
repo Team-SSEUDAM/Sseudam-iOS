@@ -12,6 +12,7 @@ import DotLottie
 import SelectSpotCategoryFeature
 import SelectSpotImageFeature
 import SelectSpotNameFeature
+import SelectSpotLocationFeature
 import DesignKit
 
 public struct ReportView: View {
@@ -34,7 +35,7 @@ public struct ReportView: View {
                 description:"쓰담이 아직 모르는 쓰레기통이 있나요?\n제보 시 5쓰담이 적립되며,\n승인되면 15쓰담을 추가 적립받아요.")
               .frame(width: geo.size.width)
               .id(0)
-              MoveLocationView(
+              SelectSpotLocationView(
                 store: store.scope(state: \.child.moveLocation, action: \.child.moveLocation)
               )
               .frame(width: geo.size.width)

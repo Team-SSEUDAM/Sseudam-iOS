@@ -33,7 +33,7 @@ public struct ReportFeature {
     var currentPage: Int = 0
     
     /// 각 페이지별 상태를 Child로 관리
-    var child: Child.State = Child.State()
+    var child: ReportChildFeature.State = ReportChildFeature.State()
     
     var nextButtonState: PrimaryButtonState = .normal
     var nextButtonText: String = "시작하기"
@@ -56,7 +56,7 @@ public struct ReportFeature {
     public enum Alert: Equatable { }
     
     case destination(PresentationAction<Destination.Action>)
-    case child(Child.Action)
+    case child(ReportChildFeature.Action)
     case binding(BindingAction<State>)
     
     
@@ -99,7 +99,7 @@ public struct ReportFeature {
     
     // Child를 하나의 Scope로 관리
     Scope(state: \.child, action: \.child) {
-      Child()
+      ReportChildFeature()
     }
     
     Reduce { state, action in
@@ -257,88 +257,6 @@ public struct ReportFeature {
     }
     .ifLet(\.$destination, action: \.destination) {
       Destination.body
-    }
-  }
-}
-
-// MARK: - Child Reducer
-@Reducer
-public struct Child {
-  
-  @ObservableState
-  public struct State: Equatable {
-    var moveLocation: SelectSpotLocationFeature.State = SelectSpotLocationFeature.State()
-    var writeName: SelectSpotNameFeature.State = SelectSpotNameFeature.State()
-    var selectKind: SelectSpotCategoryFeature.State = SelectSpotCategoryFeature.State()
-    var selectPhoto: SelectSpotImageFeature.State = SelectSpotImageFeature.State()
-    
-    public init() {}
-  }
-  
-  public enum Action: Equatable {
-    case moveLocation(SelectSpotLocationFeature.Action)
-    case writeName(SelectSpotNameFeature.Action)
-    case selectKind(SelectSpotCategoryFeature.Action)
-    case selectPhoto(SelectSpotImageFeature.Action)
-    case delegate(Delegate)
-    
-    @CasePathable
-    public enum Delegate: Equatable {
-      case moveLocation(SelectSpotLocationFeature.Action.Delegate)
-      case writeName(SelectSpotNameFeature.Action.Delegate)
-      case selectKind(SelectSpotCategoryFeature.Action.Delegate)
-      case selectPhoto(SelectSpotImageFeature.Action.Delegate)
-    }
-  }
-  
-  public var body: some ReducerOf<Self> {
-    Scope(state: \.moveLocation, action: \.moveLocation) {
-      SelectSpotLocationFeature()
-    }
-    Scope(state: \.writeName, action: \.writeName) {
-      SelectSpotNameFeature()
-    }
-    Scope(state: \.selectKind, action: \.selectKind) {
-      SelectSpotCategoryFeature()
-    }
-    Scope(state: \.selectPhoto, action: \.selectPhoto) {
-      SelectSpotImageFeature()
-    }
-    
-    Reduce { state, action in
-      switch action {
-        /// MoveLocationFeature의 delegate를 부모로 전달
-      case let .moveLocation(.delegate(delegateAction)):
-        return .send(.delegate(.moveLocation(delegateAction)))
-        
-        /// WriteNameFeature의 delegate를 부모로 전달
-      case let .writeName(.delegate(delegateAction)):
-        return .send(.delegate(.writeName(delegateAction)))
-        
-        /// SelectKindFeature의 delegate를 부모로 전달
-      case let .selectKind(.delegate(delegateAction)):
-        return .send(.delegate(.selectKind(delegateAction)))
-        
-        /// SelectPhotoFeature의 delegate를 부모로 전달
-      case let .selectPhoto(.delegate(delegateAction)):
-        return .send(.delegate(.selectPhoto(delegateAction)))
-        
-        /// 일반 Action들은 각각의 Scope에서 처리되므로 여기서는 패스
-      case .moveLocation:
-        return .none
-        
-      case .writeName:
-        return .none
-        
-      case .selectKind:
-        return .none
-        
-      case .selectPhoto:
-        return .none
-        
-      case .delegate:
-        return .none
-      }
     }
   }
 }

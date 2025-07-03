@@ -32,7 +32,6 @@ public enum Feature: String, ModuleRepresentable {
 
 public enum Domain: String, ModuleRepresentable {
   case Umbrella = ""
-  case Home
   case Auth
   case User
   case NMReverseGeocoding
@@ -44,7 +43,6 @@ public enum Domain: String, ModuleRepresentable {
 
 public enum Data: String, ModuleRepresentable {
   case Umbrella = ""
-  case Home
   case Auth
   case User
   case NMReverseGeocoding
@@ -143,10 +141,6 @@ extension TargetDependency {
   public struct Domain: TargetDependencyDelegate {
     public static let Umbrella = Self.project(.domain(.Umbrella, isInterface: nil))
     
-    public struct Home: TargetDependencyDelegate {
-      public static let Interface = Self.project(.domain(.Home, isInterface: true))
-      public static let Implement = Self.project(.domain(.Home))
-    }
     public struct Auth: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.Auth, isInterface: true))
       public static let Implement = Self.project(.domain(.Auth))
@@ -175,11 +169,6 @@ extension TargetDependency {
   
   public struct Data: TargetDependencyDelegate {
     public static let Umbrella = Self.project(.data(.Umbrella, isInterface: nil))
-    
-    public struct Home: TargetDependencyDelegate {
-      public static let Interface = Self.project(.data(.Home, isInterface: true))
-      public static let Implement = Self.project(.data(.Home))
-    }
     public struct Auth: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Auth, isInterface: true))
       public static let Implement = Self.project(.data(.Auth))

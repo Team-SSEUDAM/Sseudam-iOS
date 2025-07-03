@@ -53,7 +53,7 @@ struct HomeRootFeature {
 
         // MARK: - Alert
         
-      case let .closeAlertAction(type):
+      case .closeAlertAction:
         return .none
         
       case let .acceptAlertAction(type):

@@ -37,7 +37,7 @@ public struct TrashDetailFeature {
     Reduce { state, action in
       switch action {
       case let .showDetail(id):
-        if let id = id {
+        if let _ = id {
           state.isEmptyList = false
         } else {
           return .send(.noTrashData)

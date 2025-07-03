@@ -6,7 +6,6 @@
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
-import HomeDomain
 import NMReverseGeocodingDomain
 import SuggestionDomain
 
@@ -14,7 +13,6 @@ import HomeDomainInterface
 import NMReverseGeocodingDomainInterface
 import SuggestionDomainInterface
 
-import HomeData
 import NMReverseGeocodingData
 import SuggestionData
 

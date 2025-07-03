@@ -33,6 +33,11 @@ let project = Project.makeApp(
     .Features.Umbrella,
     .Data.Umbrella
     
+    // .Features.TrashDetail,
+    // .Features.Auth,
+    // .Domain.Auth.Implement,
+    // .Data.Auth.Implement,
+    
     // .Domain.TrashSpot.Implement,
     // .Data.TrashSpot.Implement
   ]

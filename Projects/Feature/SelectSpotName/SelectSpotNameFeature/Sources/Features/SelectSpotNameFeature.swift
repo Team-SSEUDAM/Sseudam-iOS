@@ -141,13 +141,13 @@ public struct SelectSpotNameFeature {
         
       case let .validateNameResult(result):
         switch result {
-        case let .success(isValid):
+        case .success:
           state.validationResult = .valid
           return .send(.delegate(.serverValidationCompleted(isValid: true, name: state.name)))
           
         case let .failure(networkError):
           switch networkError {
-          case let .serverError(errorMessage, code):
+          case let .serverError(errorMessage, _):
             state.validationResult = .serverError(errorMessage)
           default: state.validationResult = .serverError(nil)
           }

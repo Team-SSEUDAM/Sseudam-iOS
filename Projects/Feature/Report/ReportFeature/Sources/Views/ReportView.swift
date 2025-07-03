@@ -11,6 +11,7 @@ import ComposableArchitecture
 import DotLottie
 import SelectSpotCategoryFeature
 import SelectSpotImageFeature
+import SelectSpotNameFeature
 import DesignKit
 
 public struct ReportView: View {
@@ -38,7 +39,7 @@ public struct ReportView: View {
               )
               .frame(width: geo.size.width)
               .id(1)
-              WriteNameView(
+              SelectSpotNameView(
                 store: store.scope(state: \.child.writeName, action: \.child.writeName)
               )
               .frame(width: geo.size.width)

@@ -15,17 +15,26 @@ public struct LocationFeature {
   public init() {}
   
   public struct State: Equatable {
+    /// 유저의 현재 위치
     var userLocation: MapPoint? = nil
+    /// 이동하고자 하는 위치
     var point: MapPoint? = nil
+    /// 초기 이동 여부
     var isInitialMapLoad: Bool = true
   }
   
   public enum Action: Equatable {
+    /// 유저의 현위치 가져오기
     case fetchUserLocation
+    /// 유저 위치로 지도 이동
     case moveUserLocation
+    /// 유저 위치 저장
     case storeUserLocation(MapPoint)
+    /// 특정 위치로 이동하기
     case moveLocation(MapPoint)
+    /// 첫 로드 여부 저장
     case changeInitialMapLoad(Bool)
+    
     case delegate(Delegate)
   }
   

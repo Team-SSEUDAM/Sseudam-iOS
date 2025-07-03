@@ -36,9 +36,18 @@ struct SseudamView: View {
           }
         }
       }
+      if let alert =  store.presentAlert {
+        Alert(
+          type: alert,
+          isErrorType: alert.isErrorType,
+          closeAction: { store.send(.closeAlertAction) },
+          acceptAction: { store.send(.acceptAlertAction) }
+        )
+      }
       
     }
     .ignoresSafeArea(edges: .bottom)
+  
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in
       LoginView(store: store)
     }

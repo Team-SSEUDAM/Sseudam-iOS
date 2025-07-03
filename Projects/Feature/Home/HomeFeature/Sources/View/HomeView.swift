@@ -135,7 +135,7 @@ public struct HomeView: View {
   @ViewBuilder
   private var UserLocationButton: some View {
     IconButton(icon: .myLocation) {
-      store.send(.location(.fetchUserLocation))
+      store.send(.location(.fetchCurrentLocation(true)))
     }
   }
   

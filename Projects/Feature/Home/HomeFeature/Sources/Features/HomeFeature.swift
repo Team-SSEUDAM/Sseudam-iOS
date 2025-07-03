@@ -40,13 +40,14 @@ public struct HomeFeature {
     
     case showToastMessage(String?)
     case presentDetailView(Bool, id: Int? = nil)
+    case presentAlert(AlertType)
     case delegate(Delegate)
   }
   
   public enum Delegate: Equatable {
     case needToHiddenTabBar(Bool)
     case presentDetailView(Bool, id: Int?)
-    case noDataInDetailView
+    case presentAlert(AlertType)
   }
   
   public var body: some ReducerOf<Self> {
@@ -75,6 +76,9 @@ public struct HomeFeature {
         
       case let .location(.delegate(.requestMapBounds(isRequest))):
         return .send(.map(.requestMapBounds(isRequest)))
+        
+      case .location(.delegate(.denyLocationPermission)):
+        return .send(.delegate(.presentAlert(.locationPermission)))
         
         // MARK: - Receive MapFeature delegate action
         
@@ -111,6 +115,10 @@ public struct HomeFeature {
           return .none
         default: return .none
         }
+        
+      case let .presentAlert(alert):
+        return .send(.delegate(.presentAlert(alert)))
+        
       default: return .none
       }
     }

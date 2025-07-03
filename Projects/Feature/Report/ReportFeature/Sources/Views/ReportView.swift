@@ -101,7 +101,7 @@ public struct ReportView: View {
     PrimaryButton(
       loadingView: {
         DotLottieAnimation(
-          fileName: "loading",
+          fileName: LottieSet.loading.name,
           config: AnimationConfig(autoplay: true, loop: true)
         ).view()
       },

@@ -14,6 +14,7 @@ import SuggestionDomainInterface
 
 import SelectSpotImageFeature
 import SelectSpotCategoryFeature
+import SelectSpotNameFeature
 
 import DesignKit
 
@@ -266,7 +267,7 @@ public struct Child {
   @ObservableState
   public struct State: Equatable {
     var moveLocation: MoveLocationFeature.State = MoveLocationFeature.State()
-    var writeName: WriteNameFeature.State = WriteNameFeature.State()
+    var writeName: SelectSpotNameFeature.State = SelectSpotNameFeature.State()
     var selectKind: SelectSpotCategoryFeature.State = SelectSpotCategoryFeature.State()
     var selectPhoto: SelectSpotImageFeature.State = SelectSpotImageFeature.State()
     
@@ -275,7 +276,7 @@ public struct Child {
   
   public enum Action: Equatable {
     case moveLocation(MoveLocationFeature.Action)
-    case writeName(WriteNameFeature.Action)
+    case writeName(SelectSpotNameFeature.Action)
     case selectKind(SelectSpotCategoryFeature.Action)
     case selectPhoto(SelectSpotImageFeature.Action)
     case delegate(Delegate)
@@ -283,7 +284,7 @@ public struct Child {
     @CasePathable
     public enum Delegate: Equatable {
       case moveLocation(MoveLocationFeature.Action.Delegate)
-      case writeName(WriteNameFeature.Action.Delegate)
+      case writeName(SelectSpotNameFeature.Action.Delegate)
       case selectKind(SelectSpotCategoryFeature.Action.Delegate)
       case selectPhoto(SelectSpotImageFeature.Action.Delegate)
     }
@@ -294,7 +295,7 @@ public struct Child {
       MoveLocationFeature()
     }
     Scope(state: \.writeName, action: \.writeName) {
-      WriteNameFeature()
+      SelectSpotNameFeature()
     }
     Scope(state: \.selectKind, action: \.selectKind) {
       SelectSpotCategoryFeature()
@@ -365,7 +366,7 @@ private extension ReportFeature {
   /// `WriteNameFeature(쓰레기통 이름 작성)` Delegate 처리
   func handleWriteNameDelegate(
     state: inout State,
-    action: WriteNameFeature.Action.Delegate
+    action: SelectSpotNameFeature.Action.Delegate
   ) -> Effect<Action> {
     guard state.currentPage == 2 else { return .none }
     

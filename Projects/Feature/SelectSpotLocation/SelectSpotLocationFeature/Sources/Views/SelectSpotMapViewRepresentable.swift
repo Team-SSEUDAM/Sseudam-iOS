@@ -1,8 +1,8 @@
 //
-//  MapViewRepresentable.swift
-//  ReportFeature
+//  SelectSpotMapViewRepresentable.swift
+//  SelectSpotLocationFeature
 //
-//  Created by 조용인 on 6/20/25.
+//  Created by 조용인 on 7/3/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
@@ -12,7 +12,7 @@ import Utility
 import NMapsMap
 import ReportDomainInterface
 
-struct ReportMapViewRepresentable: UIViewRepresentable {
+struct SelectSpotMapViewRepresentable: UIViewRepresentable {
   @Binding var userLocation: Coordinates?
   
   var onCenterCoordinateChange: (@Sendable (Coordinates) -> Void)? = nil
@@ -63,7 +63,7 @@ struct ReportMapViewRepresentable: UIViewRepresentable {
   }
 }
 
-extension ReportMapViewRepresentable {
+extension SelectSpotMapViewRepresentable {
   func onReceive(
     _ onCenterCoordinateChange: @escaping @Sendable (Coordinates) -> Void
   ) -> Self {

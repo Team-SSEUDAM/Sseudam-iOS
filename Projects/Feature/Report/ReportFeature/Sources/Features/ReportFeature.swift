@@ -15,6 +15,7 @@ import SuggestionDomainInterface
 import SelectSpotImageFeature
 import SelectSpotCategoryFeature
 import SelectSpotNameFeature
+import SelectSpotLocationFeature
 
 import DesignKit
 
@@ -266,7 +267,7 @@ public struct Child {
   
   @ObservableState
   public struct State: Equatable {
-    var moveLocation: MoveLocationFeature.State = MoveLocationFeature.State()
+    var moveLocation: SelectSpotLocationFeature.State = SelectSpotLocationFeature.State()
     var writeName: SelectSpotNameFeature.State = SelectSpotNameFeature.State()
     var selectKind: SelectSpotCategoryFeature.State = SelectSpotCategoryFeature.State()
     var selectPhoto: SelectSpotImageFeature.State = SelectSpotImageFeature.State()
@@ -275,7 +276,7 @@ public struct Child {
   }
   
   public enum Action: Equatable {
-    case moveLocation(MoveLocationFeature.Action)
+    case moveLocation(SelectSpotLocationFeature.Action)
     case writeName(SelectSpotNameFeature.Action)
     case selectKind(SelectSpotCategoryFeature.Action)
     case selectPhoto(SelectSpotImageFeature.Action)
@@ -283,7 +284,7 @@ public struct Child {
     
     @CasePathable
     public enum Delegate: Equatable {
-      case moveLocation(MoveLocationFeature.Action.Delegate)
+      case moveLocation(SelectSpotLocationFeature.Action.Delegate)
       case writeName(SelectSpotNameFeature.Action.Delegate)
       case selectKind(SelectSpotCategoryFeature.Action.Delegate)
       case selectPhoto(SelectSpotImageFeature.Action.Delegate)
@@ -292,7 +293,7 @@ public struct Child {
   
   public var body: some ReducerOf<Self> {
     Scope(state: \.moveLocation, action: \.moveLocation) {
-      MoveLocationFeature()
+      SelectSpotLocationFeature()
     }
     Scope(state: \.writeName, action: \.writeName) {
       SelectSpotNameFeature()
@@ -348,7 +349,7 @@ private extension ReportFeature {
   /// `MoveLocationFeature` Delegate 처리
   func handleMoveLocationDelegate(
     state: inout State,
-    action: MoveLocationFeature.Action.Delegate
+    action: SelectSpotLocationFeature.Action.Delegate
   ) -> Effect<Action> {
     guard state.currentPage == 1 else { return .none }
     

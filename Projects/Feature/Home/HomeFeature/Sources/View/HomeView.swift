@@ -68,17 +68,17 @@ public struct HomeView: View {
   private var MapView: some View {
     MapViewRepresentable(
       userLocation: $store.location.point,
-      requestMapBounds: $store.requestMapBounds,
-      trashItems: $store.trashItems,
-      isMapMove: $store.researchButtonEnable,
-      isNeedDeleteMarker: $store.isNeedDeleteMarker
+      requestMapBounds: $store.map.requestMapBounds,
+      trashItems: $store.map.trashItems,
+      isMapMove: $store.map.researchButtonEnable,
+      isNeedDeleteMarker: $store.map.isNeedDeleteMarker
     )
     .onReceiveMapBounds {
-      store.send(.fetchTrashItems($0))
+      store.send(.map(.fetchTrashItems($0)))
     }
     .markerTapped { id in
       print("marker tapped: ", id ?? "x")
-      store.send(.markerTapped(id))
+      store.send(.map(.markerTapped(id)))
     }
   }
   
@@ -88,11 +88,11 @@ public struct HomeView: View {
       if store.isPresentDetail {
         IconButton(icon: .leftChevron) {
           store.send(.presentDetailView(false))
-          store.send(.deleteActiveMarker)
+          store.send(.map(.deleteActiveMarker))
         }
       }
       TrashFilterView { type in
-        store.send(.filterTapped(type))
+        store.send(.map(.filterTapped(type)))
       }
     }
     .padding(.vertical, .Number8)
@@ -113,8 +113,8 @@ public struct HomeView: View {
           .frame(width: .Number40, height: .Number40)
         Spacer()
         if store.state.researchButtonEnable {
-          ResearchButton {
-            store.send(.requestMapBounds(true))
+          ResearchButton {  
+            store.send((.map(.requestMapBounds(true))))
           }
         }
         Spacer()

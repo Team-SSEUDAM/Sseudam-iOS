@@ -22,18 +22,10 @@ public struct HomeFeature {
   @ObservableState
   public struct State: Equatable {
     public var location: LocationFeature.State = .init()
-    public var requestMapBounds: Bool = false
-    public var trashItems: [TrashSpot] = []
-    public var trashType: TrashType? = nil
-    public var researchButtonEnable: Bool = false
-    public var isNeedDeleteMarker: Bool = false
-    public var isPresentDetail: Bool = false
+    public var map: MapFeature.State = .init()
     
     public var path = StackState<Path.State>()
-    
-    public var isFirstLoad: Bool = true
-    public var isExpandedRetry: Bool = false
-    public var lastSearchedBounds: [MapPoint]? = nil
+    public var isPresentDetail: Bool = false
     public var toastMessage: String? = nil
     public init() {}
   }
@@ -41,40 +33,10 @@ public struct HomeFeature {
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case location(LocationFeature.Action)
+    case map(MapFeature.Action)
     
-    /// 범위 요청
-    case requestMapBounds(Bool)
-    /// 쓰레기통 데이터 조회
-    case fetchTrashItems([MapPoint])
-    /// 쓰레기통 데이터 조회 Result
-    case fetchTrashItemsResult(Result<[TrashSpot], NetworkError>)
-    /// 쓰레기통 데이터 저장 및 처리
-    case storeTrashItems([TrashSpot])
-    /// 쓰레기통 데이터가 없을 경우 처리
-    case emptyTrashItems
-    /// 첫 진입 직후 아이템 검색
-    case firstLoadSearch
-    /// 첫 진입 시 아이템 없을 경우 범위 확장
-    case requestExpandedMapBounds([MapPoint])
-    /// 확장 검색
-    case expandSearch
-    
-    /// 필터 버튼 탭
-    case filterTapped(TrashType?)
-    /// 현 위치 재검색
-    case researchButtonEnable(Bool)
-    /// 마커 탭 이벤트
-    case markerTapped(Int?)
-    /// 활성화 되어있는 마커 삭제
-    case deleteActiveMarker
     case onAppear
-    
     case path(StackActionOf<Path>)
-    
-    case reportButtonTapped
-    case presentDetailView(Bool)
-    case requestExpandedMapBounds([MapPoint])
-    
     
     case showToastMessage(String?)
     case presentDetailView(Bool, id: Int? = nil)
@@ -87,99 +49,23 @@ public struct HomeFeature {
     case noDataInDetailView
   }
   
-  @Dependency(\.HomeUseCase) var homeUseCase
-  @Dependency(\.FetchTrashSpotUseCase) var fetchTrashSpotUseCase
-  
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Scope(state: \.location, action: \.location) {
       LocationFeature()
     }
-    Reduce {
-      state,
-      action in
+    Scope(state: \.map, action: \.map) {
+      MapFeature()
+    }
+    
+    Reduce { state, action in
       switch action {
       case .onAppear:
         return .run { send in
-          let test = try await homeUseCase.execute()
-          print(test)
           await MainActor.run {
             send(.location(.fetchUserLocation))
           }
         }
-        
-      case let .filterTapped(type):
-        // 위치 및 필터 변화 없는 반복 요청
-        if type == state.trashType,
-           !state.researchButtonEnable {
-          return .none
-        }
-        state.trashType = type
-        return .send(.requestMapBounds(true))
-        
-      case let .requestExpandedMapBounds(bounds):
-        let expandedBounds = expandBounds(bounds, ratio: 0.35) // 확장비율 조정
-        return .send(.fetchTrashItems(expandedBounds))
-        
-      case let .fetchTrashItems(bounds):
-        state.lastSearchedBounds = bounds
-        return fetchTrashItem(bounds: bounds, type: state.trashType)
-        
-      case let .fetchTrashItemsResult(result):
-        switch result {
-        case let .success(items):
-          return .send(.storeTrashItems(items))
-        case let .failure(error):
-          return .send(.showToastMessage(error.localizedDescription))
-        }
-        
-      case let .storeTrashItems(items):
-        state.trashItems.removeAll()
-        state.trashItems = items
-        if items.isEmpty {
-          return .send(.emptyTrashItems)
-        } else { // 데이터 있으면 바텀시트 내리기
-          return .send(.presentDetailView(false))
-        }
-        
-      case .emptyTrashItems:
-        if state.isFirstLoad {
-          return .send(.firstLoadSearch)
-        } else { // 바텀시트 띄우기
-          return .send(.presentDetailView(true, id: nil))
-        }
-        
-      case .firstLoadSearch:
-        if !state.isExpandedRetry { // 1회 확장 검색 시도
-          state.isExpandedRetry = true
-          return .send(.expandSearch)
-        } else { // 확장 검색 후에도 없음
-          state.isFirstLoad = false
-          state.isExpandedRetry = false
-          return .send(
-            .showToastMessage("이 근방에는 쓰레기통이 없어요.\n지도를 움직여 다른 위치를 확인해보세요!")
-          )
-        }
-        
-      case let .requestMapBounds(isRequest):
-        state.requestMapBounds = isRequest
-        state.researchButtonEnable = false
-        return .none
-        
-        
-      case .expandSearch:
-        if let lastBounds = state.lastSearchedBounds {
-          return .send(.requestExpandedMapBounds(lastBounds))
-        } else {
-          return .none
-        }
-        
-      case let .markerTapped(id):
-        return .send(.presentDetailView(id != .none, id: id))
-        
-      case .deleteActiveMarker:
-        state.isNeedDeleteMarker = true
-        return .none
         
       case let .showToastMessage(message):
         state.toastMessage = message
@@ -188,7 +74,21 @@ public struct HomeFeature {
         // MARK: - Receive LocationFeature delegate action
         
       case let .location(.delegate(.requestMapBounds(isRequest))):
-        return .send(.requestMapBounds(isRequest))
+        return .send(.map(.requestMapBounds(isRequest)))
+        
+        // MARK: - Receive MapFeature delegate action
+        
+      case let .map(.delegate(action)):
+        switch action {
+        case .noDataInDetailView:
+          return .send(.presentDetailView(true, id: nil))
+          
+        case let .showToastMessage(message):
+          return .send(.showToastMessage(message))
+          
+        case let .presentDetailView(isShow, id):
+          return .send(.presentDetailView(isShow, id: id))
+        }
         
         // MARK: - Send Action to HomeRoot
       case .reportButtonTapped:
@@ -215,52 +115,5 @@ public struct HomeFeature {
       }
     }
     .forEach(\.path, action: \.path)
-  }
-}
-
-extension HomeFeature {
-  
-  private func fetchTrashItem(bounds: [MapPoint], type: TrashType?) -> Effect<Action> {
-    return .run { send in
-      let parameter: FetchTrashSpotParameter = .init(
-        region: nil,
-        type: type?.rawValue,
-        swLat: bounds[0].latitude,
-        swLng: bounds[0].longitude,
-        neLat: bounds[1].latitude,
-        neLng: bounds[1].longitude
-      )
-      do {
-        let result = try await fetchTrashSpotUseCase.execute(parameter)
-        return await send(.fetchTrashItemsResult(.success(result)))
-      } catch let error as NetworkError {
-        return await send(.showToastMessage(error.localizedDescription))
-      }
-    }
-  }
-  
-  /// 지도 범위 확장
-  private func expandBounds(_ bounds: [MapPoint], ratio: Double) -> [MapPoint] {
-      guard bounds.count == 2 else { return bounds }
-      let sw = bounds[0]
-      let ne = bounds[1]
-      let latDelta = ne.latitude - sw.latitude
-      let lngDelta = ne.longitude - sw.longitude
-      let newSW = MapPoint(
-          latitude: sw.latitude - latDelta * ratio,
-          longitude: sw.longitude - lngDelta * ratio
-      )
-      let newNE = MapPoint(
-          latitude: ne.latitude + latDelta * ratio,
-          longitude: ne.longitude + lngDelta * ratio
-      )
-      return [newSW, newNE]
-  }
-}
-
-extension HomeFeature {
-  @Reducer(state: .equatable, action: .equatable)
-  public enum Path {
-    case reportView(ReportFeature)
   }
 }

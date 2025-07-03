@@ -83,13 +83,11 @@ public struct NetworkKit: NetworkKitProtocol, Sendable {
           )
         }
       } catch is CancellationError {
-        group.cancelAll()
         throw throwError(
           FoundationError.taskCancelled,
           endpoint: endpoint
         )
       } catch {
-        group.cancelAll()
         throw error
       }
     }

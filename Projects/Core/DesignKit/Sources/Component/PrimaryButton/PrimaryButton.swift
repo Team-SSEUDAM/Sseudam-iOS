@@ -68,7 +68,6 @@ public struct PrimaryButton<Icon: View, LoadingView: View>: View {
     self.icon = icon
     self.loadingView = loadingView
     self._isLoading = isLoading
-    self._title = title
     self._state = state
     self.action = action
   }

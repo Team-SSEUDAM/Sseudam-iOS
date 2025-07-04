@@ -12,7 +12,8 @@ let project = Project.makeStaticLibraryProject(
   for: Core.Umbrella,
   dependencies: [
     .Core.DesignKit,
-    .Core.NetworkKit
+    .Core.NetworkKit,
+    .Core.Cache
   ]
 )
 

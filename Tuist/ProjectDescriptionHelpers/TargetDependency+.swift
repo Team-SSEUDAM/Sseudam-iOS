@@ -60,6 +60,7 @@ public enum Core: String, ModuleRepresentable {
   case Umbrella = ""
   case DesignKit
   case NetworkKit
+  case Cache
   public var typePath: String { "Core" }
 }
 
@@ -209,6 +210,7 @@ extension TargetDependency {
     public static let Umbrella = Self.project(.core(.Umbrella))
     public static let DesignKit = Self.project(.core(.DesignKit))
     public static let NetworkKit = Self.project(.core(.NetworkKit))
+    public static let Cache = Self.project(.core(.Cache))
   }
   
   public struct Shared: TargetDependencyDelegate {

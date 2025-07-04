@@ -40,8 +40,16 @@ struct SseudamView: View {
         Alert(
           type: alert,
           isErrorType: alert.isErrorType,
-          closeAction: { store.send(.closeAlertAction) },
-          acceptAction: { store.send(.acceptAlertAction) }
+          closeAction: {
+            Task { @MainActor in
+              store.send(.closeAlertAction)
+            }
+          },
+          acceptAction: {
+            Task { @MainActor in
+              store.send(.acceptAlertAction)
+            }
+          }
         )
       }
       

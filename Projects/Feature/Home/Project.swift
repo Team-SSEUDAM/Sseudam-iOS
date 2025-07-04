@@ -13,8 +13,7 @@ let project = Project.makeFeature(
   for: Feature.Home,
   dependencies: [
     .Features.Report,
-    .Domain.Umbrella,
-    .Domain.TrashSpot.Interface
+    .Domain.Umbrella
   ]
 )
 

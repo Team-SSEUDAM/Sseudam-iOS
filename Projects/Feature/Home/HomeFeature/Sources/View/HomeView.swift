@@ -20,7 +20,7 @@ public struct HomeView: View {
     self.store = store
   }
   
-  private let tabbarHeight: CGFloat = 83
+  private let tabbarHeight: CGFloat = 62
   private let bottomSheetHeight: CGFloat = .detailSheetHeight
   private let bottomPadding: CGFloat = .Number12
   
@@ -34,12 +34,9 @@ public struct HomeView: View {
         VStack {
           TopButtonView
           Spacer()
-          SnackBar(message: $store.toastMessage) {
-            store.send(.showToastMessage(nil))
-          }
+          SnackBarView
           BottomButtonView
         }
-        .padding(.horizontal, .Number16)
       }
       .onAppear {
         store.send(.onAppear)
@@ -57,7 +54,9 @@ public struct HomeView: View {
     }
     .onChange(of: store.path) { oldValue, newValue in
       /// 네비게이션 path의 `newValue`가 0이 되면 탭바는 등장
-      if newValue.count == 0 { store.send(.delegate(.needToHiddenTabBar(false))) }
+      if newValue.count == 0 {
+        store.send(.delegate(.needToHiddenTabBar(false)))
+      }
     }
     .transaction { transaction in
       transaction.disablesAnimations = false
@@ -77,9 +76,16 @@ public struct HomeView: View {
       store.send(.map(.fetchTrashItems($0)))
     }
     .markerTapped { id in
-      print("marker tapped: ", id ?? "x")
       store.send(.map(.markerTapped(id)))
     }
+  }
+  
+  @ViewBuilder
+  private var SnackBarView: some View {
+    SnackBar(message: $store.toastMessage) {
+      store.send(.showToastMessage(nil))
+    }
+    .padding(.horizontal, .Number16)
   }
   
   @ViewBuilder
@@ -102,34 +108,31 @@ public struct HomeView: View {
   /// 하단에 존재하는 버튼
   @ViewBuilder
   private var BottomButtonView: some View {
-    VStack {
-      HStack {
-        Spacer()
-        ReportButton
-      }
-      .padding(.horizontal, .Number16)
-      HStack {
-        Spacer()
-          .frame(width: .Number40, height: .Number40)
-        Spacer()
-        if store.state.researchButtonEnable {
-          ResearchButton {  
-            store.send((.map(.requestMapBounds(true))))
-          }
+    HStack(alignment: .bottom) {
+      Spacer()
+        .frame(width: .Number40, height: .Number40)
+      Spacer()
+      if store.map.researchButtonEnable {
+        ResearchButton {
+          store.send((.map(.requestMapBounds(true))))
         }
-        Spacer()
+      }
+      Spacer()
+      VStack(spacing: .Number12) {
+        ReportButton
         UserLocationButton
       }
-      .padding(
-        .bottom,
-        (store.isPresentDetail ? bottomSheetHeight : tabbarHeight)+bottomPadding
-      )
-      .padding(.horizontal, .Number16)
-      .animation(
-        .easeInOut(duration: store.isPresentDetail ? 0.3 : 0.13),
-        value: store.isPresentDetail
-      )
     }
+    .padding(.horizontal, .Number16)
+    .padding(
+      .bottom,
+      (store.isPresentDetail ? bottomSheetHeight : tabbarHeight)+bottomPadding
+    )
+    .animation(
+      .easeInOut(duration: store.isPresentDetail ? 0.3 : 0.13),
+      value: store.isPresentDetail
+    )
+    
   }
   
   @ViewBuilder

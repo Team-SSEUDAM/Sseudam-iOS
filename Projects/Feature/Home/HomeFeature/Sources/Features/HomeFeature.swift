@@ -7,7 +7,6 @@
 //
 
 import ComposableArchitecture
-import HomeDomainInterface
 
 import ReportFeature
 import TrashSpotDomainInterface
@@ -37,14 +36,14 @@ public struct HomeFeature {
     case binding(BindingAction<State>)
     case location(LocationFeature.Action)
     case map(MapFeature.Action)
-    
-    case onAppear
     case path(StackActionOf<Path>)
     
+    case onAppear
     case showToastMessage(String?)
     case presentDetailView(Bool, id: Int? = nil)
     case presentAlert(AlertType)
     
+    case reportButtonTapped
     case moveToSetting
     case delegate(Delegate)
   }
@@ -100,6 +99,7 @@ public struct HomeFeature {
         }
         
         // MARK: - Send Action to HomeRoot
+        
       case .reportButtonTapped:
         state.path.append(.reportView(ReportFeature.State()))
         return .send(.delegate(.needToHiddenTabBar(true)))
@@ -135,5 +135,12 @@ public struct HomeFeature {
       }
     }
     .forEach(\.path, action: \.path)
+  }
+}
+
+extension HomeFeature {
+  @Reducer(state: .equatable, action: .equatable)
+  public enum Path {
+    case reportView(ReportFeature)
   }
 }

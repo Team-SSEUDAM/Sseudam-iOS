@@ -12,7 +12,7 @@ import ProjectDescriptionHelpers
 let project = Project.makeStaticLibraryProject(
   for: Data.TrashSpot,
   dependencies: [
-    .Domain.TrashSpot.Interface
+    .Domain.Umbrella
   ],
   nameSuffix: "Interface"
 )

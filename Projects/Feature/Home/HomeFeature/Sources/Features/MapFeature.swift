@@ -7,7 +7,6 @@
 //
 
 import ComposableArchitecture
-import HomeDomainInterface
 import TrashSpotDomainInterface
 import DesignKit
 import Utility

@@ -13,7 +13,6 @@ let project = Project.makeFeature(
   for: Feature.TrashDetail,
   dependencies: [
     .Domain.Umbrella
-    // .Domain.TrashSpot.Interface
   ]
 )
 

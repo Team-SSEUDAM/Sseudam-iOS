@@ -9,7 +9,6 @@
 import NMReverseGeocodingDomain
 import SuggestionDomain
 
-import HomeDomainInterface
 import NMReverseGeocodingDomainInterface
 import SuggestionDomainInterface
 
@@ -47,11 +46,6 @@ struct DependencyRegister {
 
     // MARK: - Home
       
-    HomeUseCaseRegister(
-      provider: {
-        HomeUseCase.live(repository: homeRepository)
-      }
-    )
     NMReverseGeoCodeUseCaseRegister(
       provider: {
         NMReverseGeoCodeUseCase.live(repository: nmGeometryRepository)

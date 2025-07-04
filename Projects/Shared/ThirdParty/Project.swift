@@ -24,7 +24,8 @@ let project = Project(
       sources: ["Sources/**"],
       dependencies: [
         .SPM.TCA,
-        .SPM.NMapsMap
+        .SPM.NMapsMap,
+        .SPM.DotLottie,
       ]
     )
   ]

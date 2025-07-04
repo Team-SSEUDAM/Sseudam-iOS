@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-public struct PrimaryButton<Icon: View>: View {
+public struct PrimaryButton<Icon: View, LoadingView: View>: View {
   
   public enum PrimaryButtonSize {
     case large, medium
@@ -27,6 +27,13 @@ public struct PrimaryButton<Icon: View>: View {
       }
     }
     
+    public var lottie: CGFloat {
+      switch self {
+      case .large: return .Number40
+      case .medium: return .Number32
+      }
+    }
+    
     public var font: FontInfo {
       switch self {
       case .large: return FontSet.Label.label1
@@ -37,16 +44,20 @@ public struct PrimaryButton<Icon: View>: View {
   
   private var size: PrimaryButtonSize
   private var icon: () -> Icon
+  private var loadingView: () -> LoadingView
   
   public var action: @Sendable () -> Void
   
   
   @Binding public var state: PrimaryButtonState
   @Binding public var title: String
+  @Binding public var isLoading: Bool
   @State private var isPressed: Bool = false
   
   public init(
     icon: @escaping () -> Icon = { EmptyView() },
+    loadingView: @escaping () -> LoadingView = { EmptyView() },
+    isLoading: Binding<Bool> = .constant(false),
     title: Binding<String>,
     size: PrimaryButtonSize = .large,
     state: Binding<PrimaryButtonState>,
@@ -55,6 +66,8 @@ public struct PrimaryButton<Icon: View>: View {
     self._title = title
     self.size = size
     self.icon = icon
+    self.loadingView = loadingView
+    self._isLoading = isLoading
     self._state = state
     self.action = action
   }
@@ -64,25 +77,32 @@ public struct PrimaryButton<Icon: View>: View {
       .gesture(
         DragGesture(minimumDistance: .Number0)
           .onChanged { _ in isPressed = true }
-          .onEnded {
-            _ in
+          .onEnded { _ in
             isPressed = false
             action()
           }
       )
-      .disabled(state == .disabled)
+      .disabled(state == .disabled || state == .loading)
   }
   
   @ViewBuilder
   private var content: some View {
     HStack(spacing: .Number6) {
       icon()
-      Text(title)
-        .foregroundColor(state.textColor)
-        .font(size.font)
+      Group {
+        if isLoading {
+          loadingView()
+            .frame(width: size.lottie, height: size.lottie)
+        } else {
+          Text(title)
+            .foregroundColor(state.textColor)
+            .font(size.font)
+        }
+      }
+      .animation(.easeInOut(duration: 0.2), value: isLoading)
     }
     .frame(maxWidth: .infinity)
-    .padding(.vertical, size.padding.vertical)
+    .padding(.vertical, isLoading ? .Number4 : size.padding.vertical)
     .background(
       RoundedRectangle(cornerRadius: size.cornerRadius)
         .fill(state.backgroundColor)

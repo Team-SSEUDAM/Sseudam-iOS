@@ -8,7 +8,11 @@
 
 import SwiftUI
 import ComposableArchitecture
-
+import DotLottie
+import SelectSpotCategoryFeature
+import SelectSpotImageFeature
+import SelectSpotNameFeature
+import SelectSpotLocationFeature
 import DesignKit
 
 public struct ReportView: View {
@@ -31,23 +35,23 @@ public struct ReportView: View {
                 description:"쓰담이 아직 모르는 쓰레기통이 있나요?\n제보 시 5쓰담이 적립되며,\n승인되면 15쓰담을 추가 적립받아요.")
               .frame(width: geo.size.width)
               .id(0)
-              MoveLocationView(
-                store: store.scope(state: \.moveLocation, action: \.moveLocation)
+              SelectSpotLocationView(
+                store: store.scope(state: \.child.moveLocation, action: \.child.moveLocation)
               )
               .frame(width: geo.size.width)
               .id(1)
-              WriteNameView(
-                store: store.scope(state: \.writeName, action: \.writeName)
+              SelectSpotNameView(
+                store: store.scope(state: \.child.writeName, action: \.child.writeName)
               )
               .frame(width: geo.size.width)
               .id(2)
-              SelectKindView(
-                store: store.scope(state: \.selectKind, action: \.selectKind)
+              SelectSpotCategoryView(
+                store: store.scope(state: \.child.selectKind, action: \.child.selectKind)
               )
               .frame(width: geo.size.width)
               .id(3)
-              SelectPhotoView(
-                store: store.scope(state: \.selectPhoto, action: \.selectPhoto)
+              SelectSpotImageView(
+                store: store.scope(state: \.child.selectPhoto, action: \.child.selectPhoto)
               )
               .frame(width: geo.size.width)
               .id(4)
@@ -95,6 +99,13 @@ public struct ReportView: View {
   @ViewBuilder
   private var nextButton: some View {
     PrimaryButton(
+      loadingView: {
+        DotLottieAnimation(
+          fileName: LottieSet.loading.name,
+          config: AnimationConfig(autoplay: true, loop: true)
+        ).view()
+      },
+      isLoading: $store.isLoading,
       title: $store.nextButtonText,
       size: .large,
       state: $store.nextButtonState

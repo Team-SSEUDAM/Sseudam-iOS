@@ -35,6 +35,7 @@ let package = Package(
   name: "tuist-template", /// 패키지 이름
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.20.1"),
-    .package(url: "https://github.com/navermaps/SPM-NMapsMap.git", exact: "3.21.0")
+    .package(url: "https://github.com/navermaps/SPM-NMapsMap.git", exact: "3.21.0"),
+    .package(url: "https://github.com/LottieFiles/dotlottie-ios", exact: "0.8.3")
   ]
 )

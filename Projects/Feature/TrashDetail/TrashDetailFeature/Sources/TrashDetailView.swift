@@ -115,20 +115,23 @@ public struct TrashDetailView: View {
   
   @ViewBuilder
   private var ButtonsView: some View {
-    HStack(spacing: .Number8) {
-      SecondaryButton(title: "수정 제안하기", size: .medium) {
+    GeometryReader { geo in
+      HStack(spacing: .Number8) {
+        SecondaryButton(title: "수정 제안하기", size: .medium) { }
+          .frame(width: (geo.size.width - .Number8) / 3)
+        
+        PrimaryButton(
+          title: .constant("이 곳에 쓰레기 버리기"),
+          size: .medium,
+          state: .constant(.normal)
+        ) {
+          
+        }
+        .frame(width: (geo.size.width - .Number8) * 2 / 3)
         
       }
-      PrimaryButton(
-        title: .constant("이 곳에 쓰레기 버리기"),
-        size: .medium,
-        state: .constant(.normal)
-      ) {
-        
-      }
-      .frame(width: 224)
     }
-    
+    .frame(maxWidth: .infinity)
     
   }
 }

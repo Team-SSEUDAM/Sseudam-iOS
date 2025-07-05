@@ -27,7 +27,7 @@ public struct TrashDetailView: View {
         if let data = store.trashDetail {
           DetailContent(data: data)
         } else {
-          
+          ErrorView
         }
       }
     }
@@ -64,6 +64,7 @@ public struct TrashDetailView: View {
         Icon(
           image: .sentimentDissatisfied,
           size: .Number32,
+          renderingMode: .template,
           color: ColorSet.Icon.Secondary
         )
         VStack(alignment: .center, spacing: .Number16) {
@@ -133,6 +134,22 @@ public struct TrashDetailView: View {
     }
     .frame(maxWidth: .infinity)
     
+  }
+  
+  @ViewBuilder
+  private var ErrorView: some View {
+    HStack(alignment: .center) {
+      VStack(alignment: .center, spacing: .Number20) {
+        Icon(
+          image: .sentimentDissatisfied,
+          size: .Number32,
+          renderingMode: .template,
+          color: ColorSet.Icon.Secondary
+        )
+        Text("쓰레기통 정보를 가져오는데 실패했어요.")
+          .foregroundStyle(ColorSet.Text.Secondary)
+      }
+    }
   }
 }
 

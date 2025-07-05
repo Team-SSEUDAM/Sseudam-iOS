@@ -19,7 +19,6 @@ public struct TrashDetailFeature {
   public struct State: Equatable {
     var isEmptyList: Bool = false
     var trashDetail: TrashSpotDetail? = nil
-    
     public init() {}
   }
 
@@ -58,6 +57,7 @@ public struct TrashDetailFeature {
         
       case let .fetchTrashDetailResult(.failure(error)):
         print(error)
+        state.trashDetail = nil
         return .none
         
         default: return .none

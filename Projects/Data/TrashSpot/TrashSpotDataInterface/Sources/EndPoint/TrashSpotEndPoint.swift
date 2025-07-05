@@ -18,5 +18,12 @@ public struct TrashSpotEndPoint: Sendable {
       parameters: .query(parameter)
     )
   }
+  
+  public static func fetchTrashSpotDetail(spotId: Int) -> Endpoint<TrashSpotDetailDTO> {
+    return Endpoint(
+      method: .get,
+      path: "/trash-spots/\(spotId)"
+    )
+  }
 }
 

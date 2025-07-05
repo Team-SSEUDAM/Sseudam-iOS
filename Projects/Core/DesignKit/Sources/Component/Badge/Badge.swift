@@ -13,15 +13,18 @@ public struct Badge: View {
   @Binding public var text: String
   private let state: BadgeState
   private let icon: ImageSet?
+  private let suffix: String?
   
   public init(
     text: Binding<String>,
     state: BadgeState,
-    icon: ImageSet? = nil
+    icon: ImageSet? = nil,
+    suffix: String? = nil
   ) {
     self._text = text
     self.state = state
     self.icon = icon
+    self.suffix = suffix
   }
   
   public var body: some View {
@@ -33,9 +36,23 @@ public struct Badge: View {
         )
         .foregroundColor(state.textColor)
       }
-      Text(text)
+      if let suffix {
+        HStack(spacing: 0) {
+          Text(text)
+            .lineLimit(1)
+            .truncationMode(.tail)
+            .layoutPriority(0)
+          Text(suffix)
+            .lineLimit(1)
+            .layoutPriority(1)
+        }
         .foregroundStyle(state.textColor)
         .font(FontSet.Caption.caption1)
+      } else {
+        Text(text)
+          .foregroundStyle(state.textColor)
+          .font(FontSet.Caption.caption1)
+      }
     }
     .padding(.horizontal, .Number8)
     .padding(.vertical, .Number2)

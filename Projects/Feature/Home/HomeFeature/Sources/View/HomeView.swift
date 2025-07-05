@@ -20,7 +20,7 @@ public struct HomeView: View {
     self.store = store
   }
   
-  private let tabbarHeight: CGFloat = 62
+  private let tabbarHeight: CGFloat = 83
   private let bottomSheetHeight: CGFloat = .detailSheetHeight
   private let bottomPadding: CGFloat = .Number12
   
@@ -38,6 +38,7 @@ public struct HomeView: View {
           BottomButtonView
         }
       }
+      .ignoresSafeArea(edges: .bottom)
       .onAppear {
         store.send(.onAppear)
       }

@@ -45,11 +45,6 @@ struct HomeRootFeature {
     }
     Reduce { state, action in
       switch action {
-        
-      case let .home(.delegate(.presentDetailView(isPresent, id))):
-        state.trashDetail = isPresent ? .init(id: id) : nil
-        state.isPresentDetail = isPresent
-        return .none
 
         // MARK: - Alert
         
@@ -68,8 +63,11 @@ struct HomeRootFeature {
       case let .home(.delegate(action)):
         switch action {
         case let .presentDetailView(isPresent, id):
-          state.trashDetail = isPresent ? .init(id: id) : nil
+          state.trashDetail = isPresent ? .init() : nil
           state.isPresentDetail = isPresent
+          if isPresent {
+            return .send(.trashDetail(.showDetail(id: id)))
+          }
           return .none
           
         case let .presentAlert(alert):

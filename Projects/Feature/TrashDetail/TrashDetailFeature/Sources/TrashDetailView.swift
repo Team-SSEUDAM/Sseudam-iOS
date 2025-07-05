@@ -9,6 +9,7 @@
 import SwiftUI
 import ComposableArchitecture
 import DesignKit
+import TrashSpotDomainInterface
 
 public struct TrashDetailView: View {
   @Bindable var store: StoreOf<TrashDetailFeature>
@@ -18,21 +19,31 @@ public struct TrashDetailView: View {
   }
   
   public var body: some View {
-    if store.isEmptyList {
-      EmptyDataView
-    } else {
-      DetailContent
+    ZStack {
+      ColorSet.Background.Primary
+      if store.isEmptyList {
+        EmptyDataView
+      } else {
+        if let data = store.trashDetail {
+          DetailContent(data: data)
+        } else {
+          
+        }
+      }
     }
-    
   }
   
   @ViewBuilder
-  private var DetailContent: some View {
+  private func DetailContent(data: TrashSpotDetail) -> some View {
     VStack(spacing: .Number16) {
       HStack(spacing: .Number16) {
         VStack(alignment: .leading, spacing: .Number8) {
-          TrashLocationView
-          BadgesView
+          TrashLocationView(name: data.name, address: data.address)
+          BadgesView(
+            trashType: data.trashType.title,
+            suggestionName: data.suggestionerName,
+            visitedCount: data.visitedCount
+          )
         }
         Spacer()
         Rectangle()
@@ -72,23 +83,29 @@ public struct TrashDetailView: View {
   }
   
   @ViewBuilder
-  private var TrashLocationView: some View {
+  private func TrashLocationView(name: String, address: String) -> some View {
     VStack(alignment: .leading, spacing: .Number4) {
-      Text("푸른 수목원")
+      Text(name)
         .font(FontSet.Heading.heading3)
         .foregroundStyle(ColorSet.Text.Primary)
-      Text("서울특별시 구로구 항동 9-1")
+      Text(address)
         .font(FontSet.Body.body3)
         .foregroundStyle(ColorSet.Text.Primary)
     }
   }
   
   @ViewBuilder
-  private var BadgesView: some View {
+  private func BadgesView(
+    trashType: String,
+    suggestionName: String?,
+    visitedCount: Int
+  ) -> some View {
     HStack(spacing: .Number4) {
-      Badge(text: .constant("일반쓰레기"), state: .primary)
-      Badge(text: .constant("김지연 제보"), state: .primary, icon: .verified)
-      Badge(text: .constant("인증 1회"), state: .primary)
+      Badge(text: .constant(trashType), state: .primary)
+      if let name = suggestionName {
+        Badge(text: .constant("\(name) 제보"), state: .primary, icon: .verified)
+      }
+      Badge(text: .constant("인증 \(visitedCount)회"), state: .primary)
     }
   }
   
@@ -98,7 +115,6 @@ public struct TrashDetailView: View {
       SecondaryButton(title: "수정 제안하기", size: .medium) {
         
       }
-      
       PrimaryButton(
         title: .constant("이 곳에 쓰레기 버리기"),
         size: .medium,

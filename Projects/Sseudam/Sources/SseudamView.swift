@@ -21,41 +21,32 @@ struct SseudamView: View {
     SseudamFeature()
   }
   
+  init() {
+    UITabBar.appearance().isHidden = true
+  }
+  
   var body: some View {
     
-    ZStack {
-      HomeView
-      PetView
-      MyPageView
-         
+    ZStack(alignment: .bottom) {
+      TabView(selection: $store.selectedTab) {
+        HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
+          .tag(TabBarItem.home)
+        EmptyView()
+          .tag(TabBarItem.myPet)
+        MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
+          .tag(TabBarItem.myPage)
+      }
       VStack {
         Spacer()
         if !store.isTabbarHidden {
           CustomTabBar(selectedTab: $store.selectedTab) {
             store.send(.selectTab($0))
           }
+          
         }
       }
-      if let alert =  store.presentAlert {
-        Alert(
-          type: alert,
-          isErrorType: alert.isErrorType,
-          closeAction: {
-            Task { @MainActor in
-              store.send(.closeAlertAction)
-            }
-          },
-          acceptAction: {
-            Task { @MainActor in
-              store.send(.acceptAlertAction)
-            }
-          }
-        )
-      }
-      
     }
     .ignoresSafeArea(edges: .bottom)
-  
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in
       LoginView(store: store)
     }

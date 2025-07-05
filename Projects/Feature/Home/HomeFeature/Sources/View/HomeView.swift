@@ -145,8 +145,10 @@ public struct HomeView: View {
   
   @ViewBuilder
   private var ReportButton: some View {
-    IconButton(icon: .addSpot, type: .accent) {
-      store.send(.reportButtonTapped)
+    if !store.isHiddenReportButton {
+      IconButton(icon: .addSpot, type: .accent) {
+        store.send(.reportButtonTapped)
+      }
     }
   }
   

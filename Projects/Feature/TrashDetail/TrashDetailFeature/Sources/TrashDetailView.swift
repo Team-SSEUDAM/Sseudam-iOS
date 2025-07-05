@@ -45,7 +45,7 @@ public struct TrashDetailView: View {
             visitedCount: data.visitedCount
           )
         }
-        Spacer()
+        .frame(maxWidth: .infinity, alignment: .leading)
         Rectangle()
           .fill(ColorSet.Background.Secondary)
           .clipShape(RoundedRectangle(cornerRadius: .Number8))
@@ -92,6 +92,7 @@ public struct TrashDetailView: View {
         .font(FontSet.Body.body3)
         .foregroundStyle(ColorSet.Text.Primary)
     }
+    .frame(maxWidth: .infinity, alignment: .leading)
   }
   
   @ViewBuilder
@@ -103,10 +104,13 @@ public struct TrashDetailView: View {
     HStack(spacing: .Number4) {
       Badge(text: .constant(trashType), state: .primary)
       if let name = suggestionName {
-        Badge(text: .constant("\(name) 제보"), state: .primary, icon: .verified)
+        Badge(text: .constant(name), state: .primary, icon: .verified)
+      } else {
+        Badge(text: .constant("공공데이터포털"), state: .primary, icon: .verified)
       }
       Badge(text: .constant("인증 \(visitedCount)회"), state: .primary)
     }
+    .frame(maxWidth: .infinity, alignment: .leading)
   }
   
   @ViewBuilder

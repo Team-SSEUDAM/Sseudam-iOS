@@ -8,6 +8,7 @@
 
 import ComposableArchitecture
 import TrashSpotDomainInterface
+import Utility
 
 @Reducer
 public struct TrashDetailFeature {
@@ -27,7 +28,7 @@ public struct TrashDetailFeature {
     case showDetail(id: Int?)
     case noTrashData
     case fetchTrashDetail(id: Int)
-    case storeTrashDetail(TrashSpotDetail)
+    case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -48,16 +49,29 @@ public struct TrashDetailFeature {
         state.isEmptyList = true
         return .none
         
-      case .fetchTrashDetail:
-        return .run { send in
-          let data = try await fetchTrashSpotDetailUseCase.execute(1)
-          await send(.storeTrashDetail(data))
-        }
-      case let .storeTrashDetail(data):
+      case let .fetchTrashDetail(id):
+        return fetchTrashDetail(id: id)
+        
+      case let .fetchTrashDetailResult(.success(data)):
         state.trashDetail = data
         return .none
         
+      case let .fetchTrashDetailResult(.failure(error)):
+        print(error)
+        return .none
+        
         default: return .none
+      }
+    }
+  }
+  
+  private func fetchTrashDetail(id: Int) -> Effect<Action> {
+    return .run { send in
+      do {
+        let data = try await fetchTrashSpotDetailUseCase.execute(id)
+        return await(send(.fetchTrashDetailResult(.success(data))))
+      } catch {
+        return await(send(.fetchTrashDetailResult(.failure(.customError(message: error.localizedDescription)))))
       }
     }
   }

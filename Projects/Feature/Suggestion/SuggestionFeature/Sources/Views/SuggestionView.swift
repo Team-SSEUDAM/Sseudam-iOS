@@ -110,7 +110,7 @@ public struct SuggestionView: View {
       size: .large,
       state: $store.nextButtonState
     ) {
-      if store.currentPage == 4 { store.send(.reportButtonTapped) }
+      if store.currentPage == 4 { store.send(.suggestionButtonTapped) }
       else { store.send(.nextButtonTapped) }
     }
   }

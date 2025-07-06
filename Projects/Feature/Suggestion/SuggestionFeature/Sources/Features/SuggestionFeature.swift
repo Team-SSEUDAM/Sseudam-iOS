@@ -83,7 +83,7 @@ public struct SuggestionFeature {
     case nextButtonIsEnabled(Bool)
     case nextButtonTapped
     case validateSpotNameButtonTapped /// 이름 작성 화면에서, 서버검증 요청
-    case reportButtonTapped /// 제보하기 화면에서, 서버 검증 요청
+    case suggestionButtonTapped /// 제보하기 화면에서, 서버 검증 요청
     
     
     case backButtonTapped
@@ -208,7 +208,7 @@ public struct SuggestionFeature {
           await send(.child(.writeName(.validateNameFromServer)))
         }
         
-      case .reportButtonTapped:
+      case .suggestionButtonTapped:
         return spotSuggestionEffect(state, spotSuggestionUseCase)
         
       case let .postSpotImage(prisignedURL):

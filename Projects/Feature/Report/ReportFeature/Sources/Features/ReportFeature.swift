@@ -128,6 +128,10 @@ public struct ReportFeature {
         }
         
       case .nextButtonTapped:
+        if state.currentPage == 2 && state.selectedReportInfoType == 2 {
+          return .send(.validateSpotNameButtonTapped)
+        }
+          
         state.currentPage = min(state.currentPage + 1, 5)
         /// 다음 페이지에 따라 적절한 action을 보냄
         switch state.currentPage {

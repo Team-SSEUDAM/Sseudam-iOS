@@ -13,13 +13,13 @@ public struct CheckBoxButton: View {
   @Binding public var state: CheckBoxButtonState
   
   private let text: String
-  private let icon: ImageSet
+  private let icon: ImageSet?
   private let action: @Sendable () -> Void
   
   public init(
     text: String,
     state: Binding<CheckBoxButtonState>,
-    icon: ImageSet,
+    icon: ImageSet? = nil,
     _ action: @escaping @Sendable () -> Void
   ) {
     self.text = text
@@ -42,11 +42,13 @@ public struct CheckBoxButton: View {
   @ViewBuilder
   private func contentView() -> some View {
     HStack(spacing: .Number6) {
-      Icon(
-        image: icon,
-        size: .Number24
-      )
-      .foregroundColor(state.iconColor)
+      if let icon = icon {
+        Icon(
+          image: icon,
+          size: .Number24
+        )
+        .foregroundColor(state.iconColor)
+      }
       Text(text)
         .foregroundStyle(state.textColor)
         .font(FontSet.Body.body3)

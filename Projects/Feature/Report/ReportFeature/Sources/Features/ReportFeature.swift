@@ -32,12 +32,16 @@ public struct ReportFeature {
     
     var currentPage: Int = 0
     
+    var selectedReportInfo: SelectReportInfoTypeFeature.State = SelectReportInfoTypeFeature.State()
     /// 각 페이지별 상태를 Child로 관리
     var child: ReportChildFeature.State = ReportChildFeature.State()
     
     var nextButtonState: PrimaryButtonState = .normal
+    var nextButtonIsHidden: Bool = false /// 다음 버튼의 숨김 상태
     var nextButtonText: String = "시작하기"
     var isLoading: Bool = false /// 다음 버튼의 로딩 상태
+    
+    var selectedReportInfoType: Int = 0 /// 선택된 제보 정보 타입
     
     /// 제보하기에 담길 데이터
     var spotName: String = ""
@@ -56,6 +60,7 @@ public struct ReportFeature {
     public enum Alert: Equatable { }
     
     case destination(PresentationAction<Destination.Action>)
+    case selectedReportInfo(SelectReportInfoTypeFeature.Action)
     case child(ReportChildFeature.Action)
     case binding(BindingAction<State>)
     
@@ -69,6 +74,8 @@ public struct ReportFeature {
     
     /// 시작 화면이 나타날 때
     case didAppearStartReport
+    /// 신고할 정보 타입 선택 화면이 나타날 때
+    case didAppearSelectReportInfo
     /// 위치 선택 화면이 나타날 때
     case didAppearMoveLocation
     /// 이름 작성 화면이 나타날 때
@@ -77,11 +84,11 @@ public struct ReportFeature {
     case didAppearSelectKind
     /// 사진 선택 화면이 나타날 때
     case didAppearSelectPhoto
-    /// 제보가 완료되었을 때
-    case didAppearComplete
     
     case nextButtonIsEnabled(Bool)
     case nextButtonTapped
+    
+    case checkReportInfoType /// 신고할 정보 타입 선택 화면에서, 다음 버튼 클릭 시 호출됨
     case validateSpotNameButtonTapped /// 이름 작성 화면에서, 서버검증 요청
     case reportButtonTapped /// 제보하기 화면에서, 서버 검증 요청
     
@@ -96,7 +103,9 @@ public struct ReportFeature {
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
-    
+    Scope(state: \.selectedReportInfo, action: \.selectedReportInfo) {
+      SelectReportInfoTypeFeature()
+    }
     // Child를 하나의 Scope로 관리
     Scope(state: \.child, action: \.child) {
       ReportChildFeature()
@@ -114,26 +123,17 @@ public struct ReportFeature {
         state.currentPage = max(state.currentPage - 1, 0)
         switch state.currentPage {
         case 0: return .send(.didAppearStartReport)
-        case 1: return .send(.didAppearMoveLocation)
-        case 2: return .send(.didAppearWriteName)
-        case 3: return .send(.didAppearSelectKind)
-        case 4: return .send(.didAppearSelectPhoto)
+        case 1: return .send(.didAppearSelectReportInfo)
         default: return .none
         }
         
       case .nextButtonTapped:
-        /// 다음 페이지로 넘어가기 전에 현재 페이지에서 검증 action
-        if state.currentPage == 2 { return .send(.validateSpotNameButtonTapped) }
-        if state.currentPage == 5 { return .send(.pop) }
         state.currentPage = min(state.currentPage + 1, 5)
         /// 다음 페이지에 따라 적절한 action을 보냄
         switch state.currentPage {
         case 0: return .send(.didAppearStartReport)
-        case 1: return .send(.didAppearMoveLocation)
-        case 2: return .send(.didAppearWriteName)
-        case 3: return .send(.didAppearSelectKind)
-        case 4: return .send(.didAppearSelectPhoto)
-        case 5: return .send(.didAppearComplete)
+        case 1: return .send(.didAppearSelectReportInfo)
+        case 2: return .send(.checkReportInfoType)
         default: return .none
         }
         
@@ -143,16 +143,20 @@ public struct ReportFeature {
         
       case .didAppearStartReport:
         state.nextButtonText = "시작하기"
+        state.nextButtonIsHidden = false
         return .send(.nextButtonIsEnabled(true))
+      
+      case .didAppearSelectReportInfo:
+        state.nextButtonIsHidden = true
+        return .send(.child(.writeName(.focusChanged(false))))
         
       case .didAppearMoveLocation:
+        if state.selectedReportInfoType != 1 { return .none }
         state.nextButtonText = "다음"
-        return .merge([
-          .send(.child(.writeName(.focusChanged(false)))),
-          .send(.nextButtonIsEnabled(state.child.moveLocation.isEnabled))
-        ])
+        return .send(.nextButtonIsEnabled(state.child.moveLocation.isEnabled))
         
       case .didAppearWriteName:
+        if state.selectedReportInfoType != 2 { return .none }
         state.nextButtonText = "다음"
         return .merge([
           .send(.child(.writeName(.focusChanged(true)))),
@@ -160,24 +164,21 @@ public struct ReportFeature {
         ])
         
       case .didAppearSelectKind:
+        if state.selectedReportInfoType != 3 { return .none }
         state.nextButtonText = "다음"
-        return .merge([
-          .send(.child(.writeName(.focusChanged(false)))),
-          .send(.nextButtonIsEnabled(state.child.selectKind.isEnabled))
-        ])
+        return .send(.nextButtonIsEnabled(state.child.selectKind.isEnabled))
         
       case .didAppearSelectPhoto:
-        state.nextButtonText = "완료"
-        return .merge([
-          .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
-        ])
+        if state.selectedReportInfoType != 4 { return .none }
+        state.nextButtonText = "다음"
+        return .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
         
-      case .didAppearComplete:
-        state.isNavigationBarHidden = true
-        state.nextButtonText = "확인"
-        return .run { send in
-          await send(.nextButtonIsEnabled(true))
-          await send(.setIsLoading(false))
+      case let .selectedReportInfo(.delegate(selectAction)):
+        switch selectAction {
+        case let .didSelectKind(id):
+          state.selectedReportInfoType = id
+          state.nextButtonIsHidden = false
+          return .send(.nextButtonTapped)
         }
         
         /// Child에서 오는 Delegate 처리
@@ -189,18 +190,15 @@ public struct ReportFeature {
         case let .selectPhoto(action): return handleSelectPhotoDelegate(state: &state, action: action)
         }
         
-        // Child의 일반 Action들 처리 (delegate가 아닌 경우)
-      case .child(.moveLocation):
-        return .none
-        
-      case .child(.writeName):
-        return .none
-        
-      case .child(.selectKind):
-        return .none
-        
-      case .child(.selectPhoto):
-        return .none
+      case .checkReportInfoType:
+        let selectedType = state.selectedReportInfoType
+        switch selectedType {
+        case 1: return .send(.didAppearMoveLocation) /// 위치 선택 페이지로 이동
+        case 2: return .send(.didAppearWriteName) /// 이름 작성 페이지로 이동
+        case 3: return .send(.didAppearSelectKind) /// 종류 선택 페이지로 이동
+        case 4: return .send(.didAppearSelectPhoto) /// 사진 선택 페이지로 이동
+        default: return .none
+        }
         
       case .validateSpotNameButtonTapped:
         return .run { send in
@@ -248,6 +246,12 @@ public struct ReportFeature {
       case .destination:
         return .none
         
+      case .child:
+        return .none
+        
+      case .selectedReportInfo:
+        return .none
+        
       case .binding:
         return .none
         
@@ -269,7 +273,7 @@ private extension ReportFeature {
     state: inout State,
     action: SelectSpotLocationFeature.Action.Delegate
   ) -> Effect<Action> {
-    guard state.currentPage == 1 else { return .none }
+    guard state.currentPage == 2 else { return .none }
     
     switch action {
     case let .nowCalculateReverseGeoCode(isLoading):
@@ -316,7 +320,7 @@ private extension ReportFeature {
     state: inout State,
     action: SelectSpotCategoryFeature.Action.Delegate
   ) -> Effect<Action> {
-    guard state.currentPage == 3 else { return .none }
+    guard state.currentPage == 2 else { return .none }
     
     switch action {
     case let .didSelectKind(trashType):
@@ -330,7 +334,7 @@ private extension ReportFeature {
     state: inout State,
     action: SelectSpotImageFeature.Action.Delegate
   ) -> Effect<Action> {
-    guard state.currentPage == 4 else { return .none }
+    guard state.currentPage == 2 else { return .none }
     
     switch action {
     case let .photoSelected(photo):

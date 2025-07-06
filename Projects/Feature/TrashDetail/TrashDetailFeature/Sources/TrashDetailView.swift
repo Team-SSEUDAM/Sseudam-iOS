@@ -46,15 +46,45 @@ public struct TrashDetailView: View {
           )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        Rectangle()
-          .fill(ColorSet.Background.Secondary)
-          .clipShape(RoundedRectangle(cornerRadius: .Number8))
-          .frame(width: .Number80, height: .Number80)
+        trashImageView(image: nil)
       }
       ButtonsView
     }
     .padding(.horizontal, .Number16)
     .padding(.vertical, .Number20)
+  }
+  
+  @ViewBuilder
+  private func trashImageView(image: Image?) -> some View {
+    if let _ = image {
+      Rectangle()
+        .fill(ColorSet.Background.Secondary)
+        .clipShape(RoundedRectangle(cornerRadius: .Number8))
+        .frame(width: .Number80, height: .Number80)
+    } else {
+      publicDataImageView
+    }
+  }
+  
+  @ViewBuilder
+  private var publicDataImageView: some View {
+    VStack(spacing: .Number0) {
+      Text("DATA")
+        .font(FontSet.customBoldFont(size: 14))
+        .foregroundStyle(ColorSet.Text.Secondary)
+      Text("공공데이터포털\n제공")
+        .font(FontSet.Caption.caption2)
+        .multilineTextAlignment(.center)
+        .foregroundStyle(ColorSet.Text.Secondary)
+    }
+    .frame(width: .Number80, height: .Number80)
+    .background(ColorSet.Background.Secondary)
+    .clipShape(RoundedRectangle(cornerRadius: .Number8))
+    .overlay(
+      RoundedRectangle(cornerRadius: .Number8)
+        .stroke(style: StrokeStyle(lineWidth: .Number1, dash: [5])) // 점선 설정
+        .foregroundColor(ColorSet.Border.Primary)
+    )
   }
   
   @ViewBuilder

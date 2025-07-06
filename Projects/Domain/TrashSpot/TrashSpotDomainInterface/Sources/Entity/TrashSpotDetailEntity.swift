@@ -8,6 +8,7 @@
 
 import Foundation
 import DesignKit
+import Utility
 
 public struct TrashSpotDetail: Equatable, Sendable {
   public let id: Int
@@ -15,7 +16,7 @@ public struct TrashSpotDetail: Equatable, Sendable {
   public let suggestionerName: String?
   public let name: String
   public let address: String
-  public let point: MapPoint
+  public let point: Coordinates
   public let trashType: TrashType
   public let visitedCount: Int
   public let imageUrl: String?
@@ -26,7 +27,7 @@ public struct TrashSpotDetail: Equatable, Sendable {
     suggestionerName: String?,
     name: String,
     address: String,
-    point: MapPoint,
+    point: Coordinates,
     trashType: TrashType,
     visitedCount: Int,
     imageUrl: String?

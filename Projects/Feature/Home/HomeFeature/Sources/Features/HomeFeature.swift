@@ -10,6 +10,7 @@ import ComposableArchitecture
 import HomeDomainInterface
 
 import ReportFeature
+import SuggestionFeature
 import DesignKit
 
 @Reducer
@@ -47,6 +48,7 @@ public struct HomeFeature {
     case path(StackActionOf<Path>)
     
     case reportButtonTapped
+    case suggestionButtonTapped
     case presentDetailView(Bool)
     case delegate(Delegate)
   }
@@ -113,6 +115,9 @@ public struct HomeFeature {
       case .reportButtonTapped:
         state.path.append(.reportView(ReportFeature.State()))
         return .send(.delegate(.needToHiddenTabBar(true)))
+      case .suggestionButtonTapped:
+        state.path.append(.suggestionView(SuggestionFeature.State()))
+        return .send(.delegate(.needToHiddenTabBar(true)))
       case let .presentDetailView(isPresent):
         state.isPresentDetail = isPresent
         return .run { send in
@@ -124,7 +129,7 @@ public struct HomeFeature {
         
       case let .path(action):
         switch action {
-        case .element(id: _, action: .reportView(.pop)):
+        case .element(id: _, action: .suggestionView(.pop)):
           state.path.removeLast()
           return .none
         default: return .none
@@ -151,5 +156,6 @@ extension HomeFeature {
   @Reducer(state: .equatable, action: .equatable)
   public enum Path {
     case reportView(ReportFeature)
+    case suggestionView(SuggestionFeature)
   }
 }

@@ -12,6 +12,7 @@ import DesignKit
 import ComposableArchitecture
 
 import ReportFeature
+import SuggestionFeature
 
 public struct HomeView: View {
   @Bindable var store: StoreOf<HomeFeature>
@@ -49,6 +50,8 @@ public struct HomeView: View {
       switch store.case {
       case let .reportView(store):
         ReportView(store: store)
+      case let .suggestionView(store):
+        SuggestionView(store: store)
       }
     }
     .onChange(of: store.path) { oldValue, newValue in
@@ -103,7 +106,7 @@ public struct HomeView: View {
     VStack {
       HStack {
         Spacer()
-        ReportButton
+        SuggestionButton
       }
       .padding(.horizontal, .Number16)
       HStack {
@@ -138,9 +141,9 @@ public struct HomeView: View {
   }
   
   @ViewBuilder
-  private var ReportButton: some View {
+  private var SuggestionButton: some View {
     IconButton(icon: .addSpot, type: .accent) {
-      store.send(.reportButtonTapped)
+      store.send(.suggestionButtonTapped)
     }
   }
   

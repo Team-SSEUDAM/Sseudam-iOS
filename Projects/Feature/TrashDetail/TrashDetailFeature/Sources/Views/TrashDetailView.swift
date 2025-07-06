@@ -10,6 +10,7 @@ import SwiftUI
 import ComposableArchitecture
 import DesignKit
 import TrashSpotDomainInterface
+import Utility
 
 public struct TrashDetailView: View {
   @Bindable var store: StoreOf<TrashDetailFeature>
@@ -52,6 +53,20 @@ public struct TrashDetailView: View {
     }
     .padding(.horizontal, .Number16)
     .padding(.vertical, .Number20)
+    .onAppear {
+      store.send(.visited(.fetchUserLocation))
+    }
+    .onDisappear {
+      Task {
+        await LocationService.shared.stopUpdatingLocation()
+      }
+    }
+    .task { @MainActor in
+      for await _ in await LocationService.shared.userLocationStream
+      {
+        store.send(.visited(.userLocation))
+      }
+    }
   }
   
   @ViewBuilder
@@ -156,7 +171,7 @@ public struct TrashDetailView: View {
         PrimaryButton(
           title: .constant("이 곳에 쓰레기 버리기"),
           size: .medium,
-          state: .constant(.normal)
+          state: $store.visited.isVisitedButtonEnable
         ) {
           
         }

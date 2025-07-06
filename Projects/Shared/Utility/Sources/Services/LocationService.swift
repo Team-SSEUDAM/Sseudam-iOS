@@ -9,13 +9,20 @@
 import UIKit
 import CoreLocation
 
+public enum LocationUpdateMode {
+  case single     // 한 번만 받고 중지
+  case continuous // 계속 위치 업데이트
+}
+
 /// 위치 권한 관련 서비스 구현
-@MainActor
-public class LocationService: NSObject, CLLocationManagerDelegate {
+public actor LocationService: NSObject, CLLocationManagerDelegate {
   
   public static let shared = LocationService()
-  public private(set) var userLocation: (Double, Double)? = nil
-  
+  public private(set) var userLocation: Coordinates? = nil
+  private let throttleInterval: TimeInterval = 1 // 1초 간격
+  private var lastUpdateTime: Date? = nil
+  private var mode: LocationUpdateMode = .single
+
   private lazy var locationManager: CLLocationManager = {
     let manager = CLLocationManager()
     manager.delegate = self
@@ -38,7 +45,8 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
   
   // MARK: - Location Method
   
-  public func requestUserLocation() {
+  public func requestUserLocation(mode: LocationUpdateMode = .single) {
+    self.mode = mode
     let authorizationStatus = locationManager.authorizationStatus
     switch authorizationStatus {
     case .authorizedWhenInUse, .authorizedAlways:
@@ -49,28 +57,49 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     case .denied, .restricted:
       userLocation = nil
       userLocationContinuation?.yield(())
-      break
     @unknown default:
       break
     }
   }
   
-  private func setUserLocation(lat: Double, lng: Double) {
-    if userLocation != nil { return }
+  private func setUserLocation(_ coord: Coordinates?) {
+    let now = Date()
+    // 1초 throttle
+    if let last = lastUpdateTime, now.timeIntervalSince(last) < throttleInterval {
+      return
+    }
+    lastUpdateTime = now
     
-    userLocation = (lat, lng)
+    if let coord = coord {
+      userLocation = coord
+    } else {
+      userLocation = nil
+    }
     userLocationContinuation?.yield(())
+    
+    if mode == .single {
+      locationManager.stopUpdatingLocation()
+    }
+  }
+  
+  public func stopUpdatingLocation() {
     locationManager.stopUpdatingLocation()
   }
   
   // MARK: - Delegate
   
   nonisolated public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-    guard let location = locations.last else { return }
-    let lat = location.coordinate.latitude
-    let lng = location.coordinate.longitude
+    guard let location = locations.last else {
+      Task { await setUserLocation(nil) } // 위치 정보 실패 시 nil 전달
+      return
+    }
     Task {
-      await setUserLocation(lat: lat, lng: lng)
+      await setUserLocation(
+        .init(
+          latitude: location.coordinate.latitude,
+          longitude: location.coordinate.longitude
+        )
+      )
     }
   }
   
@@ -81,10 +110,7 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
       case .authorizedAlways, .authorizedWhenInUse:
         await locationManager.startUpdatingLocation()
       case .denied, .restricted:
-        await MainActor.run {
-          userLocation = nil
-          userLocationContinuation?.yield(())
-        }
+        await self.setUserLocation(nil)
       default: break
       }
     }

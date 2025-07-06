@@ -17,6 +17,7 @@ public struct TrashDetailFeature {
   
   @ObservableState
   public struct State: Equatable {
+    public var visited: VisitedFeature.State = .init()
     var isEmptyList: Bool = false
     var trashDetail: TrashSpotDetail? = nil
     public init() {}
@@ -25,6 +26,8 @@ public struct TrashDetailFeature {
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case delegate(Delegate)
+    case visited(VisitedFeature.Action)
+    
     case showDetail(id: Int?)
     case noTrashData
     case reportButtonTapped
@@ -41,6 +44,10 @@ public struct TrashDetailFeature {
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
+    Scope(state: \.visited, action: \.visited) {
+      VisitedFeature()
+    }
+    
     Reduce { state, action in
       switch action {
       case let .showDetail(id):

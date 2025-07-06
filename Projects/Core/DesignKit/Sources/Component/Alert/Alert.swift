@@ -29,6 +29,8 @@ public struct Alert: View {
   
   public var body: some View {
     ZStack {
+      ColorSet.SubColor.backDrop
+        .ignoresSafeArea()
       content
         .background(
           RoundedRectangle(cornerRadius: .Number10)

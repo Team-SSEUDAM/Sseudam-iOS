@@ -25,6 +25,7 @@ struct SseudamFeature {
     var homeRoot: HomeRootFeature.State = .init()
     var mypageRoot: MyPageRootFeature.State = .init()
     var authFlow: AuthFlowFeature.State? = nil
+    var presentAlert: AlertType? = nil
   }
   
   enum Action: BindableAction, Equatable {
@@ -35,7 +36,9 @@ struct SseudamFeature {
     case mypageRoot(MyPageRootFeature.Action)
     case authFlow(AuthFlowFeature.Action)
     
-    
+    case closeAlertAction
+    case acceptAlertAction
+    case dismissAlert(Bool)
   }
   
   var body: some ReducerOf<Self> {
@@ -52,6 +55,10 @@ struct SseudamFeature {
         state.selectedTab = tab
         return .none
         
+      case let .homeRoot(.delegate(.presentAlert(type))):
+        state.presentAlert = type
+        return .none
+        
       case let .homeRoot(.delegate(.hiddenTabBar(isHidden))):
         state.isTabbarHidden = (isHidden)
         return .none
@@ -64,6 +71,21 @@ struct SseudamFeature {
         return .run { send in
           await send(.mypageRoot(.loginState(isLoggedIn)))
         }
+        
+        // MARK: - Alert
+        
+      case .closeAlertAction:
+        guard let type = state.presentAlert else { return .none }
+        return alertEffect(for: type, result: .close)
+
+      case .acceptAlertAction:
+        guard let type = state.presentAlert else { return .none }
+        return alertEffect(for: type, result: .accept)
+        
+      case .dismissAlert:
+        state.presentAlert = nil
+        return .none
+        
       default: return .none
       }
     }
@@ -72,4 +94,26 @@ struct SseudamFeature {
     }
   }
   
+}
+
+extension SseudamFeature {
+
+  private func alertEffect(
+    for type: AlertType,
+    result: AlertResult
+  ) -> Effect<Action> {
+    .run { send in
+      switch (type, result) {
+      case (.locationPermission, .close):
+        await send(.homeRoot(.closeAlertAction(type)))
+      case (.locationPermission, .accept):
+        await send(.homeRoot(.acceptAlertAction(type)))
+
+      default: return
+      }
+
+      // 공통적으로 알림 닫기
+      await send(.dismissAlert(true))
+    }
+  }
 }

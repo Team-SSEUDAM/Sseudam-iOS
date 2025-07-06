@@ -37,23 +37,23 @@ public enum Feature: String, ModuleRepresentable {
 
 public enum Domain: String, ModuleRepresentable {
   case Umbrella = ""
-  case Home
   case Auth
   case User
   case NMReverseGeocoding
   case Suggestion
   case Report
+  case TrashSpot
   public var typePath: String { "Domain" }
 }
 
 public enum Data: String, ModuleRepresentable {
   case Umbrella = ""
-  case Home
   case Auth
   case User
   case NMReverseGeocoding
   case Suggestion
   case Report
+  case TrashSpot
   public var typePath: String { "Data" }
 }
 
@@ -153,10 +153,6 @@ extension TargetDependency {
   public struct Domain: TargetDependencyDelegate {
     public static let Umbrella = Self.project(.domain(.Umbrella, isInterface: nil))
     
-    public struct Home: TargetDependencyDelegate {
-      public static let Interface = Self.project(.domain(.Home, isInterface: true))
-      public static let Implement = Self.project(.domain(.Home))
-    }
     public struct Auth: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.Auth, isInterface: true))
       public static let Implement = Self.project(.domain(.Auth))
@@ -177,15 +173,14 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.Report, isInterface: true))
       public static let Implement = Self.project(.domain(.Report))
     }
+    public struct TrashSpot: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.TrashSpot, isInterface: true))
+      public static let Implement = Self.project(.domain(.TrashSpot))
+    }
   }
   
   public struct Data: TargetDependencyDelegate {
     public static let Umbrella = Self.project(.data(.Umbrella, isInterface: nil))
-    
-    public struct Home: TargetDependencyDelegate {
-      public static let Interface = Self.project(.data(.Home, isInterface: true))
-      public static let Implement = Self.project(.data(.Home))
-    }
     public struct Auth: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Auth, isInterface: true))
       public static let Implement = Self.project(.data(.Auth))
@@ -205,6 +200,10 @@ extension TargetDependency {
     public struct Report: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Report, isInterface: true))
       public static let Implement = Self.project(.data(.Report))
+    }
+    public struct TrashSpot: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.TrashSpot, isInterface: true))
+      public static let Implement = Self.project(.data(.TrashSpot))
     }
   }
   

@@ -6,15 +6,12 @@
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
-import HomeDomain
 import NMReverseGeocodingDomain
 import SuggestionDomain
 
-import HomeDomainInterface
 import NMReverseGeocodingDomainInterface
 import SuggestionDomainInterface
 
-import HomeData
 import NMReverseGeocodingData
 import SuggestionData
 
@@ -27,6 +24,12 @@ import UserDomainInterface
 import UserDomain
 import UserDataInterface
 import UserData
+
+import TrashSpotDomainInterface
+import TrashSpotDomain
+import TrashSpotDataInterface
+import TrashSpotData
+
 import NetworkKit
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
@@ -34,19 +37,15 @@ struct DependencyRegister {
   /// UseCase에 Repository 주입
   func injection() {
     let networker = NetworkKit()
-    let homeRepository = HomeRepository.live
     let authRepository = AuthRepository.live(networker: networker)
     let userReoository = UserRepository.live(networker: networker)
+    let trashSpotRepository = TrashSpotRepository.live(networker: networker)
     
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live
 
     // MARK: - Home
-    HomeUseCaseRegister(
-      provider: {
-        HomeUseCase.live(repository: homeRepository)
-      }
-    )
+      
     NMReverseGeoCodeUseCaseRegister(
       provider: {
         NMReverseGeoCodeUseCase.live(repository: nmGeometryRepository)
@@ -102,6 +101,16 @@ struct DependencyRegister {
     
     SearchAreaUseCaseRegister {
       SearchAreaUseCase.live(repository: userReoository)
+    }
+    
+    // MARK: - Trash Spot
+    
+    FetchTrashSpotUseCaseRegister {
+      FetchTrashSpotUseCase.live(repository: trashSpotRepository)
+    }
+    
+    FetchTrashSpotDetailUseCaseRegister {
+      FetchTrashSpotDetailUseCase.live(repository: trashSpotRepository)
     }
     
   }

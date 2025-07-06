@@ -42,6 +42,10 @@ extension DesignKitFontFamily {
       public static let label2 = FontInfo(font: Pretendard.semiBold, size: 14, lineHeight: 1.5)
       public static let label3 = FontInfo(font: Pretendard.semiBold, size: 12, lineHeight: 1.5)
     }
+    
+    public static func customBoldFont(size: CGFloat) -> FontInfo {
+      return FontInfo(font: Pretendard.bold, size: size, lineHeight: 1.6)
+    }
   }
 }
 

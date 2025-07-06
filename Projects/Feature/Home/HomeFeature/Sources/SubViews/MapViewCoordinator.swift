@@ -9,23 +9,25 @@
 import Foundation
 import Utility
 import NMapsMap
-import HomeDomainInterface
+import TrashSpotDomainInterface
 
 extension MapViewRepresentable {
   class Coordinator: NSObject, NMFMapViewTouchDelegate, NMFMapViewCameraDelegate {
     var parent: MapViewRepresentable
     
-    var lastCameraPoint: MapPoint?
+    var lastCameraPoint: Coordinates?
     
     var isInitialBounds: Bool = true
     
-    var trashItems: [TrashItem] = []
+    var isFirstLoadData: Bool = true
+    
+    var trashItems: [TrashSpot] = []
     
     var markers: [NMFMarker] = []
     
     var activeMarker: NMFMarker?
     
-    var activeData: TrashItem?
+    var activeData: TrashSpot?
     
     init(_ parent: MapViewRepresentable) {
       self.parent = parent
@@ -50,7 +52,9 @@ extension MapViewRepresentable {
     }
     
     func mapViewCameraIdle(_ mapView: NMFMapView) {
-      configInitialMove(mapView, requestMapBounds: parent.requestMapBounds)
+      if isInitialBounds {
+        configInitialMove(mapView, requestMapBounds: parent.requestMapBounds)
+      }
     }
     
     
@@ -64,7 +68,7 @@ extension MapViewRepresentable {
     }
     
     /// 마커 활성화 설정
-    func markerTapEvent(marker: NMFMarker, data: TrashItem) {
+    func markerTapEvent(marker: NMFMarker, data: TrashSpot) {
       resetActiveMarker()
       self.activeMarker = marker
       self.activeData = data
@@ -81,7 +85,7 @@ extension MapViewRepresentable {
     }
     
     /// 지도에 나타나는 마커 리스트 저장
-    func drawMarker(items: [TrashItem], markers: [NMFMarker]) {
+    func drawMarker(items: [TrashSpot], markers: [NMFMarker]) {
       self.trashItems = items
       self.markers = markers
     }

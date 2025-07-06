@@ -32,32 +32,32 @@ public struct SnackBar: View {
     VStack {
       Spacer()
       if isVisible, let message {
-        ZStack(alignment: .bottomLeading) {
-          RoundedRectangle(cornerRadius: .Number10)
-            .fill(ColorSet.Background.Inverse)
-            .frame(height: .Number48)
-            .frame(maxWidth: .infinity)
-          HStack {
-            Text(message)
-              .font(FontSet.Body.body2)
-              .foregroundStyle(ColorSet.Text.Inverse)
-              .frame(maxWidth: .infinity, alignment: .leading)
-            if let buttonLabel {
-              Button { Task { await action() } }
-              label: {
-                Text(buttonLabel)
-                  .font(FontSet.Label.label1)
-                  .foregroundStyle(ColorSet.Text.InverseAccent)
-                  .padding(.horizontal, .Number8)
-              }
+        HStack(alignment: .bottom, spacing: 8) {
+          Text(message)
+            .font(FontSet.Body.body2)
+            .foregroundStyle(ColorSet.Text.Inverse)
+            .lineLimit(nil)
+            .fixedSize(horizontal: false, vertical: true)
+          Spacer()
+          if let buttonLabel {
+            Button { Task { await action() } } label: {
+              Text(buttonLabel)
+                .font(FontSet.Label.label1)
+                .foregroundStyle(ColorSet.Text.InverseAccent)
+                .padding(.horizontal, .Number8)
             }
           }
-          .padding(.vertical, .Number12)
-          .padding(.leading, .Number16)
-          .padding(.trailing, .Number12)
         }
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, .Number12)
+        .padding(.horizontal, .Number16)
+        .background(
+          RoundedRectangle(cornerRadius: .Number10)
+            .fill(ColorSet.Background.Inverse)
+        )
+        .fixedSize(horizontal: false, vertical: true)
         .opacity(boxOpacity)
-        .clipped()
       }
     }
     .onChange(of: message) {

@@ -135,7 +135,7 @@ public struct TrashDetailView: View {
     HStack(spacing: .Number4) {
       Badge(text: .constant(trashType), state: .primary)
       if let name = suggestionName {
-        Badge(text: .constant(name), state: .primary, icon: .verified)
+        Badge(text: .constant(name), state: .primary, icon: .verified, suffix: " 제보")
       } else {
         Badge(text: .constant("공공데이터포털"), state: .primary, icon: .verified)
       }

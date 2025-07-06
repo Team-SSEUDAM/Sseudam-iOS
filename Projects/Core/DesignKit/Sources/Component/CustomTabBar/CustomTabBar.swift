@@ -41,7 +41,8 @@ public struct CustomTabBar: View {
         image: isActive
         ? tab.tabBarIcons.selected
         : tab.tabBarIcons.unselected,
-        size: .Number30
+        size: .Number30,
+        renderingMode: .template
       )
       .foregroundColor(isActive ? ColorSet.Icon.Accent : ColorSet.Icon.Secondary)
       Text(tab.title)

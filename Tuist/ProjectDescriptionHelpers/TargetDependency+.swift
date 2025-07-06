@@ -31,6 +31,7 @@ public enum Feature: String, ModuleRepresentable {
   case SelectSpotName
   case SelectSpotCategory
   case SelectSpotImage
+  case Suggestion
   public var typePath: String { "Feature" }
 }
 
@@ -140,6 +141,7 @@ extension TargetDependency {
     
     public static let Home = Self.project(.feature(.Home))
     public static let Report = Self.project(.feature(.Report))
+    public static let Suggestion = Self.project(.feature(.Suggestion))
     public static let SelectSpotLocation = Self.project(.feature(.SelectSpotLocation))
     public static let SelectSpotName = Self.project(.feature(.SelectSpotName))
     public static let SelectSpotCategory = Self.project(.feature(.SelectSpotCategory))

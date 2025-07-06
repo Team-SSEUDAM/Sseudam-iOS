@@ -9,12 +9,13 @@
 import Foundation
 import TrashSpotDomainInterface
 import NetworkKit
+import Utility
 
 public struct PointDTO: DTO {
   public let type: String
   public let coordinates: [Double] // [longitude, latitude]
   
-  public func toEntity() throws -> MapPoint {
+  public func toEntity() throws -> Coordinates {
     return .init(latitude: coordinates[1], longitude: coordinates[0])
   }
 }

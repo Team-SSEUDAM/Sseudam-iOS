@@ -15,7 +15,7 @@ extension MapViewRepresentable {
   class Coordinator: NSObject, NMFMapViewTouchDelegate, NMFMapViewCameraDelegate {
     var parent: MapViewRepresentable
     
-    var lastCameraPoint: MapPoint?
+    var lastCameraPoint: Coordinates?
     
     var isInitialBounds: Bool = true
     

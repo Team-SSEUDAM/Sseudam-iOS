@@ -10,6 +10,7 @@ import Foundation
 import TrashSpotDomainInterface
 import NetworkKit
 import DesignKit
+import Utility
 
 public struct TrashSpotListDTO: DTO {
   public let list: [TrashSpotDTO]
@@ -29,7 +30,7 @@ public struct TrashSpotDTO: DTO {
   
   public func toEntity() throws -> TrashSpot {
     let address: String = try address.toEntity().address
-    let point: MapPoint = try point.toEntity()
+    let point: Coordinates = try point.toEntity()
     return .init(
       id: id,
       name: name,

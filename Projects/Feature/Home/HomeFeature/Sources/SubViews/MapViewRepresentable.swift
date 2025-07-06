@@ -15,7 +15,7 @@ import CoreGraphics
 
 struct MapViewRepresentable: UIViewRepresentable {
   
-  @Binding var userLocation: MapPoint?
+  @Binding var userLocation: Coordinates?
   /// 현재 지도 범위 요청 플래그
   @Binding var requestMapBounds: Bool
   /// 지도에 나타나는 쓰레기통 아이템 리스트
@@ -26,13 +26,13 @@ struct MapViewRepresentable: UIViewRepresentable {
   @Binding var isNeedDeleteMarker: Bool
   
   /// 지도 범위 전달 클로저
-  var mapBounds: (([MapPoint]) -> Void)? = nil
+  var mapBounds: (([Coordinates]) -> Void)? = nil
   /// 마커 탭 시 id값을 전달하기 위한 클로저
   var onMarkerTapped: ((Int?) -> Void)? = nil
   
   var didTapMap:(() -> Void)? = nil
   /// 기본 위치
-  private let defaultPoint: MapPoint = .init(latitude: 37.50545, longitude: 127.10143)
+  private let defaultPoint: Coordinates = .init(latitude: 37.50545, longitude: 127.10143)
   
   func makeUIView(context: Context) -> NMFNaverMapView {
     let view = NMFNaverMapView()
@@ -89,9 +89,9 @@ struct MapViewRepresentable: UIViewRepresentable {
 
 extension MapViewRepresentable {
   
-  private func moveLocation(_ view: NMFNaverMapView, to location: MapPoint, context: Context) {
+  private func moveLocation(_ view: NMFNaverMapView, to location: Coordinates, context: Context) {
     let cameraPosition = view.mapView.cameraPosition.target
-    let point = MapPoint(latitude: cameraPosition.lat, longitude: cameraPosition.lng)
+    let point = Coordinates(latitude: cameraPosition.lat, longitude: cameraPosition.lng)
     
     if point != context.coordinator.lastCameraPoint {
       moveCamera(view, to: location)
@@ -108,11 +108,11 @@ extension MapViewRepresentable {
   /// 현재 지도에 보이는 좌표 범위를 반환하는 메서드
   func currentVisibleBounds(on mapView: NMFMapView) {
     let bounds = mapView.projection.latlngBounds(fromViewBounds: mapView.bounds)
-    let northEast = MapPoint(
+    let northEast = Coordinates(
       latitude: bounds.northEastLat.rounded(to: 6),
       longitude: bounds.northEastLng.rounded(to: 6)
     )
-    let southWest = MapPoint(
+    let southWest = Coordinates(
       latitude: bounds.southWestLat.rounded(to: 6),
       longitude: bounds.southWestLng.rounded(to: 6)
     )
@@ -131,7 +131,7 @@ extension MapViewRepresentable {
   }
   
   /// 여러 마커의 중간지점 찾는 메서드
-  private func averageCenter(of points: [MapPoint]) -> MapPoint? {
+  private func averageCenter(of points: [Coordinates]) -> Coordinates? {
     guard !points.isEmpty else { return nil }
     
     let total = points.reduce((lat: 0.0, lon: 0.0)) { result, point in
@@ -139,7 +139,7 @@ extension MapViewRepresentable {
     }
     
     let count = Double(points.count)
-    return MapPoint(
+    return Coordinates(
       latitude: total.lat / count,
       longitude: total.lon / count
     )
@@ -209,7 +209,7 @@ extension MapViewRepresentable {
 extension MapViewRepresentable {
   
   /// 카메라 이동 메서드
-  private func moveCamera(_ view: NMFNaverMapView, to point: MapPoint?, zoomLevel: Double = 16) {
+  private func moveCamera(_ view: NMFNaverMapView, to point: Coordinates?, zoomLevel: Double = 16) {
     if let point = point {
       let coord = NMGLatLng(lat: point.latitude, lng: point.longitude)
       let cameraUpdate = NMFCameraUpdate(scrollTo: coord, zoomTo: zoomLevel)
@@ -231,7 +231,7 @@ extension MapViewRepresentable {
       if context.coordinator.isFirstLoadData {
         if items.count >= 20 {
           let currentPosition = view.mapView.cameraPosition.target
-          let mapPoint: MapPoint = .init(
+          let mapPoint: Coordinates = .init(
             latitude: currentPosition.lat,
             longitude: currentPosition.lng
           )
@@ -260,7 +260,7 @@ extension MapViewRepresentable {
     guard !items.isEmpty else { return }
     
     let center = view.mapView.cameraPosition.target
-    let centerPoint = MapPoint(latitude: center.lat, longitude: center.lng)
+    let centerPoint = Coordinates(latitude: center.lat, longitude: center.lng)
     let markerPoints = items.map { $0.location }
     
     // 가장 먼 거리(미터 단위)

@@ -32,7 +32,7 @@ public struct MapFeature {
     /// 확장 검색 여부
     public var isExpandedRetry: Bool = false
     /// 확장 검색 시도 시 필요한 이전 탐색 범위
-    public var lastSearchedBounds: [MapPoint]? = nil
+    public var lastSearchedBounds: [Coordinates]? = nil
     
     public init() {}
   }
@@ -43,7 +43,7 @@ public struct MapFeature {
     /// 범위 요청
     case requestMapBounds(Bool)
     /// 쓰레기통 데이터 조회
-    case fetchTrashItems([MapPoint])
+    case fetchTrashItems([Coordinates])
     /// 쓰레기통 데이터 조회 Result
     case fetchTrashItemsResult(Result<[TrashSpot], NetworkError>)
     /// 쓰레기통 데이터 저장 및 처리
@@ -53,7 +53,7 @@ public struct MapFeature {
     /// 첫 진입 직후 아이템 검색
     case firstLoadSearch
     /// 첫 진입 시 아이템 없을 경우 범위 확장
-    case requestExpandedMapBounds([MapPoint])
+    case requestExpandedMapBounds([Coordinates])
     /// 확장 검색
     case expandSearch
     /// 필터 버튼 탭
@@ -163,7 +163,7 @@ public struct MapFeature {
 }
 
 extension MapFeature {
-  private func fetchTrashItem(bounds: [MapPoint], type: TrashType?) -> Effect<Action> {
+  private func fetchTrashItem(bounds: [Coordinates], type: TrashType?) -> Effect<Action> {
     return .run { send in
       let parameter: FetchTrashSpotParameter = .init(
         region: nil,
@@ -183,17 +183,17 @@ extension MapFeature {
   }
   
   /// 지도 범위 확장
-  private func expandBounds(_ bounds: [MapPoint], ratio: Double) -> [MapPoint] {
+  private func expandBounds(_ bounds: [Coordinates], ratio: Double) -> [Coordinates] {
       guard bounds.count == 2 else { return bounds }
       let sw = bounds[0]
       let ne = bounds[1]
       let latDelta = ne.latitude - sw.latitude
       let lngDelta = ne.longitude - sw.longitude
-      let newSW = MapPoint(
+      let newSW = Coordinates(
           latitude: sw.latitude - latDelta * ratio,
           longitude: sw.longitude - lngDelta * ratio
       )
-      let newNE = MapPoint(
+      let newNE = Coordinates(
           latitude: ne.latitude + latDelta * ratio,
           longitude: ne.longitude + lngDelta * ratio
       )

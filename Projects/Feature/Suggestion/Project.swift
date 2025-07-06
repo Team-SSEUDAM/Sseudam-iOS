@@ -12,6 +12,10 @@ import ProjectDescriptionHelpers
 let project = Project.makeFeature(
   for: Feature.Suggestion,
   dependencies: [
+    .Features.SelectSpotCategory,
+    .Features.SelectSpotImage,
+    .Features.SelectSpotLocation,
+    .Features.SelectSpotName,
     .Domain.Umbrella
   ]
 )

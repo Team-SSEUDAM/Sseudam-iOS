@@ -26,6 +26,7 @@ public struct HomeFeature {
     public var location: LocationFeature.State = .init()
     public var map: MapFeature.State = .init()
     
+    public var isHiddenReportButton: Bool = false
     public var path = StackState<Path.State>()
     public var isPresentDetail: Bool = false
     public var toastMessage: String? = nil
@@ -42,6 +43,7 @@ public struct HomeFeature {
     case showToastMessage(String?)
     case presentDetailView(Bool, id: Int? = nil)
     case presentAlert(AlertType)
+    case hiddenReportButton(Bool)
     
     case reportButtonTapped
     case moveToSetting
@@ -98,6 +100,10 @@ public struct HomeFeature {
           return .send(.presentDetailView(isShow, id: id))
         }
         
+      case let .hiddenReportButton(isHidden):
+        state.isHiddenReportButton = isHidden
+        return .none
+        
         // MARK: - Send Action to HomeRoot
         
       case .reportButtonTapped:
@@ -110,6 +116,11 @@ public struct HomeFeature {
           await MainActor.run {
             send(.delegate(.needToHiddenTabBar(isPresent)))
             send(.delegate(.presentDetailView(isPresent, id: id)))
+          }
+          
+          try await Task.sleep(for: .seconds(isPresent ? 0 : 0.13))
+          await MainActor.run {
+            send(.hiddenReportButton(isPresent))
           }
         }
         

@@ -103,8 +103,14 @@ struct DependencyRegister {
       SearchAreaUseCase.live(repository: userReoository)
     }
     
+    // MARK: - Trash Spot
+    
     FetchTrashSpotUseCaseRegister {
       FetchTrashSpotUseCase.live(repository: trashSpotRepository)
+    }
+    
+    FetchTrashSpotDetailUseCaseRegister {
+      FetchTrashSpotDetailUseCase.live(repository: trashSpotRepository)
     }
     
   }

@@ -18,6 +18,11 @@ public extension TrashSpotRepository {
         let endpoint = TrashSpotEndPoint.fetchTrashSpot(parameter: parameter)
         return try await networker.execute(with: endpoint, timeout: 60).toEntity()
       
-    })
+    },
+      fetchTrashSpotDetail: { id in
+        let endpoint = TrashSpotEndPoint.fetchTrashSpotDetail(spotId: id)
+        return try await networker.execute(with: endpoint, timeout: 60).toEntity()
+      }
+    )
   }
 }

@@ -11,5 +11,6 @@ import Foundation
 public enum LottieSet: String {
   case loading = "loading"
   
+  
   public var name: String { return rawValue }
 }

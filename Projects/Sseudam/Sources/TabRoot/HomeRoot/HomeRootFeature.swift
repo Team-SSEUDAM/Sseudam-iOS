@@ -10,6 +10,7 @@ import SwiftUI
 import ComposableArchitecture
 import HomeFeature
 import TrashDetailFeature
+import DesignKit
 
 @Reducer
 struct HomeRootFeature {
@@ -25,11 +26,16 @@ struct HomeRootFeature {
     case binding(BindingAction<State>)
     case home(HomeFeature.Action)
     case trashDetail(TrashDetailFeature.Action)
+    
+    case closeAlertAction(AlertType)
+    case acceptAlertAction(AlertType)
+    
     case delegate(Delegate)
   }
   
   enum Delegate: Equatable {
     case hiddenTabBar(Bool)
+    case presentAlert(AlertType)
   }
   
   var body: some ReducerOf<Self> {
@@ -40,12 +46,39 @@ struct HomeRootFeature {
     Reduce { state, action in
       switch action {
         
-      case let .home(.delegate(.presentDetailView(isPresent))):
-        state.trashDetail = isPresent ? .init() : nil
+      case let .home(.delegate(.presentDetailView(isPresent, id))):
+        state.trashDetail = isPresent ? .init(id: id) : nil
         state.isPresentDetail = isPresent
         return .none
-      case let .home(.delegate(.needToHiddenTabBar(isHidden))):
-        return .send(.delegate(.hiddenTabBar(isHidden)))
+
+        // MARK: - Alert
+        
+      case .closeAlertAction:
+        return .none
+        
+      case let .acceptAlertAction(type):
+        switch type {
+        case .locationPermission:
+          return .send(.home(.moveToSetting))
+        default: return .none
+        }
+        
+        // MARK: - Receive HomeFeature Delegate Action
+        
+      case let .home(.delegate(action)):
+        switch action {
+        case let .presentDetailView(isPresent, id):
+          state.trashDetail = isPresent ? .init(id: id) : nil
+          state.isPresentDetail = isPresent
+          return .none
+          
+        case let .presentAlert(alert):
+          return .send(.delegate(.presentAlert(alert)))
+
+          case let .needToHiddenTabBar(isHidden):
+            return .send(.delegate(.hiddenTabBar(isHidden)))
+        }
+        
       default: return .none
       }
     }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 public struct Coordinates: Sendable, Codable, Equatable {
   public let latitude: Double
@@ -19,5 +20,13 @@ public struct Coordinates: Sendable, Codable, Equatable {
   
   public static func == (lhs: Coordinates, rhs: Coordinates) -> Bool {
     return lhs.latitude == rhs.latitude && lhs.longitude == rhs.longitude
+  }
+}
+
+extension Coordinates {
+  public func distance(to other: Coordinates) -> Double {
+    let loc1 = CLLocation(latitude: latitude, longitude: longitude)
+    let loc2 = CLLocation(latitude: other.latitude, longitude: other.longitude)
+    return loc1.distance(from: loc2)
   }
 }

@@ -86,7 +86,7 @@ public struct HomeFeature {
         return .send(.map(.requestMapBounds(isRequest)))
         
       case .location(.delegate(.denyLocationPermission)):
-        return .send(.delegate(.presentAlert(.locationPermission)))
+        return .send(.presentAlert(.locationPermission))
         
         // MARK: - Receive MapFeature delegate action
         

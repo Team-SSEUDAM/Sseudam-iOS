@@ -46,11 +46,7 @@ public struct ReportFeature {
     var selectedReportInfoType: Int = 0 /// 선택된 제보 정보 타입
     
     /// 제보하기에 담길 데이터
-    var spotName: String = ""
-    var centerPoint: Coordinates?
     var nmReverseGeoCodeEntity: NMGeoCodeReverseEntity?
-    var trashType: String = ""
-    var isNavigationBarHidden = false
     
     var selectedPhoto: UIImage? = nil
     
@@ -291,8 +287,8 @@ private extension ReportFeature {
       return .send(.setIsLoading(isLoading))
       
     case let .centerChanged(location, entity):
-      state.centerPoint = location
       state.nmReverseGeoCodeEntity = entity
+      if let location = location { state.trashSpotDetail.point = location }
       return .send(.nextButtonIsEnabled(location != nil && entity != nil))
     }
   }
@@ -306,11 +302,10 @@ private extension ReportFeature {
     
     switch action {
     case let .localValidationCompleted(isValid, name):
-      state.spotName = name
       return .send(.nextButtonIsEnabled(isValid))
       
     case let .serverValidationCompleted(isValid, name):
-      state.spotName = name
+      state.trashSpotDetail.name = name
       if isValid {
         state.currentPage = 3
         return .run { send in
@@ -335,7 +330,7 @@ private extension ReportFeature {
     
     switch action {
     case let .didSelectKind(trashType):
-      state.trashType = trashType
+      state.trashSpotDetail.trashType = TrashType(rawValue: trashType) ?? .general
       return .send(.nextButtonIsEnabled(true))
     }
   }
@@ -364,11 +359,12 @@ public extension ReportFeature {
     .run { send in
       do {
         await send(.setIsLoading(true))
+        /// TODO: Report의 UseCase에서 `/reports/{spotId}`로 변경
         let entity = try await useCase.execute(
-          state.spotName,
-          state.centerPoint,
+          state.trashSpotDetail.name,
+          state.trashSpotDetail.point,
           state.nmReverseGeoCodeEntity,
-          state.trashType
+          state.trashSpotDetail.trashType.rawValue
         )
         await send(.spotSuggestionResult(.success(entity)))
       } catch is CancellationError {

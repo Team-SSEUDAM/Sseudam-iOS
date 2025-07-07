@@ -107,7 +107,8 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     lastUpdateTime = now
     
     if let coord = coord {
-      userLocation = coord
+      if coord == userLocation { return }
+      else { userLocation = coord }
     } else {
       userLocation = nil
     }

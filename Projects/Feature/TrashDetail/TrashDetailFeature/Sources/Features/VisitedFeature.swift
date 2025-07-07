@@ -33,6 +33,8 @@ public struct VisitedFeature {
     case setTrashSpotInfo(spotId: Int?, point: Coordinates?)
     /// 이전에 남아있던 데이터 초기화
     case initialVisitedData
+    /// 방문하기 버튼 가능 여부
+    case visitedButtonEnable(Bool)
   }
   
   public var body: some ReducerOf<Self> {
@@ -40,13 +42,7 @@ public struct VisitedFeature {
     Reduce { state, action in
       switch action {
       case .fetchUserLocation:
-        return .run { send in
-          if let location = await LocationService.shared.userLocation {
-            print(location)
-          } else {
-            await send(.setLocationPermission(isDeny: true))
-          }
-        }
+        return checkDistanceFromUserLocation(target: state.trashSpotPoint)
         
       case let .setLocationPermission(isDeny):
         state.isDenyPermission = isDeny
@@ -58,13 +54,34 @@ public struct VisitedFeature {
         return .none
         
       case .initialVisitedData:
-        state.isVisitedButtonEnable = .disabled
         return .merge([
+          .send(.visitedButtonEnable(false)),
           .send(.setTrashSpotInfo(spotId: nil, point: nil)),
           .send(.setLocationPermission(isDeny: true))
         ])
         
+      case let .visitedButtonEnable(isEnable):
+        state.isVisitedButtonEnable = isEnable ? .normal : .disabled
+        return .none
+        
       default: return .none
+      }
+    }
+  }
+  
+  
+  /// 내 위치와 쓰레기통 위치 거리 비교
+  /// - Parameter target: 쓰레기통 좌표
+  private func checkDistanceFromUserLocation(target: Coordinates?) -> Effect<Action> {
+    return .run { send in
+      if let location = await LocationService.shared.userLocation {
+        if let target = target {
+          await send(.visitedButtonEnable(location.distance(to: target) <= 5))
+        } else {
+          await send(.visitedButtonEnable(false))
+        }
+      } else {
+        await send(.setLocationPermission(isDeny: true))
       }
     }
   }

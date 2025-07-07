@@ -40,7 +40,7 @@ public struct SecondaryButton<Icon: View>: View {
   private var icon: () -> Icon
   private var state: SecondaryButtonState
   
-  private var action: @Sendable () async -> Void
+  private var action: @Sendable () -> Void
   
   @State private var isPressed: Bool = false
   
@@ -49,7 +49,7 @@ public struct SecondaryButton<Icon: View>: View {
     title: String,
     size: SecondaryButtonSize = .large,
     state: SecondaryButtonState = .normal,
-    _ action: @escaping @Sendable () async -> Void
+    _ action: @escaping @Sendable () -> Void
   ) {
     self.title = title
     self.size = size
@@ -66,7 +66,7 @@ public struct SecondaryButton<Icon: View>: View {
           .onEnded {
             _ in
             isPressed = false
-            Task { await action() }
+            Task { action() }
           }
       )
       .disabled(state == .disabled)

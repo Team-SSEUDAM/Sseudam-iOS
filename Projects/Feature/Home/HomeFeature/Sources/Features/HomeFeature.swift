@@ -114,9 +114,10 @@ public struct HomeFeature {
 
       case let .presentDetailView(isPresent, id):
         state.isPresentDetail = isPresent
+        let isPathEmpty = state.path.isEmpty
         return .run { send in
           await MainActor.run {
-            send(.delegate(.needToHiddenTabBar(isPresent)))
+            if isPathEmpty { send(.delegate(.needToHiddenTabBar(isPresent))) }
             send(.delegate(.presentDetailView(isPresent, id: id)))
           }
           

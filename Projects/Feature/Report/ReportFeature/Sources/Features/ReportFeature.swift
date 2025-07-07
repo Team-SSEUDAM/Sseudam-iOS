@@ -36,7 +36,7 @@ public struct ReportFeature {
     
     var selectedReportInfo: SelectReportInfoTypeFeature.State = SelectReportInfoTypeFeature.State()
     /// 각 페이지별 상태를 Child로 관리
-    var child: ReportChildFeature.State = ReportChildFeature.State()
+    var child: ReportChildFeature.State
     
     var nextButtonState: PrimaryButtonState = .normal
     var nextButtonIsHidden: Bool = false /// 다음 버튼의 숨김 상태
@@ -58,6 +58,7 @@ public struct ReportFeature {
       _ detail: TrashSpotDetail
     ) {
       self.trashSpotDetail = detail
+      self.child = ReportChildFeature.State(detail)
     }
   }
   

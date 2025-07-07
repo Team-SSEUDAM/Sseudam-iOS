@@ -119,10 +119,13 @@ public struct ReportView: View {
   
   @ViewBuilder
   private var bottomButtonView: some View {
-    if !store.nextButtonIsHidden {
+    ZStack {
       nextButton
         .padding(.horizontal, .Number16)
         .padding(.vertical, .Number24)
+      if store.nextButtonIsHidden {
+        Rectangle().frame(height: .Number48).background(ColorSet.Background.Primary)
+      }
     }
   }
   

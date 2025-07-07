@@ -105,9 +105,9 @@ public struct TrashDetailView: View {
             size: .medium,
             state: .constant(.normal)
           ) {
-              print("제보하러 가기")
-            }
-            .frame(width: 116)
+            print("제보하러 가기")
+          }
+          .frame(width: 116)
         }
       }
     }
@@ -148,8 +148,10 @@ public struct TrashDetailView: View {
   private var ButtonsView: some View {
     GeometryReader { geo in
       HStack(spacing: .Number8) {
-        SecondaryButton(title: "수정 제안하기", size: .medium) { }
-          .frame(width: (geo.size.width - .Number8) / 3)
+        SecondaryButton(title: "수정 제안하기", size: .medium) {
+          store.send(.reportButtonTapped)
+        }
+        .frame(width: (geo.size.width - .Number8) / 3)
         
         PrimaryButton(
           title: .constant("이 곳에 쓰레기 버리기"),

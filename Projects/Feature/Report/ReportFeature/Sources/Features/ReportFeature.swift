@@ -11,6 +11,7 @@ import ComposableArchitecture
 import Utility
 import NMReverseGeocodingDomainInterface
 import SuggestionDomainInterface
+import TrashSpotDomainInterface
 
 import SelectSpotImageFeature
 import SelectSpotCategoryFeature
@@ -31,6 +32,7 @@ public struct ReportFeature {
     @Presents var destination: Destination.State?
     
     var currentPage: Int = 0
+    var trashSpotDetail: TrashSpotDetail
     
     var selectedReportInfo: SelectReportInfoTypeFeature.State = SelectReportInfoTypeFeature.State()
     /// 각 페이지별 상태를 Child로 관리
@@ -52,7 +54,11 @@ public struct ReportFeature {
     
     var selectedPhoto: UIImage? = nil
     
-    public init() {}
+    public init(
+      _ detail: TrashSpotDetail
+    ) {
+      self.trashSpotDetail = detail
+    }
   }
   
   public enum Action: BindableAction, Equatable {
@@ -94,7 +100,7 @@ public struct ReportFeature {
     
     
     case backButtonTapped
-    case pop
+    case pop(TrashSpotDetail)
     case backPageTapped
   }
   
@@ -115,7 +121,7 @@ public struct ReportFeature {
       switch action {
       case .backButtonTapped:
         switch state.currentPage {
-        case 0: return .send(.pop) /// RecordFeature에서 처리
+        case 0: return .send(.pop(state.trashSpotDetail)) /// RecordFeature에서 처리
         default: return .send(.backPageTapped)
         }
         

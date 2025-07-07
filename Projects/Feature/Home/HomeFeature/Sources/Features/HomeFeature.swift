@@ -46,7 +46,7 @@ public struct HomeFeature {
     case presentAlert(AlertType)
     case hiddenReportButton(Bool)
     
-    case reportButtonTapped
+    case receiveTrashDetailFromRoot(TrashSpotDetail?)
     case moveToSetting
     case suggestionButtonTapped
     case delegate(Delegate)
@@ -132,9 +132,9 @@ public struct HomeFeature {
           state.path.removeLast()
           return .none
           
-        case .element(id: _, action: .reportView(.pop)):
+        case let .element(id: _, action: .reportView(.pop(detail))):
           state.path.removeLast()
-          return .none
+          return .send(.presentDetailView(true, id: detail.id))
         default: return .none
         }
         
@@ -148,6 +148,12 @@ public struct HomeFeature {
           }
         }
         
+      case let .receiveTrashDetailFromRoot(trashSpotDetail):
+        if let detail = trashSpotDetail {
+          state.path.append(.reportView(ReportFeature.State(detail)))
+          return .send(.presentDetailView(false))
+        }
+        return .none
       default: return .none
       }
     }

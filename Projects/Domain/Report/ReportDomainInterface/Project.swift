@@ -12,7 +12,8 @@ import ProjectDescriptionHelpers
 let project = Project.makeStaticLibraryProject(
   for: Domain.Report,
   dependencies: [
-    .Core.Umbrella
+    .Core.Umbrella,
+    .Domain.TrashSpot.Interface
   ],
   nameSuffix: "Interface"
 )

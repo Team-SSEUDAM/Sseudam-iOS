@@ -1,15 +1,15 @@
 //
-//  SpotNameValidateUseCase.swift
-//  SuggestionDomainInterface
+//  ReportSpotNameValidateUseCase.swift
+//  ReportDomainInterface
 //
-//  Created by 조용인 on 6/30/25.
+//  Created by 조용인 on 7/7/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
 import Foundation
 import Utility
 
-public struct SpotNameValidateUseCase {
+public struct ReportSpotNameValidateUseCase {
   public var execute: @Sendable (
     _ spotName: String
   ) async throws -> Bool

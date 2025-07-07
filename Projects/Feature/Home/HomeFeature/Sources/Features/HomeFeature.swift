@@ -70,11 +70,7 @@ public struct HomeFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
-        return .run { send in
-          await MainActor.run {
-            send(.location(.fetchUserLocation))
-          }
-        }
+        return .send(.location(.moveUserLocation))
         
       case let .showToastMessage(message):
         state.toastMessage = message

@@ -41,10 +41,6 @@ public struct VisitedFeature {
       switch action {
       case .fetchUserLocation:
         return .run { send in
-          await LocationService.shared.requestUserLocation(mode: .continuous)
-        }
-      case .userLocation:
-        return .run { send in
           if let location = await LocationService.shared.userLocation {
             print(location)
           } else {

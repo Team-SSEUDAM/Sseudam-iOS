@@ -54,17 +54,15 @@ public struct TrashDetailView: View {
     .padding(.horizontal, .Number16)
     .padding(.vertical, .Number20)
     .onAppear {
+      LocationService.shared.startTracking()
       store.send(.visited(.fetchUserLocation))
     }
     .onDisappear {
-      Task {
-        await LocationService.shared.stopUpdatingLocation()
-      }
+      LocationService.shared.stopUpdatingLocation()
     }
     .task { @MainActor in
-      for await _ in await LocationService.shared.userLocationStream
-      {
-        store.send(.visited(.userLocation))
+      for await _ in LocationService.shared.userLocationStream {
+        store.send(.visited(.fetchUserLocation))
       }
     }
   }

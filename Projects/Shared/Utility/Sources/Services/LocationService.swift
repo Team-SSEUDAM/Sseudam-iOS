@@ -15,7 +15,8 @@ public enum LocationUpdateMode {
 }
 
 /// 위치 권한 관련 서비스 구현
-public actor LocationService: NSObject, CLLocationManagerDelegate {
+@MainActor
+public class LocationService: NSObject, CLLocationManagerDelegate {
   
   public static let shared = LocationService()
   public private(set) var userLocation: Coordinates? = nil
@@ -30,34 +31,69 @@ public actor LocationService: NSObject, CLLocationManagerDelegate {
     return manager
   }()
   
+  
+  /// 단발 위치 요청 시 응답을 위한 continuation
+  private var singleLocationContinuation: CheckedContinuation<Coordinates?, Never>?
+  
+  /// 내부에서 유지하는 위치 업데이트 스트림
+  private let userLocationStreamInternal: AsyncStream<Void>
+  
+  /// 위치 업데이트 발생 시 외부로 전달할 continuation
   private var userLocationContinuation: AsyncStream<Void>.Continuation?
+  
+  /// 외부에 노출되는 위치 업데이트 스트림 (읽기 전용)
   public var userLocationStream: AsyncStream<Void> {
-    AsyncStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
-      self.userLocationContinuation = continuation
-    }
+    userLocationStreamInternal
   }
   
   // MARK: - Initialize
   
   private override init() {
+    var continuation: AsyncStream<Void>.Continuation!
+    self.userLocationStreamInternal = AsyncStream { cont in
+      continuation = cont
+    }
+    self.userLocationContinuation = continuation
     super.init()
   }
   
   // MARK: - Location Method
   
-  public func requestUserLocation(mode: LocationUpdateMode = .single) {
-    self.mode = mode
-    let authorizationStatus = locationManager.authorizationStatus
-    switch authorizationStatus {
-    case .authorizedWhenInUse, .authorizedAlways:
-      userLocation = nil
+  
+  /// 단발 위치 요청 (버튼 눌렀을 때 사용)
+  public func requestSingleLocation() async -> Coordinates? {
+    self.mode = .single
+    return await withCheckedContinuation { continuation in
+      self.singleLocationContinuation = continuation
+
+      let status = locationManager.authorizationStatus
+      switch status {
+      case .authorizedWhenInUse, .authorizedAlways:
+        locationManager.startUpdatingLocation()
+      case .notDetermined:
+        locationManager.requestWhenInUseAuthorization()
+      case .denied, .restricted:
+        self.singleLocationContinuation = nil
+        continuation.resume(returning: nil)
+      default:
+        break
+      }
+    }
+  }
+  
+  /// 연속으로 유저 위치 요청
+  public func startTracking() {
+    self.mode = .continuous
+    let status = locationManager.authorizationStatus
+    switch status {
+    case .authorizedAlways, .authorizedWhenInUse:
       locationManager.startUpdatingLocation()
     case .notDetermined:
       locationManager.requestWhenInUseAuthorization()
     case .denied, .restricted:
       userLocation = nil
       userLocationContinuation?.yield(())
-    @unknown default:
+    default:
       break
     }
   }
@@ -76,6 +112,11 @@ public actor LocationService: NSObject, CLLocationManagerDelegate {
       userLocation = nil
     }
     userLocationContinuation?.yield(())
+    
+    if let continuation = singleLocationContinuation {
+      singleLocationContinuation = nil
+      continuation.resume(returning: coord)
+    }
     
     if mode == .single {
       locationManager.stopUpdatingLocation()

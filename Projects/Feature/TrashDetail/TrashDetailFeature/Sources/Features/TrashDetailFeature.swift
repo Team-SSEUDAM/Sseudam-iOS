@@ -32,6 +32,8 @@ public struct TrashDetailFeature {
     case noTrashData
     case reportButtonTapped
     
+    case setInitVisitedState
+    case emptyTrashData(Bool)
     case fetchTrashDetail(id: Int)
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
     
@@ -52,14 +54,20 @@ public struct TrashDetailFeature {
       switch action {
       case let .showDetail(id):
         if let id = id {
-          state.isEmptyList = false
-          return .send(.fetchTrashDetail(id: id))
+          return .concatenate([
+            .send(.emptyTrashData(false)),
+            .send(.setInitVisitedState),
+            .send(.fetchTrashDetail(id: id))
+          ])
         } else {
-          return .send(.noTrashData)
+          return .send(.emptyTrashData(true))
         }
         
-      case .noTrashData:
-        state.isEmptyList = true
+      case .setInitVisitedState:
+        return .send(.visited(.initialVisitedData))
+        
+      case let .emptyTrashData(isEmpty):
+        state.isEmptyList = isEmpty
         return .none
         
       case .reportButtonTapped:
@@ -70,12 +78,12 @@ public struct TrashDetailFeature {
         
       case let .fetchTrashDetailResult(.success(data)):
         state.trashDetail = data
-        return .none
+        return .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point)))
         
       case let .fetchTrashDetailResult(.failure(error)):
         print(error)
         state.trashDetail = nil
-        return .none
+        return .send(.visited(.initialVisitedData))
         
         default: return .none
       }

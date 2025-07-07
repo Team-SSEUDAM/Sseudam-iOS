@@ -123,7 +123,7 @@ public struct HomeView: View {
       }
       Spacer()
       VStack(spacing: .Number12) {
-        ReportButton
+        SuggestionButton
         UserLocationButton
       }
     }

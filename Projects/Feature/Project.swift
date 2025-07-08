@@ -12,6 +12,7 @@ let project = Project.makeStaticLibraryProject(
   for: Feature.Umbrella,
   dependencies: [
     .Features.Home,
+    .Features.MyPet,
     .Features.Report,
     .Features.TrashDetail,
     .Features.Auth,

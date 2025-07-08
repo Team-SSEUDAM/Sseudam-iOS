@@ -146,8 +146,10 @@ public struct ReportView: View {
   private var navigationBar: some View {
     NavigationBar(
       backContent: {
-        TouchArea(image: .leftChevron) {
-          store.send(.backButtonTapped)
+        if !store.isNavigationBarHidden {
+          TouchArea(image: .leftChevron) {
+            store.send(.backButtonTapped)
+          }
         }
       }
     )

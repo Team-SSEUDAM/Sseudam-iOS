@@ -41,6 +41,7 @@ public struct ReportFeature {
     var nextButtonState: PrimaryButtonState = .normal
     var nextButtonIsHidden: Bool = false
     var nextButtonText: String = "시작하기"
+    var isNavigationBarHidden = false
     var isLoading: Bool = false
     
     /// 선택된 정보 관련 `State`
@@ -143,7 +144,7 @@ public struct ReportFeature {
         case 0: return .send(.didAppearStartReport)
         case 1: return .send(.didAppearSelectReportInfo)
         case 2: return .send(.checkReportInfoType)
-        case 3: return .send(.reportButtonTapped)
+        case 3: return .send(.didAppearComplete)
         default: return .none
         }
         
@@ -185,7 +186,11 @@ public struct ReportFeature {
         
       case .didAppearComplete:
         state.nextButtonText = "확인"
-        return .send(.nextButtonIsEnabled(true))
+        state.isNavigationBarHidden = true
+        return .merge([
+          .send(.child(.writeName(.focusChanged(false)))),
+          .send(.nextButtonIsEnabled(true))
+        ])
         
       case let .selectedReportInfo(.delegate(selectAction)):
         switch selectAction {

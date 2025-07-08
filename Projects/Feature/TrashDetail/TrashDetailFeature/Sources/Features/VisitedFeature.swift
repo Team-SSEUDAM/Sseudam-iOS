@@ -76,7 +76,8 @@ public struct VisitedFeature {
     return .run { send in
       if let location = await LocationService.shared.userLocation {
         if let target = target {
-          await send(.visitedButtonEnable(location.distance(to: target) <= 5))
+          let distance = location.distance(to: target)
+          await send(.visitedButtonEnable(distance <= 5))
         } else {
           await send(.visitedButtonEnable(false))
         }

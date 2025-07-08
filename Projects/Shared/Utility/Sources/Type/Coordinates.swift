@@ -27,6 +27,7 @@ extension Coordinates {
   public func distance(to other: Coordinates) -> Double {
     let loc1 = CLLocation(latitude: latitude, longitude: longitude)
     let loc2 = CLLocation(latitude: other.latitude, longitude: other.longitude)
+    
     return loc1.distance(from: loc2)
   }
 }

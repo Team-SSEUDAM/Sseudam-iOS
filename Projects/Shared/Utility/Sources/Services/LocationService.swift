@@ -75,8 +75,9 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
       case .denied, .restricted:
         self.singleLocationContinuation = nil
         continuation.resume(returning: nil)
-      default:
-        break
+      @unknown default:
+        self.singleLocationContinuation = nil
+        continuation.resume(returning: nil)
       }
     }
   }
@@ -106,12 +107,7 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     }
     lastUpdateTime = now
     
-    if let coord = coord {
-      if coord == userLocation { return }
-      else { userLocation = coord }
-    } else {
-      userLocation = nil
-    }
+    userLocation = coord
     userLocationContinuation?.yield(())
     
     if let continuation = singleLocationContinuation {
@@ -135,6 +131,9 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
       Task { await setUserLocation(nil) } // 위치 정보 실패 시 nil 전달
       return
     }
+    
+    guard location.horizontalAccuracy > 0 && location.horizontalAccuracy < 50 else { return }
+    
     Task {
       await setUserLocation(
         .init(
@@ -153,6 +152,12 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
         await locationManager.startUpdatingLocation()
       case .denied, .restricted:
         await self.setUserLocation(nil)
+        await MainActor.run {
+          if let continuation = singleLocationContinuation {
+            singleLocationContinuation = nil
+            continuation.resume(returning: nil)
+          }
+        }
       default: break
       }
     }

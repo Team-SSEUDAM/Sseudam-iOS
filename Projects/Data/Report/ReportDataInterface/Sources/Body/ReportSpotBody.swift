@@ -11,6 +11,7 @@ import ReportDomainInterface
 
 public struct ReportSpotBody: Encodable, Equatable {
   public let spotId: Int
+  public let reportType: String
   public let spotName: String
   public let latitude: Double?
   public let longitude: Double?
@@ -23,6 +24,7 @@ public struct ReportSpotBody: Encodable, Equatable {
     _ input: ReportSpotInput
   ) {
     self.spotId = input.spotId
+    self.reportType = input.reportType
     self.spotName = input.spotName
     self.latitude = input.latitude
     self.longitude = input.longitude

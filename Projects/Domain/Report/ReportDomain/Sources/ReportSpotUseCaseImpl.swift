@@ -12,15 +12,12 @@ import NMReverseGeocodingDomainInterface
 
 extension ReportSpotUseCase {
   public static func live(repository: ReportRepository) -> ReportSpotUseCase {
-    .init { spotId, spotname, centerPoint, nmReverseGeoCode, trashType in
+    .init { reportType, spotDetail in
       let input = ReportSpotInput(
-        spotId: spotId,
-        spotName: spotname,
-        centerPoint: centerPoint,
-        nmReverseGeoCode: nmReverseGeoCode,
-        trashType: trashType
+        reportType: reportType,
+        spotDetail: spotDetail
       )
-      let entity = try await repository.reportSpot(input)
+      let entity = try await repository.postReportSpot(input)
       return entity.imageUploadURL
     }
   }

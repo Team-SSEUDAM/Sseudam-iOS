@@ -13,7 +13,7 @@ import ReportDomainInterface
 public struct ReportSpotDTO: DTO {
   public typealias Entity = ReportSpotEntity
   
-  public let suggestionId: UInt16
+  public let reportId: UInt16
   public let presignedUrl: String
 }
 

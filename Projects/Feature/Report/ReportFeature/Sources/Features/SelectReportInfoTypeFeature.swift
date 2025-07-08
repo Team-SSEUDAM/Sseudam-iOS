@@ -18,12 +18,12 @@ public struct SelectReportInfoTypeFeature {
     
   }
   
-  public enum SelectedInfoEditType: Int, Equatable {
-    case location = 1
-    case name = 2
-    case kind = 3
-    case photo = 4
-    case none = 0
+  public enum SelectedInfoEditType: String, Equatable {
+    case location = "POINT"
+    case name = "NAME"
+    case kind = "KIND"
+    case photo = "PHOTO"
+    case none = ""
   }
   
   @ObservableState
@@ -41,7 +41,7 @@ public struct SelectReportInfoTypeFeature {
     case selectedKind(SelectedInfoEditType)
     
     public enum Delegate: Equatable {
-      case didSelectKind(id: Int)
+      case didSelectKind(id: String)
     }
   }
   

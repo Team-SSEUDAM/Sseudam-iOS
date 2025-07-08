@@ -8,24 +8,18 @@
 
 import Foundation
 import Utility
-import NMReverseGeocodingDomainInterface
+import TrashSpotDomainInterface
 
 public struct ReportSpotUseCase {
   public var execute: @Sendable (
-    _ spotId: Int,
-    _ spotName: String,
-    _ centerPoint: Coordinates?,
-    _ nmReverseGeoCode: NMGeoCodeReverseEntity?,
-    _ trashType: String
+    _ reportType: String,
+    _ trashSpotDetail: TrashSpotFlattenDetailEntity?
   ) async throws -> String
   
   public init(
     execute: @Sendable @escaping (
-      _ spotId: Int,
-      _ spotName: String,
-      _ centerPoint: Coordinates?,
-      _ nmReverseGeoCode: NMGeoCodeReverseEntity?,
-      _ trashType: String
+      _ reportType: String,
+      _ trashSpotDetail: TrashSpotFlattenDetailEntity?
     ) async throws -> String
   ) {
     self.execute = execute

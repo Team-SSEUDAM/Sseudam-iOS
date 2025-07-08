@@ -8,11 +8,11 @@
 
 import Foundation
 import Utility
-import NMReverseGeocodingDomainInterface
+import TrashSpotDomainInterface
 
 public struct ReportSpotInput: Codable, Equatable {
   public let spotId: Int
-  
+  public let reportType: String
   public let spotName: String
   public let latitude: Double?
   public let longitude: Double?
@@ -22,19 +22,17 @@ public struct ReportSpotInput: Codable, Equatable {
   public let trashType: String
   
   public init(
-    spotId: Int,
-    spotName: String,
-    centerPoint: Coordinates?,
-    nmReverseGeoCode: NMGeoCodeReverseEntity?,
-    trashType: String
+    reportType: String,
+    spotDetail: TrashSpotFlattenDetailEntity?
   ) {
-    self.spotId = spotId
-    self.spotName = spotName
-    self.latitude = centerPoint?.latitude
-    self.longitude = centerPoint?.longitude
-    self.region = nmReverseGeoCode?.region
-    self.city = nmReverseGeoCode?.city
-    self.site = nmReverseGeoCode?.site
-    self.trashType = trashType
+    self.reportType = reportType
+    self.spotId = spotDetail?.id ?? 0
+    self.spotName = spotDetail?.spotName ?? ""
+    self.latitude = spotDetail?.latitude
+    self.longitude = spotDetail?.longitude
+    self.region = spotDetail?.region
+    self.city = spotDetail?.city
+    self.site = spotDetail?.site
+    self.trashType = spotDetail?.trashType ?? ""
   }
 }

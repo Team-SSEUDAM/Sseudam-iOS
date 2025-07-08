@@ -9,7 +9,6 @@
 import SwiftUI
 import ComposableArchitecture
 import Utility
-import NMReverseGeocodingDomainInterface
 import ReportDomainInterface
 import TrashSpotDomainInterface
 
@@ -34,26 +33,28 @@ public struct ReportFeature {
     var currentPage: Int = 0
     var trashSpotDetail: TrashSpotDetail
     
-    var selectedReportInfo: SelectReportInfoTypeFeature.State = SelectReportInfoTypeFeature.State()
-    /// 각 페이지별 상태를 Child로 관리
+    /// 하위 `Feature`
+    var selectedReportInfo: SelectReportInfoTypeFeature.State
     var child: ReportChildFeature.State
     
+    /// 다음 버튼 관련 `State`
     var nextButtonState: PrimaryButtonState = .normal
-    var nextButtonIsHidden: Bool = false /// 다음 버튼의 숨김 상태
+    var nextButtonIsHidden: Bool = false
     var nextButtonText: String = "시작하기"
-    var isLoading: Bool = false /// 다음 버튼의 로딩 상태
+    var isLoading: Bool = false
     
+    /// 선택된 정보 관련 `State`
     var selectedReportInfoType: String = "" /// 선택된 제보 정보 타입
-    
-    /// 제보하기에 담길 데이터
-    var nmReverseGeoCodeEntity: NMGeoCodeReverseEntity?
-    
     var selectedPhoto: UIImage? = nil
+    
+    /// 신고하기 데이터 모델
+    var reportSpotDetail: TrashSpotFlattenDetailEntity?
     
     public init(
       _ detail: TrashSpotDetail
     ) {
       self.trashSpotDetail = detail
+      self.selectedReportInfo = SelectReportInfoTypeFeature.State()
       self.child = ReportChildFeature.State(detail)
     }
   }
@@ -67,7 +68,8 @@ public struct ReportFeature {
     case child(ReportChildFeature.Action)
     case binding(BindingAction<State>)
     
-    
+    case fetchTrashSpotDetailEffect(Result<TrashSpotFlattenDetailEntity, NetworkError>)
+    case combineSpotReportModel
     case spotReportResult(Result<String, NetworkError>)
     case uploadReportSpotImageResult(Result<String, NetworkError>)
     case postSpotImage(String)
@@ -87,6 +89,8 @@ public struct ReportFeature {
     case didAppearSelectKind
     /// 사진 선택 화면이 나타날 때
     case didAppearSelectPhoto
+    /// 완료 화면이 등장했을 때
+    case didAppearComplete
     
     case nextButtonIsEnabled(Bool)
     case nextButtonTapped
@@ -103,6 +107,7 @@ public struct ReportFeature {
   
   @Dependency(\.ReportSpotUseCase) var reportSpotUseCase
   @Dependency(\.UploadReportSpotImageUseCase) var uploadReportSpotImageUseCase
+  @Dependency(\.FetchTrashSpotRawDetailUseCase) var fetchTrashSpotRawDetailUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -131,16 +136,14 @@ public struct ReportFeature {
         }
         
       case .nextButtonTapped:
-        if state.currentPage == 2 && state.selectedReportInfoType == "NAME" {
-          return .send(.validateSpotNameButtonTapped)
-        }
-        
+        if state.currentPage == 3 { return .send(.pop(state.trashSpotDetail)) }
         state.currentPage = min(state.currentPage + 1, 3)
         /// 다음 페이지에 따라 적절한 action을 보냄
         switch state.currentPage {
         case 0: return .send(.didAppearStartReport)
         case 1: return .send(.didAppearSelectReportInfo)
         case 2: return .send(.checkReportInfoType)
+        case 3: return .send(.reportButtonTapped)
         default: return .none
         }
         
@@ -159,12 +162,12 @@ public struct ReportFeature {
         
       case .didAppearMoveLocation:
         if state.selectedReportInfoType != "POINT" { return .none }
-        state.nextButtonText = "다음"
+        state.nextButtonText = "완료"
         return .send(.nextButtonIsEnabled(state.child.moveLocation.isEnabled))
         
       case .didAppearWriteName:
         if state.selectedReportInfoType != "NAME" { return .none }
-        state.nextButtonText = "다음"
+        state.nextButtonText = "완료"
         return .merge([
           .send(.child(.writeName(.focusChanged(true)))),
           .send(.nextButtonIsEnabled(state.child.writeName.isButtonEnabled))
@@ -172,13 +175,17 @@ public struct ReportFeature {
         
       case .didAppearSelectKind:
         if state.selectedReportInfoType != "KIND" { return .none }
-        state.nextButtonText = "다음"
+        state.nextButtonText = "완료"
         return .send(.nextButtonIsEnabled(state.child.selectKind.isEnabled))
         
       case .didAppearSelectPhoto:
         if state.selectedReportInfoType != "PHOTO" { return .none }
-        state.nextButtonText = "다음"
+        state.nextButtonText = "완료"
         return .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
+        
+      case .didAppearComplete:
+        state.nextButtonText = "확인"
+        return .send(.nextButtonIsEnabled(true))
         
       case let .selectedReportInfo(.delegate(selectAction)):
         switch selectAction {
@@ -214,15 +221,42 @@ public struct ReportFeature {
         }
         
       case .reportButtonTapped:
-        return spotReportEffect(state, reportSpotUseCase)
+        if state.selectedReportInfoType == "NAME" { return .send(.validateSpotNameButtonTapped) }
+        return fetchTrashSpotDetailEffect(state.trashSpotDetail.id, fetchTrashSpotRawDetailUseCase)
         
       case let .postSpotImage(prisignedURL):
         return uploadReportSpotImageEffect(state, prisignedURL, uploadReportSpotImageUseCase)
         
+      case let .fetchTrashSpotDetailEffect(result):
+        switch result {
+        case let .success(entity):
+          state.reportSpotDetail = entity
+          return .send(.combineSpotReportModel)
+        case let .failure(error):
+          state.destination = .alert(.occuredError(error.localizedDescription))
+          return .send(.setIsLoading(false))
+        }
+        
+      case .combineSpotReportModel:
+        var reportSpotDetail = state.reportSpotDetail
+        reportSpotDetail?.id = state.trashSpotDetail.id
+        reportSpotDetail?.spotName = state.trashSpotDetail.name
+        reportSpotDetail?.latitude = state.trashSpotDetail.point.latitude
+        reportSpotDetail?.longitude = state.trashSpotDetail.point.longitude
+        reportSpotDetail?.trashType = state.trashSpotDetail.trashType.rawValue
+        state.reportSpotDetail = reportSpotDetail
+        return spotReportEffect(state, reportSpotUseCase)
+        
       case let .spotReportResult(result):
         switch result {
         case let .success(prisignedURL):
-          return .send(.postSpotImage(prisignedURL))
+          if state.selectedReportInfoType == "PHOTO" { return .send(.postSpotImage(prisignedURL)) }
+          else {
+            return .merge([
+              .send(.setIsLoading(false)),
+              .send(.nextButtonTapped)
+            ])
+          }
           
         case let .failure(error):
           return .send(.errorOccured(message: error.localizedDescription))
@@ -231,7 +265,10 @@ public struct ReportFeature {
       case let .uploadReportSpotImageResult(result):
         switch result {
         case .success:
-          return .send(.nextButtonTapped) /// 완료 페이지로 이동
+          return .merge([
+            .send(.setIsLoading(false)),
+            .send(.nextButtonTapped)
+          ])
         
         case let .failure(error):
           return .send(.errorOccured(message: error.localizedDescription))
@@ -287,7 +324,6 @@ private extension ReportFeature {
       return .send(.setIsLoading(isLoading))
       
     case let .centerChanged(location, entity):
-      state.nmReverseGeoCodeEntity = entity
       if let location = location { state.trashSpotDetail.point = location }
       return .send(.nextButtonIsEnabled(location != nil && entity != nil))
     }
@@ -307,11 +343,7 @@ private extension ReportFeature {
     case let .serverValidationCompleted(isValid, name):
       state.trashSpotDetail.name = name
       if isValid {
-        state.currentPage = 3
-        return .run { send in
-          await send(.setIsLoading(false))
-          await send(.didAppearSelectKind)
-        }
+        return fetchTrashSpotDetailEffect(state.trashSpotDetail.id, fetchTrashSpotRawDetailUseCase)
       } else {
         return .run { send in
           await send(.setIsLoading(false))
@@ -352,20 +384,34 @@ private extension ReportFeature {
 
 /// MARK: - 순수하게 `ReportFeature`에서 사용할 `Effect들
 public extension ReportFeature {
+  
+  func fetchTrashSpotDetailEffect(
+    _ input: Int,
+    _ useCase: FetchTrashSpotRawDetailUseCase
+  ) -> Effect<Action> {
+    .run { send in
+      do {
+        await send(.setIsLoading(true))
+        let entity = try await useCase.execute(input)
+        await send(.fetchTrashSpotDetailEffect(.success(entity)))
+      } catch is CancellationError {
+        await send(.fetchTrashSpotDetailEffect(.failure(.taskCancelled)))
+      } catch {
+        await send(.fetchTrashSpotDetailEffect(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
+  
+  
   func spotReportEffect(
     _ state: Self.State,
     _ useCase: ReportSpotUseCase
   ) -> Effect<Action> {
     .run { send in
       do {
-        await send(.setIsLoading(true))
         let entity = try await useCase.execute(
-          state.trashSpotDetail.id,
           state.selectedReportInfoType,
-          state.trashSpotDetail.name,
-          state.trashSpotDetail.point,
-          state.nmReverseGeoCodeEntity,
-          state.trashSpotDetail.trashType.rawValue
+          state.reportSpotDetail
         )
         await send(.spotReportResult(.success(entity)))
       } catch is CancellationError {

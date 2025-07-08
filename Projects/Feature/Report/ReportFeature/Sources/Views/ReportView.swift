@@ -45,6 +45,7 @@ public struct ReportView: View {
           startView(width: width)
           selectInfoTypeView(width: width)
           selectedContentView(width: width)
+          reportCompletedView(width: width)
         }
       }
       .onChange(of: store.currentPage) { prev, next in
@@ -81,28 +82,28 @@ public struct ReportView: View {
   private func selectedContentView(width: CGFloat) -> some View {
     Group {
       switch store.selectedReportInfoType {
-      case 1:
+      case "POINT":
         SelectSpotLocationView(
           store: store.scope(
             state: \.child.moveLocation,
             action: \.child.moveLocation
           )
         )
-      case 2:
+      case "NAME":
         SelectSpotNameView(
           store: store.scope(
             state: \.child.writeName,
             action: \.child.writeName
           )
         )
-      case 3:
+      case "KIND":
         SelectSpotCategoryView(
           store: store.scope(
             state: \.child.selectKind,
             action: \.child.selectKind
           )
         )
-      case 4:
+      case "PHOTO":
         SelectSpotImageView(
           store: store.scope(
             state: \.child.selectPhoto,
@@ -115,6 +116,17 @@ public struct ReportView: View {
     }
     .frame(width: width)
     .id(2)
+  }
+  
+  @ViewBuilder
+  private func reportCompletedView(width: CGFloat) -> some View {
+    ReportCompleteView(
+      image: .addSpot,
+      title: "제보가 완료되었어요!",
+      description: "심사는 1-2일이 소요되며,\n승인되면 15쓰담을 추가 적립 받아요."
+    )
+    .frame(width: width)
+    .id(3)
   }
   
   @ViewBuilder
@@ -156,7 +168,8 @@ public struct ReportView: View {
       size: .large,
       state: $store.nextButtonState
     ) {
-      store.send(.nextButtonTapped)
+      if store.currentPage == 2 { store.send(.reportButtonTapped) }
+      else { store.send(.nextButtonTapped) }
     }
   }
 }

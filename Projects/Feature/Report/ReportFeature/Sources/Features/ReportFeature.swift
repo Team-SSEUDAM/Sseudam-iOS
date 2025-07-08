@@ -10,7 +10,7 @@ import SwiftUI
 import ComposableArchitecture
 import Utility
 import NMReverseGeocodingDomainInterface
-import SuggestionDomainInterface
+import ReportDomainInterface
 import TrashSpotDomainInterface
 
 import SelectSpotImageFeature
@@ -43,7 +43,7 @@ public struct ReportFeature {
     var nextButtonText: String = "시작하기"
     var isLoading: Bool = false /// 다음 버튼의 로딩 상태
     
-    var selectedReportInfoType: Int = 0 /// 선택된 제보 정보 타입
+    var selectedReportInfoType: String = "" /// 선택된 제보 정보 타입
     
     /// 제보하기에 담길 데이터
     var nmReverseGeoCodeEntity: NMGeoCodeReverseEntity?
@@ -68,8 +68,8 @@ public struct ReportFeature {
     case binding(BindingAction<State>)
     
     
-    case spotSuggestionResult(Result<String, NetworkError>)
-    case uploadSpotImageResult(Result<String, NetworkError>)
+    case spotReportResult(Result<String, NetworkError>)
+    case uploadReportSpotImageResult(Result<String, NetworkError>)
     case postSpotImage(String)
     
     case setIsLoading(Bool)
@@ -101,8 +101,8 @@ public struct ReportFeature {
     case backPageTapped
   }
   
-  @Dependency(\.SpotSuggestionUseCase) var spotSuggestionUseCase
-  @Dependency(\.UploadSpotImageUseCase) var uploadSpotImageUseCase
+  @Dependency(\.ReportSpotUseCase) var reportSpotUseCase
+  @Dependency(\.UploadReportSpotImageUseCase) var uploadReportSpotImageUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -131,11 +131,11 @@ public struct ReportFeature {
         }
         
       case .nextButtonTapped:
-        if state.currentPage == 2 && state.selectedReportInfoType == 2 {
+        if state.currentPage == 2 && state.selectedReportInfoType == "NAME" {
           return .send(.validateSpotNameButtonTapped)
         }
-          
-        state.currentPage = min(state.currentPage + 1, 5)
+        
+        state.currentPage = min(state.currentPage + 1, 3)
         /// 다음 페이지에 따라 적절한 action을 보냄
         switch state.currentPage {
         case 0: return .send(.didAppearStartReport)
@@ -158,12 +158,12 @@ public struct ReportFeature {
         return .send(.child(.writeName(.focusChanged(false))))
         
       case .didAppearMoveLocation:
-        if state.selectedReportInfoType != 1 { return .none }
+        if state.selectedReportInfoType != "POINT" { return .none }
         state.nextButtonText = "다음"
         return .send(.nextButtonIsEnabled(state.child.moveLocation.isEnabled))
         
       case .didAppearWriteName:
-        if state.selectedReportInfoType != 2 { return .none }
+        if state.selectedReportInfoType != "NAME" { return .none }
         state.nextButtonText = "다음"
         return .merge([
           .send(.child(.writeName(.focusChanged(true)))),
@@ -171,19 +171,19 @@ public struct ReportFeature {
         ])
         
       case .didAppearSelectKind:
-        if state.selectedReportInfoType != 3 { return .none }
+        if state.selectedReportInfoType != "KIND" { return .none }
         state.nextButtonText = "다음"
         return .send(.nextButtonIsEnabled(state.child.selectKind.isEnabled))
         
       case .didAppearSelectPhoto:
-        if state.selectedReportInfoType != 4 { return .none }
+        if state.selectedReportInfoType != "PHOTO" { return .none }
         state.nextButtonText = "다음"
         return .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
         
       case let .selectedReportInfo(.delegate(selectAction)):
         switch selectAction {
-        case let .didSelectKind(id):
-          state.selectedReportInfoType = id
+        case let .didSelectKind(type):
+          state.selectedReportInfoType = type
           state.nextButtonIsHidden = false
           return .send(.nextButtonTapped)
         }
@@ -200,10 +200,10 @@ public struct ReportFeature {
       case .checkReportInfoType:
         let selectedType = state.selectedReportInfoType
         switch selectedType {
-        case 1: return .send(.didAppearMoveLocation) /// 위치 선택 페이지로 이동
-        case 2: return .send(.didAppearWriteName) /// 이름 작성 페이지로 이동
-        case 3: return .send(.didAppearSelectKind) /// 종류 선택 페이지로 이동
-        case 4: return .send(.didAppearSelectPhoto) /// 사진 선택 페이지로 이동
+        case "POINT": return .send(.didAppearMoveLocation) /// 위치 선택 페이지로 이동
+        case "NAME": return .send(.didAppearWriteName) /// 이름 작성 페이지로 이동
+        case "KIND": return .send(.didAppearSelectKind) /// 종류 선택 페이지로 이동
+        case "PHOTO": return .send(.didAppearSelectPhoto) /// 사진 선택 페이지로 이동
         default: return .none
         }
         
@@ -214,12 +214,12 @@ public struct ReportFeature {
         }
         
       case .reportButtonTapped:
-        return spotSuggestionEffect(state, spotSuggestionUseCase)
+        return spotReportEffect(state, reportSpotUseCase)
         
       case let .postSpotImage(prisignedURL):
-        return uploadSpotImageEffect(state, prisignedURL, uploadSpotImageUseCase)
+        return uploadReportSpotImageEffect(state, prisignedURL, uploadReportSpotImageUseCase)
         
-      case let .spotSuggestionResult(result):
+      case let .spotReportResult(result):
         switch result {
         case let .success(prisignedURL):
           return .send(.postSpotImage(prisignedURL))
@@ -228,7 +228,7 @@ public struct ReportFeature {
           return .send(.errorOccured(message: error.localizedDescription))
         }
         
-      case let .uploadSpotImageResult(result):
+      case let .uploadReportSpotImageResult(result):
         switch result {
         case .success:
           return .send(.nextButtonTapped) /// 완료 페이지로 이동
@@ -301,7 +301,7 @@ private extension ReportFeature {
     guard state.currentPage == 2 else { return .none }
     
     switch action {
-    case let .localValidationCompleted(isValid, name):
+    case let .localValidationCompleted(isValid, _):
       return .send(.nextButtonIsEnabled(isValid))
       
     case let .serverValidationCompleted(isValid, name):
@@ -352,33 +352,34 @@ private extension ReportFeature {
 
 /// MARK: - 순수하게 `ReportFeature`에서 사용할 `Effect들
 public extension ReportFeature {
-  func spotSuggestionEffect(
+  func spotReportEffect(
     _ state: Self.State,
-    _ useCase: SpotSuggestionUseCase
+    _ useCase: ReportSpotUseCase
   ) -> Effect<Action> {
     .run { send in
       do {
         await send(.setIsLoading(true))
-        /// TODO: Report의 UseCase에서 `/reports/{spotId}`로 변경
         let entity = try await useCase.execute(
+          state.trashSpotDetail.id,
+          state.selectedReportInfoType,
           state.trashSpotDetail.name,
           state.trashSpotDetail.point,
           state.nmReverseGeoCodeEntity,
           state.trashSpotDetail.trashType.rawValue
         )
-        await send(.spotSuggestionResult(.success(entity)))
+        await send(.spotReportResult(.success(entity)))
       } catch is CancellationError {
-        await send(.spotSuggestionResult(.failure(.taskCancelled)))
+        await send(.spotReportResult(.failure(.taskCancelled)))
       } catch {
-        await send(.spotSuggestionResult(.failure(.customError(message: error.localizedDescription))))
+        await send(.spotReportResult(.failure(.customError(message: error.localizedDescription))))
       }
     }
   }
   
-  func uploadSpotImageEffect(
+  func uploadReportSpotImageEffect(
     _ state: Self.State,
     _ url: String,
-    _ useCase: UploadSpotImageUseCase
+    _ useCase: UploadReportSpotImageUseCase
   ) -> Effect<Action> {
     .run { send in
       do {
@@ -386,11 +387,11 @@ public extension ReportFeature {
           throw NetworkError.customError(message: "이미지를 선택해주세요.")
         }
         try await useCase.execute(image, url)
-        await send(.uploadSpotImageResult(.success("성공"))) /// 임시 메시지
+        await send(.uploadReportSpotImageResult(.success("성공"))) /// 임시 메시지
       } catch is CancellationError {
-        await send(.uploadSpotImageResult(.failure(.taskCancelled)))
+        await send(.uploadReportSpotImageResult(.failure(.taskCancelled)))
       } catch {
-        await send(.uploadSpotImageResult(.failure(.customError(message: error.localizedDescription))))
+        await send(.uploadReportSpotImageResult(.failure(.customError(message: error.localizedDescription))))
       }
     }
   }

@@ -13,6 +13,7 @@ let project = Project.makeFeature(
   for: Feature.Home,
   dependencies: [
     .Features.Report,
+    .Features.Suggestion,
     .Domain.Umbrella
   ]
 )

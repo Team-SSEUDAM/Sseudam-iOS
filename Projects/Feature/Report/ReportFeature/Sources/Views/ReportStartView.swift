@@ -33,6 +33,7 @@ public struct ReportStartView: View {
         Text(title)
           .font(FontSet.Heading.heading1)
           .foregroundStyle(ColorSet.Text.Primary)
+          .multilineTextAlignment(.center)
         Text(description)
           .font(FontSet.Body.body3)
           .foregroundStyle(ColorSet.Text.Secondary)
@@ -42,17 +43,4 @@ public struct ReportStartView: View {
     .padding(.Number16)
     
   }
-}
-
-#Preview {
-  ReportStartView(
-    image: .addSpot,
-    title: "발견한 쓰레기통을 제보해주세요!",
-    description:
-    """
-    쓰담이 아직 모르는 쓰레기통이 있나요?
-    제보 시 5쓰담이 적립되며,
-    승인되면 15쓰담을 추가 적립받아요.
-    """
-  )
 }

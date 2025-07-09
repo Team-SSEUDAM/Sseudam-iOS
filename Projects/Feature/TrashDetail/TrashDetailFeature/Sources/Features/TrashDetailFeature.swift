@@ -24,10 +24,17 @@ public struct TrashDetailFeature {
 
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    case delegate(Delegate)
     case showDetail(id: Int?)
     case noTrashData
+    case reportButtonTapped
+    
     case fetchTrashDetail(id: Int)
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
+    
+    public enum Delegate: Equatable {
+      case reportButtonTapped(TrashSpotDetail?)
+    }
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -47,6 +54,9 @@ public struct TrashDetailFeature {
       case .noTrashData:
         state.isEmptyList = true
         return .none
+        
+      case .reportButtonTapped:
+        return .send(.delegate(.reportButtonTapped(state.trashDetail)))
         
       case let .fetchTrashDetail(id):
         return fetchTrashDetail(id: id)

@@ -8,7 +8,6 @@
 
 import Foundation
 import Utility
-import NMReverseGeocodingDomainInterface
 
 public struct SpotNameValidateUseCase {
   public var execute: @Sendable (

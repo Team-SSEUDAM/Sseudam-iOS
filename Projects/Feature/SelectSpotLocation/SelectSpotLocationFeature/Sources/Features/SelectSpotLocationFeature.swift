@@ -28,7 +28,13 @@ public struct SelectSpotLocationFeature {
     
     public var isEnabled: Bool = false
     
-    public init() {}
+    public var initCoordinates: Coordinates?
+    
+    public init(
+      _ coordinates: Coordinates? = nil
+    ) {
+      self.initCoordinates = coordinates
+    }
   }
   
   public enum Action: BindableAction, Equatable {
@@ -58,6 +64,9 @@ public struct SelectSpotLocationFeature {
       switch action {
       case .onAppear:
         state.isEnabled = false
+        if let initCoordinates = state.initCoordinates {
+          return .send(.initUserLocation(initCoordinates))
+        }
         return moveUserLocation()
       
       case .onMapMovingStarted:

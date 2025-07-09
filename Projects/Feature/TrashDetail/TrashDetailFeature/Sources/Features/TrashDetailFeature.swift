@@ -85,6 +85,12 @@ public struct TrashDetailFeature {
         state.trashDetail = nil
         return .send(.visited(.initialVisitedData))
         
+      case let .visited(.delegate(action)):
+        switch action {
+        case let .showToastMessage(message):
+          return .none
+        }
+        
         default: return .none
       }
     }

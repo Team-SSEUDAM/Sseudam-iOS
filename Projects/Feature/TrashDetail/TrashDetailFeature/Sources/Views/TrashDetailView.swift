@@ -171,7 +171,12 @@ public struct TrashDetailView: View {
           size: .medium,
           state: $store.visited.isVisitedButtonEnable
         ) {
-          
+          store.send(.visited(.visitedButtonTapped))
+        }
+        .onTapGesture {
+          if store.visited.isVisitedButtonEnable == .disabled {
+            store.send(.visited(.visitedButtonTapped))
+          }
         }
         .frame(width: (geo.size.width - .Number8) * 2 / 3)
         

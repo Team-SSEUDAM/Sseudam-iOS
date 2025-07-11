@@ -167,7 +167,7 @@ public struct TrashDetailView: View {
         .frame(width: (geo.size.width - .Number8) / 3)
         
         PrimaryButton(
-          title: .constant("이 곳에 쓰레기 버리기"),
+          title: $store.visited.visitedButtonText,
           size: .medium,
           state: $store.visited.isVisitedButtonEnable
         ) {

@@ -10,13 +10,14 @@ import SwiftUI
 import ComposableArchitecture
 import AuthFeature
 import UserDefaults
+import MyPageFeature
 
 @Reducer
 struct MyPageRootFeature {
   @ObservableState
   struct State {
     var isLoggedIn: Bool
-    
+    var mypage: MyPageFeature.State = .init()
     init() {
       self.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
     }
@@ -28,7 +29,7 @@ struct MyPageRootFeature {
     case delegate(Delegate)
     
     case requestLogin(Bool, AuthEntryPoint)
-    
+    case mypage(MyPageFeature.Action)
   }
   
   enum Delegate: Equatable {
@@ -38,6 +39,9 @@ struct MyPageRootFeature {
   
   var body: some ReducerOf<Self> {
     BindingReducer()
+    Scope(state: \.mypage, action: \.mypage) {
+      MyPageFeature()
+    }
     Reduce { state, action in
       switch action {
       case let .requestLogin(isPresent, entryPoint):

@@ -10,6 +10,7 @@ import SwiftUI
 import ComposableArchitecture
 import AuthFeature
 import DesignKit
+import MyPageFeature
 
 struct MyPageRootView: View {
   
@@ -23,14 +24,15 @@ struct MyPageRootView: View {
     ZStack {
       ColorSet.Background.Primary
         .ignoresSafeArea()
-      VStack {
-        if !store.state.isLoggedIn {
-          requireLoginView
-        } else {
-          Text("로그인~")
-            .foregroundStyle(ColorSet.Text.Primary)
-        }
-      }
+      MyPageView(store: store.scope(state: \.mypage, action: \.mypage))
+//      VStack {
+//        if !store.state.isLoggedIn {
+//          requireLoginView
+//        } else {
+//          Text("로그인~")
+//            .foregroundStyle(ColorSet.Text.Primary)
+//        }
+      
     }
   }
   

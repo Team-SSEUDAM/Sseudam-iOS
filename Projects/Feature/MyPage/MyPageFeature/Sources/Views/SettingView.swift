@@ -28,6 +28,9 @@ public struct SettingView: View {
       }
     }
     .navigationBarBackButtonHidden()
+    .onAppear {
+      store.send(.onAppear)
+    }
   }
   
   @ViewBuilder
@@ -82,9 +85,9 @@ public struct SettingView: View {
     SettingItemListView(title: "기타") {
       SettingItemView(
         item: .update,
-        subTitle: "v2.0/v1.0",
+        subTitle: store.version,
         trailingContent: {
-          Text(true ? "업데이트" : "최신버전 사용 중")
+          Text(store.isNeedUpdate ? "업데이트" : "최신버전 사용 중")
             .font(FontSet.Label.label2)
             .foregroundStyle(ColorSet.Text.Accent)
         }

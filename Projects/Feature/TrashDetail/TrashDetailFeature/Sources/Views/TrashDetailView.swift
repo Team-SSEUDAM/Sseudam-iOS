@@ -169,13 +169,13 @@ public struct TrashDetailView: View {
         PrimaryButton(
           title: $store.visited.visitedButtonText,
           size: .medium,
-          state: $store.visited.isVisitedButtonEnable
+          state: store.visited.visitedState.buttonEnable ? .constant(.normal) : .constant(.disabled)
         ) {
-          store.send(.visited(.visitedButtonTapped))
+//          store.send(.visited(.visitedButtonTapped))
         }
         .onTapGesture {
-          if store.visited.isVisitedButtonEnable == .disabled {
-            store.send(.visited(.visitedButtonTapped))
+          if !store.visited.visitedState.buttonEnable {
+//            store.send(.visited(.visitedButtonTapped))
           }
         }
         .frame(width: (geo.size.width - .Number8) * 2 / 3)

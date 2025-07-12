@@ -18,4 +18,12 @@ extension Date {
   static func fromISOString(_ string: String) -> Date? {
     ISO8601DateFormatter().date(from: string)
   }
+  
+  
+  /// 현재 시간 비교해서 남은 시간을 반환하는 메서드
+  /// - Returns: 시간이 남아있으면 TimerInterval 타입을, 시간이 지났다면 nil을 반환
+  public func remainingFromNow() -> TimeInterval? {
+      let interval = self.timeIntervalSinceNow
+      return interval > 0 ? interval : nil
+  }
 }

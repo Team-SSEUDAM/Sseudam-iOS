@@ -137,11 +137,12 @@ struct DependencyRegister {
     // MARK: - Trash Spot
     
     FetchTrashSpotUseCaseRegister {
-      FetchTrashSpotUseCase.live(repository: trashSpotRepository)
+//      FetchTrashSpotUseCase.live(repository: trashSpotRepository)
+      FetchTrashSpotUseCase.test
     }
     
     FetchTrashSpotDetailUseCaseRegister {
-      FetchTrashSpotDetailUseCase.live(repository: trashSpotRepository)
+      FetchTrashSpotDetailUseCase.test(repository: trashSpotRepository)
     }
     
     FetchTrashSpotRawDetailUseCaseRegister {

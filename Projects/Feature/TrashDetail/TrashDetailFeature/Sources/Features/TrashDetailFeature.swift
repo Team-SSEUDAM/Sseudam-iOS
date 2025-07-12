@@ -47,7 +47,7 @@ public struct TrashDetailFeature {
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Scope(state: \.visited, action: \.visited) {
-      VisitedFeature()
+      VisitedFeature() //._printChanges()
     }
     
     Reduce { state, action in

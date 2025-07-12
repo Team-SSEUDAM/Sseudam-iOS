@@ -214,6 +214,8 @@ extension VisitedFeature {
       return .send(.showToastMessage("인증을 시도할 수 없어요."))
     case .denyPermission:
       return .send(.showAlert(.locationPermission))
+    case .auth:
+      return .send(.showAlert(.login))
     }
     return .none
   }
@@ -226,7 +228,7 @@ extension VisitedFeature {
   ) -> Effect<Action> {
     print("🤓", #function)
     guard UserDefaultsKeys.isLoggedIn == true else {
-      return .send(.showAlert(.login))
+      return .send(.changeVisitedState(.auth))
     }
     
     guard remainingTime == .none else { // 시간이 남아있음

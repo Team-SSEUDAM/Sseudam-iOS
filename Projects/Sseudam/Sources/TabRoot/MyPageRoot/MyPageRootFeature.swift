@@ -16,16 +16,12 @@ import MyPageFeature
 struct MyPageRootFeature {
   @ObservableState
   struct State {
-    var isLoggedIn: Bool
     var mypage: MyPageFeature.State = .init()
-    init() {
-      self.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
-    }
+    init() { }
   }
   
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
-    case loginState(Bool)
     case delegate(Delegate)
     
     case requestLogin(Bool, AuthEntryPoint)
@@ -46,9 +42,16 @@ struct MyPageRootFeature {
       switch action {
       case let .requestLogin(isPresent, entryPoint):
         return .send(.delegate(.requestLogin(isPresent, entryPoint)))
-      case let .loginState(isLoggedIn):
-        state.isLoggedIn = isLoggedIn
-        return .none
+        
+      case let .mypage(.delegate(action)):
+        switch action {
+        case let .hiddenTabBar(isHidden):
+          return .send(.delegate(.hiddenTabBar(isHidden)))
+          
+        case let .requestLogin(isPresent):
+          return .send(.delegate(.requestLogin(isPresent, .mypage)))
+        }
+        
       default: return .none
       }
       

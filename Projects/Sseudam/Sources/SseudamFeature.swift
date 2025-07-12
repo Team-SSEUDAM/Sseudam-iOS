@@ -67,10 +67,15 @@ struct SseudamFeature {
         state.authFlow = isPresent ? .init() : nil
         return .send(.authFlow(.presentLogin(isPresent)))
         
+      case let .mypageRoot(.delegate(.hiddenTabBar(isHidden))):
+        state.isTabbarHidden = (isHidden)
+        return .none
+        
       case let .authFlow(.delegate(.changeLoginState(isLoggedIn))):
-        return .run { send in
-          await send(.mypageRoot(.loginState(isLoggedIn)))
-        }
+        return .none
+//        return .run { send in
+//          await send(.mypageRoot(.loginState(isLoggedIn)))
+//        }
         
         // MARK: - Alert
         

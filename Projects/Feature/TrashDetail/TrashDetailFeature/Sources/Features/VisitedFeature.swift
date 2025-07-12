@@ -12,25 +12,6 @@ import Utility
 import DesignKit
 import UserDefaults
 
-public enum VisitedState {
-  /// 방문 인증 5분 지나지 않음
-  case remainTime
-  /// 쓰레기통이 멀리(5m 밖)에 있음
-  case far
-  /// 5m 안 쪽에 있음
-  case enableVisit
-  
-  case unknown
-  
-  case denyPermission
-  
-  var buttonEnable: Bool {
-    self == .enableVisit
-  }
-  
-  
-}
-
 @Reducer
 public struct VisitedFeature {
   

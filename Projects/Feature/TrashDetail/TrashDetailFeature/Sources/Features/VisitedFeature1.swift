@@ -92,9 +92,9 @@ public struct VisitedFeature {
     
     case changeVisitedButtonText(remainingTime: String?)
     case setLocationPermission(isDeny: Bool)
-    case showLocationPermissionAlert
     
     case showToastMessage(String?)
+    case showAlert(AlertType)
     case delegate(Delegate)
     
     case timer(TimerAction)
@@ -102,7 +102,7 @@ public struct VisitedFeature {
   
   public enum Delegate: Equatable {
     case showToastMessage(String?)
-    case showLocationPermissionAlert
+    case showAlert(AlertType)
   }
   
   public enum TimerAction: Equatable {
@@ -209,9 +209,6 @@ public struct VisitedFeature {
         state.isDenyPermission = isDeny
         return .none
         
-      case .showLocationPermissionAlert:
-        return .send(.delegate(.showLocationPermissionAlert))
-        
       case let .showToastMessage(message):
         return .send(.delegate(.showToastMessage(message)))
       
@@ -273,7 +270,7 @@ public struct VisitedFeature {
     case .unknown:
       return .send(.showToastMessage("인증을 시도할 수 없어요."))
     case .denyPermission:
-      return .send(.showLocationPermissionAlert)
+      return .send(.showAlert(.locationPermission))
     }
     return .none
   }
@@ -285,6 +282,10 @@ public struct VisitedFeature {
     remainingTime: TimeInterval?
   ) -> Effect<Action> {
     print("🤓", #function)
+    guard UserDefaultsKeys.isLoggedIn == true else {
+      return .send(.showAlert(.login))
+    }
+    
     guard remainingTime == .none else { // 시간이 남아있음
       return .send(.changeVisitedState(.remainTime))
     }

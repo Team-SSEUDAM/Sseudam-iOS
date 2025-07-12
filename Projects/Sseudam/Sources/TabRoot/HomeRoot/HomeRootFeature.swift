@@ -93,8 +93,8 @@ struct HomeRootFeature {
         case let .showToastMessage(message):
           return .send(.home(.showToastMessage(message)))
           
-        case .showLocationPermissionAlert:
-          return .send(.presentAlert(.locationPermission))
+        case let .showAlert(type):
+          return .send(.presentAlert(type))
           
         }
         

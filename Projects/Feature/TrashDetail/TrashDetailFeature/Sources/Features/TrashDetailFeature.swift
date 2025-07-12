@@ -9,6 +9,7 @@
 import ComposableArchitecture
 import TrashSpotDomainInterface
 import Utility
+import DesignKit
 
 @Reducer
 public struct TrashDetailFeature {
@@ -39,12 +40,14 @@ public struct TrashDetailFeature {
     
     case showToastMessage(String?)
     case showLocationPermissionAlert
+    case showAlert(AlertType)
+    case delegate(Delegate)
   }
   
   public enum Delegate: Equatable {
     case reportButtonTapped(TrashSpotDetail?)
     case showToastMessage(String?)
-    case showLocationPermissionAlert
+    case showAlert(AlertType)
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -94,16 +97,16 @@ public struct TrashDetailFeature {
       case let .showToastMessage(message):
         return .send(.delegate(.showToastMessage(message)))
         
-      case .showLocationPermissionAlert:
-        return .send(.delegate(.showLocationPermissionAlert))
+      case let .showAlert(type):
+        return .send(.delegate(.showAlert(type)))
         
         // MARK: - VisitedFeature Delegate Action
       case let .visited(.delegate(action)):
         switch action {
         case let .showToastMessage(message):
           return .send(.showToastMessage(message))
-        case .showLocationPermissionAlert:
-          return .send(.showLocationPermissionAlert)
+        case let .showAlert(type):
+          return .send(.showAlert(type))
         }
         
         default: return .none

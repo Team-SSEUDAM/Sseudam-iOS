@@ -37,9 +37,14 @@ public struct TrashDetailFeature {
     case fetchTrashDetail(id: Int)
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
     
-    public enum Delegate: Equatable {
-      case reportButtonTapped(TrashSpotDetail?)
-    }
+    case showToastMessage(String?)
+    case showLocationPermissionAlert
+  }
+  
+  public enum Delegate: Equatable {
+    case reportButtonTapped(TrashSpotDetail?)
+    case showToastMessage(String?)
+    case showLocationPermissionAlert
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -85,10 +90,20 @@ public struct TrashDetailFeature {
         state.trashDetail = nil
         return .send(.visited(.initialVisitedData))
         
+        
+      case let .showToastMessage(message):
+        return .send(.delegate(.showToastMessage(message)))
+        
+      case .showLocationPermissionAlert:
+        return .send(.delegate(.showLocationPermissionAlert))
+        
+        // MARK: - VisitedFeature Delegate Action
       case let .visited(.delegate(action)):
         switch action {
         case let .showToastMessage(message):
-          return .none
+          return .send(.showToastMessage(message))
+        case .showLocationPermissionAlert:
+          return .send(.showLocationPermissionAlert)
         }
         
         default: return .none

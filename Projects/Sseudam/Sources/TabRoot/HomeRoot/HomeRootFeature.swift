@@ -30,6 +30,8 @@ struct HomeRootFeature {
     case closeAlertAction(AlertType)
     case acceptAlertAction(AlertType)
     
+    case hiddenTabBar(Bool)
+    case presentAlert(AlertType)
     case delegate(Delegate)
   }
   
@@ -58,6 +60,12 @@ struct HomeRootFeature {
         default: return .none
         }
         
+      case let .hiddenTabBar(isHidden):
+        return .send(.delegate(.hiddenTabBar(isHidden)))
+        
+      case let .presentAlert(type):
+        return .send(.delegate(.presentAlert(type)))
+        
         // MARK: - Receive HomeFeature Delegate Action
         
       case let .home(.delegate(action)):
@@ -71,17 +79,23 @@ struct HomeRootFeature {
           return .none
           
         case let .presentAlert(alert):
-          return .send(.delegate(.presentAlert(alert)))
-          
-        case let .needToHiddenTabBar(isHidden):
-          return .send(.delegate(.hiddenTabBar(isHidden)))
+          return .send(.presentAlert(alert))
+
+          case let .needToHiddenTabBar(isHidden):
+            return .send(.hiddenTabBar(isHidden))
         }
         
-        // MARK: - Receive TrashDetailFeature Delegate Action
       case let .trashDetail(.delegate(action)):
         switch action {
         case let .reportButtonTapped(detailData):
           return .send(.home(.receiveTrashDetailFromRoot(detailData)))
+          
+        case let .showToastMessage(message):
+          return .send(.home(.showToastMessage(message)))
+          
+        case .showLocationPermissionAlert:
+          return .send(.presentAlert(.locationPermission))
+          
         }
         
       default: return .none

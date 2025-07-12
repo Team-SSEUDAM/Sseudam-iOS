@@ -22,6 +22,8 @@ public enum VisitedState {
   
   case unknown
   
+  case denyPermission
+  
   var buttonEnable: Bool {
     self == .enableVisit
   }
@@ -90,14 +92,17 @@ public struct VisitedFeature {
     
     case changeVisitedButtonText(remainingTime: String?)
     case setLocationPermission(isDeny: Bool)
-    case showToastMessage(String)
+    case showLocationPermissionAlert
+    
+    case showToastMessage(String?)
     case delegate(Delegate)
     
     case timer(TimerAction)
   }
   
   public enum Delegate: Equatable {
-    case showToastMessage(String)
+    case showToastMessage(String?)
+    case showLocationPermissionAlert
   }
   
   public enum TimerAction: Equatable {
@@ -134,7 +139,7 @@ public struct VisitedFeature {
           .send(.changeVisitedButtonText(remainingTime: nil)), // 버튼 텍스트 초기화
           .send(.timer(.initialTimerState)), // 타이머 상태 초기화
           .send(.setTrashSpotInfo(spotId: nil, point: nil)), // 저장된 쓰레기통 데이터 초기화
-          .send(.setLocationPermission(isDeny: true)) // 위치 권한 초기화
+          .send(.setLocationPermission(isDeny: false)) // 위치 권한 초기화
         ])
         
       case .fetchUserLocation:
@@ -164,6 +169,7 @@ public struct VisitedFeature {
       case .checkEnableVisit:
         return checkEnableVisit(
           isWithinDistance: state.isWithinDistance,
+          isDenyPermission: state.isDenyPermission,
           remainingTime: state.remainingTime
         )
         
@@ -182,7 +188,7 @@ public struct VisitedFeature {
         return .send(.timer(.startTimer(expireTime: expireTime)))
         
       case .disableVisit:
-        return handleDisableVisit(state: state.visitedState)
+        return handleDisableVisit(state: state.visitedState, time: state.remainingTime)
         
         
         
@@ -199,6 +205,15 @@ public struct VisitedFeature {
         }
         return .none
         
+      case let .setLocationPermission(isDeny):
+        state.isDenyPermission = isDeny
+        return .none
+        
+      case .showLocationPermissionAlert:
+        return .send(.delegate(.showLocationPermissionAlert))
+        
+      case let .showToastMessage(message):
+        return .send(.delegate(.showToastMessage(message)))
       
         
         // MARK: - Timer
@@ -237,25 +252,51 @@ public struct VisitedFeature {
     }
   }
   
-  private func handleDisableVisit(state: VisitedState) -> Effect<Action> {
+  private func handleDisableVisit(state: VisitedState, time: TimeInterval? = nil) -> Effect<Action> {
     print("🤓", #function)
+    switch state {
+    case .remainTime:
+      if let time = time {
+        var remainTime = Int(time) / 60
+        if remainTime < 1 {
+          remainTime = Int(time) % 60
+          return .send(.showToastMessage("\(remainTime)초 뒤 다시 시도해주세요."))
+        } else {
+          return .send(.showToastMessage("\(remainTime)분 뒤 다시 시도해주세요."))
+        }
+       
+      }
+    case .far:
+      return .send(.showToastMessage("인증하려면 쓰레기통 5m 이내로 이동해주세요."))
+    case .enableVisit:
+      return .none
+    case .unknown:
+      return .send(.showToastMessage("인증을 시도할 수 없어요."))
+    case .denyPermission:
+      return .send(.showLocationPermissionAlert)
+    }
     return .none
   }
   
+  /// 방문 인증 가능 여부 확인, 상태 변경
   private func checkEnableVisit(
     isWithinDistance: Bool,
+    isDenyPermission: Bool,
     remainingTime: TimeInterval?
   ) -> Effect<Action> {
     print("🤓", #function)
-    guard remainingTime == .none else {
-      print("시간이 남아있음")
+    guard remainingTime == .none else { // 시간이 남아있음
       return .send(.changeVisitedState(.remainTime))
     }
     
-    guard isWithinDistance else {
-      print("멀다")
+    guard !isDenyPermission else { // 위치 권한이 없음
+      return .send(.changeVisitedState(.denyPermission))
+    }
+    
+    guard isWithinDistance else { // 거리 내에 없음
       return .send(.changeVisitedState(.far))
     }
+    
     return .send(.changeVisitedState(.enableVisit))
   }
   
@@ -308,29 +349,23 @@ extension VisitedFeature {
   private func checkRemainVisitedData(spotId: Int?) -> Effect<Action> {
     print("🤓", #function)
     guard let spotId = spotId else {
-      print("쓰레기통 정보를 찾을 수 없어요.")
-      return .none
+      return .send(.showToastMessage("쓰레기통 정보를 찾을 수 없어요."))
     }
     
     guard let savedVisitedData = UserDefaultsKeys.visitedSpot else {
-      print("저장된 데이터가 없음 - 남은 인증 내역이 없음")
       return .send(.checkEnableVisit)
     }
     
     let key = spotId.description
     guard let savedExpireTime = savedVisitedData[key] else {
-      print("저장된 데이터가 없음 - 해당 장소에 대한 정보 없음")
-      return .none
+      return .send(.checkEnableVisit)
     }
     
     if let _ = savedExpireTime.remainingFromNow() {
-      print("시간이 남아있음")
       return .send(.timer(.startTimer(expireTime: savedExpireTime)))
     }  else {
-      print("시간이 지남.")
       saveRemainingTime(key: key, value: nil) // 삭제
       return .send(.checkEnableVisit)
-      
     }
 
   }
@@ -374,9 +409,7 @@ extension VisitedFeature {
         let isWithin5m =  user.distance(to: target) <= 10
         await send(.storedWithinDistance(isWithin5m))
       } else {
-        // TODO: - 토스트
-        print("위치 정보를 확인할 수 없어요.")
-        
+        await send(.showToastMessage("위치 정보를 확인할 수 없어요"))
       }
     }
   }

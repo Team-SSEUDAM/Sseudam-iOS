@@ -102,6 +102,8 @@ public struct LoginFeature {
         await send(.loginResult(.success(data)))
       } catch let error as NetworkError {
         await send(.loginResult(.failure(error)))
+      } catch {
+        await send(.loginResult(.failure(.customError(message: error.localizedDescription))))
       }
     }
   }

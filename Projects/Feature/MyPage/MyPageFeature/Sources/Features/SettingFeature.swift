@@ -8,6 +8,7 @@
 
 import ComposableArchitecture
 import Utility
+import UserDefaults
 
 @Reducer
 public struct SettingFeature {
@@ -28,6 +29,7 @@ public struct SettingFeature {
     case onAppear
     case checkAppVersion
     case configVersionInfo(String, Bool)
+    case checkLoggedIn
     case notiAllow
     case logout
     case withdrwal
@@ -50,7 +52,10 @@ public struct SettingFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
-        return .send(.checkAppVersion)
+        return .merge([
+          .send(.checkLoggedIn),
+          .send(.checkAppVersion)
+        ])
         
       case .checkAppVersion:
         return checkAppVersion()
@@ -58,6 +63,10 @@ public struct SettingFeature {
       case let .configVersionInfo(version, isNeedUpdate):
         state.version = version
         state.isNeedUpdate = isNeedUpdate
+        return .none
+        
+      case .checkLoggedIn:
+        state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
         return .none
         
       case .notiAllow:

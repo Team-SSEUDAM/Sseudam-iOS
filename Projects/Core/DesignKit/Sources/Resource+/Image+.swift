@@ -40,6 +40,8 @@ public enum ImageSet: String {
   case apple = "apple"
   case kakao = "kakao"
   case check = "check"
+  case feedback = "feedback"
+  case notification = "notification"
   
   public var swiftUIImage: DesignKitImages { DesignKitImages(name: self.rawValue) }
 }

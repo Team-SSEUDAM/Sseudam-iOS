@@ -17,7 +17,7 @@ public struct SettingFeature {
   
   @ObservableState
   public struct State: Equatable {
-    
+    var isLoggedIn: Bool = true
     public init() {}
   }
 

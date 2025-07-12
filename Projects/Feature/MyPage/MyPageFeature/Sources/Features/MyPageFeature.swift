@@ -56,7 +56,7 @@ public struct MyPageFeature {
       case let .hiddenTabBar(isHidden):
         return .send(.delegate(.hiddenTabBar(isHidden)))
         
-        // MARK: - Setting Delegate Action 
+        // MARK: - Setting Delegate Action
       case let .path(.element(id: _, action: .setting(.delegate(action)))):
         switch action {
         case .pop:

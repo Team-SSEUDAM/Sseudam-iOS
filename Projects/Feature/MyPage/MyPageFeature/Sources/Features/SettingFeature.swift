@@ -7,10 +7,11 @@
 //
 
 import ComposableArchitecture
+import AuthDomainInterface
+
 import Utility
 import UserDefaults
 import DesignKit
-import AuthDomainInterface
 
 @Reducer
 public struct SettingFeature {
@@ -24,6 +25,7 @@ public struct SettingFeature {
     public var version: String = ""
     public var isNeedUpdate: Bool = false
     public var alertType: AlertType? = nil
+    public var toastMessage: String? = nil
     public init() {}
   }
 
@@ -38,10 +40,12 @@ public struct SettingFeature {
     case logout
     case initialLoginData
     case withdrawal
+    case withdrawalResult(Result<EmptyEquatable, NetworkError>)
     
     case alertCancelTapped
     case alertAcceptTapped(AlertType)
     case clearAlertState
+    case showToastMessage(String)
     
     case pop
     case delegate(Delegate)
@@ -58,6 +62,7 @@ public struct SettingFeature {
   
   @Dependency(\.LogoutUseCase) var logoutUseCase
   @Dependency(\.TokenDeleteUseCase) var tokenDeleteUseCase
+  @Dependency(\.WithdrawalUseCase) var withdrawalUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -94,6 +99,12 @@ public struct SettingFeature {
       case .withdrawal:
         state.alertType = .withdrawal
         return .none
+        
+      case .withdrawalResult(.success):
+        return handleLogoutCompletion()
+        
+      case let .withdrawalResult(.failure(error)):
+        return .send(.showToastMessage(error.localizedDescription))
         
       case .alertCancelTapped:
         return .send(.clearAlertState)
@@ -134,6 +145,19 @@ public struct SettingFeature {
     }
   }
   
+  private func requestWithdrawal() -> Effect<Action> {
+    return .run { send in
+      do {
+        try await withdrawalUseCase.execute()
+        await send(.withdrawalResult(.success(.value)))
+      } catch let error as NetworkError {
+        await send(.withdrawalResult(.failure(error)))
+      } catch {
+        await send(.withdrawalResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
+  
   private func checkAppVersion() -> Effect<Action> {
     return .run { send in
       let versionInfo = await AppVersionManager.shared.getVersionInfo()
@@ -142,4 +166,5 @@ public struct SettingFeature {
     }
   }
 }
+
 

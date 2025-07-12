@@ -30,6 +30,9 @@ public extension AuthRepository {
       },
       logout: {
         return Void()
+      },
+      withdrawal: {
+        return Void()
       }
     )
   }

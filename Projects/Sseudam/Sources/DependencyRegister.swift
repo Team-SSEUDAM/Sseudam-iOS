@@ -110,6 +110,10 @@ struct DependencyRegister {
       TokenDeleteUseCase.live
     }
     
+    WithdrawalUseCaseRegister {
+      WithdrawalUseCase.live(repository: authRepository)
+    }
+    
     // MARK: - User
     
     CheckNicknameValidUseCaseRegister {

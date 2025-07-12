@@ -45,58 +45,42 @@ public struct SettingView: View {
   
   @ViewBuilder
   private var settingListView: some View {
-    SettingItemListView(title: "서비스", items: serviceItems()) { _ in
-//      store.send(.settingListTapped($0))
+    SettingItemListView(title: "서비스", items: []) {
+      SettingItemView(item: .suggestion, trailingContent: {})
+      SettingItemView(item: .feedback, trailingContent: {})
     }
     
     BorderView(size: .xlarge)
-    SettingItemListView(title: "알림 설정", items: notification()) { _ in
-//      store.send(.settingListTapped($0))
+    SettingItemListView(title: "푸시 알림", items: []) {
+      SettingItemView(item: .notification, trailingContent: {
+        Toggle(isOn: $store.isNotiOn) {
+          
+        }
+        .customToggleStyle()
+      })
     }
     
     BorderView(size: .xlarge)
-    SettingItemListView(title: "기타", items: etcItems()) { _ in
-//      store.send(.settingListTapped($0))
+    SettingItemListView(title: "기타", items: []) {
+      SettingItemView(
+        item: .update,
+        subTitle: "v2.0/v1.0",
+        trailingContent: {
+          Text(true ? "업데이트" : "최신버전 사용 중")
+            .font(FontSet.Label.label2)
+            .foregroundStyle(ColorSet.Text.Accent)
+        }
+      )
+      SettingItemView(item: .serviceTerm)
+      SettingItemView(item: .privacyTerm)
     }
     
     if store.isLoggedIn {
       BorderView(size: .xlarge)
-      SettingItemListView(items: accountItems()) { _ in
-//        store.send(.settingListTapped($0))
+      SettingItemListView(items: []) {
+        SettingItemView(item: .logout)
+        SettingItemView(item: .withdraw)
       }
     }
-  }
-}
-
-// MARK: - Data
-
-extension SettingView {
-  
-  private func serviceItems() -> [SettingItem] {
-    [
-      .init(type: .suggestion, title: "쓰레기통 제보하기", icon: .addSpot),
-      .init(type: .feedback, title: "피드백 남기기", icon: .feedback)
-    ]
-  }
-  
-  private func notification() -> [SettingItem] {
-    [
-      .init(type: .notification, title: "푸시 알림", icon: .notification)
-    ]
-  }
-  
-  private func etcItems() -> [SettingItem] {
-    [
-      .init(type: .update, title: "최신버전 업데이트", subtitle: "v2.0/v1.0", trailing: true ? "업데이트" : "최신버전 사용 중"),
-      .init(type: .serviceTerm, title: "서비스 이용약관"),
-      .init(type: .privacyTerm, title: "개인정보 처리방침")
-    ]
-  }
-  
-  private func accountItems() -> [SettingItem] {
-    [
-      .init(type: .logout, title: "로그아웃"),
-      .init(type: .withdraw, title: "탈퇴하기")
-    ]
   }
 }

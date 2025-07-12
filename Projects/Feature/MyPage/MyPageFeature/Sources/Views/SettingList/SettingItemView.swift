@@ -12,15 +12,18 @@ import DesignKit
 /// 설정 화면의 리스트 아이템
 struct SettingItemView<Trailing: View>: View {
   
-  private let item: SettingItem
-  private var action: ((SettingType) async -> Void)? = nil
+  private let item: SettingType
+  private let subTitle: String?
   private let trailingContent: (() -> Trailing)
+  private var action: ((SettingType) async -> Void)? = nil
   
   init(
-    item: SettingItem,
+    item: SettingType,
+    subTitle: String? = nil,
     @ViewBuilder trailingContent: @escaping (() -> Trailing) = { Spacer() }
   ) {
     self.item = item
+    self.subTitle = subTitle
     self.trailingContent = trailingContent
   }
   
@@ -33,7 +36,7 @@ struct SettingItemView<Trailing: View>: View {
         Text(item.title)
           .font(FontSet.Body.body2)
           .foregroundStyle(ColorSet.Text.Primary)
-        if let subtitle = item.subtitle {
+        if let subtitle = self.subTitle {
           Text(subtitle)
             .font(FontSet.Caption.caption1)
             .lineSpacing(20)
@@ -42,11 +45,6 @@ struct SettingItemView<Trailing: View>: View {
       }
       Spacer()
       trailingContent()
-//      if let trailingText = item.trailing {
-//        Text(trailingText)
-//          .font(FontSet.Label.label2)
-//          .foregroundStyle(ColorSet.Text.Accent)
-//      }
     }
     .padding(.vertical, .Number12)
     .padding(.horizontal, .Number16)
@@ -54,7 +52,7 @@ struct SettingItemView<Trailing: View>: View {
     .onTapGesture {
       if let action = action {
         Task { @MainActor in
-          await action(item.type)
+          await action(item)
         }
       }
     }

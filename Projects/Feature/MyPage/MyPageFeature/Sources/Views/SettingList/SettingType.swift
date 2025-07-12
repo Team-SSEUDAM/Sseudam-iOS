@@ -25,3 +25,37 @@ public enum SettingType {
   case logout
   case withdraw
 }
+
+extension SettingType {
+  var title: String {
+    switch self {
+    case .suggestion:
+      "쓰레기통 제보하기"
+    case .feedback:
+      "피드백 남기기"
+    case .notification:
+      "푸시 알림"
+    case .update:
+      "최신버전 업데이트"
+    case .serviceTerm:
+      "서비스 이용약관"
+    case .privacyTerm:
+      "개인정보처리방침"
+    case .logout:
+      "로그아웃"
+    case .withdraw:
+      "탈퇴하기"
+    }
+  }
+  
+  
+  var icon: ImageSet? {
+    switch self {
+    case .suggestion: return ImageSet.addSpot
+    case .feedback: return ImageSet.feedback
+    case .notification: return ImageSet.notification
+    default: return .none
+    }
+  }
+  
+}

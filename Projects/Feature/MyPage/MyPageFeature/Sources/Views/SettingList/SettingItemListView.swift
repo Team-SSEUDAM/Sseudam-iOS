@@ -9,24 +9,38 @@
 import SwiftUI
 import DesignKit
 
-struct SettingItemListView: View {
+struct SettingItemListView<Content: View>: View {
   var title: String? = nil
   let items: [SettingItem]
-  let onTap: (SettingType) -> Void
+//  let onTap: (SettingType) -> Void
+  let content: (() -> Content)
+  
+  init(
+    title: String? = nil,
+    items: [SettingItem],
+//    onTap: @escaping (SettingType) -> Void,
+  @ViewBuilder content: @escaping () -> Content = { Spacer() }
+  ) {
+    self.title = title
+    self.items = items
+//    self.onTap = onTap
+    self.content = content
+  }
   
   var body: some View {
     VStack(alignment: .leading, spacing: .Number0) {
       if let title = title {
         sectionTitle(title)
       }
-      ForEach(items, id: \.self) { item in
-        SettingItemView(
-          item: item
-        )
-        .action { type in
-          onTap(type)
-        }
-      }
+      content()
+//      ForEach(items, id: \.self) { item in
+//        SettingItemView(
+//          item: item
+//        )
+//        .action { type in
+//          onTap(type)
+//        }
+//      }
     }
     .padding(.vertical, .Number8)
   }

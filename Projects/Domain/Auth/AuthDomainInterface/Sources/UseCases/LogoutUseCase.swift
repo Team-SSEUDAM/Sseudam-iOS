@@ -1,0 +1,17 @@
+//
+//  LogoutUseCase.swift
+//  AuthDomainInterface
+//
+//  Created by Jiyeon on 7/12/25.
+//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
+//
+
+import Foundation
+
+public struct LogoutUseCase {
+  public var execute: @Sendable () async throws -> Void
+  
+  public init(execute: @Sendable @escaping () async throws -> Void) {
+    self.execute = execute
+  }
+}

@@ -102,6 +102,14 @@ struct DependencyRegister {
       SignUpUseCase.live(repository: authRepository)
     }
     
+    LogoutUseCaseRegister {
+      LogoutUseCase.live(repository: authRepository)
+    }
+    
+    TokenDeleteUseCaseRegister {
+      TokenDeleteUseCase.live
+    }
+    
     // MARK: - User
     
     CheckNicknameValidUseCaseRegister {

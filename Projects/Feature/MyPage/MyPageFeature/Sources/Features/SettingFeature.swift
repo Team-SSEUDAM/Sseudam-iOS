@@ -10,6 +10,7 @@ import ComposableArchitecture
 import Utility
 import UserDefaults
 import DesignKit
+import AuthDomainInterface
 
 @Reducer
 public struct SettingFeature {
@@ -33,7 +34,9 @@ public struct SettingFeature {
     case configVersionInfo(String, Bool)
     case checkLoggedIn
     case notiAllow
+    
     case logout
+    case initialLoginData
     case withdrawal
     
     case alertCancelTapped
@@ -52,6 +55,9 @@ public struct SettingFeature {
   public enum Delegate: Equatable {
     case pop
   }
+  
+  @Dependency(\.LogoutUseCase) var logoutUseCase
+  @Dependency(\.TokenDeleteUseCase) var tokenDeleteUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -82,6 +88,9 @@ public struct SettingFeature {
         state.alertType = .logout
         return .none
         
+      case .initialLoginData:
+        return handleLogoutCompletion()
+        
       case .withdrawal:
         state.alertType = .withdrawal
         return .none
@@ -90,7 +99,6 @@ public struct SettingFeature {
         return .send(.clearAlertState)
         
       case .alertAcceptTapped(.logout):
-        
         return .none
         
       case .alertAcceptTapped(.withdrawal):
@@ -104,6 +112,24 @@ public struct SettingFeature {
         return .send(.delegate(.pop))
         
       default: return .none
+      }
+    }
+  }
+  
+  private func handleLogoutCompletion() -> Effect<Action> {
+    return .run { send in
+      await tokenDeleteUseCase.execute()
+      await send(.checkLoggedIn)
+    }
+  }
+  
+  private func requestLogout() -> Effect<Action> {
+    return .run { send in
+      do {
+        try await logoutUseCase.execute()
+        await send(.initialLoginData)
+      } catch {
+        await send(.initialLoginData)
       }
     }
   }

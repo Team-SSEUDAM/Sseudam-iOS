@@ -27,6 +27,9 @@ public extension AuthRepository {
         )
         let endpoint = AuthEndpoint.signUp(body: body)
         return try await networker.execute(with: endpoint, timeout: 60).toEntity()
+      },
+      logout: {
+        return Void()
       }
     )
   }

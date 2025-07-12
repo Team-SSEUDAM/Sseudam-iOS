@@ -34,6 +34,10 @@ public struct SettingView: View {
     }
   }
   
+}
+
+extension SettingView {
+  
   @ViewBuilder
   private var AlertView: some View {
     if let alertType = store.alertType {
@@ -59,7 +63,6 @@ public struct SettingView: View {
       },
       title: "설정"
     )
-    
   }
   
   @ViewBuilder
@@ -78,8 +81,10 @@ public struct SettingView: View {
   @ViewBuilder
   private var ServiceSection: some View {
     SettingItemListView(title: "서비스") {
-      SettingItemView(item: .suggestion, trailingContent: {})
-      SettingItemView(item: .feedback, trailingContent: {})
+      SettingItemView(item: .suggestion)
+      SettingItemView(item: .feedback) {
+        store.send(.feedback)
+      }
     }
   }
   
@@ -106,10 +111,17 @@ public struct SettingView: View {
           Text(store.isNeedUpdate ? "업데이트" : "최신버전 사용 중")
             .font(FontSet.Label.label2)
             .foregroundStyle(ColorSet.Text.Accent)
+            .onTapGesture {
+              store.send(.appstore)
+            }
         }
       )
-      SettingItemView(item: .serviceTerm)
-      SettingItemView(item: .privacyTerm)
+      SettingItemView(item: .serviceTerm) {
+        store.send(.serviceTerm)
+      }
+      SettingItemView(item: .privacyTerm) {
+        store.send(.privacyTerm)
+      }
     }
   }
   

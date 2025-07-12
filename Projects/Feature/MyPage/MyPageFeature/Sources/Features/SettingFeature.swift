@@ -6,6 +6,7 @@
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
+import Foundation
 import ComposableArchitecture
 import AuthDomainInterface
 
@@ -42,6 +43,11 @@ public struct SettingFeature {
     case withdrawal
     case withdrawalResult(Result<EmptyEquatable, NetworkError>)
     
+    case feedback
+    case serviceTerm
+    case privacyTerm
+    case appstore
+    
     case alertCancelTapped
     case alertAcceptTapped(AlertType)
     case clearAlertState
@@ -63,6 +69,7 @@ public struct SettingFeature {
   @Dependency(\.LogoutUseCase) var logoutUseCase
   @Dependency(\.TokenDeleteUseCase) var tokenDeleteUseCase
   @Dependency(\.WithdrawalUseCase) var withdrawalUseCase
+  @Dependency(\.openURL) var openURL
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -106,6 +113,22 @@ public struct SettingFeature {
       case let .withdrawalResult(.failure(error)):
         return .send(.showToastMessage(error.localizedDescription))
         
+      case .feedback:
+        return openExternalLink(url: ExternalURL.feedBack)
+        
+      case .serviceTerm:
+        return openExternalLink(url: ExternalURL.serviceTerm)
+        
+      case .privacyTerm:
+        return openExternalLink(url: ExternalURL.privacyTerm)
+        
+      case .appstore:
+        if state.isNeedUpdate {
+          return openExternalLink(url: ExternalURL.appStore)
+        } else {
+          return .none
+        }
+        
       case .alertCancelTapped:
         return .send(.clearAlertState)
         
@@ -123,6 +146,18 @@ public struct SettingFeature {
         return .send(.delegate(.pop))
         
       default: return .none
+      }
+    }
+  }
+  
+}
+
+extension SettingFeature {
+  
+  private func openExternalLink(url: URL?) -> Effect<Action> {
+    return .run { send in
+      if let url = url {
+        await openURL(url)
       }
     }
   }
@@ -166,5 +201,4 @@ public struct SettingFeature {
     }
   }
 }
-
 

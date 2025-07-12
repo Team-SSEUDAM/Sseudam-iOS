@@ -26,10 +26,26 @@ public struct SettingView: View {
         settingListView
         Spacer()
       }
+      AlertView
     }
     .navigationBarBackButtonHidden()
     .onAppear {
       store.send(.onAppear)
+    }
+  }
+  
+  @ViewBuilder
+  private var AlertView: some View {
+    if let alertType = store.alertType {
+      Alert(
+        type: alertType,
+        closeAction: {
+          store.send(.alertCancelTapped)
+        },
+        acceptAction: {
+          store.send(.alertAcceptTapped(alertType))
+        }
+      )
     }
   }
   
@@ -104,7 +120,7 @@ public struct SettingView: View {
         store.send(.logout)
       }
       SettingItemView(item: .withdrawal) {
-        store.send(.withdrwal)
+        store.send(.withdrawal)
       }
     }
   }

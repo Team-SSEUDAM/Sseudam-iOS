@@ -29,6 +29,9 @@ public struct MyPageView: View {
           SettingView(store: store)
         }
       }
+      .onAppear {
+        store.send(.onAppear)
+      }
       .onChange(of: store.path) { oldValue, newValue in
         if newValue.count == 0 {
           store.send(.delegate(.hiddenTabBar(false)))
@@ -48,10 +51,10 @@ public struct MyPageView: View {
       VStack {
         NavigationBarView
         Spacer()
-        if UserDefaultsKeys.isLoggedIn ?? false {
-          requireLoginView
-        } else {
+        if store.isLoggedIn {
           EmptyView()
+        } else {
+          requireLoginView
         }
       }
     }

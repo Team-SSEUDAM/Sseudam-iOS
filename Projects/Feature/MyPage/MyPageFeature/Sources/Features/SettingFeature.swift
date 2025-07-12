@@ -9,6 +9,7 @@
 import ComposableArchitecture
 import Utility
 import UserDefaults
+import DesignKit
 
 @Reducer
 public struct SettingFeature {
@@ -21,6 +22,7 @@ public struct SettingFeature {
     var isNotiOn: Bool = true
     public var version: String = ""
     public var isNeedUpdate: Bool = false
+    public var alertType: AlertType? = nil
     public init() {}
   }
 
@@ -32,7 +34,11 @@ public struct SettingFeature {
     case checkLoggedIn
     case notiAllow
     case logout
-    case withdrwal
+    case withdrawal
+    
+    case alertCancelTapped
+    case alertAcceptTapped(AlertType)
+    case clearAlertState
     
     case pop
     case delegate(Delegate)
@@ -66,10 +72,32 @@ public struct SettingFeature {
         return .none
         
       case .checkLoggedIn:
-        state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
+        state.isLoggedIn = true //UserDefaultsKeys.isLoggedIn ?? false
         return .none
         
       case .notiAllow:
+        return .none
+        
+      case .logout:
+        state.alertType = .logout
+        return .none
+        
+      case .withdrawal:
+        state.alertType = .withdrawal
+        return .none
+        
+      case .alertCancelTapped:
+        return .send(.clearAlertState)
+        
+      case .alertAcceptTapped(.logout):
+        
+        return .none
+        
+      case .alertAcceptTapped(.withdrawal):
+        return .none
+        
+      case .clearAlertState:
+        state.alertType = nil
         return .none
         
       case .pop:

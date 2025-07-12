@@ -80,7 +80,7 @@ public struct Alert: View {
       PrimaryButton(
         title: .constant(type.accept),
         size: .large,
-        state: isErrorType ? .constant(.error) : .constant(.normal)
+        state: type.isErrorType ? .constant(.error) : .constant(.normal)
       ) { acceptAction() }
     }
   }

@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import UserDefaults
 
 @Reducer
 public struct MyPageFeature {
@@ -16,12 +17,15 @@ public struct MyPageFeature {
   @ObservableState
   public struct State: Equatable {
     public var path = StackState<MyPagePath.State>()
+    public var isLoggedIn: Bool = false
     public init() {}
   }
 
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case path(StackActionOf<MyPagePath>)
+    case onAppear
+    case checkLoggedIn
     
     case settingButtonTapped
     
@@ -46,6 +50,13 @@ public struct MyPageFeature {
     BindingReducer()
     Reduce { state, action in
       switch action {
+      case .onAppear:
+        return .send(.checkLoggedIn)
+        
+      case .checkLoggedIn:
+        state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
+        return .none
+        
       case .settingButtonTapped:
         state.path.append(.setting(SettingFeature.State()))
         return .send(.hiddenTabBar(true))

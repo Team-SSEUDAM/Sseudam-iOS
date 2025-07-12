@@ -11,19 +11,13 @@ import DesignKit
 
 struct SettingItemListView<Content: View>: View {
   var title: String? = nil
-  let items: [SettingItem]
-//  let onTap: (SettingType) -> Void
   let content: (() -> Content)
   
   init(
     title: String? = nil,
-    items: [SettingItem],
-//    onTap: @escaping (SettingType) -> Void,
-  @ViewBuilder content: @escaping () -> Content = { Spacer() }
+    @ViewBuilder content: @escaping () -> Content = { Spacer() }
   ) {
     self.title = title
-    self.items = items
-//    self.onTap = onTap
     self.content = content
   }
   
@@ -33,14 +27,6 @@ struct SettingItemListView<Content: View>: View {
         sectionTitle(title)
       }
       content()
-//      ForEach(items, id: \.self) { item in
-//        SettingItemView(
-//          item: item
-//        )
-//        .action { type in
-//          onTap(type)
-//        }
-//      }
     }
     .padding(.vertical, .Number8)
   }

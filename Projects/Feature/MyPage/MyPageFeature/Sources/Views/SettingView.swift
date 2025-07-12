@@ -45,13 +45,28 @@ public struct SettingView: View {
   
   @ViewBuilder
   private var settingListView: some View {
-    SettingItemListView(title: "서비스", items: []) {
+    ServiceSection
+    BorderView(size: .xlarge)
+    NotiSection
+    BorderView(size: .xlarge)
+    EtcSection
+    if store.isLoggedIn {
+      BorderView(size: .xlarge)
+      AuthSection
+    }
+  }
+  
+  @ViewBuilder
+  private var ServiceSection: some View {
+    SettingItemListView(title: "서비스") {
       SettingItemView(item: .suggestion, trailingContent: {})
       SettingItemView(item: .feedback, trailingContent: {})
     }
-    
-    BorderView(size: .xlarge)
-    SettingItemListView(title: "푸시 알림", items: []) {
+  }
+  
+  @ViewBuilder
+  private var NotiSection: some View {
+    SettingItemListView(title: "푸시 알림") {
       SettingItemView(item: .notification, trailingContent: {
         Toggle(isOn: $store.isNotiOn) {
           
@@ -59,9 +74,11 @@ public struct SettingView: View {
         .customToggleStyle()
       })
     }
-    
-    BorderView(size: .xlarge)
-    SettingItemListView(title: "기타", items: []) {
+  }
+  
+  @ViewBuilder
+  private var EtcSection: some View {
+    SettingItemListView(title: "기타") {
       SettingItemView(
         item: .update,
         subTitle: "v2.0/v1.0",
@@ -74,13 +91,13 @@ public struct SettingView: View {
       SettingItemView(item: .serviceTerm)
       SettingItemView(item: .privacyTerm)
     }
-    
-    if store.isLoggedIn {
-      BorderView(size: .xlarge)
-      SettingItemListView(items: []) {
-        SettingItemView(item: .logout)
-        SettingItemView(item: .withdraw)
-      }
+  }
+  
+  @ViewBuilder
+  private var AuthSection: some View {
+    SettingItemListView() {
+      SettingItemView(item: .logout)
+      SettingItemView(item: .withdraw)
     }
   }
 }

@@ -68,10 +68,11 @@ public struct SettingView: View {
   private var NotiSection: some View {
     SettingItemListView(title: "푸시 알림") {
       SettingItemView(item: .notification, trailingContent: {
-        Toggle(isOn: $store.isNotiOn) {
-          
-        }
-        .customToggleStyle()
+        Toggle(isOn: $store.isNotiOn) { }
+          .customToggleStyle()
+          .onChange(of: store.isNotiOn) { _, _ in
+            store.send(.notiAllow)
+          }
       })
     }
   }
@@ -96,8 +97,12 @@ public struct SettingView: View {
   @ViewBuilder
   private var AuthSection: some View {
     SettingItemListView() {
-      SettingItemView(item: .logout)
-      SettingItemView(item: .withdraw)
+      SettingItemView(item: .logout) {
+        store.send(.logout)
+      }
+      SettingItemView(item: .withdrawal) {
+        store.send(.withdrwal)
+      }
     }
   }
 }

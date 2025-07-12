@@ -15,15 +15,17 @@ struct SettingItemView<Trailing: View>: View {
   private let item: SettingType
   private let subTitle: String?
   private let trailingContent: (() -> Trailing)
-  private var action: ((SettingType) async -> Void)? = nil
+  private var action: (() async -> Void)? = nil
   
   init(
     item: SettingType,
     subTitle: String? = nil,
+    action: (() async -> Void)? = nil,
     @ViewBuilder trailingContent: @escaping (() -> Trailing) = { Spacer() }
   ) {
     self.item = item
     self.subTitle = subTitle
+    self.action = action
     self.trailingContent = trailingContent
   }
   
@@ -52,17 +54,9 @@ struct SettingItemView<Trailing: View>: View {
     .onTapGesture {
       if let action = action {
         Task { @MainActor in
-          await action(item)
+          await action()
         }
       }
     }
-  }
-}
-
-extension SettingItemView {
-  func action(_ action: ((SettingType) async -> Void)?) -> Self {
-    var content = self
-    content.action = action
-    return content
   }
 }

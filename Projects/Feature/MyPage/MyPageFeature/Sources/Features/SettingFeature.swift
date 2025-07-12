@@ -24,6 +24,11 @@ public struct SettingFeature {
 
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    
+    case notiAllow
+    case logout
+    case withdrwal
+    
     case pop
     case delegate(Delegate)
   }
@@ -43,6 +48,9 @@ public struct SettingFeature {
     BindingReducer()
     Reduce { state, action in
       switch action {
+      case .notiAllow:
+        return .none
+        
       case .pop:
         return .send(.delegate(.pop))
         default: return .none

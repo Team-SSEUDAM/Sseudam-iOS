@@ -23,7 +23,7 @@ public enum SettingType {
   case privacyTerm
   
   case logout
-  case withdraw
+  case withdrawal
 }
 
 extension SettingType {
@@ -43,7 +43,7 @@ extension SettingType {
       "개인정보처리방침"
     case .logout:
       "로그아웃"
-    case .withdraw:
+    case .withdrawal:
       "탈퇴하기"
     }
   }

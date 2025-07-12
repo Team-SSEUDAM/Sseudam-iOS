@@ -171,11 +171,11 @@ public struct TrashDetailView: View {
           size: .medium,
           state: store.visited.visitedState.buttonEnable ? .constant(.normal) : .constant(.disabled)
         ) {
-//          store.send(.visited(.visitedButtonTapped))
+          store.send(.visited(.visitButtonTapped))
         }
         .onTapGesture {
           if !store.visited.visitedState.buttonEnable {
-//            store.send(.visited(.visitedButtonTapped))
+            store.send(.visited(.visitButtonTapped))
           }
         }
         .frame(width: (geo.size.width - .Number8) * 2 / 3)

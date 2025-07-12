@@ -78,9 +78,17 @@ public struct VisitedFeature {
     case storedWithinDistance(Bool)
     /// 방문 인증 가능 여부 확인
     case checkEnableVisit
-    
+    /// 방문하기 버튼 탭
+    case visitButtonTapped
+    /// 인증하기 성공
+    case successVisit
+    /// 인증 불가능 - 버튼 탭 시
+    case disableVisit
+    /// 방문하기 상태 변경
     case changeVisitedState(VisitedState)
     
+    
+    case changeVisitedButtonText(remainingTime: String?)
     case setLocationPermission(isDeny: Bool)
     case showToastMessage(String)
     case delegate(Delegate)
@@ -94,23 +102,21 @@ public struct VisitedFeature {
   
   public enum TimerAction: Equatable {
     /// 시작할 장소 ID
-    case startTimer
-    /// 뷰가 닫힐 때 타이머 종료
-    case stpoTimer
-    /// 해당 장소에 5분 내 인증한 적 있는지 여부 체크
-    case checkRemainingTime(spotId: Int?)
+    case startTimer(expireTime: Date)
     /// 1초마다 호출됨
     case tick(String)
     /// 상태 업데이트
     case updateRemainingTime(String, TimeInterval)
+    /// 타이머 state 초기화
+    case initialTimerState
     /// 타이머가 끝남
     case isTimerOver
-    /// 타이머 동작 중단
+    
     
   }
   
   enum TimerID: Hashable {
-    case cooldown(String) // 장소 ID 기반
+    case cooldown(String?) // 장소 ID 기반
   }
   
   
@@ -122,9 +128,13 @@ public struct VisitedFeature {
       switch action {
         
       case .initialVisitedData:
+        state.visitedState = .unknown
         return .merge([
-          .send(.setTrashSpotInfo(spotId: nil, point: nil)),
-          .send(.setLocationPermission(isDeny: true))
+          .cancel(id: TimerID.cooldown(state.trashSpotId?.description)), // 타이머 종료
+          .send(.changeVisitedButtonText(remainingTime: nil)), // 버튼 텍스트 초기화
+          .send(.timer(.initialTimerState)), // 타이머 상태 초기화
+          .send(.setTrashSpotInfo(spotId: nil, point: nil)), // 저장된 쓰레기통 데이터 초기화
+          .send(.setLocationPermission(isDeny: true)) // 위치 권한 초기화
         ])
         
       case .fetchUserLocation:
@@ -157,16 +167,67 @@ public struct VisitedFeature {
           remainingTime: state.remainingTime
         )
         
+      case .visitButtonTapped:
+        guard state.visitedState == .enableVisit else {
+          return .send(.disableVisit)
+        }
+        // TODO: - 인증하기 api 연결
+        return .send(.successVisit)
+        
+      case .successVisit:
+        // 만료 시간 저장
+        let expireTime = Date().addingTimeInterval(300)
+        let spotId = state.trashSpotId?.description
+        saveRemainingTime(key: spotId, value: expireTime)
+        return .send(.timer(.startTimer(expireTime: expireTime)))
+        
+      case .disableVisit:
+        return handleDisableVisit(state: state.visitedState)
+        
+        
+        
       case let .changeVisitedState(visitedState):
         state.visitedState = visitedState
         return . none
-      
+        
+      case let .changeVisitedButtonText(remainingTime):
+        let text: String = "이 곳에 쓰레기 담기"
+        if let remainingTime = remainingTime {
+          state.visitedButtonText = text+"(\(remainingTime))"
+        } else {
+          state.visitedButtonText = text
+        }
+        return .none
         
       
-//      case let .timer(action);
-//        switch action {
-//          
-//        }
+        
+        // MARK: - Timer
+        
+      case let .timer(action):
+        switch action {
+          
+        case let .startTimer(expireTime):
+          state.expireTime = expireTime
+          return startTimer(spotId: state.trashSpotId?.description)
+          
+        case let .tick(spotID):
+          return timerTick(spotId: spotID, cooldowns: state.expireTime)
+          
+        case let .updateRemainingTime(_, time):
+          state.remainingTime = time
+          let remainTime = changeTimerFormat(time: time)
+          return .send(.changeVisitedButtonText(remainingTime: remainTime))
+        
+        case .initialTimerState:
+          state.expireTime = nil
+          state.remainingTime = nil
+          return .none
+        
+        case .isTimerOver:
+          saveRemainingTime(key: state.trashSpotId?.description, value: nil)
+          return .send(.changeVisitedButtonText(remainingTime: nil))
+          
+        }
         
         
       default: return .none
@@ -174,6 +235,11 @@ public struct VisitedFeature {
         
       }
     }
+  }
+  
+  private func handleDisableVisit(state: VisitedState) -> Effect<Action> {
+    print("🤓", #function)
+    return .none
   }
   
   private func checkEnableVisit(
@@ -195,6 +261,47 @@ public struct VisitedFeature {
   
 }
 
+// MARK: - Timer
+extension VisitedFeature {
+  private func startTimer(spotId: String?) -> Effect<Action> {
+    print("⏱️", #function)
+    guard let spotId = spotId else { return .none }
+    return .run { send in
+        while true {
+          try await Task.sleep(nanoseconds: 1_000_000_000)
+          await send(.timer(.tick(spotId)))
+        }
+      }
+      .cancellable(id: TimerID.cooldown(spotId), cancelInFlight: true)
+  }
+  
+  private func timerTick(spotId: String, cooldowns: Date?) -> Effect<Action> {
+    print("⏱️", #function)
+    guard let expireTime = cooldowns else {
+      return .cancel(id: TimerID.cooldown(spotId))
+    }
+    let remaining = expireTime.timeIntervalSinceNow
+    if remaining <= 0 { // 타이머 종료
+      return .concatenate([
+        .send(.timer(.isTimerOver)),
+        .send(.timer(.initialTimerState)),
+        .cancel(id: TimerID.cooldown(spotId))
+      ])
+    } else {
+      return .send(.timer(.updateRemainingTime(spotId, remaining)))
+    }
+  }
+  
+  /// 남은 시간 string 타입
+  private func changeTimerFormat(time: TimeInterval?) -> String {
+    guard let time = time,
+          time > 0 else { return "" }
+    let minutes = Int(time) / 60
+    let seconds = Int(time) % 60
+    return String(format: "%d:%02d", minutes, seconds)
+  }
+}
+
 // MARK: - Visit Time
 
 extension VisitedFeature {
@@ -207,28 +314,25 @@ extension VisitedFeature {
     
     guard let savedVisitedData = UserDefaultsKeys.visitedSpot else {
       print("저장된 데이터가 없음 - 남은 인증 내역이 없음")
-      // TODO: - 거리 확인
       return .send(.checkEnableVisit)
     }
     
     let key = spotId.description
-    guard let savedTime = savedVisitedData[key] else {
+    guard let savedExpireTime = savedVisitedData[key] else {
       print("저장된 데이터가 없음 - 해당 장소에 대한 정보 없음")
       return .none
     }
     
-    if let _ = savedTime.remainingFromNow() {
+    if let _ = savedExpireTime.remainingFromNow() {
       print("시간이 남아있음")
-      // TODO: - 타이머 시작
-      return .none
+      return .send(.timer(.startTimer(expireTime: savedExpireTime)))
     }  else {
       print("시간이 지남.")
       saveRemainingTime(key: key, value: nil) // 삭제
-      // TODO: - 거리 확인
       return .send(.checkEnableVisit)
       
     }
-    
+
   }
   
   /// UserDefaults에 저장

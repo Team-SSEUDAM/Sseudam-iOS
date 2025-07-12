@@ -46,7 +46,7 @@ let testData: [Int: TrashSpotDetail] = [
   imageUrl: nil
 ),
   2: .init(
-    id: 1,
+    id: 2,
     suggestionerId: 1,
     suggestionerName: "지연",
     name: "test2",
@@ -57,7 +57,7 @@ let testData: [Int: TrashSpotDetail] = [
     imageUrl: nil
   ),
   3: .init(
-    id: 1,
+    id: 3,
     suggestionerId: 1,
     suggestionerName: "지연",
     name: "test3",

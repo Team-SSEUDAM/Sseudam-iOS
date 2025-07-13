@@ -34,6 +34,7 @@ public struct MyPageView: View {
       }
       .onChange(of: store.path) { oldValue, newValue in
         if newValue.count == 0 {
+          store.send(.checkLoggedIn)
           store.send(.delegate(.hiddenTabBar(false)))
         }
       }

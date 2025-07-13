@@ -24,6 +24,7 @@ struct MyPageRootFeature {
     case binding(BindingAction<State>)
     case delegate(Delegate)
     
+    case checkLoggedin
     case requestLogin(Bool, AuthEntryPoint)
     case mypage(MyPageFeature.Action)
   }
@@ -42,6 +43,9 @@ struct MyPageRootFeature {
       switch action {
       case let .requestLogin(isPresent, entryPoint):
         return .send(.delegate(.requestLogin(isPresent, entryPoint)))
+        
+      case .checkLoggedin:
+        return .send(.mypage(.checkLoggedIn))
         
       case let .mypage(.delegate(action)):
         switch action {

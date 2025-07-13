@@ -72,10 +72,9 @@ struct SseudamFeature {
         return .none
         
       case let .authFlow(.delegate(.changeLoginState(isLoggedIn))):
-        return .none
-//        return .run { send in
-//          await send(.mypageRoot(.loginState(isLoggedIn)))
-//        }
+        return .run { send in
+          await send(.mypageRoot(.checkLoggedin))
+        }
         
         // MARK: - Alert
         

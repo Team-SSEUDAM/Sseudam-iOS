@@ -1,8 +1,8 @@
 //
 //  WithdrawalUseCaseKey.swift
-//  AuthDomainInterface
+//  UserDomainInterface
 //
-//  Created by Jiyeon on 7/12/25.
+//  Created by Jiyeon on 7/13/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
@@ -31,3 +31,4 @@ extension DependencyValues {
     set { self[WithdrawalUseCaseKey.self] = newValue }
   }
 }
+

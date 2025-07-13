@@ -9,6 +9,7 @@
 import Foundation
 import ComposableArchitecture
 import AuthDomainInterface
+import UserDomainInterface
 
 import Utility
 import UserDefaults
@@ -51,7 +52,7 @@ public struct SettingFeature {
     case alertCancelTapped
     case alertAcceptTapped(AlertType)
     case clearAlertState
-    case showToastMessage(String)
+    case showToastMessage(String?)
     
     case pop
     case delegate(Delegate)
@@ -90,7 +91,7 @@ public struct SettingFeature {
         return .none
         
       case .checkLoggedIn:
-        state.isLoggedIn = true //UserDefaultsKeys.isLoggedIn ?? false
+        state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
         return .none
         
       case .notiAllow:
@@ -108,10 +109,13 @@ public struct SettingFeature {
         return .none
         
       case .withdrawalResult(.success):
-        return handleLogoutCompletion()
+        return .merge([
+          .send(.showToastMessage("탈퇴에 성공했어요")),
+          handleLogoutCompletion()
+        ])
         
       case let .withdrawalResult(.failure(error)):
-        return .send(.showToastMessage(error.localizedDescription))
+        return .send(.showToastMessage("탈퇴에 실패했어요"))
         
       case .feedback:
         return openExternalLink(url: ExternalURL.feedBack)
@@ -133,13 +137,23 @@ public struct SettingFeature {
         return .send(.clearAlertState)
         
       case .alertAcceptTapped(.logout):
-        return .none
+        return .merge([
+          .send(.clearAlertState),
+          requestLogout()
+        ])
         
       case .alertAcceptTapped(.withdrawal):
-        return .none
+        return .merge([
+          .send(.clearAlertState),
+          requestWithdrawal()
+        ])
         
       case .clearAlertState:
         state.alertType = nil
+        return .none
+        
+      case let .showToastMessage(message):
+        state.toastMessage = message
         return .none
         
       case .pop:
@@ -174,6 +188,7 @@ extension SettingFeature {
       do {
         try await logoutUseCase.execute()
         await send(.initialLoginData)
+        await send(.showToastMessage("로그아웃이 완료되었어요."))
       } catch {
         await send(.initialLoginData)
       }

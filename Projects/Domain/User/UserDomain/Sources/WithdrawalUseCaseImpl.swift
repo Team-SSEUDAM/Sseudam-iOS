@@ -1,16 +1,16 @@
 //
 //  WithdrawalUseCaseImpl.swift
-//  AuthDomain
+//  UserDomain
 //
-//  Created by Jiyeon on 7/12/25.
+//  Created by Jiyeon on 7/13/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
 import Foundation
-import AuthDomainInterface
+import UserDomainInterface
 
 extension WithdrawalUseCase {
-  public static func live(repository: AuthRepository) -> WithdrawalUseCase {
+  public static func live(repository: UserRepository) -> WithdrawalUseCase {
     .init {
       try await repository.withdrawal()
     }

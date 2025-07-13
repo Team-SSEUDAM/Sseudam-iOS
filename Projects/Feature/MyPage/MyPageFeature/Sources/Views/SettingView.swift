@@ -25,6 +25,7 @@ public struct SettingView: View {
         NavigationBarView
         settingListView
         Spacer()
+        SnackBarView
       }
       AlertView
     }
@@ -37,6 +38,14 @@ public struct SettingView: View {
 }
 
 extension SettingView {
+  
+  @ViewBuilder
+  private var SnackBarView: some View {
+    SnackBar(message: $store.toastMessage) {
+      store.send(.showToastMessage(nil))
+    }
+    .padding(.horizontal, .Number16)
+  }
   
   @ViewBuilder
   private var AlertView: some View {

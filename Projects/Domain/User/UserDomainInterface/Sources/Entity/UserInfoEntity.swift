@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct UserInfoEntity {
+public struct UserInfoEntity: Equatable {
   public let id: Int
   public let email: String
   public let name: String?

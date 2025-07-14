@@ -10,6 +10,8 @@ import ComposableArchitecture
 import Utility
 import KeyChain
 import AuthDomainInterface
+import UserDomainInterface
+import UserDefaults
 
 @Reducer
 public struct LoginFeature {
@@ -18,6 +20,7 @@ public struct LoginFeature {
   @ObservableState
   public struct State: Equatable {
     var email: String? = nil
+    var toastMessage: String? = nil
     public init() {}
   }
   
@@ -31,6 +34,9 @@ public struct LoginFeature {
     case delegate(Delegate)
     case loginResult(Result<SocialLoginEntity, NetworkError>)
     case storeEmail(String?)
+    case fetchUserInfo
+    case fetchUserInfoResult(Result<UserInfoEntity, NetworkError>)
+    case showToastMessage(String?)
   }
   
   public enum Delegate: Equatable {
@@ -46,6 +52,7 @@ public struct LoginFeature {
   @Dependency(\.mainQueue) var mainQueue
   @Dependency(\.AppleLoginUseCase) var appleLoginUseCase
   @Dependency(\.TokenSaveUseCase) var tokenSaveUseCase
+  @Dependency(\.FetchUserInfoUseCase) var fetchUserInfoUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -67,31 +74,53 @@ public struct LoginFeature {
       case .presentSignUp:
         return .send(.delegate(.presentSignUp(email: state.email)))
         
-      case let .loginResult(result):
-        return handleLoginResult(result: result)
+      case let .loginResult(.success(result)):
+        return handleLoginResult(data: result)
+        
+      case let .loginResult(.failure(error)):
+        return .send(.showToastMessage(error.localizedDescription))
         
       case let .storeEmail(email):
         state.email = email
         return .none
+        
+      case .fetchUserInfo:
+        return fetchUserInfo()
+        
+      case let .fetchUserInfoResult(.success(data)):
+        UserDefaultsKeys.userId = data.id
+        return .send(.delegate(.complete))
+        
+      case let .fetchUserInfoResult(.failure(error)):
+        return .send(.showToastMessage(error.localizedDescription))
         
       default: return .none
       }
     }
   }
   
-  private func handleLoginResult(result: Result<SocialLoginEntity, NetworkError>) -> Effect<Action> {
-    switch result {
-    case let .success(data):
-      return .run { send in
-        await tokenSaveUseCase.execute(data)
-        if data.isTempToken {
-          return await send(.presentSignUp)
-        } else {
-          await send(.delegate(.complete))
-        }
+  private func fetchUserInfo() -> Effect<Action> {
+    return .run { send in
+      do {
+        let data = try await fetchUserInfoUseCase.execute()
+        await send(.fetchUserInfoResult(.success(data)))
+      } catch let error as NetworkError {
+        await send(.fetchUserInfoResult(.failure(error)))
+      } catch {
+        await send(.fetchUserInfoResult(.failure(.customError(message: "회원 정보를 불러오는데 실패했어요"))))
       }
-    case .failure(_):
-      return .send(.delegate(.dismiss))
+    }
+  }
+  
+  private func handleLoginResult(data: SocialLoginEntity) -> Effect<Action> {
+    return .run { send in
+      await tokenSaveUseCase.execute(data)
+      if data.isTempToken {
+        return await send(.presentSignUp)
+      } else {
+//        return await send(.delegate(.complete))
+        return await send(.fetchUserInfo)
+      }
     }
   }
   

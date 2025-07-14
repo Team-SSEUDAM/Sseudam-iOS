@@ -37,15 +37,20 @@ public struct MyPetView: View {
   @ViewBuilder
   private var MainView: some View {
     ColorSet.Background.Primary
-      .ignoresSafeArea()
-      .draggableBottomSheet(
-        isPresented: $store.isPresentMyPetSheet,
-        isIgnoreTabBar: .constant(true),
-        smallHeight: 68,
-        smallContent: { Text("내 반려동물") },
-        largeContent: { Text("내 반려동물 상세 정보") }
+      .overlay(
+        CustomBottomSheet(
+          minHeight: 200,
+          maxHeight: 500
+        ) {
+          Text("Min Height View")
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.yellow)
+        } largeContent: {
+          Text("Max Height View")
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.orange)
+        }
       )
-      
     
   }
   

@@ -18,10 +18,27 @@ public struct MyPetView: View {
   }
   
   public var body: some View {
-    ContentView
-      .onAppear() {
-        store.send(.onAppear)
+    NavigationStack(
+      path: $store.scope(state: \.path, action: \.path)
+    ) {
+      ContentView
+        .onAppear() {
+          store.send(.onAppear)
+        }
+    } destination: { store in
+      switch store.case {
+      case let .petDetail(store):
+        MyPetDetailView(store: store)
       }
+    }
+    .onChange(of: store.path) { oldValue, newValue in
+      /// 네비게이션 path의 `newValue`가 0이 되면 탭바는 등장
+      if newValue.count == 0 { store.send(.delegate(.needToHiddenTabBar(false))) }
+    }
+    .transaction { transaction in
+      transaction.disablesAnimations = false
+    }
+    
   }
   
   @ViewBuilder
@@ -42,11 +59,18 @@ public struct MyPetView: View {
           minHeight: 200,
           maxHeight: 500
         ) {
-          Text("Min Height View")
+          Text("작은 시트")
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.yellow)
+          PrimaryButton(
+            title: .constant("네비게이션"),
+            size: .large,
+            state: .constant(.normal)
+          ) {
+            store.send(.petDetailButtonTapped)
+          }
         } largeContent: {
-          Text("Max Height View")
+          Text("큰 시트")
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.orange)
         }
@@ -69,7 +93,7 @@ public struct MyPetView: View {
         size: .large,
         state: .constant(.normal)
       ) {
-        store.send(.requestLogin(true, .mypet))
+        store.send(.requestLogin)
       }
       .frame(width: 129)
       

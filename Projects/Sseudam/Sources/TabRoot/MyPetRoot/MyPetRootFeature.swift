@@ -9,6 +9,7 @@
 import SwiftUI
 import ComposableArchitecture
 import MyPetFeature
+import AuthFeature
 
 @Reducer
 struct MyPetRootFeature {
@@ -20,9 +21,16 @@ struct MyPetRootFeature {
   
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
-    case myPet(MyPetFeature.Action)
+    case delegate(Delegate)
     
-    case needToHideMyPetBottomSheet(Bool)
+    case checkLoggedin
+    case requestLogin(Bool, AuthEntryPoint)
+    case myPet(MyPetFeature.Action)
+  }
+  
+  enum Delegate: Equatable {
+    case hiddenTabBar(Bool)
+    case requestLogin(Bool, AuthEntryPoint)
   }
   
   var body: some ReducerOf<Self> {
@@ -32,8 +40,21 @@ struct MyPetRootFeature {
     }
     Reduce { state, action in
       switch action {
-      case let .needToHideMyPetBottomSheet(isHidden):
-        return .send(.myPet(.hideMyPetBottomSheet(isHidden)))
+      case let .requestLogin(isPresent, entryPoint):
+        return .send(.delegate(.requestLogin(isPresent, entryPoint)))
+        
+      case .checkLoggedin:
+        return .send(.myPet(.checkLoggedIn))
+        
+      case let .myPet(.delegate(action)):
+        switch action {
+        case let .needToHiddenTabBar(isHidden):
+          return .send(.delegate(.hiddenTabBar(isHidden)))
+          
+        case let .requestLogin(isPresent):
+          return .send(.delegate(.requestLogin(isPresent, .mypet)))
+        }
+        
       default: return .none
       }
     }

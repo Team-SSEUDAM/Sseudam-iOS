@@ -59,7 +59,7 @@ struct SseudamFeature {
       switch action {
       case let .selectTab(tab):
         state.selectedTab = tab
-        return .send(.myPetRoot(.needToHideMyPetBottomSheet(tab != .myPet)))
+        return .none
         
       case let .homeRoot(.delegate(.presentAlert(type))):
         state.presentAlert = type
@@ -77,9 +77,18 @@ struct SseudamFeature {
         state.isTabbarHidden = (isHidden)
         return .none
         
-      case let .authFlow(.delegate(.changeLoginState(isLoggedIn))):
+      case let .myPetRoot(.delegate(.requestLogin(isPresent, _))):
+        state.authFlow = isPresent ? .init() : nil
+        return .send(.authFlow(.presentLogin(isPresent)))
+        
+      case let .myPetRoot(.delegate(.hiddenTabBar(isHidden))):
+        state.isTabbarHidden = (isHidden)
+        return .none
+        
+      case .authFlow(.delegate(.changeLoginState)):
         return .run { send in
           await send(.mypageRoot(.checkLoggedin))
+          await send(.myPetRoot(.checkLoggedin))
         }
         
         // MARK: - Alert

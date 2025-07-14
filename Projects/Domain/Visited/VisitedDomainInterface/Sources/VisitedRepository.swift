@@ -9,9 +9,9 @@
 import Foundation
 
 public struct VisitedRepository {
-  public var fetchData: @Sendable () async throws -> Void
+  public var requestVisited: @Sendable (_ userId: Int, _ spotId: Int) async throws -> VisitedCompleteEntity
 
-  public init(fetchData: @Sendable @escaping () async throws -> Void) {
-    self.fetchData = fetchData
+  public init(requestVisited: @Sendable @escaping (_ userId: Int, _ spotId: Int) async throws -> VisitedCompleteEntity) {
+    self.requestVisited = requestVisited
   }
 }

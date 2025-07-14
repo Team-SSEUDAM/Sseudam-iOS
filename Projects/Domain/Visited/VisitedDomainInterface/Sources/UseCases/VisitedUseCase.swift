@@ -9,9 +9,9 @@
 import Foundation
 
 public struct VisitedUseCase {
-  public var execute: @Sendable () async throws -> Void
+  public var execute: @Sendable (_ userId: Int, _ spotId: Int) async throws -> VisitedCompleteEntity
   
-  public init(execute: @Sendable @escaping () async throws -> Void) {
+  public init(execute: @Sendable @escaping (_ userId: Int, _ spotId: Int) async throws -> VisitedCompleteEntity) {
     self.execute = execute
   }
 }

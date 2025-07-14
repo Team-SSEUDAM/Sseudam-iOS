@@ -12,11 +12,12 @@ import VisitedDataInterface
 import NetworkKit
 
 public extension VisitedRepository {
-  static var live: VisitedRepository {
+  static func live(networker: NetworkKit) -> VisitedRepository {
     VisitedRepository(
-      fetchData: {
-        // 실제 네트워크 작업 구현
-        return
+      requestVisited: { userId, spotId in
+        let parameter = VisitedParameter(user: userId)
+        let endPoint = VisitedEndPoint.visited(parameter: parameter, spotId: spotId)
+        return try await networker.execute(with: endPoint, timeout: 30).toEntity()
       }
     )
   }

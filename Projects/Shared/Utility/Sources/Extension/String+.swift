@@ -41,4 +41,10 @@ extension String {
   public func toFormattedDateOptional(_ format: String = "yy-MM-dd") -> String? {
     return self.toFormattedDate(format) == self ? nil : self.toFormattedDate(format)
   }
+  
+  public var toDateFromISO8601: Date? {
+      let formatter = ISO8601DateFormatter()
+      formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+      return formatter.date(from: self)
+  }
 }

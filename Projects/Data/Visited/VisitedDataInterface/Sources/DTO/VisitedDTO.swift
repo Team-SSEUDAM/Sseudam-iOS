@@ -7,6 +7,18 @@
 //
 
 import Foundation
+import NetworkKit
 import VisitedDomainInterface
+import Utility
 
-
+public struct VisitedDTO: DTO {
+  let id: Int
+  let spotId: Int
+  let userId: Int
+  let site: String
+  let visitedAt: String
+  
+  public func toEntity() throws -> VisitedCompleteEntity {
+    return .init(visitedAt: visitedAt.toDateFromISO8601)
+  }
+}

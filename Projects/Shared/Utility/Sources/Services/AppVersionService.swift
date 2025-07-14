@@ -39,7 +39,11 @@ public final actor AppVersionManager {
       return (current: currentVersion, appStore: "0", updateNeeded: false)
     }
     
-    let updateNeeded = storeVersion > currentVersion
+    let updateNeeded = compareVersions(storeVersion, currentVersion) == .orderedDescending
     return (current: currentVersion, appStore: storeVersion, updateNeeded: updateNeeded)
+  }
+  
+  private func compareVersions(_ version1: String, _ version2: String) -> ComparisonResult {
+    return version1.compare(version2, options: .numeric)
   }
 }

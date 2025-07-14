@@ -18,15 +18,19 @@ public struct MyPetFeature {
   
   @ObservableState
   public struct State {
-    public var isLoggedIn: Bool
-    
-    public init() {
-      self.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
-    }
+    public var isLoggedIn: Bool = false
+    public var isPresentMyPetSheet: Bool = false
+    public init() {}
   }
   
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    case onAppear
+    case checkLoggedIn
+    
+    case hideMyPetBottomSheet(Bool)
+    
+    
     case loginState(Bool)
     case delegate(Delegate)
     
@@ -35,7 +39,6 @@ public struct MyPetFeature {
   }
   
   public enum Delegate: Equatable {
-    case hiddenTabBar(Bool)
     case requestLogin(Bool, AuthEntryPoint)
   }
   
@@ -43,6 +46,17 @@ public struct MyPetFeature {
     BindingReducer()
     Reduce { state, action in
       switch action {
+      case let .hideMyPetBottomSheet(isHide):
+        state.isPresentMyPetSheet = isHide == false
+        return .none
+        
+      case .onAppear:
+        return .send(.checkLoggedIn)
+        
+      case .checkLoggedIn:
+        state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
+        return .none
+        
       case let .requestLogin(isPresent, entryPoint):
         return .send(.delegate(.requestLogin(isPresent, entryPoint)))
       case let .loginState(isLoggedIn):

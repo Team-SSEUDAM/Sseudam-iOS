@@ -19,6 +19,9 @@ public struct MyPetView: View {
   
   public var body: some View {
     ContentView
+      .onAppear() {
+        store.send(.onAppear)
+      }
   }
   
   @ViewBuilder
@@ -36,7 +39,7 @@ public struct MyPetView: View {
     ColorSet.Background.Primary
       .ignoresSafeArea()
       .draggableBottomSheet(
-        isPresented: .constant(true),
+        isPresented: $store.isPresentMyPetSheet,
         isIgnoreTabBar: .constant(true),
         smallHeight: 68,
         smallContent: { Text("내 반려동물") },

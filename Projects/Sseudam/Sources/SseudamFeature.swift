@@ -59,7 +59,7 @@ struct SseudamFeature {
       switch action {
       case let .selectTab(tab):
         state.selectedTab = tab
-        return .none
+        return .send(.myPetRoot(.needToHideMyPetBottomSheet(tab != .myPet)))
         
       case let .homeRoot(.delegate(.presentAlert(type))):
         state.presentAlert = type

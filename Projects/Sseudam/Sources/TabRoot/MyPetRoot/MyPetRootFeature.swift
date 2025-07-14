@@ -21,12 +21,19 @@ struct MyPetRootFeature {
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case myPet(MyPetFeature.Action)
+    
+    case needToHideMyPetBottomSheet(Bool)
   }
   
   var body: some ReducerOf<Self> {
     BindingReducer()
+    Scope(state: \.myPet, action: \.myPet) {
+      MyPetFeature()
+    }
     Reduce { state, action in
       switch action {
+      case let .needToHideMyPetBottomSheet(isHidden):
+        return .send(.myPet(.hideMyPetBottomSheet(isHidden)))
       default: return .none
       }
     }

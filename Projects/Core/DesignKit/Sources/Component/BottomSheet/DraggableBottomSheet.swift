@@ -11,7 +11,6 @@ public struct DraggableBottomSheet<SmallContent: View, LargeContent: View>: View
   @Binding var isPresented: Bool
   @Binding var isIgnoreTabbar: Bool
   @State private var selectedDetent: PresentationDetent
-  @State private var isAnimating: Bool = false
   
   let smallDetent: PresentationDetent
   let largeDetent: PresentationDetent

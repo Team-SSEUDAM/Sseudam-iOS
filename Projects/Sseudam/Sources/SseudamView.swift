@@ -62,24 +62,6 @@ struct SseudamView: View {
     }
   }
   
-  private var HomeView: some View {
-    HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
-       .opacity(store.selectedTab == .home ? 1 : 0)
-       .allowsHitTesting(store.selectedTab == .home)
-  }
-  
-  private var PetView: some View {
-    MyPetRootView(store: store.scope(state: \.myPetRoot, action: \.myPetRoot))
-       .opacity(store.selectedTab == .myPet ? 1 : 0)
-       .allowsHitTesting(store.selectedTab == .myPet)
-  }
-  
-  private var MyPageView: some View {
-    MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
-      .opacity(store.selectedTab == .myPage ? 1 : 0)
-      .allowsHitTesting(store.selectedTab == .myPage)
-  }
-  
 }
 
 #Preview {

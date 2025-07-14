@@ -11,6 +11,7 @@ import DesignKit
 import ComposableArchitecture
 
 import HomeFeature
+import MyPetFeature
 import TrashDetailFeature
 import AuthFeature
 
@@ -23,6 +24,7 @@ struct SseudamFeature {
     var isTabbarHidden: Bool = false
     
     var homeRoot: HomeRootFeature.State = .init()
+    var myPetRoot: MyPetRootFeature.State = .init()
     var mypageRoot: MyPageRootFeature.State = .init()
     var authFlow: AuthFlowFeature.State? = nil
     var presentAlert: AlertType? = nil
@@ -33,6 +35,7 @@ struct SseudamFeature {
     case selectTab(TabBarItem)
     
     case homeRoot(HomeRootFeature.Action)
+    case myPetRoot(MyPetRootFeature.Action)
     case mypageRoot(MyPageRootFeature.Action)
     case authFlow(AuthFlowFeature.Action)
     
@@ -45,6 +48,9 @@ struct SseudamFeature {
     BindingReducer()
     Scope(state: \.homeRoot, action: \.homeRoot) {
       HomeRootFeature()
+    }
+    Scope(state: \.myPetRoot, action: \.myPetRoot) {
+      MyPetRootFeature()
     }
     Scope(state: \.mypageRoot, action: \.mypageRoot) {
       MyPageRootFeature()

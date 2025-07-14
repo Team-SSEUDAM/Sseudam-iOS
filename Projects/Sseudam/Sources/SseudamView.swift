@@ -10,6 +10,7 @@ import SwiftUI
 import DesignKit
 import ComposableArchitecture
 import HomeFeature
+import MyPetFeature
 import TrashDetailFeature
 import AuthFeature
 import UserDefaults
@@ -31,7 +32,7 @@ struct SseudamView: View {
       TabView(selection: $store.selectedTab) {
         HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
           .tag(TabBarItem.home)
-        EmptyView()
+        MyPetRootView(store: store.scope(state: \.myPetRoot, action: \.myPetRoot))
           .tag(TabBarItem.myPet)
         MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
           .tag(TabBarItem.myPage)
@@ -68,7 +69,7 @@ struct SseudamView: View {
   }
   
   private var PetView: some View {
-    EmptyView()
+    MyPetRootView(store: store.scope(state: \.myPetRoot, action: \.myPetRoot))
        .opacity(store.selectedTab == .myPet ? 1 : 0)
        .allowsHitTesting(store.selectedTab == .myPet)
   }

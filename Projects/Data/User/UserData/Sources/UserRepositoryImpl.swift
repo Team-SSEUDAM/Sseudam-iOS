@@ -30,6 +30,9 @@ public extension UserRepository {
         let endpoint = UserEndPoint.withdrawal()
         let _ = try await networker.execute(with: endpoint, timeout: 30)
         return ()
+      }, fetchUserInfo: {
+        let endpoint = UserEndPoint.fetchUserInfo()
+        return try await networker.execute(with: endpoint, timeout: 30).toEntity()
       }
     )
   }

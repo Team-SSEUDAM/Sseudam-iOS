@@ -134,6 +134,10 @@ struct DependencyRegister {
       WithdrawalUseCase.live(repository: userReoository)
     }
     
+    FetchUserInfoUseCaseRegister {
+      FetchUserInfoUseCase.live(repository: userReoository)
+    }
+    
     // MARK: - Trash Spot
     
     FetchTrashSpotUseCaseRegister {

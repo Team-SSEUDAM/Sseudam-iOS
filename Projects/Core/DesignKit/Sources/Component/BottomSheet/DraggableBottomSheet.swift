@@ -7,8 +7,9 @@
 //
 import SwiftUI
 
-public struct DraggableBottomSheet<SmallContent: View, LargeContent: View>: View {
+public struct DraggableBottomSheet<SmallContent: View, LargeContent: View>: ViewModifier {
   @Binding var isPresented: Bool
+  @Binding var isIgnoreTabbar: Bool
   @State private var selectedDetent: PresentationDetent
   @State private var isAnimating: Bool = false
   
@@ -21,6 +22,7 @@ public struct DraggableBottomSheet<SmallContent: View, LargeContent: View>: View
   
   public init(
     isPresented: Binding<Bool>,
+    isIgnoreTabbar: Binding<Bool>,
     smallHeight: CGFloat = 350,
     largeHeight: CGFloat? = nil,
     @ViewBuilder smallContent: @escaping () -> SmallContent,
@@ -28,38 +30,27 @@ public struct DraggableBottomSheet<SmallContent: View, LargeContent: View>: View
   ) {
     self._isPresented = isPresented
     self.smallDetent = .height(smallHeight)
-    self.largeDetent = largeHeight != nil ? .height(largeHeight!) : .fraction(0.99)
+    self.largeDetent = largeHeight != nil ? .height(largeHeight!) : .large
     self._selectedDetent = State(initialValue: .height(smallHeight))
     self.smallContent = smallContent
     self.largeContent = largeContent
+    self._isIgnoreTabbar = isIgnoreTabbar
   }
   
-  public var body: some View {
-    EmptyView()
+  public func body(content: Content) -> some View {
+    content
       .sheet(isPresented: $isPresented) {
         ZStack {
-          Color.white.ignoresSafeArea()
-          
-          if isExpanded {
-            largeContent()
-              .transition(.opacity.combined(with: .scale(scale: 0.98)))
-          } else {
-            smallContent()
-              .transition(.opacity.combined(with: .scale(scale: 0.98)))
-          }
+          if isExpanded { largeContent() }
+          else { smallContent() }
         }
-        .animation(.easeInOut(duration: 0.25), value: isExpanded)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         .presentationDetents([smallDetent, largeDetent], selection: $selectedDetent)
-        .presentationDragIndicator(.visible)
         .presentationCornerRadius(16)
-        .presentationBackgroundInteraction(.enabled(upThrough: smallDetent))
-        .interactiveDismissDisabled(true)
-        .presentationContentInteraction(.resizes)
-        .onChange(of: selectedDetent) { _, _ in
-          withAnimation { isAnimating = true }
-          DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { isAnimating = false }
-        }
+        .presentationBackground(ColorSet.Background.Primary)
+        .presentationBackgroundInteraction(.enabled(upThrough: .large))
+        .interactiveDismissDisabled()
+        .bottomMaskForSheet(mask: isIgnoreTabbar, 50)
       }
   }
-  
 }

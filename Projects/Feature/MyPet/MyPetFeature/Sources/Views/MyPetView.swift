@@ -18,27 +18,36 @@ public struct MyPetView: View {
   }
   
   public var body: some View {
-    VStack {
-      if !store.state.isLoggedIn {
-        requireLoginView
-      } else {
-        ColorSet.Background.Primary
-          .ignoresSafeArea()
-          .overlay {
-            DraggableBottomSheet(
-              isPresented: .constant(true),
-              smallHeight: 68,
-              smallContent: { Text("내 반려동물") },
-              largeContent: { Text("내 반려동물 상세 정보") }
-            )
-          }
-      }
+    ContentView
+  }
+  
+  @ViewBuilder
+  private var ContentView: some View {
+    ZStack {
+      ColorSet.Background.Primary
+        .ignoresSafeArea()
+      if store.isLoggedIn { MainView }
+      else { RequireLoginView }
     }
   }
   
+  @ViewBuilder
+  private var MainView: some View {
+    ColorSet.Background.Primary
+      .ignoresSafeArea()
+      .draggableBottomSheet(
+        isPresented: .constant(true),
+        isIgnoreTabBar: .constant(true),
+        smallHeight: 68,
+        smallContent: { Text("내 반려동물") },
+        largeContent: { Text("내 반려동물 상세 정보") }
+      )
+      
+    
+  }
   
   @ViewBuilder
-  private var requireLoginView: some View {
+  private var RequireLoginView: some View {
     VStack(alignment: .center, spacing: .Number16) {
       Spacer()
       Text("로그인이 필요해요")

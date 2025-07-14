@@ -20,12 +20,12 @@ struct MyPetRootView: View {
   }
   
   var body: some View {
-    MyPetView(store: store.scope(state: \.myPet, action: \.myPet))
-      .draggableBottomSheet(
-        isPresented: .constant(true),
-        smallHeight: 68,
-        smallContent: { },
-        largeContent: { }
-      )
+    ZStack {
+      ColorSet.Background.Primary
+        .ignoresSafeArea()
+      MyPetView(store: store.scope(state: \.myPet, action: \.myPet))
+    }
+    
+    
   }
 }

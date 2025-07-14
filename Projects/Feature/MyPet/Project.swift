@@ -12,6 +12,7 @@ import ProjectDescriptionHelpers
 let project = Project.makeFeature(
   for: Feature.MyPet,
   dependencies: [
+    .Features.Auth,
     .Domain.Umbrella
   ]
 )

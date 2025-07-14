@@ -39,9 +39,7 @@ public struct TrashDetailFeature {
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
     
     case showToastMessage(String?)
-    case showLocationPermissionAlert
     case showAlert(AlertType)
-    case delegate(Delegate)
   }
   
   public enum Delegate: Equatable {

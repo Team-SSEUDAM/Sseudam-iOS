@@ -11,6 +11,7 @@ import ComposableArchitecture
 import Utility
 import NMReverseGeocodingDomainInterface
 import SuggestionDomainInterface
+import TrashSpotDomainInterface
 
 import SelectSpotImageFeature
 import SelectSpotCategoryFeature
@@ -23,12 +24,18 @@ public struct ReportChildFeature {
   
   @ObservableState
   public struct State: Equatable {
-    var moveLocation: SelectSpotLocationFeature.State = SelectSpotLocationFeature.State()
+    var moveLocation: SelectSpotLocationFeature.State
     var writeName: SelectSpotNameFeature.State = SelectSpotNameFeature.State()
     var selectKind: SelectSpotCategoryFeature.State = SelectSpotCategoryFeature.State()
     var selectPhoto: SelectSpotImageFeature.State = SelectSpotImageFeature.State()
     
-    public init() {}
+    var trashSpotDetail: TrashSpotDetail
+    public init(
+      _ trashSpotDetail: TrashSpotDetail
+    ) {
+      self.trashSpotDetail = trashSpotDetail
+      self.moveLocation = SelectSpotLocationFeature.State(trashSpotDetail.point) /// 초기값 (선택된 위치) 저장
+    }
   }
   
   public enum Action: Equatable {

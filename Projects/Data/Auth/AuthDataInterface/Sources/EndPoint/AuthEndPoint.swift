@@ -29,4 +29,15 @@ public struct AuthEndpoint: Sendable {
       parameters: .body(body)
     )
   }
+  
+  public static func logout() ->  Endpoint<EmptyResponse> {
+    let accessToken = UserDefaultsKeys.accessToken
+    let body = LogoutBody(token: accessToken ?? "")
+    return Endpoint(
+      headers: .authorization(accessToken),
+      method: .post,
+      path: "/auth/logout",
+      parameters: .body(body)
+    )
+  }
 }

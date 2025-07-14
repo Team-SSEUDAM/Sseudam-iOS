@@ -178,7 +178,10 @@ extension MapFeature {
         return await send(.fetchTrashItemsResult(.success(result)))
       } catch let error as NetworkError {
         return await send(.delegate(.showToastMessage(error.localizedDescription)))
+      } catch {
+        return await send(.delegate(.showToastMessage(error.localizedDescription)))
       }
+      
     }
   }
   

@@ -1,8 +1,8 @@
 //
-//  SpotSuggestionCompleteView.swift
-//  ReportFeature
+//  SuggestionStartView.swift
+//  SuggestionFeature
 //
-//  Created by 조용인 on 7/1/25.
+//  Created by 조용인 on 7/6/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
@@ -10,7 +10,7 @@ import SwiftUI
 import ComposableArchitecture
 import DesignKit
 
-public struct SpotSuggestionCompleteView: View {
+public struct SuggestionStartView: View {
   
   private let image: ImageSet
   private let title: String
@@ -42,17 +42,4 @@ public struct SpotSuggestionCompleteView: View {
     .padding(.Number16)
     
   }
-}
-
-#Preview {
-  ReportStartView(
-    image: .addSpot,
-    title: "발견한 쓰레기통을 제보해주세요!",
-    description:
-    """
-    쓰담이 아직 모르는 쓰레기통이 있나요?
-    제보 시 5쓰담이 적립되며,
-    승인되면 15쓰담을 추가 적립받아요.
-    """
-  )
 }

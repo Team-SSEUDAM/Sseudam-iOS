@@ -6,14 +6,17 @@
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
-import NMReverseGeocodingDomain
-import SuggestionDomain
-
 import NMReverseGeocodingDomainInterface
-import SuggestionDomainInterface
-
+import NMReverseGeocodingDomain
 import NMReverseGeocodingData
+
+import SuggestionDomainInterface
+import SuggestionDomain
 import SuggestionData
+
+import ReportDomainInterface
+import ReportDomain
+import ReportData
 
 import AuthDomainInterface
 import AuthDomain
@@ -40,6 +43,7 @@ struct DependencyRegister {
     let authRepository = AuthRepository.live(networker: networker)
     let userReoository = UserRepository.live(networker: networker)
     let trashSpotRepository = TrashSpotRepository.live(networker: networker)
+    let reportRepository = ReportRepository.live(networker: networker)
     
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live
@@ -71,6 +75,19 @@ struct DependencyRegister {
       }
     )
     
+    // MARK: - Report
+    ReportSpotUseCaseRegister {
+      ReportSpotUseCase.live(repository: reportRepository)
+    }
+    
+    UploadReportSpotImageUseCaseRegister {
+      UploadReportSpotImageUseCase.live(repository: reportRepository)
+    }
+    
+    ReportSpotNameValidateUseCaseRegister {
+      ReportSpotNameValidateUseCase.live(repository: reportRepository)
+    }
+    
     // MARK: - Auth
     
     AppleLoginUseCaseRegister {
@@ -85,10 +102,18 @@ struct DependencyRegister {
       SignUpUseCase.live(repository: authRepository)
     }
     
+    LogoutUseCaseRegister {
+      LogoutUseCase.live(repository: authRepository)
+    }
+    
+    TokenDeleteUseCaseRegister {
+      TokenDeleteUseCase.live
+    }
+    
     // MARK: - User
     
     CheckNicknameValidUseCaseRegister {
-      CheckNicknameValidateUseCase.test(repository: userReoository)
+      CheckNicknameValidateUseCase.live(repository: userReoository)
     }
     
     LoadAreaListUseCaseRegister {
@@ -103,6 +128,10 @@ struct DependencyRegister {
       SearchAreaUseCase.live(repository: userReoository)
     }
     
+    WithdrawalUseCaseRegister {
+      WithdrawalUseCase.live(repository: userReoository)
+    }
+    
     // MARK: - Trash Spot
     
     FetchTrashSpotUseCaseRegister {
@@ -113,5 +142,8 @@ struct DependencyRegister {
       FetchTrashSpotDetailUseCase.live(repository: trashSpotRepository)
     }
     
+    FetchTrashSpotRawDetailUseCaseRegister {
+      FetchTrashSpotRawDetailUseCase.live(repository: trashSpotRepository)
+    }
   }
 }

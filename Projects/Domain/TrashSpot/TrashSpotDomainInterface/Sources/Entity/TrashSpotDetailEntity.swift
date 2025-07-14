@@ -11,15 +11,15 @@ import DesignKit
 import Utility
 
 public struct TrashSpotDetail: Equatable, Sendable {
-  public let id: Int
-  public let suggestionerId: Int?
-  public let suggestionerName: String?
-  public let name: String
-  public let address: String
-  public let point: Coordinates
-  public let trashType: TrashType
-  public let visitedCount: Int
-  public let imageUrl: String?
+  public var id: Int
+  public var suggestionerId: Int?
+  public var suggestionerName: String?
+  public var name: String
+  public var address: String
+  public var point: Coordinates
+  public var trashType: TrashType
+  public var visitedCount: Int
+  public var imageUrl: String?
   
   public init(
     id: Int,

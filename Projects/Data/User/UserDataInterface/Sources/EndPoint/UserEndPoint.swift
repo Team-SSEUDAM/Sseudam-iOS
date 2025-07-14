@@ -21,5 +21,14 @@ public struct UserEndPoint: Sendable {
       parameters: .body(body)
     )
   }
+  
+  public static func withdrawal() -> Endpoint<EmptyResponse> {
+    let accessToken = UserDefaultsKeys.accessToken
+    return Endpoint(
+      headers: .authorization(accessToken),
+      method: .delete,
+      path: "/users"
+    )
+  }
 }
 

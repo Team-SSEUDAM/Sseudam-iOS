@@ -39,4 +39,18 @@ public struct TrashSpotDetailDTO: DTO {
       imageUrl: imageUrl
     )
   }
+  
+  public func toFlattenEntity() throws -> TrashSpotFlattenDetailEntity {
+    let point: Coordinates = try point.toEntity()
+    return .init(
+      id: id,
+      latitude: point.latitude,
+      longitude: point.longitude,
+      spotName: name,
+      region: region,
+      city: address.city,
+      site: address.site,
+      trashType: trashType
+    )
+  }
 }

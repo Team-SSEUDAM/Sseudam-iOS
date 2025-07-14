@@ -175,7 +175,8 @@ extension NetworkKit {
             message: errorResponse.data.message,
             code: errorResponse.status
           ),
-          endpoint: endpoint
+          endpoint: endpoint,
+          errorClassName: errorResponse.data.errorClassName
         )
       default:
         throw throwError(
@@ -242,7 +243,8 @@ extension NetworkKit {
   
   fileprivate func throwError(
     _ error: Error,
-    endpoint: (any APIRequestable)? = nil
+    endpoint: (any APIRequestable)? = nil,
+    errorClassName: String? = nil
   ) -> Error {
     var description: String = error.localizedDescription
     if let error = error as? NetworkError {
@@ -257,6 +259,7 @@ extension NetworkKit {
           ============== 🚨 ERROR==================
           ✔️ Path: \(endpoint?.path ?? "PUT")
           ✔️ Message: \(description)
+          ✔️ ServerErrorClassName: \(errorClassName ?? "")
           =========================================
           """)
     return error

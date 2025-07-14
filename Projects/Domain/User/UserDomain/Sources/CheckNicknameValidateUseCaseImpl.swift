@@ -10,7 +10,7 @@ import Foundation
 import UserDomainInterface
 
 extension CheckNicknameValidateUseCase {
-  public static func test(repository: UserRepository) -> CheckNicknameValidateUseCase {
+  public static func live(repository: UserRepository) -> CheckNicknameValidateUseCase {
     .init { nickname in
       try await repository.checkNicknameValidate(nickname)
     }

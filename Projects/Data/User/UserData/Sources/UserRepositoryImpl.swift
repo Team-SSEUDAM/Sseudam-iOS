@@ -26,6 +26,10 @@ public extension UserRepository {
         await cache.fetchList()
       }, deleteAreaList: {
         await cache.deleteAll()
+      }, withdrawal: {
+        let endpoint = UserEndPoint.withdrawal()
+        let _ = try await networker.execute(with: endpoint, timeout: 30)
+        return ()
       }
     )
   }

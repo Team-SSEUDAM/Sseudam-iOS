@@ -102,10 +102,18 @@ struct DependencyRegister {
       SignUpUseCase.live(repository: authRepository)
     }
     
+    LogoutUseCaseRegister {
+      LogoutUseCase.live(repository: authRepository)
+    }
+    
+    TokenDeleteUseCaseRegister {
+      TokenDeleteUseCase.live
+    }
+    
     // MARK: - User
     
     CheckNicknameValidUseCaseRegister {
-      CheckNicknameValidateUseCase.test(repository: userReoository)
+      CheckNicknameValidateUseCase.live(repository: userReoository)
     }
     
     LoadAreaListUseCaseRegister {
@@ -118,6 +126,10 @@ struct DependencyRegister {
     
     SearchAreaUseCaseRegister {
       SearchAreaUseCase.live(repository: userReoository)
+    }
+    
+    WithdrawalUseCaseRegister {
+      WithdrawalUseCase.live(repository: userReoository)
     }
     
     // MARK: - Trash Spot

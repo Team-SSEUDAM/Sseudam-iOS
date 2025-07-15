@@ -12,11 +12,11 @@ import PetDataInterface
 import NetworkKit
 
 public extension PetRepository {
-  static var live: PetRepository {
-    PetRepository(
-      fetchData: {
-        // 실제 네트워크 작업 구현
-        return
+  static func live(networker: NetworkKit) -> PetRepository {
+    return .init(
+      getPetInfo: {
+        let endpoint = PetEndpoint.getPetInfo()
+        return try await networker.execute(with: endpoint).toEntity()
       }
     )
   }

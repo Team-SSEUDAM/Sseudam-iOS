@@ -52,6 +52,7 @@ public struct MyPetView: View {
         MainView
         CustomBottomSheet(
           minHeight: .Number72,
+          midHeight: .Number200,
           smallContent: {
             Text("작은 시트")
               .frame(maxWidth: .infinity, maxHeight: .infinity)

@@ -24,16 +24,18 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
   @State private var initialHeight: CGFloat = 0
   
   // 중간 임계값 (콘텐츠 전환 기준)
-  private var midHeight: CGFloat { (minHeight + maxHeight) / 2 }
+  private let midHeight: CGFloat
 
   public init(
     minHeight: CGFloat,
     maxHeight: CGFloat? = nil,
+    midHeight: CGFloat? = nil,
     @ViewBuilder smallContent: @escaping () -> SmallContent,
     @ViewBuilder largeContent: @escaping () -> LargeContent
   ) {
     self.minHeight = minHeight
     self.maxHeight = maxHeight ?? UIScreen.main.bounds.height * 0.8
+    self.midHeight = midHeight ?? (minHeight + (maxHeight ?? UIScreen.main.bounds.height * 0.8)) / 2
     self.smallContent = smallContent
     self.largeContent = largeContent
     // 시작 시에는 minHeight
@@ -77,7 +79,7 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
     .frame(height: currentHeight)
     .frame(maxWidth: .infinity)
     .background(ColorSet.Background.Primary)
-    .cornerRadius(16)
+    .clipCorners(.Number16, corners: [.topLeft, .topRight])
     .highPriorityGesture(dragGesture())
   }
   
@@ -95,9 +97,16 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
       }
       .onEnded { value in
         isDragging = false
-        let currentPosition = initialHeight - value.translation.height
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
-          currentHeight = currentPosition > midHeight ? maxHeight : minHeight
+        let velocity = CGSize(
+          width:  value.predictedEndLocation.x - value.location.x,
+          height: value.predictedEndLocation.y - value.location.y
+        )
+        
+        if abs(velocity.height) > 450 {
+          if velocity.height > 0 { withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { currentHeight = minHeight } }
+          else { withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { currentHeight = maxHeight } }
+        } else {
+          withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { currentHeight = initialHeight - value.translation.height > midHeight ? maxHeight : minHeight }
         }
       }
   }

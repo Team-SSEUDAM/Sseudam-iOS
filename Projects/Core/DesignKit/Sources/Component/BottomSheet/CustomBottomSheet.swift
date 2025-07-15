@@ -53,10 +53,20 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
   
   private var sheetView: some View {
     VStack(spacing: 0) {
-      RoundedRectangle(cornerRadius: 2)
-        .fill(ColorSet.Gray._200)
-        .frame(width: 80, height: 4)
-        .padding(.vertical, 8)
+      VStack {
+        RoundedRectangle(cornerRadius: 2)
+          .fill(ColorSet.Gray._200)
+          .frame(width: 80, height: 4)
+          .padding(.vertical, 8)
+      }
+      .frame(maxWidth: .infinity)
+      .contentShape(Rectangle())
+      .frame(height: .Number20)
+      .onTapGesture {
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+          currentHeight = currentHeight < midHeight ? maxHeight : minHeight
+        }
+      }
       
       Group {
         if currentHeight < midHeight { smallContent() }
@@ -70,16 +80,26 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
     .cornerRadius(16)
     .padding(.bottom, 50)
     .highPriorityGesture(dragGesture())
-    .animation(isDragging ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: currentHeight)
   }
   
   private func dragGesture() -> some Gesture {
-    DragGesture()
-      .onEnded { value in
-        let dragThreshold: CGFloat = 30 // 30포인트 이상이면 전환
+    DragGesture(coordinateSpace: .global)
+      .onChanged { value in
+        if !isDragging {
+          isDragging = true
+          initialHeight = currentHeight /// 초기 바텀시트의 크기
+          print("초기 바텀시트의 크기: \(initialHeight)")
+        }
         
-        if abs(value.translation.height) > dragThreshold {
-          currentHeight = currentHeight < midHeight ? maxHeight : minHeight
+        let translation = value.translation.height
+        if translation > 0 { currentHeight = max(minHeight, initialHeight - abs(translation)) }
+        else { currentHeight = min(maxHeight, initialHeight + abs(translation)) }
+      }
+      .onEnded { value in
+        isDragging = false
+        let currentPosition = initialHeight - value.translation.height
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+          currentHeight = currentPosition > midHeight ? maxHeight : minHeight
         }
       }
   }

@@ -43,39 +43,78 @@ public struct MyPetView: View {
   
   @ViewBuilder
   private var ContentView: some View {
-    ZStack {
-      ColorSet.Background.Primary
-        .ignoresSafeArea()
-      if store.isLoggedIn { MainView }
-      else { RequireLoginView }
+    if store.isLoggedIn {
+      ZStack {
+        MainView
+        CustomBottomSheet(
+          minHeight: .Number72,
+          smallContent: {
+            Text("작은 시트")
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+              .background(Color.yellow)
+          },
+          largeContent: {
+            Text("큰 시트")
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+              .background(Color.yellow)
+          }
+        )
+      }
     }
+    else { RequireLoginView }
   }
   
   @ViewBuilder
   private var MainView: some View {
-    ColorSet.Background.Primary
-      .overlay(
-        CustomBottomSheet(
-          minHeight: 200,
-          maxHeight: 500
-        ) {
-          Text("작은 시트")
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.yellow)
-          PrimaryButton(
-            title: .constant("네비게이션"),
-            size: .large,
-            state: .constant(.normal)
-          ) {
-            store.send(.petDetailButtonTapped)
-          }
-        } largeContent: {
-          Text("큰 시트")
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.orange)
-        }
-      )
     
+    VStack(spacing: 0) {
+      // 상단 카드 뷰
+      CardView
+        .padding(.Number16)
+      // 중간 펫 이미지 영역
+      ZStack {
+        // 배경색 (연한 파란색)
+        ColorSet.Background.Accent
+          .ignoresSafeArea()
+        
+        VStack {
+          Spacer()
+          
+          // 펫 이미지 (임시로 원형 뷰)
+          Circle()
+            .fill(Color.orange.opacity(0.7))
+            .frame(width: 150, height: 150)
+            .overlay(
+              VStack {
+                Circle()
+                  .fill(Color.black)
+                  .frame(width: 4, height: 4)
+                  .offset(x: -15, y: -10)
+                Circle()
+                  .fill(Color.black)
+                  .frame(width: 4, height: 4)
+                  .offset(x: 15, y: -30)
+                Circle()
+                  .fill(ColorSet.Background.Secondary)
+                  .frame(width: 12, height: 8)
+                  .offset(y: 5)
+              }
+            )
+          Spacer()
+        }
+      }
+    }
+  }
+  
+  @ViewBuilder
+  private var CardView: some View {
+    MyPetCardView(
+      level: 1,
+      petNickName: "작고 소중한" + "{{고양이 이름}}",
+      currentStamps: 10,
+      goalStamp: 100,
+      progress: .constant(30)
+    )
   }
   
   @ViewBuilder

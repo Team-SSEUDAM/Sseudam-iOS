@@ -28,12 +28,12 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
 
   public init(
     minHeight: CGFloat,
-    maxHeight: CGFloat,
+    maxHeight: CGFloat? = nil,
     @ViewBuilder smallContent: @escaping () -> SmallContent,
     @ViewBuilder largeContent: @escaping () -> LargeContent
   ) {
     self.minHeight = minHeight
-    self.maxHeight = maxHeight
+    self.maxHeight = maxHeight ?? UIScreen.main.bounds.height * 0.8
     self.smallContent = smallContent
     self.largeContent = largeContent
     // 시작 시에는 minHeight
@@ -41,58 +41,46 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
   }
   
   public var body: some View {
-    ZStack(alignment: .bottom) {
+    VStack {
+      Spacer()
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+        .allowsHitTesting(false)
       sheetView
-        .transition(.move(edge: .bottom))
     }
     .ignoresSafeArea()
   }
   
   private var sheetView: some View {
-    GeometryReader { proxy in
-      VStack(spacing: 0) {
-        RoundedRectangle(cornerRadius: 2)
-          .fill(ColorSet.Gray._200)
-          .frame(width: 80, height: 4)
-          .padding(.vertical, 8)
-        
-        Group {
-          if currentHeight < midHeight { smallContent() }
-          else { largeContent() }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    VStack(spacing: 0) {
+      RoundedRectangle(cornerRadius: 2)
+        .fill(ColorSet.Gray._200)
+        .frame(width: 80, height: 4)
+        .padding(.vertical, 8)
+      
+      Group {
+        if currentHeight < midHeight { smallContent() }
+        else { largeContent() }
       }
-      .frame(height: currentHeight)
-      .animation(isDragging ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: currentHeight)
-      .frame(maxWidth: .infinity)
-      .frame(maxHeight: .infinity, alignment: .bottom)
-      .padding(.bottom, proxy.safeAreaInsets.bottom + 50)
-      .background(Color.white)
-      .cornerRadius(16)
-      .gesture(dragGesture(in: proxy))
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+    .frame(height: currentHeight)
+    .frame(maxWidth: .infinity)
+    .background(ColorSet.Background.Primary)
+    .cornerRadius(16)
+    .padding(.bottom, 50)
+    .highPriorityGesture(dragGesture())
+    .animation(isDragging ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: currentHeight)
   }
   
-  private func dragGesture(in proxy: GeometryProxy) -> some Gesture {
+  private func dragGesture() -> some Gesture {
     DragGesture()
-      .onChanged { value in
-        if !isDragging {
-          isDragging = true
-          initialHeight = currentHeight
-        }
-        let translation = value.translation.height
-        let newHeight = initialHeight - translation
-        
-        if newHeight > maxHeight { currentHeight = maxHeight + (newHeight - maxHeight) * 0.1 }
-        else if newHeight < minHeight { currentHeight = minHeight - (minHeight - newHeight) * 0.1 }
-        else { currentHeight = newHeight }
-      }
       .onEnded { value in
-        isDragging = false
-        let target = (initialHeight - value.translation.height) > midHeight
-        ? maxHeight
-        : minHeight
-        currentHeight = target
+        let dragThreshold: CGFloat = 30 // 30포인트 이상이면 전환
+        
+        if abs(value.translation.height) > dragThreshold {
+          currentHeight = currentHeight < midHeight ? maxHeight : minHeight
+        }
       }
   }
 }

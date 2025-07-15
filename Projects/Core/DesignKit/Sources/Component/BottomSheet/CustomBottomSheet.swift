@@ -78,7 +78,6 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
     .frame(maxWidth: .infinity)
     .background(ColorSet.Background.Primary)
     .cornerRadius(16)
-    .padding(.bottom, 50)
     .highPriorityGesture(dragGesture())
   }
   
@@ -87,8 +86,7 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
       .onChanged { value in
         if !isDragging {
           isDragging = true
-          initialHeight = currentHeight /// 초기 바텀시트의 크기
-          print("초기 바텀시트의 크기: \(initialHeight)")
+          initialHeight = currentHeight
         }
         
         let translation = value.translation.height

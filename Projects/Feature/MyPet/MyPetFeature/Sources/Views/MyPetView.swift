@@ -25,6 +25,10 @@ public struct MyPetView: View {
         .onAppear() {
           store.send(.onAppear)
         }
+        .background(
+          ColorSet.Background.Primary
+            .ignoresSafeArea()
+        )
     } destination: { store in
       switch store.case {
       case let .petDetail(store):
@@ -60,8 +64,11 @@ public struct MyPetView: View {
           }
         )
       }
+      .padding(.bottom, 50)
     }
-    else { RequireLoginView }
+    else {
+      RequireLoginView
+    }
   }
   
   @ViewBuilder

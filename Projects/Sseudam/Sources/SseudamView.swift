@@ -10,6 +10,7 @@ import SwiftUI
 import DesignKit
 import ComposableArchitecture
 import HomeFeature
+import MyPetFeature
 import TrashDetailFeature
 import AuthFeature
 import UserDefaults
@@ -31,7 +32,7 @@ struct SseudamView: View {
       TabView(selection: $store.selectedTab) {
         HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
           .tag(TabBarItem.home)
-        EmptyView()
+        MyPetRootView(store: store.scope(state: \.myPetRoot, action: \.myPetRoot))
           .tag(TabBarItem.myPet)
         MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
           .tag(TabBarItem.myPage)
@@ -59,24 +60,6 @@ struct SseudamView: View {
     .transaction { transaction in
       transaction.disablesAnimations = true
     }
-  }
-  
-  private var HomeView: some View {
-    HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
-       .opacity(store.selectedTab == .home ? 1 : 0)
-       .allowsHitTesting(store.selectedTab == .home)
-  }
-  
-  private var PetView: some View {
-    EmptyView()
-       .opacity(store.selectedTab == .myPet ? 1 : 0)
-       .allowsHitTesting(store.selectedTab == .myPet)
-  }
-  
-  private var MyPageView: some View {
-    MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
-      .opacity(store.selectedTab == .myPage ? 1 : 0)
-      .allowsHitTesting(store.selectedTab == .myPage)
   }
   
 }

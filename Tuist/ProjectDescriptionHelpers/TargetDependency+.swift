@@ -24,6 +24,7 @@ public enum Module {
 public enum Feature: String, ModuleRepresentable {
   case Umbrella = ""
   case Home
+  case MyPet
   case TrashDetail
   case Auth
   case Report
@@ -141,6 +142,7 @@ extension TargetDependency {
     public static let Umbrella = Self.project(.feature(.Umbrella))
     
     public static let Home = Self.project(.feature(.Home))
+    public static let MyPet = Self.project(.feature(.MyPet))
     public static let Report = Self.project(.feature(.Report))
     public static let Suggestion = Self.project(.feature(.Suggestion))
     public static let SelectSpotLocation = Self.project(.feature(.SelectSpotLocation))

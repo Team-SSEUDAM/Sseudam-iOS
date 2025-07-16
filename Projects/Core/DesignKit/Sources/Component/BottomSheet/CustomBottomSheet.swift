@@ -80,6 +80,7 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
     .frame(maxWidth: .infinity)
     .background(ColorSet.Background.Primary)
     .clipCorners(.Number16, corners: [.topLeft, .topRight])
+    .elevation(level: .small, cornerRadius: .Number16)
     .highPriorityGesture(dragGesture())
   }
   

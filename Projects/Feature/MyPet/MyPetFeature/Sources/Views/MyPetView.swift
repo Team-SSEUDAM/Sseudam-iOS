@@ -115,13 +115,16 @@ public struct MyPetView: View {
         .foregroundStyle(ColorSet.Text.Secondary)
         .padding(.horizontal, .Number16)
       Spacer()
-      TouchArea(
+      Icon(
         image: .rightChevron,
-        size: .Number24
-      ) {
-        store.send(.petDetailButtonTapped)
-      }
+        size: .Number24,
+        renderingMode: .template,
+        color: ColorSet.Icon.Primary
+      )
       .padding(.trailing, .Number8)
+    }
+    .onTapGesture {
+      store.send(.petDetailButtonTapped)
     }
   }
   

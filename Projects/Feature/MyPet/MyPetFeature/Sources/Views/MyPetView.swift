@@ -52,14 +52,17 @@ public struct MyPetView: View {
   private var ContentView: some View {
     if store.isLoggedIn {
       ZStack {
-        MainView
-        CustomBottomSheet(
-          minHeight: .Number72,
-          midHeight: .Number100,
-          isBottomSheetDragEnabled: $bottomSheetDragEnabled,
-          smallContent: { SmallBottomSheetContent },
-          largeContent: { BigBottomSheetContent }
-        )
+        GeometryReader { proxy in
+          MainView
+          CustomBottomSheet(
+            minHeight: .Number72,
+            maxHeight: proxy.size.height,
+            midHeight: .Number100,
+            isBottomSheetDragEnabled: $bottomSheetDragEnabled,
+            smallContent: { SmallBottomSheetContent },
+            largeContent: { BigBottomSheetContent }
+          )
+        }
       }
       .padding(.bottom, 50)
     }

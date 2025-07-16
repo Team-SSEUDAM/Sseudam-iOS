@@ -10,7 +10,6 @@ import SwiftUI
 import ComposableArchitecture
 import UserDefaults
 import Utility
-import Cache
 
 import AuthFeature
 import PetDomainInterface
@@ -116,16 +115,6 @@ extension MyPetFeature {
   ) -> Effect<Action> {
     .run { send in
       do {
-        /// 캐시 키 생성
-        let cacheKey = MyPetCacheKey.myPetInfo
-        
-        let cache = try await CacheActor.shared.MY_PET_INFO_CACHE
-        if let hitData = await cache.value(forKey: cacheKey) {
-          /// 캐시 hit되면 그대로 사용
-          let entity = PetInfoEntity(hitData)
-          await send(.fetchMyPetInfoResult(.success(entity)))
-        }
-        /// 캐시 miss되면 API 호출
         let entity = try await useCase.execute()
         await send(.fetchMyPetInfoResult(.success(entity)))
       } catch is CancellationError {

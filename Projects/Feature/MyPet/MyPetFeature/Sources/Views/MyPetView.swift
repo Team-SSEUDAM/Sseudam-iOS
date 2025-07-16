@@ -104,7 +104,7 @@ public struct MyPetView: View {
   @ViewBuilder
   private var CommonHeaderView: some View {
     HStack(alignment: .center) {
-      Text("내가 살린 고양이")
+      Text("내가 돌본 고양이")
         .font(FontSet.Body.body3)
         .foregroundStyle(ColorSet.Text.Secondary)
         .padding(.horizontal, .Number16)

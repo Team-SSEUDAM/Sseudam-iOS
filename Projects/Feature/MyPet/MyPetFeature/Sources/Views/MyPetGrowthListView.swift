@@ -56,6 +56,9 @@ public struct BigBottomSheetContentView: View {
           }
       )
       
+      BorderView(size: .long)
+        .padding(.horizontal, .Number16)
+      
       // 성장 기록 섹션 헤더
       HStack(alignment: .center) {
         Text("성장 기록")

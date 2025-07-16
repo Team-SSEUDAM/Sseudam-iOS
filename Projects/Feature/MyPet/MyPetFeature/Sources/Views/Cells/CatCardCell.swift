@@ -19,7 +19,7 @@ public struct CatCardCell: View {
   }
   
   public var body: some View {
-    RoundedRectangle(cornerRadius: 12)
+    RoundedRectangle(cornerRadius: .Number8)
       .fill(card.isLocked ? ColorSet.Background.Tertiary : ColorSet.Gray._100)
       .frame(width: .Number64, height: .Number64)
       .overlay(
@@ -31,11 +31,9 @@ public struct CatCardCell: View {
               renderingMode: .template,
               color: ColorSet.Icon.Tertiary
             )
-          } else {
-            RoundedRectangle(cornerRadius: 12)
-              .fill(ColorSet.Component.Primary.opacity(0.2))
           }
         }
       )
+      .opacity(card.isLocked ? 0.4 : 1.0)
   }
 }

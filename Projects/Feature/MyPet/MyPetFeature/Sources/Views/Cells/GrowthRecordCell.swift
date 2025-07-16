@@ -67,6 +67,6 @@ public struct GrowthRecordCell: View {
     }
     .padding(.horizontal, .Number16)
     .padding(.vertical, .Number8)
-    .opacity(record.isLocked ? 0.5 : 1.0)
+    .opacity(record.isLocked ? 0.4 : 1.0)
   }
 }

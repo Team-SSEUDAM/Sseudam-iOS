@@ -57,7 +57,7 @@ public struct MyPetView: View {
           CustomBottomSheet(
             minHeight: .Number72,
             maxHeight: proxy.size.height,
-            midHeight: .Number100,
+            midHeight: .Number200,
             isBottomSheetDragEnabled: $bottomSheetDragEnabled,
             smallContent: { SmallBottomSheetContent },
             largeContent: { BigBottomSheetContent }

@@ -120,8 +120,7 @@ public struct MyPetView: View {
       level: 1,
       petNickName: "작고 소중한" + "{{고양이 이름}}",
       currentStamps: 10,
-      goalStamp: 100,
-      progress: .constant(30)
+      goalStamp: 100
     )
   }
   

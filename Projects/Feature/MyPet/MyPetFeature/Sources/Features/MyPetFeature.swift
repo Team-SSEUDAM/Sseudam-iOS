@@ -9,7 +9,12 @@
 import SwiftUI
 import ComposableArchitecture
 import UserDefaults
+import Utility
+import Cache
+
 import AuthFeature
+import PetDomainInterface
+
 
 @Reducer
 public struct MyPetFeature {
@@ -19,7 +24,7 @@ public struct MyPetFeature {
   @ObservableState
   public struct State {
     public var path = StackState<Path.State>()
-    
+    public var myPetInfo: PetInfoEntity?
     public var isLoggedIn: Bool = false
 
     public init() {}
@@ -30,6 +35,9 @@ public struct MyPetFeature {
     case path(StackActionOf<Path>)
     case onAppear
     case checkLoggedIn
+    case fetchMyPetInfo
+    
+    case fetchMyPetInfoResult(Result<PetInfoEntity, NetworkError>)
     
     case petNicknameButtonTapped
     case petDetailButtonTapped
@@ -45,6 +53,8 @@ public struct MyPetFeature {
     case requestLogin(Bool)
   }
   
+  @Dependency(\.CheckPetInfoUseCase) var checkPetInfoUseCase
+  
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
@@ -55,7 +65,21 @@ public struct MyPetFeature {
         
       case .checkLoggedIn:
         state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
+        if state.isLoggedIn { return .send(.fetchMyPetInfo) }
         return .none
+        
+      case .fetchMyPetInfo:
+        return fetchMyPetInfoEffect(checkPetInfoUseCase)
+        
+      case let .fetchMyPetInfoResult(result):
+        switch result {
+        case let .success(entity):
+          state.myPetInfo = entity
+          return .none
+        case let .failure(error):
+          state.myPetInfo = nil
+          return .none
+        }
         
       case .petDetailButtonTapped:
         state.path.append(.petDetail(MyPetDetailFeature.State()))
@@ -83,6 +107,33 @@ public struct MyPetFeature {
       }
     }
     .forEach(\.path, action: \.path)
+  }
+}
+
+extension MyPetFeature {
+  func fetchMyPetInfoEffect(
+    _ useCase: CheckPetInfoUseCase
+  ) -> Effect<Action> {
+    .run { send in
+      do {
+        /// 캐시 키 생성
+        let cacheKey = MyPetCacheKey.myPetInfo
+        
+        let cache = try await CacheActor.shared.MY_PET_INFO_CACHE
+        if let hitData = await cache.value(forKey: cacheKey) {
+          /// 캐시 hit되면 그대로 사용
+          let entity = PetInfoEntity(hitData)
+          await send(.fetchMyPetInfoResult(.success(entity)))
+        }
+        /// 캐시 miss되면 API 호출
+        let entity = try await useCase.execute()
+        await send(.fetchMyPetInfoResult(.success(entity)))
+      } catch is CancellationError {
+        await send(.fetchMyPetInfoResult(.failure(.taskCancelled)))
+      } catch {
+        await send(.fetchMyPetInfoResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
   }
 }
 

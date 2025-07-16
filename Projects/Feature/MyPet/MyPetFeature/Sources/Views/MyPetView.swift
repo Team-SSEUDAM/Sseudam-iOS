@@ -131,13 +131,17 @@ public struct MyPetView: View {
   // MARK: - 더미데이터로 주입한 카드 뷰
   @ViewBuilder
   private var CardView: some View {
-    MyPetCardView(
-      level: 1,
-      petNickName: "작고 소중한" + "{{고양이 이름}}",
-      currentStamps: 10,
-      goalStamp: 100
-    ) {
-      store.send(.petNicknameButtonTapped)
+    if let myPetInfo = store.myPetInfo {
+      MyPetCardView(
+        level: myPetInfo.levelType.transformed,
+        petNickName: myPetInfo.nickname,
+        currentStamps: myPetInfo.currentPoint,
+        goalStamp: myPetInfo.goalPoint
+      ) {
+        store.send(.petNicknameButtonTapped)
+      }
+    } else {
+      EmptyView()
     }
   }
   

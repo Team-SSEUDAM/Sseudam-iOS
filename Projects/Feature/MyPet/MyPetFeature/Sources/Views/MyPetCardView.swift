@@ -11,7 +11,7 @@ import DesignKit
 
 public struct MyPetCardView: View {
   
-  private let level: String
+  private let level: Int
   private let petNickName: String
   private let nextLevelText: String
   private let currentStamps: Int
@@ -29,9 +29,9 @@ public struct MyPetCardView: View {
     goalStamp: Int,
     _ action: @escaping @Sendable () -> Void
   ) {
-    self.level = "Lv.\(level)"
+    self.level = level
     self.petNickName = petNickName
-    self.nextLevelText = "다음 레벨까지 \(goalStamp - currentStamps)쓰담"
+    self.nextLevelText = level == 5 ? "최대 레벨을 달성했습니다 🎉" : "다음 레벨까지 \(goalStamp - currentStamps)쓰담"
     self.currentStamps = currentStamps
     self.goalStamp = goalStamp
     self.action = action
@@ -41,7 +41,7 @@ public struct MyPetCardView: View {
     VStack(alignment: .leading, spacing: .Number4) {
       /// --------- 헤더 영역 ---------
       HStack(spacing: .Number6) {
-        Badge(text: .constant(level), state: .primary)
+        Badge(text: .constant("Lv.\(level)"), state: .primary)
         Text(petNickName)
           .font(FontSet.Heading.heading3)
           .foregroundStyle(ColorSet.Text.Primary)
@@ -84,7 +84,7 @@ public struct MyPetCardView: View {
         }
         .frame(height: .Number6)
         
-        Text("\(currentStamps) / \(goalStamp) 쓰담")
+        Text( level == 5 ? "Max" : "\(currentStamps) / \(goalStamp) 쓰담")
           .font(FontSet.Body.body3)
           .foregroundStyle(ColorSet.Text.Primary)
       }

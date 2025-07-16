@@ -53,11 +53,7 @@ public struct MyPetView: View {
         CustomBottomSheet(
           minHeight: .Number72,
           midHeight: .Number200,
-          smallContent: {
-            Text("작은 시트")
-              .frame(maxWidth: .infinity, maxHeight: .infinity)
-              .background(Color.yellow)
-          },
+          smallContent: { SmallBottomSheetContent },
           largeContent: {
             Text("큰 시트")
               .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -74,43 +70,58 @@ public struct MyPetView: View {
   
   @ViewBuilder
   private var MainView: some View {
-    
-    VStack(spacing: 0) {
-      // 상단 카드 뷰
-      CardView
-        .padding(.Number16)
-      // 중간 펫 이미지 영역
-      ZStack {
-        // 배경색 (연한 파란색)
-        ColorSet.Background.Accent
-          .ignoresSafeArea()
-        
-        VStack {
-          Spacer()
-          
-          // 펫 이미지 (임시로 원형 뷰)
-          Circle()
-            .fill(Color.orange.opacity(0.7))
-            .frame(width: 150, height: 150)
-            .overlay(
-              VStack {
-                Circle()
-                  .fill(Color.black)
-                  .frame(width: 4, height: 4)
-                  .offset(x: -15, y: -10)
-                Circle()
-                  .fill(Color.black)
-                  .frame(width: 4, height: 4)
-                  .offset(x: 15, y: -30)
-                Circle()
-                  .fill(ColorSet.Background.Secondary)
-                  .frame(width: 12, height: 8)
-                  .offset(y: 5)
-              }
-            )
-          Spacer()
+    ZStack {
+      VStack {
+        CardView
+          .padding(.Number16)
+        /// 일단 더미데이터 로 채워둠
+        ZStack {
+          VStack {
+            Spacer()
+            
+            // 펫 이미지 (임시로 원형 뷰)
+            Circle()
+              .fill(Color.orange.opacity(0.7))
+              .frame(width: 150, height: 150)
+              .overlay(
+                VStack {
+                  Circle()
+                    .fill(Color.black)
+                    .frame(width: 4, height: 4)
+                    .offset(x: -15, y: -10)
+                  Circle()
+                    .fill(Color.black)
+                    .frame(width: 4, height: 4)
+                    .offset(x: 15, y: -30)
+                  Circle()
+                    .fill(ColorSet.Background.Secondary)
+                    .frame(width: 12, height: 8)
+                    .offset(y: 5)
+                }
+              )
+            Spacer()
+          }
         }
       }
+    }
+    .background(ColorSet.Background.Accent)
+  }
+  
+  @ViewBuilder
+  private var SmallBottomSheetContent: some View {
+    HStack(alignment: .center) {
+      Text("내가 살린 고양이")
+        .font(FontSet.Body.body3)
+        .foregroundStyle(ColorSet.Text.Secondary)
+        .padding(.horizontal, .Number16)
+      Spacer()
+      TouchArea(
+        image: .rightChevron,
+        size: .Number24
+      ) {
+        store.send(.petDetailButtonTapped)
+      }
+      .padding(.trailing, .Number8)
     }
   }
   

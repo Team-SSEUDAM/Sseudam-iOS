@@ -38,6 +38,5 @@ public struct MyPetDetailView: View {
         }
       }
     )
-    .blockBackToSwipe()
   }
 }

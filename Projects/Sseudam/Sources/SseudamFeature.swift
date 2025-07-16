@@ -127,6 +127,11 @@ extension SseudamFeature {
         await send(.homeRoot(.closeAlertAction(type)))
       case (.locationPermission, .accept):
         await send(.homeRoot(.acceptAlertAction(type)))
+        
+      case (.login, .close):
+        await send(.homeRoot(.closeAlertAction(type)))
+      case (.login, .accept):
+        await send(.authFlow(.presentLogin(true)))
 
       default: return
       }

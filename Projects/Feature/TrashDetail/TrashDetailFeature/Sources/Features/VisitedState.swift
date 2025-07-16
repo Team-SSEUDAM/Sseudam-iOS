@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import DesignKit
 
 public enum VisitedState {
   /// 방문 인증 5분 지나지 않음

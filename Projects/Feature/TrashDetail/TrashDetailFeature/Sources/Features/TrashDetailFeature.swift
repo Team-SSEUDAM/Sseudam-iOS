@@ -29,6 +29,7 @@ public struct TrashDetailFeature {
     case delegate(Delegate)
     case visited(VisitedFeature.Action)
     
+    case onDiappaer
     case showDetail(id: Int?)
     case noTrashData
     case reportButtonTapped
@@ -48,6 +49,10 @@ public struct TrashDetailFeature {
     case showAlert(AlertType)
   }
   
+  private enum CancelID {
+    case userLocationStream
+  }
+  
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
 
   public var body: some ReducerOf<Self> {
@@ -58,6 +63,9 @@ public struct TrashDetailFeature {
     
     Reduce { state, action in
       switch action {
+      case .onDiappaer:
+        return .cancel(id: CancelID.userLocationStream)
+        
       case let .showDetail(id):
         if let id = id {
           return .concatenate([

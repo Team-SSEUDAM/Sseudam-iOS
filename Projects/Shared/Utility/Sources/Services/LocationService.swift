@@ -31,6 +31,20 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     return manager
   }()
   
+  private lazy var singleLocationManager: CLLocationManager = {
+    let manager = CLLocationManager()
+    manager.delegate = self
+    manager.desiredAccuracy = kCLLocationAccuracyBest
+    return manager
+  }()
+  
+  private lazy var continuousLocationManager: CLLocationManager = {
+    let manager = CLLocationManager()
+    manager.delegate = self
+    manager.desiredAccuracy = kCLLocationAccuracyBest
+    return manager
+  }()
+  
   
   /// 단발 위치 요청 시 응답을 위한 continuation
   private var singleLocationContinuation: CheckedContinuation<Coordinates?, Never>?
@@ -43,7 +57,10 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
   
   /// 외부에 노출되는 위치 업데이트 스트림 (읽기 전용)
   public var userLocationStream: AsyncStream<Void> {
-    userLocationStreamInternal
+    AsyncStream { continuation in
+      // 새로 구독이 시작될 때마다 저장
+      self.userLocationContinuation = continuation
+    }
   }
   
   // MARK: - Initialize
@@ -66,12 +83,12 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     return await withCheckedContinuation { continuation in
       self.singleLocationContinuation = continuation
 
-      let status = locationManager.authorizationStatus
+      let status = singleLocationManager.authorizationStatus
       switch status {
       case .authorizedWhenInUse, .authorizedAlways:
-        locationManager.startUpdatingLocation()
+        singleLocationManager.startUpdatingLocation()
       case .notDetermined:
-        locationManager.requestWhenInUseAuthorization()
+        singleLocationManager.requestWhenInUseAuthorization()
       case .denied, .restricted:
         self.singleLocationContinuation = nil
         continuation.resume(returning: nil)
@@ -85,12 +102,12 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
   /// 연속으로 유저 위치 요청
   public func startTracking() {
     self.mode = .continuous
-    let status = locationManager.authorizationStatus
+    let status = continuousLocationManager.authorizationStatus
     switch status {
     case .authorizedAlways, .authorizedWhenInUse:
-      locationManager.startUpdatingLocation()
+      continuousLocationManager.startUpdatingLocation()
     case .notDetermined:
-      locationManager.requestWhenInUseAuthorization()
+      continuousLocationManager.requestWhenInUseAuthorization()
     case .denied, .restricted:
       userLocation = nil
       userLocationContinuation?.yield(())
@@ -99,66 +116,68 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     }
   }
   
-  private func setUserLocation(_ coord: Coordinates?) {
-    let now = Date()
-    // 1초 throttle
-    if let last = lastUpdateTime, now.timeIntervalSince(last) < throttleInterval {
-      return
-    }
-    lastUpdateTime = now
-    
-    userLocation = coord
-    userLocationContinuation?.yield(())
-    
-    if let continuation = singleLocationContinuation {
-      singleLocationContinuation = nil
-      continuation.resume(returning: coord)
-    }
-    
-    if mode == .single {
-      locationManager.stopUpdatingLocation()
-    }
-  }
-  
-  public func stopUpdatingLocation() {
-    locationManager.stopUpdatingLocation()
+  public func stopTracking() {
+    continuousLocationManager.stopUpdatingLocation()
   }
   
   // MARK: - Delegate
   
-  nonisolated public func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+  nonisolated public func locationManager(
+    _ manager: CLLocationManager,
+    didUpdateLocations locations: [CLLocation]
+  ) {
+    
     guard let location = locations.last else {
-      Task { await setUserLocation(nil) } // 위치 정보 실패 시 nil 전달
       return
     }
+    let coord = Coordinates(
+      latitude: location.coordinate.latitude,
+      longitude: location.coordinate.longitude
+    )
     
-    guard location.horizontalAccuracy > 0 && location.horizontalAccuracy < 50 else { return }
-    
-    Task {
-      await setUserLocation(
-        .init(
-          latitude: location.coordinate.latitude,
-          longitude: location.coordinate.longitude
-        )
-      )
+    Task { @MainActor in
+      // 받은 좌표를 저장
+      self.userLocation = coord
+      
+      if manager === singleLocationManager {
+        // 단발 요청 완료 처리
+        singleLocationManager.stopUpdatingLocation()
+        self.singleLocationContinuation?.resume(returning: coord)
+        self.singleLocationContinuation = nil
+      } else if manager === continuousLocationManager {
+        // 연속 구독 이벤트 발행
+        let now = Date()
+        // 1초 throttle
+        if let last = lastUpdateTime, now.timeIntervalSince(last) < throttleInterval {
+          return
+        }
+        lastUpdateTime = now
+        self.userLocationContinuation?.yield(())
+      }
     }
   }
   
   nonisolated public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
     let status = manager.authorizationStatus
-    Task {
-      switch status {
-      case .authorizedAlways, .authorizedWhenInUse:
-        await locationManager.startUpdatingLocation()
-      case .denied, .restricted:
-        await self.setUserLocation(nil)
-        await MainActor.run {
-          if let continuation = singleLocationContinuation {
-            singleLocationContinuation = nil
-            continuation.resume(returning: nil)
-          }
+    Task { @MainActor in
+      if manager === singleLocationManager {
+        // 단발 권한 처리
+        switch status {
+        case .authorizedAlways, .authorizedWhenInUse:
+          singleLocationManager.startUpdatingLocation()
+        default:
+          singleLocationContinuation?.resume(returning: nil)
+          singleLocationContinuation = nil
         }
-      default: break
+      } else if manager === continuousLocationManager {
+        // 연속 권한 처리
+        switch status {
+        case .authorizedAlways, .authorizedWhenInUse:
+          continuousLocationManager.startUpdatingLocation()
+        default:
+          self.userLocation = nil
+          userLocationContinuation?.yield(())
+        }
       }
     }
   }

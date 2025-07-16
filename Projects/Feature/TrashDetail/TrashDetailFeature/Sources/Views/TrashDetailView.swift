@@ -55,10 +55,10 @@ public struct TrashDetailView: View {
     .padding(.vertical, .Number20)
     .onAppear {
       LocationService.shared.startTracking()
-      store.send(.visited(.fetchUserLocation))
     }
     .onDisappear {
-      LocationService.shared.stopUpdatingLocation()
+      LocationService.shared.stopTracking()
+      store.send(.onDiappaer)
     }
     .task { @MainActor in
       for await _ in LocationService.shared.userLocationStream {
@@ -169,8 +169,9 @@ public struct TrashDetailView: View {
         PrimaryButton(
           title: $store.visited.visitedButtonText,
           size: .medium,
-          state: store.visited.visitedState.buttonEnable ? .constant(.normal) : .constant(.disabled)
+          state: $store.visited.visitedButtonState//store.visited.visitedState.buttonEnable ? .constant(.normal) : .constant(.disabled)
         ) {
+          print(store.visited.visitedButtonState, store.visited)
           store.send(.visited(.visitButtonTapped))
         }
         .onTapGesture {

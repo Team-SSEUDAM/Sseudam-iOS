@@ -24,6 +24,8 @@ public struct VisitedFeature {
     
     public var isVisitedButtonEnable: Bool = false
     
+    public var visitedButtonState: PrimaryButtonState = .disabled
+    
     public var visitedButtonText: String = "이 곳에 쓰레기 담기"
     /// 현재 쓰레기통 위치 좌표
     public var trashSpotPoint: Coordinates? = nil
@@ -32,7 +34,7 @@ public struct VisitedFeature {
     
     public var userLocation: Coordinates? = nil
     
-    public var isDenyPermission: Bool = false
+    public var isDenyPermission: Bool = true
     
     public var isWithinDistance: Bool = false // 5m 범위 내에 있는지
     
@@ -114,25 +116,23 @@ public struct VisitedFeature {
 //          await send(.checkEnableVisit)
 //        }
         return .merge([
-          storedUserLocation(),
+          storedUserLocation(isDenyPermission: state.isDenyPermission),
           .send(.checkEnableVisit)
         ])
         
       case let .setTrashSpotInfo(spotId?, point):
         state.trashSpotId = spotId
         state.trashSpotPoint = point
+        state.visitedButtonState = .disabled
         return checkRemainVisitedData(spotId: spotId) // 남은 시간 확인 이벤트 연결
         
       case .checkSavedVisitedData:
         return .none
         
-        
-        
       case let .checkDistance(userLocation):
         return checkDistance(user: userLocation, target: state.trashSpotPoint)
         
       case let .storedWithinDistance(isWithin):
-        print("5m내에 존재 \(isWithin)")
         state.isWithinDistance = isWithin
         return .none
         
@@ -174,6 +174,7 @@ public struct VisitedFeature {
         
       case let .changeVisitedState(visitedState):
         state.visitedState = visitedState
+        state.visitedButtonState = visitedState == .enableVisit ? .normal : .disabled
         return . none
         
       case let .changeVisitedButtonText(remainingTime):
@@ -329,13 +330,19 @@ extension VisitedFeature {
 
 extension VisitedFeature {
   /// 유저 위치를 저장 및 권한 확인
-  private func storedUserLocation() -> Effect<Action> {
+  private func storedUserLocation(isDenyPermission: Bool) -> Effect<Action> {
     print("🤓", #function)
     return .run { send in
       if let location = await LocationService.shared.userLocation {
+        
+        if isDenyPermission { // 권한이 변경된 경우 상태 변경 처리
+          await send(.setLocationPermission(isDeny: false))
+        }
         await send(.checkDistance(userLocation: location))
       } else { // 위치 권한이 없음
-        await send(.setLocationPermission(isDeny: true))
+        if !isDenyPermission { // 권한이 변경된 경우 상태 변경 처리
+          await send(.setLocationPermission(isDeny: true))
+        }
       }
     }
   }
@@ -345,7 +352,9 @@ extension VisitedFeature {
     return .run { send in
       if let user = user,
          let target = target {
-        let isWithin5m =  user.distance(to: target) <= 10
+        let distance = user.distance(to: target)
+        print("distance: \(distance)")
+        let isWithin5m = distance <= 10
         await send(.storedWithinDistance(isWithin5m))
       } else {
         await send(.showToastMessage("위치 정보를 확인할 수 없어요"))

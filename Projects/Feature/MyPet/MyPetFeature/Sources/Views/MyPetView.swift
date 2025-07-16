@@ -13,6 +13,9 @@ import DesignKit
 public struct MyPetView: View {
   @Bindable var store: StoreOf<MyPetFeature>
   
+  @State private var bottomSheetDragEnabled: Bool = true
+  @State private var startBottomSheetInsideScroll: Bool = true
+    
   public init(store: StoreOf<MyPetFeature>) {
     self.store = store
   }
@@ -52,7 +55,8 @@ public struct MyPetView: View {
         MainView
         CustomBottomSheet(
           minHeight: .Number72,
-          midHeight: .Number200,
+          midHeight: .Number100,
+          isBottomSheetDragEnabled: $bottomSheetDragEnabled,
           smallContent: { SmallBottomSheetContent },
           largeContent: { BigBottomSheetContent }
         )
@@ -109,6 +113,21 @@ public struct MyPetView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
       }
+      .simultaneousGesture(
+        DragGesture()
+          .onChanged { value in
+            if startBottomSheetInsideScroll {
+              let horizontalAmount = abs(value.translation.width) > 10 ? abs(value.translation.width) : 0
+              let verticalAmount = abs(value.translation.height) > 10 ? abs(value.translation.height) : 0
+              bottomSheetDragEnabled = verticalAmount > horizontalAmount
+              startBottomSheetInsideScroll = false
+            }
+          }
+          .onEnded { _ in
+            startBottomSheetInsideScroll = true
+            bottomSheetDragEnabled = true
+          }
+      )
       
       // 성장 기록 섹션 헤더
       Text("성장 기록")

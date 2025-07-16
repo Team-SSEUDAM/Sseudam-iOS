@@ -23,6 +23,9 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
   @State private var isDragging: Bool = false
   @State private var initialHeight: CGFloat = 0
   
+  /// 외부에서 `Environment`로 드래그 가능 여부를 제어할 수 있도록 설정
+  @Binding private var isBottomSheetDragEnabled: Bool
+  
   // 중간 임계값 (콘텐츠 전환 기준)
   private let midHeight: CGFloat
 
@@ -30,6 +33,7 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
     minHeight: CGFloat,
     maxHeight: CGFloat? = nil,
     midHeight: CGFloat? = nil,
+    isBottomSheetDragEnabled: Binding<Bool>,
     @ViewBuilder smallContent: @escaping () -> SmallContent,
     @ViewBuilder largeContent: @escaping () -> LargeContent
   ) {
@@ -40,6 +44,8 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
     self.largeContent = largeContent
     // 시작 시에는 minHeight
     self._currentHeight = State(initialValue: minHeight)
+    // 외부에서 드래그 가능 여부를 제어할 수 있도록 설정
+    self._isBottomSheetDragEnabled = isBottomSheetDragEnabled
   }
   
   public var body: some View {
@@ -81,7 +87,7 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
     .background(ColorSet.Background.Primary)
     .clipCorners(.Number16, corners: [.topLeft, .topRight])
     .elevation(level: .small, cornerRadius: .Number16)
-    .highPriorityGesture(dragGesture())
+    .gesture( isBottomSheetDragEnabled ? dragGesture() : nil)
   }
   
   private func dragGesture() -> some Gesture {

@@ -13,11 +13,11 @@ public struct MyPetCardView: View {
   
   private let level: String
   private let petNickName: String
-  
   private let nextLevelText: String
-  
   private let currentStamps: Int
   private let goalStamp: Int
+  
+  public var action: @Sendable () -> Void
   
   
   @State private var progress: CGFloat = 0.0
@@ -26,13 +26,15 @@ public struct MyPetCardView: View {
     level: Int,
     petNickName: String,
     currentStamps: Int,
-    goalStamp: Int
+    goalStamp: Int,
+    _ action: @escaping @Sendable () -> Void
   ) {
     self.level = "Lv.\(level)"
     self.petNickName = petNickName
     self.nextLevelText = "다음 레벨까지 \(goalStamp - currentStamps)쓰담"
     self.currentStamps = currentStamps
     self.goalStamp = goalStamp
+    self.action = action
   }
   
   public var body: some View {
@@ -51,7 +53,7 @@ public struct MyPetCardView: View {
         )
       }
       .onTapGesture {
-        // TODO: 네비게이션 액션
+        action()
       }
       
       /// --------- 목표 영역 ---------

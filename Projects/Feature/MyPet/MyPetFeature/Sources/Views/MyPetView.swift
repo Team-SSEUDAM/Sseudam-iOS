@@ -122,7 +122,9 @@ public struct MyPetView: View {
       petNickName: "작고 소중한" + "{{고양이 이름}}",
       currentStamps: 10,
       goalStamp: 100
-    )
+    ) {
+      store.send(.petNicknameButtonTapped)
+    }
   }
   
   @ViewBuilder

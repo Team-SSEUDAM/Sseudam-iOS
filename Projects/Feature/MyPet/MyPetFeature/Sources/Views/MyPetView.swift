@@ -13,6 +13,9 @@ import DesignKit
 public struct MyPetView: View {
   @Bindable var store: StoreOf<MyPetFeature>
   
+  @State private var bottomSheetDragEnabled: Bool = true
+  @State private var startBottomSheetInsideScroll: Bool = true
+    
   public init(store: StoreOf<MyPetFeature>) {
     self.store = store
   }
@@ -49,21 +52,17 @@ public struct MyPetView: View {
   private var ContentView: some View {
     if store.isLoggedIn {
       ZStack {
-        MainView
-        CustomBottomSheet(
-          minHeight: .Number72,
-          midHeight: .Number200,
-          smallContent: {
-            Text("작은 시트")
-              .frame(maxWidth: .infinity, maxHeight: .infinity)
-              .background(Color.yellow)
-          },
-          largeContent: {
-            Text("큰 시트")
-              .frame(maxWidth: .infinity, maxHeight: .infinity)
-              .background(Color.yellow)
-          }
-        )
+        GeometryReader { proxy in
+          MainView
+          CustomBottomSheet(
+            minHeight: .Number72,
+            maxHeight: proxy.size.height,
+            midHeight: .Number200,
+            isBottomSheetDragEnabled: $bottomSheetDragEnabled,
+            smallContent: { SmallBottomSheetContent },
+            largeContent: { BigBottomSheetContent }
+          )
+        }
       }
       .padding(.bottom, 50)
     }
@@ -74,43 +73,52 @@ public struct MyPetView: View {
   
   @ViewBuilder
   private var MainView: some View {
-    
-    VStack(spacing: 0) {
-      // 상단 카드 뷰
-      CardView
-        .padding(.Number16)
-      // 중간 펫 이미지 영역
-      ZStack {
-        // 배경색 (연한 파란색)
-        ColorSet.Background.Accent
-          .ignoresSafeArea()
-        
-        VStack {
-          Spacer()
-          
-          // 펫 이미지 (임시로 원형 뷰)
-          Circle()
-            .fill(Color.orange.opacity(0.7))
-            .frame(width: 150, height: 150)
-            .overlay(
-              VStack {
-                Circle()
-                  .fill(Color.black)
-                  .frame(width: 4, height: 4)
-                  .offset(x: -15, y: -10)
-                Circle()
-                  .fill(Color.black)
-                  .frame(width: 4, height: 4)
-                  .offset(x: 15, y: -30)
-                Circle()
-                  .fill(ColorSet.Background.Secondary)
-                  .frame(width: 12, height: 8)
-                  .offset(y: 5)
-              }
-            )
-          Spacer()
-        }
+    ZStack {
+      VStack {
+        CardView
+          .padding(.Number16)
+        Spacer()
       }
+    }
+    .background(ColorSet.Background.Accent)
+  }
+  
+  @ViewBuilder
+  private var BigBottomSheetContent: some View {
+    VStack {
+      CommonHeaderView
+      BigBottomSheetContentView(
+        catCards: store.catCards,
+        growthRecords: store.growthRecords,
+        startBottomSheetInsideScroll: $startBottomSheetInsideScroll,
+        bottomSheetDragEnabled: $bottomSheetDragEnabled
+      )
+    }
+  }
+  
+  @ViewBuilder
+  private var SmallBottomSheetContent: some View {
+    CommonHeaderView
+  }
+  
+  @ViewBuilder
+  private var CommonHeaderView: some View {
+    HStack(alignment: .center) {
+      Text("내가 돌본 고양이")
+        .font(FontSet.Body.body3)
+        .foregroundStyle(ColorSet.Text.Secondary)
+        .padding(.horizontal, .Number16)
+      Spacer()
+      Icon(
+        image: .rightChevron,
+        size: .Number24,
+        renderingMode: .template,
+        color: ColorSet.Icon.Primary
+      )
+      .padding(.trailing, .Number8)
+    }
+    .onTapGesture {
+      store.send(.petDetailButtonTapped)
     }
   }
   
@@ -118,10 +126,7 @@ public struct MyPetView: View {
   @ViewBuilder
   private var CardView: some View {
     MyPetCardView(
-      level: 1,
-      petNickName: "작고 소중한" + "{{고양이 이름}}",
-      currentStamps: 10,
-      goalStamp: 100
+      myPetInfo: store.myPetInfo
     ) {
       store.send(.petNicknameButtonTapped)
     }

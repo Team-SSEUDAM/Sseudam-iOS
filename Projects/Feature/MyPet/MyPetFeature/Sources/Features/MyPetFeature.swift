@@ -9,7 +9,11 @@
 import SwiftUI
 import ComposableArchitecture
 import UserDefaults
+import Utility
+
 import AuthFeature
+import PetDomainInterface
+
 
 @Reducer
 public struct MyPetFeature {
@@ -19,9 +23,27 @@ public struct MyPetFeature {
   @ObservableState
   public struct State {
     public var path = StackState<Path.State>()
-    
+    public var myPetInfo: PetInfoEntity?
     public var isLoggedIn: Bool = false
 
+    public var catCards = [
+      CatCard(image: "cat1", isLocked: false),
+      CatCard(image: "cat2", isLocked: false),
+      CatCard(image: nil, isLocked: true),
+      CatCard(image: nil, isLocked: true),
+      CatCard(image: nil, isLocked: true),
+      CatCard(image: nil, isLocked: true)
+    ]
+    
+    public var growthRecords = [
+      GrowthRecord(level: "Lv.1", title: "작고 소중한 {{고양이 이름}}", description: "", date: "YY.MM.DD.", stampCount: "0쓰담", isLocked: false),
+      GrowthRecord(level: "Lv.2", title: "호기심 가득한 {{고양이 이...", description: "", date: "YY.MM.DD.", stampCount: "20쓰담", isLocked: false),
+      GrowthRecord(level: "Lv.3", title: "쑥쑥 자라나는 {{고양이...", description: "", date: nil, stampCount: "110쓰담", isLocked: true),
+      GrowthRecord(level: "Lv.4", title: "왕 커서 귀여운{{고양이 이...", description: "", date: nil, stampCount: "N쓰담", isLocked: true),
+      GrowthRecord(level: "Special", title: "{{스페셜 문구}} {{고양이...", description: "", date: nil, stampCount: "N쓰담", isLocked: true)
+    ]
+    
+    
     public init() {}
   }
   
@@ -30,6 +52,9 @@ public struct MyPetFeature {
     case path(StackActionOf<Path>)
     case onAppear
     case checkLoggedIn
+    case fetchMyPetInfo
+    
+    case fetchMyPetInfoResult(Result<PetInfoEntity, NetworkError>)
     
     case petNicknameButtonTapped
     case petDetailButtonTapped
@@ -45,6 +70,8 @@ public struct MyPetFeature {
     case requestLogin(Bool)
   }
   
+  @Dependency(\.CheckPetInfoUseCase) var checkPetInfoUseCase
+  
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
@@ -55,7 +82,22 @@ public struct MyPetFeature {
         
       case .checkLoggedIn:
         state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
+        if state.isLoggedIn { return .send(.fetchMyPetInfo) }
         return .none
+        
+      case .fetchMyPetInfo:
+        return fetchMyPetInfoEffect(checkPetInfoUseCase)
+        
+      case let .fetchMyPetInfoResult(result):
+        switch result {
+        case let .success(entity):
+          state.myPetInfo = entity
+          return .none
+        case let .failure(error):
+          state.myPetInfo = nil
+          print("Error fetching pet info: \(error)")
+          return .none
+        }
         
       case .petDetailButtonTapped:
         state.path.append(.petDetail(MyPetDetailFeature.State()))
@@ -83,6 +125,23 @@ public struct MyPetFeature {
       }
     }
     .forEach(\.path, action: \.path)
+  }
+}
+
+extension MyPetFeature {
+  func fetchMyPetInfoEffect(
+    _ useCase: CheckPetInfoUseCase
+  ) -> Effect<Action> {
+    .run { send in
+      do {
+        let entity = try await useCase.execute()
+        await send(.fetchMyPetInfoResult(.success(entity)))
+      } catch is CancellationError {
+        await send(.fetchMyPetInfoResult(.failure(.taskCancelled)))
+      } catch {
+        await send(.fetchMyPetInfoResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
   }
 }
 

@@ -28,3 +28,16 @@ public enum SampleCacheKey: CacheKey {
     }
   }
 }
+
+public enum MyPetCacheKey: CacheKey {
+  case myPetInfo
+  
+  public var directory: String { "MyPet" }
+  public var fileName: String { "\(identifier).cache" }
+  
+  public var identifier: String {
+    switch self {
+    case .myPetInfo: "my_pet_info"
+    }
+  }
+}

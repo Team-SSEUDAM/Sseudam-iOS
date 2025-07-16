@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Cache
 
 public struct PetInfoEntity: Sendable, Equatable {
   public let nickname: String
@@ -22,8 +23,22 @@ public struct PetInfoEntity: Sendable, Equatable {
   ) {
     self.nickname = nickname
     self.currentPoint = point
-    self.goalPoint = maxLevelStandard
     self.levelType = LevelType(rawValue: levelType) ?? .유년기
+    
+    if LevelType(rawValue: levelType) == .궁극체 { self.goalPoint = point }
+    else { self.goalPoint = maxLevelStandard }
+  }
+  
+  /// Cache데이터를 PetInfoEntity로 변환하는 초기화 메서드
+  public init(
+    _ cacheModel: MyPetInfoCacheModel
+  ) {
+    self.init(
+      nickname: cacheModel.nickname,
+      point: cacheModel.currentPoint,
+      levelType: cacheModel.levelType,
+      maxLevelStandard: cacheModel.goalPoint
+    )
   }
 }
 
@@ -33,4 +48,14 @@ public enum LevelType: String, Sendable {
   case 성숙기 = "LEVEL_3" 
   case 완전체 = "LEVEL_4"
   case 궁극체 = "SPECIAL"
+  
+  public var transformed: Int {
+    switch self {
+    case .유년기: return 1
+    case .성장기: return 2
+    case .성숙기: return 3
+    case .완전체: return 4
+    case .궁극체: return 5
+    }
+  }
 }

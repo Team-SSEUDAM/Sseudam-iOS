@@ -8,8 +8,8 @@
 
 import Foundation
 
-public struct VisitedCompleteEntity {
-  let visitedAt: Date?
+public struct VisitedCompleteEntity: Equatable {
+  public let visitedAt: Date?
   
   public init(visitedAt: Date?) {
     self.visitedAt = visitedAt

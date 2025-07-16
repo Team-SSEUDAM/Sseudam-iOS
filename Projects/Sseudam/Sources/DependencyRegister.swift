@@ -34,6 +34,10 @@ import PetDomainInterface
 import PetDomain
 import PetData
 
+import VisitedDomainInterface
+import VisitedDomain
+import VisitedData
+
 import NetworkKit
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
@@ -46,6 +50,7 @@ struct DependencyRegister {
     let trashSpotRepository = TrashSpotRepository.live(networker: networker)
     let reportRepository = ReportRepository.live(networker: networker)
     let petRepository = PetRepository.live(networker: networker)
+    let visitedRepository = VisitedRepository.live(networker: networker)
     
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live
@@ -141,12 +146,12 @@ struct DependencyRegister {
     // MARK: - Trash Spot
     
     FetchTrashSpotUseCaseRegister {
-//      FetchTrashSpotUseCase.live(repository: trashSpotRepository)
-      FetchTrashSpotUseCase.test
+      FetchTrashSpotUseCase.live(repository: trashSpotRepository)
+//      FetchTrashSpotUseCase.test
     }
     
     FetchTrashSpotDetailUseCaseRegister {
-      FetchTrashSpotDetailUseCase.test(repository: trashSpotRepository)
+      FetchTrashSpotDetailUseCase.live(repository: trashSpotRepository)
     }
     
     FetchTrashSpotRawDetailUseCaseRegister {
@@ -157,8 +162,14 @@ struct DependencyRegister {
       CheckPetInfoUseCase.live(repository: petRepository)
     }
     
+<<<<<<< HEAD
     FetchPetSeasonInfoUseCaseRegister {
       FetchPetSeasonInfoUseCase.live(repository: petRepository)
+=======
+    // MARK: - Visited
+    VisitedUseCaseRegister {
+      VisitedUseCase.live(repository: visitedRepository)
+>>>>>>> 6f4d10d (feat: #37 인증하기 api 연결 작업)
     }
   }
 }

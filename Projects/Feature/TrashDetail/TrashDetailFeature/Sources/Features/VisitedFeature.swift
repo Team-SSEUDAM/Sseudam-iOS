@@ -11,6 +11,7 @@ import ComposableArchitecture
 import Utility
 import DesignKit
 import UserDefaults
+import VisitedDomainInterface
 
 @Reducer
 public struct VisitedFeature {
@@ -60,8 +61,10 @@ public struct VisitedFeature {
     case checkEnableVisit
     /// 방문하기 버튼 탭
     case visitButtonTapped
+    
+    case requestVisitResult(Result<VisitedCompleteEntity, NetworkError>)
     /// 인증하기 성공
-    case successVisit
+    case successVisit(date: Date?)
     /// 인증 불가능 - 버튼 탭 시
     case disableVisit
     /// 방문하기 상태 변경
@@ -84,6 +87,8 @@ public struct VisitedFeature {
     case showAlert(AlertType)
   }
   
+  @Dependency(\.VisitedUseCase) var visitedUseCase
+  
   public var body: some ReducerOf<Self> {
     Scope(state: \.timer, action: \.timer) {
       TimerFeature()
@@ -104,6 +109,10 @@ public struct VisitedFeature {
         ])
         
       case .fetchUserLocation:
+//        return .run { send in
+//          await storedUserLocation()
+//          await send(.checkEnableVisit)
+//        }
         return .merge([
           storedUserLocation(),
           .send(.checkEnableVisit)
@@ -138,12 +147,23 @@ public struct VisitedFeature {
         guard state.visitedState == .enableVisit else {
           return .send(.disableVisit)
         }
-        // TODO: - 인증하기 api 연결
-        return .send(.successVisit)
         
-      case .successVisit:
+        guard let spotId = state.trashSpotId else {
+          return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
+        }
+        return requestVisited(spotId: spotId)
+        
+      case let .requestVisitResult(.success(result)):
+        // TODO: - 인증 화면 이동
+        return .send(.successVisit(date: result.visitedAt))
+        
+      case let .requestVisitResult(.failure(error)):
+        return .send(.showToastMessage(error.localizedDescription))
+        
+      case let .successVisit(date):
         // 만료 시간 저장
-        let expireTime = Date().addingTimeInterval(300)
+        let date: Date = date ?? .init()
+        let expireTime = date.addingTimeInterval(300)
         let spotId = state.trashSpotId?.description
         saveRemainingTime(key: spotId, value: expireTime)
         return .send(.timer(.startTimer(expireTime: expireTime, spotId: spotId)))
@@ -172,6 +192,8 @@ public struct VisitedFeature {
       case let .showToastMessage(message):
         return .send(.delegate(.showToastMessage(message)))
       
+      case let .showAlert(type):
+        return .send(.delegate(.showAlert(type)))
         
         // MARK: - Timer
         
@@ -191,6 +213,23 @@ public struct VisitedFeature {
 }
 
 extension VisitedFeature {
+  
+  private func requestVisited(spotId: Int) -> Effect<Action> {
+    guard let userId = UserDefaultsKeys.userId else {
+      return .send(.showToastMessage("유저 정보를 조회할 수 없어요"))
+    }
+    
+    return .run { send in
+      do {
+        let date = try await visitedUseCase.execute(userId, spotId)
+        return await send(.requestVisitResult(.success(date)))
+      } catch let error as NetworkError {
+        return await send(.requestVisitResult(.failure(error)))
+      } catch {
+        return await send(.requestVisitResult(.failure(.customError(message: "방문 인증에 실패했어요"))))
+      }
+    }
+  }
   
   private func handleDisableVisit(state: VisitedState, time: TimeInterval? = nil) -> Effect<Action> {
     print("🤓", #function)

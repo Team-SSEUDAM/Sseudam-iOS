@@ -24,16 +24,18 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
   @State private var initialHeight: CGFloat = 0
   
   // 중간 임계값 (콘텐츠 전환 기준)
-  private var midHeight: CGFloat { (minHeight + maxHeight) / 2 }
+  private let midHeight: CGFloat
 
   public init(
     minHeight: CGFloat,
-    maxHeight: CGFloat,
+    maxHeight: CGFloat? = nil,
+    midHeight: CGFloat? = nil,
     @ViewBuilder smallContent: @escaping () -> SmallContent,
     @ViewBuilder largeContent: @escaping () -> LargeContent
   ) {
     self.minHeight = minHeight
-    self.maxHeight = maxHeight
+    self.maxHeight = maxHeight ?? UIScreen.main.bounds.height * 0.8
+    self.midHeight = midHeight ?? (minHeight + (maxHeight ?? UIScreen.main.bounds.height * 0.8)) / 2
     self.smallContent = smallContent
     self.largeContent = largeContent
     // 시작 시에는 minHeight
@@ -41,58 +43,71 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
   }
   
   public var body: some View {
-    ZStack(alignment: .bottom) {
+    VStack {
+      Spacer()
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+        .allowsHitTesting(false)
       sheetView
-        .transition(.move(edge: .bottom))
     }
     .ignoresSafeArea()
   }
   
   private var sheetView: some View {
-    GeometryReader { proxy in
-      VStack(spacing: 0) {
+    VStack(spacing: 0) {
+      VStack {
         RoundedRectangle(cornerRadius: 2)
           .fill(ColorSet.Gray._200)
           .frame(width: 80, height: 4)
           .padding(.vertical, 8)
-        
-        Group {
-          if currentHeight < midHeight { smallContent() }
-          else { largeContent() }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
-      .frame(height: currentHeight)
-      .animation(isDragging ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: currentHeight)
       .frame(maxWidth: .infinity)
-      .frame(maxHeight: .infinity, alignment: .bottom)
-      .padding(.bottom, proxy.safeAreaInsets.bottom + 50)
-      .background(Color.white)
-      .cornerRadius(16)
-      .gesture(dragGesture(in: proxy))
+      .contentShape(Rectangle())
+      .frame(height: .Number20)
+      .onTapGesture {
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+          currentHeight = currentHeight < midHeight ? maxHeight : minHeight
+        }
+      }
+      
+      Group {
+        if currentHeight < midHeight { smallContent() }
+        else { largeContent() }
+      }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+    .frame(height: currentHeight)
+    .frame(maxWidth: .infinity)
+    .background(ColorSet.Background.Primary)
+    .clipCorners(.Number16, corners: [.topLeft, .topRight])
+    .highPriorityGesture(dragGesture())
   }
   
-  private func dragGesture(in proxy: GeometryProxy) -> some Gesture {
-    DragGesture()
+  private func dragGesture() -> some Gesture {
+    DragGesture(coordinateSpace: .global)
       .onChanged { value in
         if !isDragging {
           isDragging = true
           initialHeight = currentHeight
         }
-        let translation = value.translation.height
-        let newHeight = initialHeight - translation
         
-        if newHeight > maxHeight { currentHeight = maxHeight + (newHeight - maxHeight) * 0.1 }
-        else if newHeight < minHeight { currentHeight = minHeight - (minHeight - newHeight) * 0.1 }
-        else { currentHeight = newHeight }
+        let translation = value.translation.height
+        if translation > 0 { currentHeight = max(minHeight, initialHeight - abs(translation)) }
+        else { currentHeight = min(maxHeight, initialHeight + abs(translation)) }
       }
       .onEnded { value in
         isDragging = false
-        let target = (initialHeight - value.translation.height) > midHeight
-        ? maxHeight
-        : minHeight
-        currentHeight = target
+        let velocity = CGSize(
+          width:  value.predictedEndLocation.x - value.location.x,
+          height: value.predictedEndLocation.y - value.location.y
+        )
+        
+        if abs(velocity.height) > 450 {
+          if velocity.height > 0 { withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { currentHeight = minHeight } }
+          else { withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { currentHeight = maxHeight } }
+        } else {
+          withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) { currentHeight = initialHeight - value.translation.height > midHeight ? maxHeight : minHeight }
+        }
       }
   }
 }

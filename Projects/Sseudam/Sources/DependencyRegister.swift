@@ -20,18 +20,19 @@ import ReportData
 
 import AuthDomainInterface
 import AuthDomain
-import AuthDataInterface
 import AuthData
 
 import UserDomainInterface
 import UserDomain
-import UserDataInterface
 import UserData
 
 import TrashSpotDomainInterface
 import TrashSpotDomain
-import TrashSpotDataInterface
 import TrashSpotData
+
+import PetDomainInterface
+import PetDomain
+import PetData
 
 import NetworkKit
 
@@ -44,6 +45,7 @@ struct DependencyRegister {
     let userReoository = UserRepository.live(networker: networker)
     let trashSpotRepository = TrashSpotRepository.live(networker: networker)
     let reportRepository = ReportRepository.live(networker: networker)
+    let petRepository = PetRepository.live(networker: networker)
     
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live
@@ -144,6 +146,10 @@ struct DependencyRegister {
     
     FetchTrashSpotRawDetailUseCaseRegister {
       FetchTrashSpotRawDetailUseCase.live(repository: trashSpotRepository)
+    }
+    
+    CheckPetInfoUseCaseRegister {
+      CheckPetInfoUseCase.live(repository: petRepository)
     }
   }
 }

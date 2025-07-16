@@ -54,11 +54,7 @@ public struct MyPetView: View {
           minHeight: .Number72,
           midHeight: .Number200,
           smallContent: { SmallBottomSheetContent },
-          largeContent: {
-            Text("큰 시트")
-              .frame(maxWidth: .infinity, maxHeight: .infinity)
-              .background(Color.yellow)
-          }
+          largeContent: { BigBottomSheetContent }
         )
       }
       .padding(.bottom, 50)
@@ -81,7 +77,69 @@ public struct MyPetView: View {
   }
   
   @ViewBuilder
+  private var BigBottomSheetContent: some View {
+    let catCards = [
+      CatCard(image: "cat1", isLocked: false),
+      CatCard(image: "cat2", isLocked: false),
+      CatCard(image: nil, isLocked: true),
+      CatCard(image: nil, isLocked: true),
+      CatCard(image: nil, isLocked: true),
+      CatCard(image: nil, isLocked: true)
+    ]
+    
+    let growthRecords = [
+      GrowthRecord(level: "Lv.1", title: "작고 소중한 {{고양이 이름}}", description: "", date: "YY.MM.DD.", stampCount: "0쓰담", isLocked: false),
+      GrowthRecord(level: "Lv.2", title: "호기심 가득한 {{고양이 이...", description: "", date: "YY.MM.DD.", stampCount: "20쓰담", isLocked: false),
+      GrowthRecord(level: "Lv.3", title: "쑥쑥 자라나는 {{고양이...", description: "", date: "", stampCount: "110쓰담", isLocked: true),
+      GrowthRecord(level: "Lv.4", title: "왕 커서 귀여운{{고양이 이...", description: "", date: "", stampCount: "N쓰담", isLocked: true),
+      GrowthRecord(level: "Special", title: "{{스페셜 문구}} {{고양이...", description: "", date: "", stampCount: "N쓰담", isLocked: true)
+    ]
+    
+    
+    VStack(alignment: .center) {
+      CommonHeaderView
+      
+      // 고양이 카드 가로 스크롤
+      ScrollView(.horizontal, showsIndicators: false) {
+        HStack(spacing: 12) {
+          ForEach(catCards) { card in
+            CatCardCell(card: card)
+          }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
+      }
+      
+      // 성장 기록 섹션 헤더
+      Text("성장 기록")
+        .font(FontSet.Body.body2)
+        .foregroundColor(ColorSet.Text.Primary)
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+        .padding(.bottom, 12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+      
+      // 성장 기록 리스트 (스크롤 가능)
+      ScrollView(.vertical, showsIndicators: false) {
+        LazyVStack(spacing: 0) {
+          ForEach(growthRecords) { record in
+            VStack(spacing: 0) {
+              GrowthRecordCell(record: record)
+            }
+          }
+        }
+      }
+    }
+    .padding(.vertical, .Number8)
+  }
+  
+  @ViewBuilder
   private var SmallBottomSheetContent: some View {
+    CommonHeaderView
+  }
+  
+  @ViewBuilder
+  private var CommonHeaderView: some View {
     HStack(alignment: .center) {
       Text("내가 살린 고양이")
         .font(FontSet.Body.body3)

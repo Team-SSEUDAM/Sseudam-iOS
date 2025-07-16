@@ -60,7 +60,7 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
   }
   
   private var sheetView: some View {
-    VStack(spacing: 0) {
+    VStack(spacing: .Number8) {
       VStack {
         RoundedRectangle(cornerRadius: 2)
           .fill(ColorSet.Gray._200)

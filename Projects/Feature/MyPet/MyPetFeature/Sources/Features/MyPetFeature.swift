@@ -26,6 +26,24 @@ public struct MyPetFeature {
     public var myPetInfo: PetInfoEntity?
     public var isLoggedIn: Bool = false
 
+    public var catCards = [
+      CatCard(image: "cat1", isLocked: false),
+      CatCard(image: "cat2", isLocked: false),
+      CatCard(image: nil, isLocked: true),
+      CatCard(image: nil, isLocked: true),
+      CatCard(image: nil, isLocked: true),
+      CatCard(image: nil, isLocked: true)
+    ]
+    
+    public var growthRecords = [
+      GrowthRecord(level: "Lv.1", title: "작고 소중한 {{고양이 이름}}", description: "", date: "YY.MM.DD.", stampCount: "0쓰담", isLocked: false),
+      GrowthRecord(level: "Lv.2", title: "호기심 가득한 {{고양이 이...", description: "", date: "YY.MM.DD.", stampCount: "20쓰담", isLocked: false),
+      GrowthRecord(level: "Lv.3", title: "쑥쑥 자라나는 {{고양이...", description: "", date: nil, stampCount: "110쓰담", isLocked: true),
+      GrowthRecord(level: "Lv.4", title: "왕 커서 귀여운{{고양이 이...", description: "", date: nil, stampCount: "N쓰담", isLocked: true),
+      GrowthRecord(level: "Special", title: "{{스페셜 문구}} {{고양이...", description: "", date: nil, stampCount: "N쓰담", isLocked: true)
+    ]
+    
+    
     public init() {}
   }
   
@@ -77,6 +95,7 @@ public struct MyPetFeature {
           return .none
         case let .failure(error):
           state.myPetInfo = nil
+          print("Error fetching pet info: \(error)")
           return .none
         }
         

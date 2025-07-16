@@ -13,7 +13,7 @@ public struct GrowthRecord: Identifiable {
   public let level: String
   public let title: String
   public let description: String
-  public let date: String
+  public let date: String?
   public let stampCount: String
   public let isLocked: Bool
 }

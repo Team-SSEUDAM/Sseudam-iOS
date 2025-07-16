@@ -114,6 +114,7 @@ public struct MyPetView: View {
     }
   }
   
+  // MARK: - 더미데이터로 주입한 카드 뷰
   @ViewBuilder
   private var CardView: some View {
     MyPetCardView(

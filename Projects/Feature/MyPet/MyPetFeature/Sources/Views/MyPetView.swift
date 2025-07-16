@@ -74,34 +74,7 @@ public struct MyPetView: View {
       VStack {
         CardView
           .padding(.Number16)
-        /// 일단 더미데이터 로 채워둠
-        ZStack {
-          VStack {
-            Spacer()
-            
-            // 펫 이미지 (임시로 원형 뷰)
-            Circle()
-              .fill(Color.orange.opacity(0.7))
-              .frame(width: 150, height: 150)
-              .overlay(
-                VStack {
-                  Circle()
-                    .fill(Color.black)
-                    .frame(width: 4, height: 4)
-                    .offset(x: -15, y: -10)
-                  Circle()
-                    .fill(Color.black)
-                    .frame(width: 4, height: 4)
-                    .offset(x: 15, y: -30)
-                  Circle()
-                    .fill(ColorSet.Background.Secondary)
-                    .frame(width: 12, height: 8)
-                    .offset(y: 5)
-                }
-              )
-            Spacer()
-          }
-        }
+        Spacer()
       }
     }
     .background(ColorSet.Background.Accent)
@@ -131,17 +104,10 @@ public struct MyPetView: View {
   // MARK: - 더미데이터로 주입한 카드 뷰
   @ViewBuilder
   private var CardView: some View {
-    if let myPetInfo = store.myPetInfo {
-      MyPetCardView(
-        level: myPetInfo.levelType.transformed,
-        petNickName: myPetInfo.nickname,
-        currentStamps: myPetInfo.currentPoint,
-        goalStamp: myPetInfo.goalPoint
-      ) {
-        store.send(.petNicknameButtonTapped)
-      }
-    } else {
-      EmptyView()
+    MyPetCardView(
+      myPetInfo: store.myPetInfo
+    ) {
+      store.send(.petNicknameButtonTapped)
     }
   }
   

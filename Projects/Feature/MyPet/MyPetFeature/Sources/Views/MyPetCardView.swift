@@ -8,6 +8,7 @@
 
 import SwiftUI
 import DesignKit
+import PetDomainInterface
 
 public struct MyPetCardView: View {
   
@@ -16,28 +17,35 @@ public struct MyPetCardView: View {
   private let nextLevelText: String
   private let currentStamps: Int
   private let goalStamp: Int
+  private let myPetInfo :PetInfoEntity?
   
   public var action: @Sendable () -> Void
-  
   
   @State private var progress: CGFloat = 0.0
   
   public init(
-    level: Int,
-    petNickName: String,
-    currentStamps: Int,
-    goalStamp: Int,
+    myPetInfo: PetInfoEntity?,
     _ action: @escaping @Sendable () -> Void
   ) {
-    self.level = level
-    self.petNickName = petNickName
+    self.level = myPetInfo?.levelType.transformed ?? 0
+    self.petNickName = myPetInfo?.nickname ?? "서버 오류 냥이"
+    self.currentStamps = myPetInfo?.currentPoint ?? 0
+    self.goalStamp = myPetInfo?.goalPoint ?? 0
     self.nextLevelText = level == 5 ? "최대 레벨을 달성했습니다 🎉" : "다음 레벨까지 \(goalStamp - currentStamps)쓰담"
-    self.currentStamps = currentStamps
-    self.goalStamp = goalStamp
     self.action = action
+    self.myPetInfo = myPetInfo
   }
   
   public var body: some View {
+    ContentView
+    
+    //TODO: - 서버 오류로 인해 펫 정보가 없는 경우 뭘 보여줘야할까
+    if myPetInfo != nil {  }
+    else {  }
+  }
+  
+  @ViewBuilder
+  private var ContentView: some View {
     VStack(alignment: .leading, spacing: .Number4) {
       /// --------- 헤더 영역 ---------
       HStack(spacing: .Number6) {
@@ -93,8 +101,9 @@ public struct MyPetCardView: View {
     .background(ColorSet.Background.Primary)
     .cornerRadius(.Number16)
     .elevation(level: .medium, cornerRadius: .Number16)
-    .onAppear {
+    .onChange(of: myPetInfo) { _, _ in
       withAnimation(.easeInOut(duration: 1.0)) {
+        print("Current Stamps: \(currentStamps), Goal Stamp: \(goalStamp) || Progress: \(progress)")
         progress = goalStamp > 0 ? CGFloat(currentStamps) / CGFloat(goalStamp) : 0.0
       }
     }

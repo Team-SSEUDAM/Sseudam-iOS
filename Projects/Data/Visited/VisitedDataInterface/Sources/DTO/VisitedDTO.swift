@@ -17,8 +17,12 @@ public struct VisitedDTO: DTO {
   let userId: Int
   let site: String
   let visitedAt: String
+  let isToday: Bool
   
   public func toEntity() throws -> VisitedCompleteEntity {
-    return .init(visitedAt: visitedAt.toDateFromISO8601)
+    return .init(
+      visitedAt: visitedAt.toDateFromISO8601,
+      isTodayFirst: isToday
+    )
   }
 }

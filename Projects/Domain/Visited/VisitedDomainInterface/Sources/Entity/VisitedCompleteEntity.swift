@@ -10,8 +10,13 @@ import Foundation
 
 public struct VisitedCompleteEntity: Equatable {
   public let visitedAt: Date?
+  public let isTodayFirst: Bool
   
-  public init(visitedAt: Date?) {
+  public init(
+    visitedAt: Date?,
+    isTodayFirst: Bool
+  ) {
     self.visitedAt = visitedAt
+    self.isTodayFirst = isTodayFirst
   }
 }

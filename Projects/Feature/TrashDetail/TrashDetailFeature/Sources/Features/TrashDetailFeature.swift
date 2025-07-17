@@ -41,12 +41,15 @@ public struct TrashDetailFeature {
     
     case showToastMessage(String?)
     case showAlert(AlertType)
+    case visitedComplete(isFirst: Bool)
   }
   
   public enum Delegate: Equatable {
     case reportButtonTapped(TrashSpotDetail?)
     case showToastMessage(String?)
     case showAlert(AlertType)
+    /// 방문 완료
+    case visitedComplete(isFirst: Bool)
   }
   
   private enum CancelID {
@@ -99,6 +102,9 @@ public struct TrashDetailFeature {
         state.trashDetail = nil
         return .send(.visited(.initialVisitedData))
         
+        // MARK: - Send Delegate To Parent Feature
+      case let .visitedComplete(isFirst):
+        return .send(.delegate(.visitedComplete(isFirst: isFirst)))
         
       case let .showToastMessage(message):
         return .send(.delegate(.showToastMessage(message)))
@@ -106,11 +112,15 @@ public struct TrashDetailFeature {
       case let .showAlert(type):
         return .send(.delegate(.showAlert(type)))
         
-        // MARK: - VisitedFeature Delegate Action
+        // MARK: - Receive VisitedFeature Delegate Action
       case let .visited(.delegate(action)):
         switch action {
+        case let .visitedComplete(isFirst):
+          return .send(.visitedComplete(isFirst: isFirst))
+          
         case let .showToastMessage(message):
           return .send(.showToastMessage(message))
+          
         case let .showAlert(type):
           return .send(.showAlert(type))
         }

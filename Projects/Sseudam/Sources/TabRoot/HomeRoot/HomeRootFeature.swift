@@ -96,6 +96,9 @@ struct HomeRootFeature {
         case let .showAlert(type):
           return .send(.presentAlert(type))
           
+        case let .visitedComplete(isFirst):
+          return .none
+          
         }
         
       default: return .none

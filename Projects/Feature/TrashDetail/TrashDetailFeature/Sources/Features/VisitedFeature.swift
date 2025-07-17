@@ -77,6 +77,7 @@ public struct VisitedFeature {
     /// 위치 권한 설정 여부
     case setLocationPermission(isDeny: Bool)
     
+    case visitedComplete(isFirst: Bool)
     case showToastMessage(String?)
     case showAlert(AlertType)
     case delegate(Delegate)
@@ -85,6 +86,7 @@ public struct VisitedFeature {
   }
   
   public enum Delegate: Equatable {
+    case visitedComplete(isFirst: Bool)
     case showToastMessage(String?)
     case showAlert(AlertType)
   }
@@ -155,7 +157,10 @@ public struct VisitedFeature {
         
       case let .requestVisitResult(.success(result)):
         // TODO: - 인증 화면 이동
-        return .send(.successVisit(date: result.visitedAt))
+        return .merge([
+          .send(.visitedComplete(isFirst: result.isTodayFirst)),
+          .send(.successVisit(date: result.visitedAt))
+        ])
         
       case let .requestVisitResult(.failure(error)):
         return .send(.showToastMessage(error.localizedDescription))
@@ -195,6 +200,9 @@ public struct VisitedFeature {
       
       case let .showAlert(type):
         return .send(.delegate(.showAlert(type)))
+        
+      case let .visitedComplete(isFirst):
+        return .send(.delegate(.visitedComplete(isFirst: isFirst)))
         
         // MARK: - Timer
         

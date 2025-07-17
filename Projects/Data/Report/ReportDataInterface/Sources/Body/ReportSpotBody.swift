@@ -12,13 +12,13 @@ import ReportDomainInterface
 public struct ReportSpotBody: Encodable, Equatable {
   public let spotId: Int
   public let reportType: String
-  public let spotName: String
+  public let spotName: String?
   public let latitude: Double?
   public let longitude: Double?
   public let region: String?
   public let city: String?
   public let site: String?
-  public let trashType: String
+  public let trashType: String?
   
   public init(
     _ input: ReportSpotInput

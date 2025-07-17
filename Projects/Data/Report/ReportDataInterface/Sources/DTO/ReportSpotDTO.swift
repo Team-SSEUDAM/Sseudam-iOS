@@ -14,7 +14,7 @@ public struct ReportSpotDTO: DTO {
   public typealias Entity = ReportSpotEntity
   
   public let reportId: UInt16
-  public let presignedUrl: String
+  public let presignedUrl: String?
 }
 
 public extension ReportSpotDTO {

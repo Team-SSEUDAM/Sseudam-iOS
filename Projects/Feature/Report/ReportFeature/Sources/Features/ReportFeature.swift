@@ -70,7 +70,7 @@ public struct ReportFeature {
     case binding(BindingAction<State>)
     
     case combineSpotReportModel
-    case spotReportResult(Result<String, NetworkError>)
+    case spotReportResult(Result<String?, NetworkError>)
     case uploadReportSpotImageResult(Result<String, NetworkError>)
     case postSpotImage(String)
     
@@ -242,8 +242,8 @@ public struct ReportFeature {
         
       case let .spotReportResult(result):
         switch result {
-        case let .success(prisignedURL):
-          if state.selectedReportInfoType == "PHOTO" { return .send(.postSpotImage(prisignedURL)) }
+        case let .success(optionalPresignedURL):
+          if let presignedURL = optionalPresignedURL { return .send(.postSpotImage(presignedURL)) }
           else {
             return .merge([
               .send(.setIsLoading(false)),

@@ -9,9 +9,9 @@
 import Foundation
 
 public struct ReportSpotEntity: Sendable, Equatable {
-  public let imageUploadURL: String
+  public let imageUploadURL: String?
   
-  public init(imageUploadURL: String) {
+  public init(imageUploadURL: String?) {
     self.imageUploadURL = imageUploadURL
   }
 }

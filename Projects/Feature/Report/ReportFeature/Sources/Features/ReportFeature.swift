@@ -52,11 +52,12 @@ public struct ReportFeature {
     var reportSpotDetail: TrashSpotFlattenDetailEntity?
     
     public init(
-      _ detail: TrashSpotDetail
+      _ detail: TrashSpotDetail,
+      currentLocation: Coordinates? = nil
     ) {
       self.trashSpotDetail = detail
       self.selectedReportInfo = SelectReportInfoTypeFeature.State()
-      self.child = ReportChildFeature.State(detail)
+      self.child = ReportChildFeature.State(detail, currentLocation: currentLocation)
     }
   }
   

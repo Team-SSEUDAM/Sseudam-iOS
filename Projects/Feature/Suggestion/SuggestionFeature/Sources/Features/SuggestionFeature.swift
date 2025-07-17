@@ -48,7 +48,11 @@ public struct SuggestionFeature {
     
     var selectedPhoto: UIImage? = nil
     
-    public init() {}
+    public init(
+      _ initLocation: Coordinates? = nil
+    ) {
+      self.child = SuggestionChildFeature.State(initLocation)
+    }
   }
   
   public enum Action: BindableAction, Equatable {

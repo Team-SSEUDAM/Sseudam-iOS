@@ -31,10 +31,11 @@ public struct ReportChildFeature {
     
     var trashSpotDetail: TrashSpotDetail
     public init(
-      _ trashSpotDetail: TrashSpotDetail
+      _ trashSpotDetail: TrashSpotDetail,
+      currentLocation: Coordinates? = nil
     ) {
       self.trashSpotDetail = trashSpotDetail
-      self.moveLocation = SelectSpotLocationFeature.State(trashSpotDetail.point) /// 초기값 (선택된 위치) 저장
+      self.moveLocation = SelectSpotLocationFeature.State(currentLocation)
     }
   }
   

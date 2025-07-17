@@ -15,6 +15,8 @@ import CoreGraphics
 
 struct MapViewRepresentable: UIViewRepresentable {
   
+  @Binding var lastCameraPosition: Coordinates?
+  
   @Binding var userLocation: Coordinates?
   /// 현재 지도 범위 요청 플래그
   @Binding var requestMapBounds: Bool

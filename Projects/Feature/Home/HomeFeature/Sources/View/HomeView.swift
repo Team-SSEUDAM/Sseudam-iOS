@@ -70,6 +70,7 @@ public struct HomeView: View {
   @ViewBuilder
   private var MapView: some View {
     MapViewRepresentable(
+      lastCameraPosition: $store.location.lastCameraPosition,
       userLocation: $store.location.point,
       requestMapBounds: $store.map.requestMapBounds,
       trashItems: $store.map.trashItems,

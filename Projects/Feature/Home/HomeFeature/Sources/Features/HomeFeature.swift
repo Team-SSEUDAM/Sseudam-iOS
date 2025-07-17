@@ -109,7 +109,7 @@ public struct HomeFeature {
         // MARK: - Send Action to HomeRoot
         
       case .suggestionButtonTapped:
-        state.path.append(.suggestionView(SuggestionFeature.State()))
+        state.path.append(.suggestionView(SuggestionFeature.State(state.location.lastCameraPosition)))
         return .send(.delegate(.needToHiddenTabBar(true)))
 
       case let .presentDetailView(isPresent, id):
@@ -151,7 +151,7 @@ public struct HomeFeature {
         
       case let .receiveTrashDetailFromRoot(trashSpotDetail):
         if let detail = trashSpotDetail {
-          state.path.append(.reportView(ReportFeature.State(detail)))
+          state.path.append(.reportView(ReportFeature.State(detail, currentLocation: state.location.lastCameraPosition)))
           return .send(.presentDetailView(false))
         }
         return .none

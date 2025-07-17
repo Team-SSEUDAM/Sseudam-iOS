@@ -75,9 +75,47 @@ public struct MyPetView: View {
   private var MainView: some View {
     ZStack {
       VStack {
+        Spacer()
+        ColorSet.Mint._100
+          .frame(height: .Number280)
+          .offset(y: .Number50)
+      }
+        
+      VStack {
         CardView
           .padding(.Number16)
-        Spacer()
+        Group {
+          ZStack {
+            Ellipse()
+              .fill(
+                RadialGradient(
+                  gradient: Gradient(stops: [
+                    .init(color: Color(hex: "#006F9D").opacity(0.3), location: 0),
+                    .init(color: Color(hex: "#006F9D").opacity(0), location: 1)
+                  ]),
+                  center: .center,
+                  startRadius: 0,
+                  endRadius: 77
+                )
+              )
+              .frame(width: 153, height: 52)
+              .blur(radius: 6)
+              .offset(y: 90)
+            
+            // 고양이 이미지
+            Image(
+              asset: CatImageSet.imgae(
+                level: store.myPetInfo?.levelType,
+                interaction: false,
+                type: .basic
+              )
+            )
+            .resizable()
+            .aspectRatio(1, contentMode: .fit)
+            .frame(height: .Number220)
+          }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
     }
     .background(ColorSet.Background.Accent)

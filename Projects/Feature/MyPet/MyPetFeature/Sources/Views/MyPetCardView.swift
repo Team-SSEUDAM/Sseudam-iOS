@@ -27,7 +27,7 @@ public struct MyPetCardView: View {
     myPetInfo: PetInfoEntity?,
     _ action: @escaping @Sendable () -> Void
   ) {
-    self.level = myPetInfo?.levelType.transformed ?? 0
+    self.level = myPetInfo?.levelType.rawInt ?? 1
     self.petNickName = myPetInfo?.nickname ?? "서버 오류 냥이"
     self.currentStamps = myPetInfo?.currentPoint ?? 0
     self.goalStamp = myPetInfo?.goalPoint ?? 0

@@ -9,12 +9,12 @@
 import Foundation
 
 // MARK: - Enum Types
-public enum CatType: String, CaseIterable {
+public enum CatType: String, Sendable, CaseIterable {
   case basic = "basic"
   /// 추후 다른 타입들 추가 가능
 }
 
-public enum CatLevel: String, CaseIterable {
+public enum CatLevel: String, Sendable, CaseIterable {
   case level1 = "LEVEL_1"
   case level2 = "LEVEL_2"
   case level3 = "LEVEL_3"
@@ -58,7 +58,7 @@ public extension DesignKitImages {
 
 // MARK: - 편의 메소드들
 public struct CatImageSet {
-  static func imgae(level: CatLevel, interaction: Bool, type: CatType) -> DesignKitImages {
-    return DesignKitImages(type: type, level: level, interaction: interaction)
+  public static func imgae(level: CatLevel?, interaction: Bool, type: CatType) -> DesignKitImages {
+    return DesignKitImages(type: type, level: level ?? .level1, interaction: interaction)
   }
 }

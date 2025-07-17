@@ -29,12 +29,15 @@ public extension CGFloat {
   static let Number32: CGFloat = 32
   static let Number40: CGFloat = 40
   static let Number48: CGFloat = 48
+  static let Number50: CGFloat = 50
   static let Number56: CGFloat = 56
   static let Number64: CGFloat = 64
   static let Number72: CGFloat = 72
   static let Number80: CGFloat = 80
   static let Number100: CGFloat = 100
   static let Number200: CGFloat = 200
+  static let Number220: CGFloat = 220
+  static let Number280: CGFloat = 280
   static let Number320: CGFloat = 320
   
   static let detailSheetHeight: CGFloat = 197

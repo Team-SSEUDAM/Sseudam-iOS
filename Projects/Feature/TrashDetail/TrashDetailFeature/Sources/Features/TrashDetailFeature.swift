@@ -49,7 +49,7 @@ public struct TrashDetailFeature {
     case showToastMessage(String?)
     case showAlert(AlertType)
     /// 방문 완료
-    case visitedComplete(isFirst: Bool)
+    case visitedComplete(isFirst: Bool, detailData: TrashSpotDetail?)
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -60,7 +60,9 @@ public struct TrashDetailFeature {
       VisitedFeature() //._printChanges()
     }
     
-    Reduce { state, action in
+    Reduce {
+      state,
+      action in
       switch action {
         
       case let .showDetail(id):
@@ -97,7 +99,14 @@ public struct TrashDetailFeature {
         
         // MARK: - Send Delegate To Parent Feature
       case let .visitedComplete(isFirst):
-        return .send(.delegate(.visitedComplete(isFirst: isFirst)))
+        return .send(
+          .delegate(
+            .visitedComplete(
+              isFirst: isFirst,
+              detailData: state.trashDetail
+            )
+          )
+        )
         
       case let .showToastMessage(message):
         return .send(.delegate(.showToastMessage(message)))

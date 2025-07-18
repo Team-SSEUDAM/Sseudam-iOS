@@ -47,6 +47,7 @@ public struct HomeFeature {
     case presentAlert(AlertType)
     case hiddenReportButton(Bool)
     
+    case showReportView(detail: TrashSpotDetail?)
     case receiveTrashDetailFromRoot(TrashSpotDetail?)
     case moveToSetting
     case suggestionButtonTapped
@@ -105,6 +106,11 @@ public struct HomeFeature {
         
       case let .hiddenReportButton(isHidden):
         state.isHiddenReportButton = isHidden
+        return .none
+        
+      case let .showReportView(detail):
+        guard let detail = detail else { return .none }
+        state.path.append(.reportView(ReportFeature.State(detail)))
         return .none
         
         // MARK: - Send Action to HomeRoot

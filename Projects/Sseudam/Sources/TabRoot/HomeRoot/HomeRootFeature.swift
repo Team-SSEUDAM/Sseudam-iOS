@@ -93,7 +93,10 @@ struct HomeRootFeature {
       case let .trashDetail(.delegate(action)):
         switch action {
         case let .reportButtonTapped(detailData):
-          return .send(.home(.receiveTrashDetailFromRoot(detailData)))
+          return .run { @MainActor send in
+            send(.home(.showReportView(detail: detailData)))
+            send(.home(.receiveTrashDetailFromRoot(detailData)))
+          }
           
         case let .showToastMessage(message):
           return .send(.home(.showToastMessage(message)))
@@ -101,8 +104,11 @@ struct HomeRootFeature {
         case let .showAlert(type):
           return .send(.presentAlert(type))
           
-        case let .visitedComplete(isFirst):
-          return .none
+        case let .visitedComplete(isFirst, detailData):
+          return .run { @MainActor send in
+            send(.home(.receiveTrashDetailFromRoot(detailData)))
+            // 인증 화면
+          }
           
         }
         

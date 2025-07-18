@@ -16,7 +16,7 @@ public struct MyPetView: View {
   
   @State private var bottomSheetDragEnabled: Bool = true
   @State private var startBottomSheetInsideScroll: Bool = true
-    
+  
   public init(store: StoreOf<MyPetFeature>) {
     self.store = store
   }
@@ -81,7 +81,7 @@ public struct MyPetView: View {
           .frame(height: .Number230)
           .offset(y: -.Number50)
       }
-        
+      
       VStack {
         CardView
           .padding(.Number16)
@@ -119,11 +119,23 @@ public struct MyPetView: View {
                 .contentShape(Rectangle())
                 .allowsHitTesting(true)
                 .onTapGesture(coordinateSpace: .global) { location in
+                  let impactFeedback = UIImpactFeedbackGenerator(style: .soft)
+                  impactFeedback.impactOccurred()
+                  
                   var newLocation = location
                   newLocation.y -= .Number220
                   store.send(.catImageTapped(newLocation))
                 }
             )
+            
+            if store.showBubble {
+              BubbleView(text: store.bubbleText)
+                .offset(x: store.bubbleOffset.x, y: store.bubbleOffset.y)
+                .transition(.scale.combined(with: .opacity))
+                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: store.showBubble)
+                .zIndex(2)
+                .allowsHitTesting(false)
+            }
             
             if store.showShineLottieAnimation {
               TapCatImageWithShine

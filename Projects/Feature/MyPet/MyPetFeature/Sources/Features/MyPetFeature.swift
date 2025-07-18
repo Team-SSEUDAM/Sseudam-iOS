@@ -30,8 +30,13 @@ public struct MyPetFeature {
     public var showShineLottieAnimation: Bool = false
     public var isMyPetInteracted: Bool = false
     
+    /// 버블 관련
+    public var showBubble: Bool = false
+    public var bubbleText: String = ""
+    public var bubbleOffset: CGPoint = .zero
+    
     public var isLoggedIn: Bool = false
-
+    
     public var catCards = [
       CatCard(image: "cat1", isLocked: false),
       CatCard(image: "cat2", isLocked: false),
@@ -66,7 +71,8 @@ public struct MyPetFeature {
     case petDetailButtonTapped
     
     case catImageTapped(CGPoint)
-    case showShineLottieAnimation(Bool)
+    case showShineLottieAnimation
+    case hideShineLottieAnimation
     case resetInteractionState
     
     case requestLogin
@@ -124,15 +130,24 @@ public struct MyPetFeature {
       case let .catImageTapped(location):
         /// 이전 로띠가 표시 중이면 무시
         guard !state.showShineLottieAnimation else { return .none }
+        if !state.showBubble {
+          let randomXOffset: CGFloat = [-60, 60].randomElement() ?? 0
+          state.bubbleOffset = CGPoint(x: randomXOffset, y: -140)
+        }
         
         state.tapMyPetLocation = location
         state.isMyPetInteracted = true
         state.showShineLottieAnimation = true
         
+        if let interactionTexts = state.myPetInfo?.levelType.interactionText {
+          state.bubbleText = interactionTexts.randomElement() ?? ""
+          state.showBubble = true
+        }
+        
         return .merge(
           .run { send in
             try await Task.sleep(nanoseconds: 300_000_000)
-            await send(.showShineLottieAnimation(false))
+            await send(.hideShineLottieAnimation)
           }.cancellable(id: CancelID.lottieAnimation, cancelInFlight: true),
           
           .run { send in
@@ -141,12 +156,18 @@ public struct MyPetFeature {
           }.cancellable(id: CancelID.interactionState, cancelInFlight: true)
         )
         
-      case let .showShineLottieAnimation(isShowLottie):
-        state.showShineLottieAnimation = isShowLottie
+      case .showShineLottieAnimation:
+        state.showShineLottieAnimation = true
+        return .none
+        
+      case .hideShineLottieAnimation:
+        state.showShineLottieAnimation = false
         return .none
         
       case .resetInteractionState:
         state.isMyPetInteracted = false
+        state.showBubble = false
+        state.bubbleOffset = .zero
         return .none
         
       case .requestLogin:

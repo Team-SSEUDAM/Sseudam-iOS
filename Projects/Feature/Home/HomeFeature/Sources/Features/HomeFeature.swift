@@ -31,6 +31,7 @@ public struct HomeFeature {
     public var path = StackState<Path.State>()
     public var isPresentDetail: Bool = false
     public var toastMessage: String? = nil
+    public var isInitAppear: Bool = true
     public init() {}
   }
 
@@ -70,7 +71,11 @@ public struct HomeFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
-        return .send(.location(.moveUserLocation))
+        if state.isInitAppear {
+          state.isInitAppear = false
+          return .send(.location(.moveUserLocation))
+        }
+        return .none
         
       case let .showToastMessage(message):
         state.toastMessage = message

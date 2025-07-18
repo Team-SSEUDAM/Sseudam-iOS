@@ -11,6 +11,7 @@ import SwiftUI
 public struct SnackBar: View {
   
   @Binding var message: String?
+  @Binding var attributedMessage: AttributedString?
   @State private var isVisible = false
   @State private var boxOpacity: Double = 1
   @State private var currentTask: Task<Void, Never>? = nil
@@ -24,6 +25,18 @@ public struct SnackBar: View {
     _ action: @escaping @Sendable () async -> Void
   ) {
     self._message = message
+    self._attributedMessage = .constant(nil)
+    self.buttonLabel = buttonLabel
+    self.action = action
+  }
+  
+  public init(
+    attributedMessage: Binding<AttributedString?>,
+    buttonLabel: String? = nil,
+    _ action: @escaping @Sendable () async -> Void
+  ) {
+    self._message = .constant(nil)
+    self._attributedMessage = attributedMessage
     self.buttonLabel = buttonLabel
     self.action = action
   }
@@ -31,13 +44,22 @@ public struct SnackBar: View {
   public var body: some View {
     VStack {
       Spacer()
-      if isVisible, let message {
+      
+      if isVisible {
         HStack(alignment: .bottom, spacing: 8) {
-          Text(message)
-            .font(FontSet.Body.body2)
-            .foregroundStyle(ColorSet.Text.Inverse)
-            .lineLimit(nil)
-            .fixedSize(horizontal: false, vertical: true)
+          if let attributedMessage {
+              Text(attributedMessage)
+                .font(FontSet.Body.body2)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+            } else if let message {
+              Text(message)
+                .font(FontSet.Body.body2)
+                .foregroundStyle(ColorSet.Text.Inverse)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+            }
+            
           Spacer()
           if let buttonLabel {
             Button { Task { await action() } } label: {
@@ -63,10 +85,13 @@ public struct SnackBar: View {
     .onChange(of: message) {
       showToastIfNeeded()
     }
+    .onChange(of: attributedMessage) {
+      showToastIfNeeded()
+    }
   }
   
   private func showToastIfNeeded() {
-    guard let message = message, !message.isEmpty else { return }
+    guard (message != nil && !message!.isEmpty) || attributedMessage != nil else { return }
     currentTask?.cancel()
     currentTask = Task {
       boxOpacity = 1
@@ -81,7 +106,7 @@ public struct SnackBar: View {
       try? await Task.sleep(for: .seconds(0.2))
       isVisible = false
       self.message = nil
-      
+      self.attributedMessage = nil
     }
   }
 }

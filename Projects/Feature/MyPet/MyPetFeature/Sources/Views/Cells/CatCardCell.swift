@@ -31,6 +31,10 @@ public struct CatCardCell: View {
               renderingMode: .template,
               color: ColorSet.Icon.Tertiary
             )
+          } else {
+            CatImageSet.image(name: card.imageURL)
+              .resizable()
+              .scaledToFit()
           }
         }
       )

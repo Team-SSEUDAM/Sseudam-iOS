@@ -8,8 +8,8 @@
 
 import Foundation
 
-public struct CatCard: Identifiable {
+public struct CatCard: Identifiable, Equatable {
   public let id = UUID()
-  public let image: String? // nil이면 잠긴 상태
   public let isLocked: Bool
+  public let imageURL: String
 }

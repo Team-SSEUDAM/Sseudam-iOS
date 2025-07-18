@@ -6,7 +6,7 @@
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
-import Foundation
+import SwiftUI
 
 // MARK: - Enum Types
 public enum CatType: String, Sendable, CaseIterable {
@@ -68,7 +68,13 @@ public extension DesignKitImages {
 
 // MARK: - 편의 메소드들
 public struct CatImageSet {
-  public static func imgae(level: CatLevel?, interaction: Bool, type: CatType) -> DesignKitImages {
+  public static func imgae(level: CatLevel?, interaction: Bool = true, type: CatType) -> DesignKitImages {
     return DesignKitImages(type: type, level: level ?? .level1, interaction: interaction)
   }
+  
+  public static func image(name: String) -> Image {
+    return DesignKitImages(name: name).swiftUIImage
+  }
+  
+  public static func imageURL(level: CatLevel, type: CatType, interaction: Bool = true) -> String { "type:\(type.rawValue)_\(level.rawInt), interaction:\(interaction)" }
 }

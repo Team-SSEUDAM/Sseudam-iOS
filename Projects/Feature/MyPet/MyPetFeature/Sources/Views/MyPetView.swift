@@ -159,8 +159,7 @@ public struct MyPetView: View {
     VStack {
       CommonHeaderView
       BigBottomSheetContentView(
-        catCards: store.catCards,
-        growthRecords: store.growthRecords,
+        store: store.scope(state: \.petGrowthList, action: \.petGrowthList),
         startBottomSheetInsideScroll: $startBottomSheetInsideScroll,
         bottomSheetDragEnabled: $bottomSheetDragEnabled
       )

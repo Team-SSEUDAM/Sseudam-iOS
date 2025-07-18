@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct GrowthRecord: Identifiable {
+public struct GrowthRecord: Identifiable, Equatable {
   public let id = UUID()
   public let level: String
   public let title: String

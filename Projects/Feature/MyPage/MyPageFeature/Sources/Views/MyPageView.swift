@@ -49,15 +49,22 @@ public struct MyPageView: View {
     ZStack {
       ColorSet.Background.Primary
         .ignoresSafeArea()
-      VStack {
-        NavigationBarView
-        Spacer()
-        if store.isLoggedIn {
-          EmptyView()
-        } else {
+      if store.isLoggedIn {
+        NavigationContent
+      } else {
+        ZStack {
+          NavigationContent
           requireLoginView
         }
       }
+    }
+  }
+  
+  @ViewBuilder
+  private var NavigationContent: some View {
+    VStack {
+      NavigationBarView
+      Spacer()
     }
   }
   

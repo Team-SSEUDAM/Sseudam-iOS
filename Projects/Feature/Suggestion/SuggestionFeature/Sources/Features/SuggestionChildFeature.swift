@@ -28,7 +28,11 @@ public struct SuggestionChildFeature {
     var selectKind: SelectSpotCategoryFeature.State = SelectSpotCategoryFeature.State()
     var selectPhoto: SelectSpotImageFeature.State = SelectSpotImageFeature.State()
     
-    public init() {}
+    public init(
+      _ initLocation: Coordinates? = nil
+    ) {
+      self.moveLocation = SelectSpotLocationFeature.State(initLocation)
+    }
   }
   
   public enum Action: Equatable {

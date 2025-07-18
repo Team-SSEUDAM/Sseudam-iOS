@@ -55,6 +55,14 @@ extension MapViewRepresentable {
       if isInitialBounds {
         configInitialMove(mapView, requestMapBounds: parent.requestMapBounds)
       }
+      
+      /// 카메라 이동할 때 마다, 좌표 값 저장
+      let target = mapView.cameraPosition.target
+      let center = Coordinates(
+        latitude: target.lat.rounded(to: 6),
+        longitude: target.lng.rounded(to: 6)
+      )
+      Task { @MainActor in parent.lastCameraPosition = center }
     }
     
     

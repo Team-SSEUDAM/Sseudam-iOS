@@ -52,11 +52,12 @@ public struct ReportFeature {
     var reportSpotDetail: TrashSpotFlattenDetailEntity?
     
     public init(
-      _ detail: TrashSpotDetail
+      _ detail: TrashSpotDetail,
+      currentLocation: Coordinates? = nil
     ) {
       self.trashSpotDetail = detail
       self.selectedReportInfo = SelectReportInfoTypeFeature.State()
-      self.child = ReportChildFeature.State(detail)
+      self.child = ReportChildFeature.State(detail, currentLocation: currentLocation)
     }
   }
   
@@ -69,9 +70,8 @@ public struct ReportFeature {
     case child(ReportChildFeature.Action)
     case binding(BindingAction<State>)
     
-    case fetchTrashSpotDetailEffect(Result<TrashSpotFlattenDetailEntity, NetworkError>)
     case combineSpotReportModel
-    case spotReportResult(Result<String, NetworkError>)
+    case spotReportResult(Result<String?, NetworkError>)
     case uploadReportSpotImageResult(Result<String, NetworkError>)
     case postSpotImage(String)
     
@@ -227,35 +227,24 @@ public struct ReportFeature {
         
       case .reportButtonTapped:
         if state.selectedReportInfoType == "NAME" { return .send(.validateSpotNameButtonTapped) }
-        return fetchTrashSpotDetailEffect(state.trashSpotDetail.id, fetchTrashSpotRawDetailUseCase)
+        return .send(.combineSpotReportModel)
         
       case let .postSpotImage(prisignedURL):
         return uploadReportSpotImageEffect(state, prisignedURL, uploadReportSpotImageUseCase)
         
-      case let .fetchTrashSpotDetailEffect(result):
-        switch result {
-        case let .success(entity):
-          state.reportSpotDetail = entity
-          return .send(.combineSpotReportModel)
-        case let .failure(error):
-          state.destination = .alert(.occuredError(error.localizedDescription))
-          return .send(.setIsLoading(false))
-        }
-        
       case .combineSpotReportModel:
-        var reportSpotDetail = state.reportSpotDetail
-        reportSpotDetail?.id = state.trashSpotDetail.id
-        reportSpotDetail?.spotName = state.trashSpotDetail.name
-        reportSpotDetail?.latitude = state.trashSpotDetail.point.latitude
-        reportSpotDetail?.longitude = state.trashSpotDetail.point.longitude
-        reportSpotDetail?.trashType = state.trashSpotDetail.trashType.rawValue
+        var reportSpotDetail = TrashSpotFlattenDetailEntity(id: state.trashSpotDetail.id)
+        reportSpotDetail.spotName = state.trashSpotDetail.name
+        reportSpotDetail.latitude = state.trashSpotDetail.point.latitude
+        reportSpotDetail.longitude = state.trashSpotDetail.point.longitude
+        reportSpotDetail.trashType = state.trashSpotDetail.trashType.rawValue
         state.reportSpotDetail = reportSpotDetail
         return spotReportEffect(state, reportSpotUseCase)
         
       case let .spotReportResult(result):
         switch result {
-        case let .success(prisignedURL):
-          if state.selectedReportInfoType == "PHOTO" { return .send(.postSpotImage(prisignedURL)) }
+        case let .success(optionalPresignedURL):
+          if let presignedURL = optionalPresignedURL { return .send(.postSpotImage(presignedURL)) }
           else {
             return .merge([
               .send(.setIsLoading(false)),
@@ -347,9 +336,8 @@ private extension ReportFeature {
       
     case let .serverValidationCompleted(isValid, name):
       state.trashSpotDetail.name = name
-      if isValid {
-        return fetchTrashSpotDetailEffect(state.trashSpotDetail.id, fetchTrashSpotRawDetailUseCase)
-      } else {
+      if isValid { return .send(.combineSpotReportModel) }
+      else {
         return .run { send in
           await send(.setIsLoading(false))
           await send(.nextButtonIsEnabled(false))
@@ -389,24 +377,6 @@ private extension ReportFeature {
 
 /// MARK: - 순수하게 `ReportFeature`에서 사용할 `Effect들
 public extension ReportFeature {
-  
-  func fetchTrashSpotDetailEffect(
-    _ input: Int,
-    _ useCase: FetchTrashSpotRawDetailUseCase
-  ) -> Effect<Action> {
-    .run { send in
-      do {
-        await send(.setIsLoading(true))
-        let entity = try await useCase.execute(input)
-        await send(.fetchTrashSpotDetailEffect(.success(entity)))
-      } catch is CancellationError {
-        await send(.fetchTrashSpotDetailEffect(.failure(.taskCancelled)))
-      } catch {
-        await send(.fetchTrashSpotDetailEffect(.failure(.customError(message: error.localizedDescription))))
-      }
-    }
-  }
-  
   
   func spotReportEffect(
     _ state: Self.State,

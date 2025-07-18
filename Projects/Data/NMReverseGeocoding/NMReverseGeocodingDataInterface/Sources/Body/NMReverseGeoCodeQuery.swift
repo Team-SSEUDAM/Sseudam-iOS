@@ -17,7 +17,7 @@ public struct NMReverseGeoCodeQuery: Codable {
   
   public init(_ input: NMReverseGeoCodeInput) {
     self.coords = "\(input.longitude),\(input.latitude)"
-    self.orders = "roadaddr"
+    self.orders = "admcode,legalcode,addr,roadaddr"
     self.output = "json"
   }
 }

@@ -22,6 +22,8 @@ public struct LocationFeature {
     /// 초기 이동 여부
     var isInitialMapLoad: Bool = true
     
+    var lastCameraPosition: Coordinates? = nil
+    
     var isCurrentButtonTap: Bool = false
   }
   

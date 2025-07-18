@@ -30,6 +30,16 @@ public enum CatLevel: String, Sendable, CaseIterable {
     case .level5: return 5
     }
   }
+  
+  public var interactionText: [String] {
+    switch self {
+    case .level1: return ["안녕..?", "반가워", "나랑 친구해주는 거야?", "여기 따뜻하고 좋다..~"]
+    case .level2: return ["또 보네~", "자주 보자 우리", "안녕~", "나 심심해~"]
+    case .level3: return ["오늘 하루는 어땠어?!", "나랑 놀아줄 사람~", "나 많이 컸지~~", "너랑 노는 거 너무 재밌어⚡️"]
+    case .level4: return ["나 요즘 행복해~~", "항상 고마워🩵", "오늘은 뭐하고 놀까?", "쓰담쓰담해주세요~~"]
+    case .level5: return ["₍^ >ヮ<^₎ .ᐟ.ᐟ", "오늘 기분 최고!!", "너와 함께라 행복해🩵", "넌 진짜 짱이야!", "보고싶었어~~"]
+    }
+  }
 }
 
 // MARK: - DesignKitImages Extension

@@ -27,6 +27,8 @@ struct HomeRootFeature {
     case home(HomeFeature.Action)
     case trashDetail(TrashDetailFeature.Action)
     
+    case presentDetail(Bool, id: Int?)
+    
     case closeAlertAction(AlertType)
     case acceptAlertAction(AlertType)
     
@@ -66,17 +68,20 @@ struct HomeRootFeature {
       case let .presentAlert(type):
         return .send(.delegate(.presentAlert(type)))
         
+      case let .presentDetail(isPresent, id):
+        state.trashDetail = isPresent ? .init() : nil
+        state.isPresentDetail = isPresent
+        if isPresent {
+          return .send(.trashDetail(.showDetail(id: id)))
+        }
+        return .none
+        
         // MARK: - Receive HomeFeature Delegate Action
         
       case let .home(.delegate(action)):
         switch action {
         case let .presentDetailView(isPresent, id):
-          state.trashDetail = isPresent ? .init() : nil
-          state.isPresentDetail = isPresent
-          if isPresent {
-            return .send(.trashDetail(.showDetail(id: id)))
-          }
-          return .none
+          return .send(.presentDetail(isPresent, id: id))
           
         case let .presentAlert(alert):
           return .send(.presentAlert(alert))

@@ -58,7 +58,6 @@ public struct TrashDetailView: View {
     }
     .onDisappear {
       LocationService.shared.stopTracking()
-      store.send(.onDiappaer)
     }
     .task { @MainActor in
       for await _ in LocationService.shared.userLocationStream {

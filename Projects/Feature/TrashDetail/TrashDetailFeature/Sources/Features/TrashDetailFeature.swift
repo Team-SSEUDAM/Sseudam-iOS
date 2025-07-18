@@ -29,7 +29,7 @@ public struct TrashDetailFeature {
     case delegate(Delegate)
     case visited(VisitedFeature.Action)
     
-    case onDiappaer
+    case onDisappaer
     case showDetail(id: Int?)
     case noTrashData
     case reportButtonTapped
@@ -52,10 +52,6 @@ public struct TrashDetailFeature {
     case visitedComplete(isFirst: Bool)
   }
   
-  private enum CancelID {
-    case userLocationStream
-  }
-  
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
 
   public var body: some ReducerOf<Self> {
@@ -66,8 +62,6 @@ public struct TrashDetailFeature {
     
     Reduce { state, action in
       switch action {
-      case .onDiappaer:
-        return .cancel(id: CancelID.userLocationStream)
         
       case let .showDetail(id):
         if let id = id {
@@ -98,7 +92,6 @@ public struct TrashDetailFeature {
         return .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point)))
         
       case let .fetchTrashDetailResult(.failure(error)):
-        print(error)
         state.trashDetail = nil
         return .send(.visited(.initialVisitedData))
         

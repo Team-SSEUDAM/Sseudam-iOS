@@ -113,10 +113,6 @@ public struct VisitedFeature {
         ])
         
       case .fetchUserLocation:
-//        return .run { send in
-//          await storedUserLocation()
-//          await send(.checkEnableVisit)
-//        }
         return .merge([
           storedUserLocation(isDenyPermission: state.isDenyPermission),
           .send(.checkEnableVisit)
@@ -180,7 +176,7 @@ public struct VisitedFeature {
       case let .changeVisitedState(visitedState):
         state.visitedState = visitedState
         state.visitedButtonState = visitedState == .enableVisit ? .normal : .disabled
-        return . none
+        return .none
         
       case let .changeVisitedButtonText(remainingTime):
         let text: String = "이 곳에 쓰레기 담기"

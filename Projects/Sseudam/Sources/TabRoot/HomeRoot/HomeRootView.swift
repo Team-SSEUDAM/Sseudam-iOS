@@ -10,6 +10,7 @@ import SwiftUI
 import ComposableArchitecture
 import HomeFeature
 import TrashDetailFeature
+import VisitedFeature
 
 struct HomeRootView: View {
   
@@ -25,6 +26,9 @@ struct HomeRootView: View {
         IfLetStore(store.scope(state: \.trashDetail, action: \.trashDetail)) { store in
           TrashDetailView(store: store)
         }
+      }
+      .fullScreenCover(item: $store.scope(state: \.modal?.visitedComplete, action: \.modal.visitedComplete)) { store in
+        VisitedCompleteView(store: store)
       }
   }
   

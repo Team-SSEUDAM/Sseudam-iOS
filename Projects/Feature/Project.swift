@@ -20,7 +20,8 @@ let project = Project.makeStaticLibraryProject(
     .Features.SelectSpotImage,
     .Features.SelectSpotLocation,
     .Features.SelectSpotName,
-    .Features.MyPage
+    .Features.MyPage,
+    .Features.Visited
   ]
 )
 

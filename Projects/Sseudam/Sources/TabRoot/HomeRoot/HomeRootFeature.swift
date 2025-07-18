@@ -11,6 +11,8 @@ import ComposableArchitecture
 import HomeFeature
 import TrashDetailFeature
 import DesignKit
+import VisitedFeature
+import TrashSpotDomainInterface
 
 @Reducer
 struct HomeRootFeature {
@@ -20,6 +22,8 @@ struct HomeRootFeature {
     var home: HomeFeature.State = HomeFeature.State()
     var trashDetail: TrashDetailFeature.State? = nil
     var isPresentDetail: Bool = false
+    var tempSavingDetailData: TrashSpotDetail? = nil
+    @Presents var modal: ModalDestination.State?
   }
   
   enum Action: BindableAction, Equatable {
@@ -28,12 +32,15 @@ struct HomeRootFeature {
     case trashDetail(TrashDetailFeature.Action)
     
     case presentDetail(Bool, id: Int?)
+    case presentVisitedComplete(isFirst: Bool)
     
     case closeAlertAction(AlertType)
     case acceptAlertAction(AlertType)
     
     case hiddenTabBar(Bool)
     case presentAlert(AlertType)
+    
+    case modal(PresentationAction<ModalDestination.Action>)
     case delegate(Delegate)
   }
   
@@ -41,6 +48,12 @@ struct HomeRootFeature {
     case hiddenTabBar(Bool)
     case presentAlert(AlertType)
   }
+  
+  @Reducer(state: .equatable, action: .equatable)
+  enum ModalDestination {
+    case visitedComplete(VisitedCompleteFeature)
+  }
+  
   
   var body: some ReducerOf<Self> {
     BindingReducer()
@@ -76,6 +89,26 @@ struct HomeRootFeature {
         }
         return .none
         
+      case let .presentVisitedComplete(isFirst):
+        state.modal = .visitedComplete(VisitedCompleteFeature.State(isFirstVisit: isFirst))
+        return .none
+        
+      case let .modal(.presented(.visitedComplete(action))):
+        switch action {
+        case .delegate(.dismiss):
+          state.modal = nil
+          if let detailData = state.tempSavingDetailData {
+            return .merge([
+              .send(.hiddenTabBar(true)),
+              .send(.presentDetail(true, id: detailData.id))
+            ])
+          } else {
+            return .none
+          }
+        default: return .none
+        }
+        
+        
         // MARK: - Receive HomeFeature Delegate Action
         
       case let .home(.delegate(action)):
@@ -105,8 +138,10 @@ struct HomeRootFeature {
           return .send(.presentAlert(type))
           
         case let .visitedComplete(isFirst, detailData):
+          state.tempSavingDetailData = detailData
           return .run { @MainActor send in
             send(.home(.receiveTrashDetailFromRoot(detailData)))
+            send(.presentVisitedComplete(isFirst: isFirst))
             // 인증 화면
           }
           
@@ -118,5 +153,6 @@ struct HomeRootFeature {
     .ifLet(\.trashDetail, action: \.trashDetail) {
       TrashDetailFeature()
     }
+    .ifLet(\.$modal, action: \.modal)
   }
 }

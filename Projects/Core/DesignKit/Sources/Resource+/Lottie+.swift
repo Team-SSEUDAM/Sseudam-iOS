@@ -10,6 +10,7 @@ import Foundation
 
 public enum LottieSet: String {
   case loading = "loading"
+  case tap_shine = "tap_shine"
   
   
   public var name: String { return rawValue }

@@ -7,13 +7,14 @@
 //
 
 import Foundation
+import DesignKit
 import Cache
 
 public struct PetInfoEntity: Sendable, Equatable {
   public let nickname: String
   public let currentPoint: Int
   public let goalPoint: Int
-  public let levelType: LevelType
+  public let levelType: CatLevel
   
   public init(
     nickname: String,
@@ -23,9 +24,9 @@ public struct PetInfoEntity: Sendable, Equatable {
   ) {
     self.nickname = nickname
     self.currentPoint = point
-    self.levelType = LevelType(rawValue: levelType) ?? .유년기
+    self.levelType = CatLevel(rawValue: levelType) ?? .level1
     
-    if LevelType(rawValue: levelType) == .궁극체 { self.goalPoint = point }
+    if CatLevel(rawValue: levelType) == .level5 { self.goalPoint = point }
     else { self.goalPoint = maxLevelStandard }
   }
   
@@ -39,23 +40,5 @@ public struct PetInfoEntity: Sendable, Equatable {
       levelType: cacheModel.levelType,
       maxLevelStandard: cacheModel.goalPoint
     )
-  }
-}
-
-public enum LevelType: String, Sendable {
-  case 유년기 = "LEVEL_1"
-  case 성장기 = "LEVEL_2"
-  case 성숙기 = "LEVEL_3" 
-  case 완전체 = "LEVEL_4"
-  case 궁극체 = "SPECIAL"
-  
-  public var transformed: Int {
-    switch self {
-    case .유년기: return 1
-    case .성장기: return 2
-    case .성숙기: return 3
-    case .완전체: return 4
-    case .궁극체: return 5
-    }
   }
 }

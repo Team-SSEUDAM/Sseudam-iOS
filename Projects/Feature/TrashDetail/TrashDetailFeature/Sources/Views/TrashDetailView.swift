@@ -11,6 +11,7 @@ import ComposableArchitecture
 import DesignKit
 import TrashSpotDomainInterface
 import Utility
+import DotLottie
 
 public struct TrashDetailView: View {
   @Bindable var store: StoreOf<TrashDetailFeature>
@@ -168,7 +169,7 @@ public struct TrashDetailView: View {
         PrimaryButton(
           title: $store.visited.visitedButtonText,
           size: .medium,
-          state: $store.visited.visitedButtonState//store.visited.visitedState.buttonEnable ? .constant(.normal) : .constant(.disabled)
+          state: $store.visited.visitedButtonState
         ) {
           print(store.visited.visitedButtonState, store.visited)
           store.send(.visited(.visitButtonTapped))

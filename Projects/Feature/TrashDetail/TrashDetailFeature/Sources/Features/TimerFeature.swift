@@ -112,7 +112,7 @@ extension TimerFeature {
   }
   
   private func timerTick(spotId: String, cooldowns: Date?) -> Effect<Action> {
-    print("⏱️", #function)
+//    print("⏱️", #function)
     guard let expireTime = cooldowns else {
       return .cancel(id: TimerID.cooldown(spotId))
     }

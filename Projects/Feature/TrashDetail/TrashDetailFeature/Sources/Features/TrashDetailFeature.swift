@@ -94,6 +94,7 @@ public struct TrashDetailFeature {
         return .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point)))
         
       case let .fetchTrashDetailResult(.failure(error)):
+        print(error)
         state.trashDetail = nil
         return .send(.visited(.initialVisitedData))
         

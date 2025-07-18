@@ -138,7 +138,7 @@ public struct VisitedFeature {
         return checkEnableVisit(
           isWithinDistance: state.isWithinDistance,
           isDenyPermission: state.isDenyPermission,
-          remainingTime: state.timer.remainingTime
+          expiredTime: state.timer.expireTime
         )
         
       case .visitButtonTapped:
@@ -268,14 +268,14 @@ extension VisitedFeature {
   private func checkEnableVisit(
     isWithinDistance: Bool,
     isDenyPermission: Bool,
-    remainingTime: TimeInterval?
+    expiredTime: Date?
   ) -> Effect<Action> {
     print("🤓", #function)
     guard UserDefaultsKeys.isLoggedIn == true else {
       return .send(.changeVisitedState(.auth))
     }
     
-    guard remainingTime == .none else { // 시간이 남아있음
+    guard expiredTime == .none else { // 시간이 남아있음
       return .send(.changeVisitedState(.remainTime))
     }
     

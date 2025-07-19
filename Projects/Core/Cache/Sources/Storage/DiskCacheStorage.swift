@@ -86,15 +86,15 @@ extension DiskCacheStorage {
   /// - Parameters:
   ///   - key: 제거할 캐시의 key
   ///   - withDirectory: true인 경우 디렉토리 전체를 삭제
-  static func removeDiskCache(for key: Key, withDirectory: Bool = false) async throws {
-    try await Task.detached(priority: .background) {
+  static func removeDiskCache(for key: Key, withDirectory: Bool = false) {
+    Task.detached(priority: .background) {
       if withDirectory {
         try await removeAllInDirectory(for: key)
       } else {
         let fileURL = try cacheFileURL(for: key)
         try await removeFile(at: fileURL)
       }
-    }.value
+    }
   }
   
   /// 특정 디렉토리 내의 만료된 캐시들을 삭제합니다.

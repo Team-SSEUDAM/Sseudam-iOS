@@ -21,12 +21,12 @@ final class MemoryCacheStorage<Key: Hashable, Value: Codable & Sendable> {
     return entry.isExpired ? nil : entry
   }
   
-  func remove(forKey key: Key) throws {
+  func remove(forKey key: Key) {
     storage.removeValue(forKey: key)
   }
   
   // async 키워드도 제거 가능
-  func removeAll() throws {
+  func removeAll() {
     storage.removeAll()
   }
   

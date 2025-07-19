@@ -84,11 +84,21 @@ extension MyPetGrowthListFeature {
     return .fetchCatCards(catCards)
   }
   
-  // 실제 구현 시 사용할 함수
   fileprivate func fetchGrowthRecordsAction(with seasonData: PetSeasonInfoEntity) -> Action {
-    // 실제 구현 로직
-    let growthRecords: [GrowthRecord] = [] // 실제 데이터 처리
+    let catCards = seasonData.seasonPetInfo.map { item -> CatCard in
+      let imageURL = CatImageSet.imageURL(level: item.levelType, type: item.season)
+      return .init(isLocked: item.isLocked, imageURL: imageURL)
+    }
+    
+    let growthRecords = seasonData.seasonPetInfo.enumerated().map { index, item -> GrowthRecord in
+      return .init(
+        catCard: catCards[index],
+        levelType: item.levelType,
+        goalStamp: item.needPoint,
+        nickname: item.nickname,
+        createdAt: item.createdAt
+      )
+    }
     return .fetchGrowthRecords(growthRecords)
   }
 }
-

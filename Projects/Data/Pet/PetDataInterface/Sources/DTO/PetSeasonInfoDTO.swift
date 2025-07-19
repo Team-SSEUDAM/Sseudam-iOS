@@ -35,7 +35,8 @@ public extension PetSeasonInfoDTO {
         needPoint: item.point,
         levelType: item.levelType,
         isLocked: item.isLocked,
-        season: item.season
+        season: item.season,
+        createdAt: item.createdAt
       )
     }
     return PetSeasonInfoEntity(growthEntity)

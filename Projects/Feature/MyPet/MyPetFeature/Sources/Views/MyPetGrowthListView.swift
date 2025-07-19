@@ -68,7 +68,7 @@ public struct BigBottomSheetContentView: View {
       // 성장 기록 리스트 (스크롤 가능)
       ScrollView(.vertical, showsIndicators: false) {
         VStack {
-//          ForEach(growthRecords) { GrowthRecordCell(record: $0) }
+          ForEach(store.growthRecords) { GrowthRecordCell(record: $0) }
         }
       }
     }

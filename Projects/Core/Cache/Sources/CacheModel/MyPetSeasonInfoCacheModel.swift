@@ -24,18 +24,21 @@ public struct PetGrowthCacheModel: Sendable, Equatable, Codable {
   public let levelType: String
   public let isLocked: Bool
   public let season: String
+  public let createdAt: String
   
   public init(
     nickname: String,
     needPoint: Int,
     levelType: String,
     isLocked: Bool,
-    season: String
+    season: String,
+    createdAt: String
   ) {
     self.nickname = nickname
     self.needPoint = needPoint
     self.levelType = levelType
     self.isLocked = isLocked
     self.season = season
+    self.createdAt = createdAt
   }
 }

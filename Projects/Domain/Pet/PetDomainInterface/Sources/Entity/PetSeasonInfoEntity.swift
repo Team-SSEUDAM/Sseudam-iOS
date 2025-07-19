@@ -37,19 +37,22 @@ public struct PetGrowthEntity: Sendable, Equatable {
   public let levelType: CatLevel /// 해당 레벨의 타입
   public let isLocked: Bool /// 해당 레벨이 잠겨있는지 여부
   public let season: CatType /// 현재 시즌 이름 (ex. `basic`)
+  public let createdAt: String
   
   public init(
     nickname: String,
     needPoint: Int,
     levelType: String,
     isLocked: Bool,
-    season: String
+    season: String,
+    createdAt: String
   ) {
     self.nickname = nickname
     self.needPoint = needPoint
     self.levelType = CatLevel(rawValue: levelType) ?? .level1
     self.isLocked = isLocked
     self.season = CatType(rawValue: season) ?? ._2025_07
+    self.createdAt = createdAt
   }
   
   public init(
@@ -60,7 +63,8 @@ public struct PetGrowthEntity: Sendable, Equatable {
       needPoint: cacheModel.needPoint,
       levelType: cacheModel.levelType,
       isLocked: cacheModel.isLocked,
-      season: cacheModel.season
+      season: cacheModel.season,
+      createdAt: cacheModel.createdAt
     )
   }
   
@@ -70,7 +74,8 @@ public struct PetGrowthEntity: Sendable, Equatable {
       needPoint: data.needPoint,
       levelType: data.levelType.rawValue,
       isLocked: data.isLocked,
-      season: data.season.rawValue
+      season: data.season.rawValue,
+      createdAt: data.createdAt
     )
   }
 }

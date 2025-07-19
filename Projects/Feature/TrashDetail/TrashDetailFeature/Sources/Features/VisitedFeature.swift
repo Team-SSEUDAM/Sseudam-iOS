@@ -105,7 +105,7 @@ public struct VisitedFeature {
       switch action {
         
       case .initialVisitedData:
-        state.visitedState = .unknown
+        state.visitedState = .notDetermine
         return .merge([
           .send(.timer(.timerCancel(state.trashSpotId?.description))), // 타이머 종료
           .send(.changeVisitedButtonText(remainingTime: nil)), // 버튼 텍스트 초기화
@@ -145,10 +145,10 @@ public struct VisitedFeature {
         guard state.visitedState == .enableVisit else {
           return .send(.disableVisit)
         }
-        
         guard let spotId = state.trashSpotId else {
           return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
         }
+        state.visitedState = .notDetermine
         return requestVisited(spotId: spotId)
         
       case let .requestVisitResult(.success(result)):
@@ -168,8 +168,7 @@ public struct VisitedFeature {
         state.checkComplete = true
         return handleExistRemaingTime(data: result, spotId: state.trashSpotId)
         
-      case let .checkRemaingTimeResult(.failure(error)):
-        print(error.localizedDescription)
+      case .checkRemaingTimeResult(.failure):
         state.checkComplete = true
         return .send(.checkEnableVisit)
         
@@ -260,7 +259,7 @@ extension VisitedFeature {
       return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
     }
     guard let userId = UserDefaultsKeys.userId else {
-      return .send(.checkEnableVisit)
+      return .send(.checkComplete)
     }
     return .run { send in
       do {

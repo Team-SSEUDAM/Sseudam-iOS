@@ -53,7 +53,7 @@ public struct TrashDetailFeature {
     case showToastMessage(String?)
     case showAlert(AlertType)
     /// 방문 완료
-    case visitedComplete(isFirst: Bool, detailData: TrashSpotDetail?)
+    case visitedComplete(isFirst: Bool)
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -61,7 +61,7 @@ public struct TrashDetailFeature {
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Scope(state: \.visited, action: \.visited) {
-      VisitedFeature() //._printChanges()
+      VisitedFeature()
     }
     
     Reduce {
@@ -107,14 +107,7 @@ public struct TrashDetailFeature {
         
         // MARK: - Send Delegate To Parent Feature
       case let .visitedComplete(isFirst):
-        return .send(
-          .delegate(
-            .visitedComplete(
-              isFirst: isFirst,
-              detailData: state.trashDetail
-            )
-          )
-        )
+        return .send(.delegate(.visitedComplete(isFirst: isFirst)))
         
       case let .showToastMessage(message):
         return .send(.delegate(.showToastMessage(message)))
@@ -142,7 +135,10 @@ public struct TrashDetailFeature {
   
   private func checkLoginState() -> Effect<Action> {
     if UserDefaultsKeys.isLoggedIn ?? false {
-      return .send(.visited(.checkRemaingTime))
+      return .merge([
+        .send(.visited(.checkEnableVisit)),
+        .send(.visited(.checkRemaingTime))
+      ])
     } else {
       return .none
     }

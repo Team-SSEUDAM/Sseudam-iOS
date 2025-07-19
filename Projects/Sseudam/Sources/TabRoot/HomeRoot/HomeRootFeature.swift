@@ -96,8 +96,11 @@ struct HomeRootFeature {
         return .none
         
       case .checkLoggedin:
+        let isNeedRefreshDetail = state.isPresentDetail
         return .run { send in
-          await send(.trashDetail(.checkLoggedin))
+          if isNeedRefreshDetail {
+            await send(.trashDetail(.checkLoggedin))
+          }
         }
         
         // MARK: - Receive VisitComplete Delegate Action
@@ -105,14 +108,7 @@ struct HomeRootFeature {
         switch action {
         case .delegate(.dismiss):
           state.modal = nil
-          if let detailData = state.tempSavingDetailData {
-            return .merge([
-              .send(.hiddenTabBar(true)),
-              .send(.presentDetail(true, id: detailData.id))
-            ])
-          } else {
-            return .none
-          }
+          return .none
         default: return .none
         }
         
@@ -131,6 +127,8 @@ struct HomeRootFeature {
             return .send(.hiddenTabBar(isHidden))
         }
         
+        // MARK: - Receive TrashDetail Delegate Action
+        
       case let .trashDetail(.delegate(action)):
         switch action {
         case let .reportButtonTapped(detailData):
@@ -145,13 +143,8 @@ struct HomeRootFeature {
         case let .showAlert(type):
           return .send(.presentAlert(type))
           
-        case let .visitedComplete(isFirst, detailData):
-          state.tempSavingDetailData = detailData
-          return .run { @MainActor send in
-            send(.home(.receiveTrashDetailFromRoot(detailData)))
-            send(.presentVisitedComplete(isFirst: isFirst))
-            // 인증 화면
-          }
+        case let .visitedComplete(isFirst):
+          return .send(.presentVisitedComplete(isFirst: isFirst))
           
         }
         

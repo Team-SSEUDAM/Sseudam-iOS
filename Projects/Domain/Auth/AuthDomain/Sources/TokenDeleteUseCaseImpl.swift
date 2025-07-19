@@ -16,6 +16,8 @@ extension TokenDeleteUseCase {
     .init {
       UserDefaultsKeys.isLoggedIn = false
       UserDefaultsKeys.accessToken = nil
+      UserDefaultsKeys.userId = nil
+      UserDefaultsKeys.username = nil
       KeyChainService.delete(forKey: .refreshToken)
     }
   }

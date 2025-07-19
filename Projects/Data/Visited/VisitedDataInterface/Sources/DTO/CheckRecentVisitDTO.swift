@@ -15,7 +15,7 @@ import Utility
 public struct CheckRecentVisitDTO: DTO {
   public let spotId: Int
   public let userId: Int
-  public let lastVisitedAt: String
+  public let lastVisitedAt: String?
   
   public init(spotId: Int, userId: Int, lastVisitedAt: String) {
     self.spotId = spotId
@@ -24,7 +24,7 @@ public struct CheckRecentVisitDTO: DTO {
   }
   
   public func toEntity() throws -> CheckRecentVisitEntity {
-    let lastVisitedAt: Date? = lastVisitedAt.toDateFromISO8601
+    let lastVisitedAt: Date? = lastVisitedAt?.toDateFromISO8601
     let expiredAt: Date? = lastVisitedAt?.addingTimeInterval(300)
     var isExpired: Bool = true
     if let expiredAt = expiredAt {

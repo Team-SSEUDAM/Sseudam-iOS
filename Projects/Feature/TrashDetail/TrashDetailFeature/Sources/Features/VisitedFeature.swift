@@ -226,7 +226,11 @@ public struct VisitedFeature {
         switch action {
         case let .changeVisitedButtonText(remainingTime):
           return .send(.changeVisitedButtonText(remainingTime: remainingTime))
+          
+        case .checkEnableVisit:
+          return .send(.checkEnableVisit)
         }
+        
       default: return .none
         
         
@@ -377,7 +381,6 @@ extension VisitedFeature {
       if let user = user,
          let target = target {
         let distance = user.distance(to: target)
-        print("distance: \(distance)")
         let isWithin5m = distance <= 10
         await send(.storedWithinDistance(isWithin5m))
       } else {

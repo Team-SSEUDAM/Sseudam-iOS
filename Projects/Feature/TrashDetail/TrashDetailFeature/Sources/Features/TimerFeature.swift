@@ -53,6 +53,7 @@ public struct TimerFeature {
   
   public enum Delegate: Equatable {
     case changeVisitedButtonText(remainingTime: String?)
+    case checkEnableVisit
   }
   
   public var body: some ReducerOf<Self> {
@@ -77,7 +78,7 @@ public struct TimerFeature {
       case .initialTimerState:
         state.expireTime = nil
         state.remainingTime = nil
-        return .none
+        return .cancel(id: state.trashSpotId?.description)
         
       case .isTimerOver:
         saveRemainingTime(key: state.trashSpotId, value: nil)
@@ -112,7 +113,6 @@ extension TimerFeature {
   }
   
   private func timerTick(spotId: String, cooldowns: Date?) -> Effect<Action> {
-//    print("⏱️", #function)
     guard let expireTime = cooldowns else {
       return .cancel(id: TimerID.cooldown(spotId))
     }
@@ -121,6 +121,7 @@ extension TimerFeature {
       return .concatenate([
         .send(.isTimerOver),
         .send(.initialTimerState),
+        .send(.delegate(.checkEnableVisit)),
         .cancel(id: TimerID.cooldown(spotId))
       ])
     } else {

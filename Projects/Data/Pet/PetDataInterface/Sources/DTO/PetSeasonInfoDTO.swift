@@ -17,7 +17,7 @@ public struct PetSeasonInfoDTO: DTO {
   public let list: [List]
   
   public struct List: Codable, Sendable {
-    public let userID: Int
+    public let userId: Int
     public let nickname: String
     public let point: Int
     public let levelType: String

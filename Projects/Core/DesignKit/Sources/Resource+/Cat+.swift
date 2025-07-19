@@ -56,7 +56,7 @@ public extension DesignKitImages {
   ///   - level: 레벨 (1-5)
   ///   - interaction: 상호작용 여부
   init(type: CatType, level: CatLevel, interaction: Bool) {
-    let imageName = "type:\(type.rawValue)_\(level.rawInt), interaction:\(interaction)"
+    let imageName = "type:\(type.rawString)_\(level.rawInt), interaction:\(interaction)"
     self.init(name: imageName)
   }
   
@@ -81,5 +81,5 @@ public struct CatImageSet {
     return DesignKitImages(name: name).swiftUIImage
   }
   
-  public static func imageURL(level: CatLevel, type: CatType, interaction: Bool = true) -> String { "type:\(type.rawValue)_\(level.rawInt), interaction:\(interaction)" }
+  public static func imageURL(level: CatLevel, type: CatType, interaction: Bool = true) -> String { "type:\(type.rawString)_\(level.rawInt), interaction:\(interaction)" }
 }

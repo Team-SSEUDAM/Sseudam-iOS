@@ -14,6 +14,7 @@ import HomeFeature
 import MyPetFeature
 import TrashDetailFeature
 import AuthFeature
+import AttendanceFeature
 
 @Reducer
 struct SseudamFeature {
@@ -28,11 +29,13 @@ struct SseudamFeature {
     var mypageRoot: MyPageRootFeature.State = .init()
     var authFlow: AuthFlowFeature.State? = nil
     var presentAlert: AlertType? = nil
+    @Presents var modal: Modal.State?
   }
   
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case selectTab(TabBarItem)
+    case onAppear
     
     case homeRoot(HomeRootFeature.Action)
     case myPetRoot(MyPetRootFeature.Action)
@@ -44,6 +47,13 @@ struct SseudamFeature {
     case closeAlertAction
     case acceptAlertAction
     case dismissAlert(Bool)
+    
+    case modal(PresentationAction<Modal.Action>)
+  }
+  
+  @Reducer(state: .equatable, action: .equatable)
+  enum Modal {
+    case attendance(AttendanceFeature)
   }
   
   var body: some ReducerOf<Self> {
@@ -61,6 +71,10 @@ struct SseudamFeature {
       switch action {
       case let .selectTab(tab):
         state.selectedTab = tab
+        return .none
+        
+      case .onAppear:
+        state.modal = .attendance(AttendanceFeature.State())
         return .none
         
       case let .homeRoot(.delegate(.presentAlert(type))):
@@ -118,6 +132,7 @@ struct SseudamFeature {
     .ifLet(\.authFlow, action: \.authFlow) {
       AuthFlowFeature()
     }
+    .ifLet(\.$modal, action: \.modal)
   }
   
 }

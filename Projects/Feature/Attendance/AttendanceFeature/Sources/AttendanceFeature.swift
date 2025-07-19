@@ -17,12 +17,13 @@ public struct AttendanceFeature {
   
   @ObservableState
   public struct State: Equatable {
-    
+    public let attendanceStatus: AttendanceStatus = .success(day: 3)
     public init() {}
   }
 
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    case confirmButtonTapped
   }
 
   public var body: some ReducerOf<Self> {

@@ -14,6 +14,7 @@ import MyPetFeature
 import TrashDetailFeature
 import AuthFeature
 import UserDefaults
+import AttendanceFeature
 
 struct SseudamView: View {
   @Bindable var store: StoreOf<SseudamFeature> = Store(
@@ -63,6 +64,9 @@ struct SseudamView: View {
         )
       }
     }
+    .onAppear {
+      store.send(.onAppear)
+    }
     .ignoresSafeArea(edges: .bottom)
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in
       LoginView(store: store)
@@ -72,6 +76,9 @@ struct SseudamView: View {
     }
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.complete, action: \.authFlow.modal.complete)) { store in
       SignUpCompleteView(store: store)
+    }
+    .fullScreenCover(item: $store.scope(state: \.modal?.attendance, action: \.modal.attendance)) { store in
+      AttendanceView(store: store)
     }
     .transaction { transaction in
       transaction.disablesAnimations = true

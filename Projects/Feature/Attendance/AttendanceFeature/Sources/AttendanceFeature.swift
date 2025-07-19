@@ -24,12 +24,26 @@ public struct AttendanceFeature {
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case confirmButtonTapped
+    
+    case dismiss
+    case delegate(Delegate)
+  }
+  
+  public enum Delegate: Equatable {
+    case dismiss
   }
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
       switch action {
+        
+      case .confirmButtonTapped:
+        return .send(.dismiss)
+        
+      case .dismiss:
+        return .send(.delegate(.dismiss))
+        
         default: return .none
       }
     }

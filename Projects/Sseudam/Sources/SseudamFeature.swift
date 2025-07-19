@@ -126,6 +126,15 @@ struct SseudamFeature {
         state.presentAlert = nil
         return .none
         
+        // MARK: - Attendance
+      case let .modal(.presented(.attendance(action))):
+        switch action {
+        case .delegate(.dismiss):
+          state.modal = nil
+          return .none
+        default: return .none
+        }
+        
       default: return .none
       }
     }

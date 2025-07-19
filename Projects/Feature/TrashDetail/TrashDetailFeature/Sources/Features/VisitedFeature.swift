@@ -22,8 +22,6 @@ public struct VisitedFeature {
   public struct State: Equatable {
     public var visitedState: VisitedState = .notDetermine
     
-    public var isVisitedButtonEnable: Bool = false
-    
     public var visitedButtonState: PrimaryButtonState = .disabled
     
     public var visitedButtonText: String = "이 곳에 쓰레기 담기"
@@ -31,8 +29,6 @@ public struct VisitedFeature {
     public var trashSpotPoint: Coordinates? = nil
     /// 쓰레기통 ID
     public var trashSpotId: Int? = nil
-    
-    public var userLocation: Coordinates? = nil
     
     public var isDenyPermission: Bool = true
     
@@ -47,13 +43,10 @@ public struct VisitedFeature {
     case binding(BindingAction<State>)
     /// 이전에 남아있던 데이터 초기화
     case initialVisitedData
-    
+    /// 유저 위치 추적
     case fetchUserLocation
-    /// 유저 위치 저장
-    case storedUserLocation(Coordinates?)
     /// 쓰레기통 데이터 저장
     case setTrashSpotInfo(spotId: Int?, point: Coordinates?)
-    
    
     /// 유저와 쓰레기통 간의 거리 확인
     case checkDistance(userLocation: Coordinates?)
@@ -63,25 +56,26 @@ public struct VisitedFeature {
     case checkEnableVisit
     /// 방문하기 버튼 탭
     case visitButtonTapped
-    
+    /// 방문 처리 결과
     case requestVisitResult(Result<VisitedCompleteEntity, NetworkError>)
     /// 최근 방문 여부 확인
     case checkRemaingTime
-    
+    /// 최근 방문 여부 조회 결과
     case checkRemaingTimeResult(Result<CheckRecentVisitEntity, NetworkError>)
     /// 인증하기 성공
     case successVisit(date: Date?)
-    /// 인증 불가능 - 버튼 탭 시
+    /// 방문 인증  불가능 처리 - 버튼 탭 시
     case disableVisit
     /// 방문하기 상태 변경
     case changeVisitedState(VisitedState)
-    
     /// 방문하기 버튼 텍스트 변경
     case changeVisitedButtonText(remainingTime: String?)
     /// 위치 권한 설정 여부
     case setLocationPermission(isDeny: Bool)
-    
+    /// 데이터 조회, 최근 인증 여부 조회 완료
     case checkComplete
+    
+    // MARK: - Delegate
     
     case visitedComplete(isFirst: Bool)
     case showToastMessage(String?)
@@ -106,6 +100,7 @@ public struct VisitedFeature {
     }
     
     BindingReducer()
+    
     Reduce { state, action in
       switch action {
         
@@ -188,7 +183,6 @@ public struct VisitedFeature {
       case .disableVisit:
         return handleDisableVisit(state: state.visitedState, time: state.timer.remainingTime)
         
-        
       case let .changeVisitedState(visitedState):
         state.visitedState = visitedState
         state.visitedButtonState = visitedState == .enableVisit ? .normal : .disabled
@@ -242,6 +236,7 @@ public struct VisitedFeature {
 
 extension VisitedFeature {
   
+  /// 방문 처리
   private func requestVisited(spotId: Int) -> Effect<Action> {
     guard let userId = UserDefaultsKeys.userId else {
       return .send(.showToastMessage("유저 정보를 조회할 수 없어요"))
@@ -281,7 +276,6 @@ extension VisitedFeature {
   
   /// 남은 시간 조회 후 로직
   private func handleExistRemaingTime(data: CheckRecentVisitEntity, spotId: Int?) -> Effect<Action> {
-    print("🤓", #function)
     if data.isExpired { // 방문 한 적 있음, 5분 지남
       return .send(.checkEnableVisit)
     } else {
@@ -295,8 +289,8 @@ extension VisitedFeature {
     }
   }
   
+  /// 방문 인증 실패 처리
   private func handleDisableVisit(state: VisitedState, time: TimeInterval? = nil) -> Effect<Action> {
-    print("🤓", #function)
     switch state {
     case .remainTime:
       if let time = time {
@@ -331,7 +325,6 @@ extension VisitedFeature {
     isDenyPermission: Bool,
     expiredTime: Date?
   ) -> Effect<Action> {
-    print("🤓", #function)
     guard UserDefaultsKeys.isLoggedIn == true else {
       return .send(.changeVisitedState(.auth))
     }
@@ -359,7 +352,6 @@ extension VisitedFeature {
 extension VisitedFeature {
   /// 유저 위치를 저장 및 권한 확인
   private func storedUserLocation(isDenyPermission: Bool) -> Effect<Action> {
-    print("🤓", #function)
     return .run { send in
       if let location = await LocationService.shared.userLocation {
         
@@ -376,7 +368,6 @@ extension VisitedFeature {
   }
   
   private func checkDistance(user: Coordinates?, target: Coordinates?) -> Effect<Action> {
-    print("🤓", #function)
     return .run { send in
       if let user = user,
          let target = target {

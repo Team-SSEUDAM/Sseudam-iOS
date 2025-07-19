@@ -21,6 +21,4 @@ public struct UserDefaultsKeys {
   @UserDefault("userId", default: nil)
   public static var userId: Int?
   
-  @UserDefault("visitedSpot", default: [:])
-  public static var visitedSpot: [String: Date]?
 }

@@ -40,8 +40,10 @@ public struct TimerFeature {
     case initialTimerState
     /// 타이머가 끝남
     case isTimerOver
-    
+    /// 타이머 취소
     case timerCancel(String?)
+    
+    // MARK: - Delegate
     
     case changeVisitedButtonText(remainingTime: String?)
     case delegate(Delegate)
@@ -81,7 +83,6 @@ public struct TimerFeature {
         return .cancel(id: state.trashSpotId?.description)
         
       case .isTimerOver:
-        saveRemainingTime(key: state.trashSpotId, value: nil)
         return .send(.changeVisitedButtonText(remainingTime: nil))
         
       case let .timerCancel(id):
@@ -93,7 +94,6 @@ public struct TimerFeature {
       default: return .none
       }
       
-      
     }
   }
   
@@ -101,7 +101,7 @@ public struct TimerFeature {
 
 extension TimerFeature {
   private func startTimer(spotId: String?) -> Effect<Action> {
-    print("⏱️", #function)
+//    print("⏱️", #function)
     guard let spotId = spotId else { return .none }
     return .run { send in
         while true {
@@ -136,20 +136,5 @@ extension TimerFeature {
     let minutes = Int(time) / 60
     let seconds = Int(time) % 60
     return String(format: "%d:%02d", minutes, seconds)
-  }
-  
-  
-  /// UserDefaults에 저장
-  /// value가 nil일 경우 삭제
-  private func saveRemainingTime(key: String?, value: Date?) {
-    print("🤓", #function)
-    guard let key = key else { return }
-    var dict = UserDefaultsKeys.visitedSpot ?? [:]
-    if let value = value {
-      dict[key] = value
-    } else {
-      dict.removeValue(forKey: key)
-    }
-    UserDefaultsKeys.visitedSpot = dict
   }
 }

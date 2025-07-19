@@ -41,4 +41,13 @@ public struct PetInfoEntity: Sendable, Equatable {
       maxLevelStandard: cacheModel.goalPoint
     )
   }
+  
+  public func makeCacheModel() -> MyPetInfoCacheModel {
+    return MyPetInfoCacheModel(
+      nickname: self.nickname,
+      point: self.currentPoint,
+      levelType: self.levelType.rawValue,
+      maxLevelStandard: self.goalPoint
+    )
+  }
 }

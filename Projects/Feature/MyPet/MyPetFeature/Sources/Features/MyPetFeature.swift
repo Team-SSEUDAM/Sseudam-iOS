@@ -106,8 +106,7 @@ public struct MyPetFeature {
         switch result {
         case let .success(entity):
           state.myPetInfo = entity
-          /// TODO: - `GrowthListFeature`에 데이터 기반 레이아웃 호출
-          return .send(.petGrowthList(.fetchGrowthList(entity)))
+          return .send(.petGrowthList(.fetchPetSeasonInfo))
           
         case let .failure(error):
           state.myPetInfo = nil

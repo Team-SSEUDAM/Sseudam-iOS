@@ -10,8 +10,13 @@ import SwiftUI
 
 // MARK: - Enum Types
 public enum CatType: String, Sendable, CaseIterable {
-  case basic = "basic"
-  /// 추후 다른 타입들 추가 가능
+  case _2025_07 = "2025_07"
+  
+  public var rawString: String {
+    switch self {
+    case ._2025_07: return "basic"
+    }
+  }
 }
 
 public enum CatLevel: String, Sendable, CaseIterable {

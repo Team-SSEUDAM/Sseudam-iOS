@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Utility
 
 /// `DiskCacheStorage`는 디스크에 캐시 데이터를 저장하고 관리
 /// 모든 작업은 백그라운드에서 수행되어 메인 스레드를 블로킹하지 않습니다.

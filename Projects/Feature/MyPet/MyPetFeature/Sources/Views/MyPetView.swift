@@ -109,7 +109,7 @@ public struct MyPetView: View {
               asset: CatImageSet.imgae(
                 level: store.myPetInfo?.levelType,
                 interaction: store.isMyPetInteracted,
-                type: .basic
+                type: ._2025_07
               )
             )
             .resizable()

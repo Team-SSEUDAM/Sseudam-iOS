@@ -9,6 +9,7 @@
 import SwiftUI
 import ComposableArchitecture
 import DesignKit
+import Utility
 
 import PetDomainInterface
 
@@ -27,21 +28,29 @@ public struct MyPetGrowthListFeature {
   
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
-    case fetchGrowthList(PetInfoEntity)
+    case fetchPetSeasonInfo
+    case fetchPetSeasonInfoResult(Result<PetSeasonInfoEntity, NetworkError>)
     
     case fetchCatCards([CatCard])
+    case fetchGrowthRecords([GrowthRecord])
   }
+  
+  @Dependency(\.FetchPetSeasonInfoUseCase) var fetchPetSeasonInfoUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
       switch action {
-      case let .fetchGrowthList(petInfo):
-        /// TODO: - `CatType`도 외부에서 주입 가능하도록 변경해야함....!
-        return fetchGrowthList(with: petInfo, season: .basic)
         
-      case let .fetchCatCards(cards):
-        state.catCards = cards
+      case .fetchPetSeasonInfo:
+        return fetchGrowthList()
+        
+      case let .fetchCatCards(catCards):
+        state.catCards = catCards
+        return .none
+        
+      case let .fetchGrowthRecords(growthRecords):
+        state.growthRecords = growthRecords
         return .none
         
       default: return .none
@@ -51,18 +60,35 @@ public struct MyPetGrowthListFeature {
 }
 
 extension MyPetGrowthListFeature {
-  fileprivate func fetchGrowthList(
-    with petInfo: PetInfoEntity,
-    season: CatType
-  ) -> Effect<Action> {
-    let trasnformed = CatLevel.allCases.map { catLevel -> CatCard in
-      let catImage = CatImageSet.imageURL(level: catLevel, type: season)
-      return .init(
-        isLocked: petInfo.levelType.rawInt < catLevel.rawInt,
-        imageURL: catImage
-      )
+  fileprivate func fetchGrowthList() -> Effect<Action> {
+    return .run { send in
+      do {
+        let entity = try await fetchPetSeasonInfoUseCase.execute()
+        
+        // MARK: - 여기 병합 시켜야함....
+        await send(fetchCatCardsAction(with: entity))
+        await send(fetchGrowthRecordsAction(with: entity))
+      } catch is CancellationError {
+        await send(.fetchPetSeasonInfoResult(.failure(.taskCancelled)))
+      } catch {
+        await send(.fetchPetSeasonInfoResult(.failure(.customError(message: error.localizedDescription))))
+      }
     }
-    return .send(.fetchCatCards(trasnformed))
+  }
+  
+  fileprivate func fetchCatCardsAction(with seasonData: PetSeasonInfoEntity) -> Action {
+    let catCards = seasonData.seasonPetInfo.map { item -> CatCard in
+      let imageURL = CatImageSet.imageURL(level: item.levelType, type: item.season)
+      return .init(isLocked: item.isLocked, imageURL: imageURL)
+    }
+    return .fetchCatCards(catCards)
+  }
+  
+  // 실제 구현 시 사용할 함수
+  fileprivate func fetchGrowthRecordsAction(with seasonData: PetSeasonInfoEntity) -> Action {
+    // 실제 구현 로직
+    let growthRecords: [GrowthRecord] = [] // 실제 데이터 처리
+    return .fetchGrowthRecords(growthRecords)
   }
 }
-  
+

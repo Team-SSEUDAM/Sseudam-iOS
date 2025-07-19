@@ -14,6 +14,7 @@ import Utility
 
 public struct TrashDetailView: View {
   @Bindable var store: StoreOf<TrashDetailFeature>
+  @Environment(\.scenePhase) private var scenePhase
   
   public init(store: StoreOf<TrashDetailFeature>) {
     self.store = store
@@ -62,6 +63,16 @@ public struct TrashDetailView: View {
     .task { @MainActor in
       for await _ in LocationService.shared.userLocationStream {
         store.send(.visited(.fetchUserLocation))
+      }
+    }
+    .onChange(of: scenePhase) { _, newValue in
+      switch newValue {
+      case .active:
+        LocationService.shared.startTracking()
+      case .background:
+        LocationService.shared.stopTracking()
+      default:
+        break
       }
     }
   }

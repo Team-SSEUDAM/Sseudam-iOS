@@ -20,7 +20,7 @@ public struct VisitedFeature {
   
   @ObservableState
   public struct State: Equatable {
-    public var visitedState: VisitedState = .far
+    public var visitedState: VisitedState = .notDetermine
     
     public var isVisitedButtonEnable: Bool = false
     
@@ -38,6 +38,8 @@ public struct VisitedFeature {
     
     public var isWithinDistance: Bool = false // 5m 범위 내에 있는지
     
+    public var checkComplete: Bool = false
+    
     public var timer: TimerFeature.State = .init()
   }
   
@@ -51,8 +53,6 @@ public struct VisitedFeature {
     case storedUserLocation(Coordinates?)
     /// 쓰레기통 데이터 저장
     case setTrashSpotInfo(spotId: Int?, point: Coordinates?)
-    /// 남아있는 방문 인증 정보 확인
-    case checkSavedVisitedData
     
    
     /// 유저와 쓰레기통 간의 거리 확인
@@ -65,6 +65,10 @@ public struct VisitedFeature {
     case visitButtonTapped
     
     case requestVisitResult(Result<VisitedCompleteEntity, NetworkError>)
+    /// 최근 방문 여부 확인
+    case checkRemaingTime
+    
+    case checkRemaingTimeResult(Result<CheckRecentVisitEntity, NetworkError>)
     /// 인증하기 성공
     case successVisit(date: Date?)
     /// 인증 불가능 - 버튼 탭 시
@@ -76,6 +80,8 @@ public struct VisitedFeature {
     case changeVisitedButtonText(remainingTime: String?)
     /// 위치 권한 설정 여부
     case setLocationPermission(isDeny: Bool)
+    
+    case checkComplete
     
     case visitedComplete(isFirst: Bool)
     case showToastMessage(String?)
@@ -92,6 +98,7 @@ public struct VisitedFeature {
   }
   
   @Dependency(\.VisitedUseCase) var visitedUseCase
+  @Dependency(\.CheckRecentVisitUseCase) var checkRecentVisitUseCase
   
   public var body: some ReducerOf<Self> {
     Scope(state: \.timer, action: \.timer) {
@@ -122,10 +129,7 @@ public struct VisitedFeature {
         state.trashSpotId = spotId
         state.trashSpotPoint = point
         state.visitedButtonState = .disabled
-        return checkRemainVisitedData(spotId: spotId) // 남은 시간 확인 이벤트 연결
-        
-      case .checkSavedVisitedData:
-        return .none
+        return .send(.checkRemaingTime)
         
       case let .checkDistance(userLocation):
         return checkDistance(user: userLocation, target: state.trashSpotPoint)
@@ -135,6 +139,7 @@ public struct VisitedFeature {
         return .none
         
       case .checkEnableVisit:
+        if !state.checkComplete { return .none }
         return checkEnableVisit(
           isWithinDistance: state.isWithinDistance,
           isDenyPermission: state.isDenyPermission,
@@ -152,21 +157,32 @@ public struct VisitedFeature {
         return requestVisited(spotId: spotId)
         
       case let .requestVisitResult(.success(result)):
-        // TODO: - 인증 화면 이동
         return .merge([
           .send(.visitedComplete(isFirst: result.isTodayFirst)),
           .send(.successVisit(date: result.visitedAt))
         ])
         
       case let .requestVisitResult(.failure(error)):
+        state.checkComplete = true
         return .send(.showToastMessage(error.localizedDescription))
+        
+      case .checkRemaingTime:
+        return checkRecentVisit(spotId: state.trashSpotId)
+        
+      case let .checkRemaingTimeResult(.success(result)):
+        state.checkComplete = true
+        return handleExistRemaingTime(data: result, spotId: state.trashSpotId)
+        
+      case let .checkRemaingTimeResult(.failure(error)):
+        print(error.localizedDescription)
+        state.checkComplete = true
+        return .send(.checkEnableVisit)
         
       case let .successVisit(date):
         // 만료 시간 저장
         let date: Date = date ?? .init()
         let expireTime = date.addingTimeInterval(300)
         let spotId = state.trashSpotId?.description
-        saveRemainingTime(key: spotId, value: expireTime)
         return .send(.timer(.startTimer(expireTime: expireTime, spotId: spotId)))
         
       case .disableVisit:
@@ -189,6 +205,10 @@ public struct VisitedFeature {
         
       case let .setLocationPermission(isDeny):
         state.isDenyPermission = isDeny
+        return .none
+        
+      case .checkComplete:
+        state.checkComplete = true
         return .none
         
       case let .showToastMessage(message):
@@ -214,7 +234,6 @@ public struct VisitedFeature {
     }
   }
   
-  
 }
 
 extension VisitedFeature {
@@ -233,6 +252,42 @@ extension VisitedFeature {
       } catch {
         return await send(.requestVisitResult(.failure(.customError(message: "방문 인증에 실패했어요"))))
       }
+    }
+  }
+  
+  /// 방문 여부 조회
+  private func checkRecentVisit(spotId: Int?) -> Effect<Action> {
+    guard let spotId = spotId else {
+      return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
+    }
+    guard let userId = UserDefaultsKeys.userId else {
+      return .send(.checkEnableVisit)
+    }
+    return .run { send in
+      do {
+        let data = try await checkRecentVisitUseCase.execute(userId, spotId)
+        return await send(.checkRemaingTimeResult(.success(data)))
+      } catch let error as NetworkError {
+        return await send(.checkRemaingTimeResult(.failure(error)))
+      } catch {
+        return await send(.checkRemaingTimeResult(.failure(.customError(message: "인증 정보를 불러오는데 실패했어요."))))
+      }
+    }
+  }
+  
+  /// 남은 시간 조회 후 로직
+  private func handleExistRemaingTime(data: CheckRecentVisitEntity, spotId: Int?) -> Effect<Action> {
+    print("🤓", #function)
+    if data.isExpired { // 방문 한 적 있음, 5분 지남
+      return .send(.checkEnableVisit)
+    } else {
+      guard let spotId = spotId?.description else {
+        return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
+      }
+      guard let expiredAt = data.expiredAt else {
+        return .send(.checkEnableVisit)
+      }
+      return .send(.timer(.startTimer(expireTime: expiredAt, spotId: spotId)))
     }
   }
   
@@ -260,6 +315,8 @@ extension VisitedFeature {
       return .send(.showAlert(.locationPermission))
     case .auth:
       return .send(.showAlert(.login))
+    case .notDetermine:
+      return .none
     }
     return .none
   }
@@ -290,43 +347,6 @@ extension VisitedFeature {
     return .send(.changeVisitedState(.enableVisit))
   }
   
-  private func checkRemainVisitedData(spotId: Int?) -> Effect<Action> {
-    print("🤓", #function)
-    guard let spotId = spotId else {
-      return .send(.showToastMessage("쓰레기통 정보를 찾을 수 없어요."))
-    }
-    
-    guard let savedVisitedData = UserDefaultsKeys.visitedSpot else {
-      return .send(.checkEnableVisit)
-    }
-    
-    let key = spotId.description
-    guard let savedExpireTime = savedVisitedData[key] else {
-      return .send(.checkEnableVisit)
-    }
-    
-    if let _ = savedExpireTime.remainingFromNow() {
-      return .send(.timer(.startTimer(expireTime: savedExpireTime, spotId: key)))
-    }  else {
-      saveRemainingTime(key: key, value: nil) // 삭제
-      return .send(.checkEnableVisit)
-    }
-
-  }
-  
-  /// UserDefaults에 저장
-  /// value가 nil일 경우 삭제
-  private func saveRemainingTime(key: String?, value: Date?) {
-    print("🤓", #function)
-    guard let key = key else { return }
-    var dict = UserDefaultsKeys.visitedSpot ?? [:]
-    if let value = value {
-      dict[key] = value
-    } else {
-      dict.removeValue(forKey: key)
-    }
-    UserDefaultsKeys.visitedSpot = dict
-  }
   
 }
 

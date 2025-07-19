@@ -23,6 +23,8 @@ public enum VisitedState {
   
   case auth
   
+  case notDetermine
+  
   var buttonEnable: Bool {
     self == .enableVisit
   }

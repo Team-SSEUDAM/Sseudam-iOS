@@ -18,6 +18,11 @@ public extension VisitedRepository {
         let parameter = VisitedParameter(user: userId)
         let endPoint = VisitedEndPoint.visited(parameter: parameter, spotId: spotId)
         return try await networker.execute(with: endPoint, timeout: 30).toEntity()
+      },
+      checkRecentVisit: { userId, spotId in
+        let parameter = VisitedParameter(user: userId)
+        let endPoint = VisitedEndPoint.checkRecentVisit(parameter: parameter, spotId: spotId)
+        return try await networker.execute(with: endPoint, timeout: 30).toEntity()
       }
     )
   }

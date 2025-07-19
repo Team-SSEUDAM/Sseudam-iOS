@@ -21,4 +21,14 @@ public struct VisitedEndPoint: Sendable {
       parameters: .query(parameter)
     )
   }
+  
+  public static func checkRecentVisit(parameter: VisitedParameter, spotId: Int) -> Endpoint<CheckRecentVisitDTO> {
+    let accessToken = UserDefaultsKeys.accessToken
+    return Endpoint(
+      headers: .authorization(accessToken),
+      method: .get,
+      path: "/visited/\(spotId)",
+      parameters: .query(parameter)
+    )
+  }
 }

@@ -39,6 +39,8 @@ struct SseudamFeature {
     case mypageRoot(MyPageRootFeature.Action)
     case authFlow(AuthFlowFeature.Action)
     
+    case requestLogin(isPresent: Bool)
+    
     case closeAlertAction
     case acceptAlertAction
     case dismissAlert(Bool)
@@ -89,7 +91,12 @@ struct SseudamFeature {
         return .run { send in
           await send(.mypageRoot(.checkLoggedin))
           await send(.myPetRoot(.checkLoggedin))
+          await send(.homeRoot(.checkLoggedin))
         }
+        
+      case let .requestLogin(isPresent):
+        state.authFlow = isPresent ? .init() : nil
+        return .send(.authFlow(.presentLogin(isPresent)))
         
         // MARK: - Alert
         
@@ -131,7 +138,7 @@ extension SseudamFeature {
       case (.login, .close):
         await send(.homeRoot(.closeAlertAction(type)))
       case (.login, .accept):
-        await send(.authFlow(.presentLogin(true)))
+        await send(.requestLogin(isPresent: true))
 
       default: return
       }

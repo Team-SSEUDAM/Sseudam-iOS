@@ -40,6 +40,8 @@ struct HomeRootFeature {
     case hiddenTabBar(Bool)
     case presentAlert(AlertType)
     
+    /// 로그인 후 상태 변경하기 위한 action
+    case checkLoggedin
     case modal(PresentationAction<ModalDestination.Action>)
     case delegate(Delegate)
   }
@@ -93,6 +95,12 @@ struct HomeRootFeature {
         state.modal = .visitedComplete(VisitedCompleteFeature.State(isFirstVisit: isFirst))
         return .none
         
+      case .checkLoggedin:
+        return .run { send in
+          await send(.trashDetail(.checkLoggedin))
+        }
+        
+        // MARK: - Receive VisitComplete Delegate Action
       case let .modal(.presented(.visitedComplete(action))):
         switch action {
         case .delegate(.dismiss):

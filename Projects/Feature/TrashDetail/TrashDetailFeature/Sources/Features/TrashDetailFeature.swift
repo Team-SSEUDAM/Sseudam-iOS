@@ -9,6 +9,7 @@
 import ComposableArchitecture
 import TrashSpotDomainInterface
 import Utility
+import UserDefaults
 import DesignKit
 
 @Reducer
@@ -38,6 +39,9 @@ public struct TrashDetailFeature {
     case emptyTrashData(Bool)
     case fetchTrashDetail(id: Int)
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
+    
+    /// 로그인 후 상태 변경하기 위한 action
+    case checkLoggedin
     
     case showToastMessage(String?)
     case showAlert(AlertType)
@@ -98,6 +102,9 @@ public struct TrashDetailFeature {
         state.trashDetail = nil
         return .send(.visited(.initialVisitedData))
         
+      case .checkLoggedin:
+        return checkLoginState()
+        
         // MARK: - Send Delegate To Parent Feature
       case let .visitedComplete(isFirst):
         return .send(
@@ -130,6 +137,14 @@ public struct TrashDetailFeature {
         
         default: return .none
       }
+    }
+  }
+  
+  private func checkLoginState() -> Effect<Action> {
+    if UserDefaultsKeys.isLoggedIn ?? false {
+      return .send(.visited(.checkRemaingTime))
+    } else {
+      return .none
     }
   }
   

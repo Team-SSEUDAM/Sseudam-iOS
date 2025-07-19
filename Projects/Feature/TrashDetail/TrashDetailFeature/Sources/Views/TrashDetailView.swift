@@ -11,7 +11,6 @@ import ComposableArchitecture
 import DesignKit
 import TrashSpotDomainInterface
 import Utility
-import DotLottie
 
 public struct TrashDetailView: View {
   @Bindable var store: StoreOf<TrashDetailFeature>

@@ -118,7 +118,6 @@ public struct LoginFeature {
       if data.isTempToken {
         return await send(.presentSignUp)
       } else {
-//        return await send(.delegate(.complete))
         return await send(.fetchUserInfo)
       }
     }

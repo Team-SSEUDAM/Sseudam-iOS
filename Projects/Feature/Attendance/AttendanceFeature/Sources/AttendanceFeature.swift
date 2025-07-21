@@ -6,7 +6,9 @@
 //  Created by Jiyeon
 //
 
+import Foundation
 import ComposableArchitecture
+import DesignKit
 
 @Reducer
 public struct AttendanceFeature {
@@ -17,14 +19,17 @@ public struct AttendanceFeature {
   
   @ObservableState
   public struct State: Equatable {
-    public let attendanceStatus: AttendanceStatus = .success(day: 3)
-    public let continuitityCount: Int = 2
-    public let isContinuity: Bool = false
+    public var attendanceStatus: AttendanceStatus = .success(day: 3)
+    public var continuityCount: Int = 2
+    public var isContinuity: Bool = false
+    public var toastMessage: AttributedString? = nil
     public init() {}
   }
 
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    case onAppear
+    case showToastMessage(AttributedString?)
     case confirmButtonTapped
     
     case dismiss
@@ -39,6 +44,12 @@ public struct AttendanceFeature {
     BindingReducer()
     Reduce { state, action in
       switch action {
+      case .onAppear:
+        return sseudamToast(continuityCnt: state.continuityCount)
+        
+      case let .showToastMessage(msg):
+        state.toastMessage = msg
+        return .none
         
       case .confirmButtonTapped:
         return .send(.dismiss)
@@ -49,5 +60,18 @@ public struct AttendanceFeature {
         default: return .none
       }
     }
+  }
+  
+  private func sseudamToast(continuityCnt: Int) -> Effect<Action> {
+    let point = continuityCnt == 5 ? "5쓰담" : "2쓰담"
+    var attributed: AttributedString {
+      var sseudam = AttributedString(point)
+      var text = AttributedString("이 적립됐어요!")
+      sseudam.foregroundColor = ColorSet.Text.InverseAccent
+      text.foregroundColor = ColorSet.Text.Inverse
+      sseudam.append(text)
+      return sseudam
+    }
+    return .send(.showToastMessage(attributed))
   }
 }

@@ -6,6 +6,7 @@
 //  Created by Jiyeon
 //
 
+import Foundation
 import SwiftUI
 import ComposableArchitecture
 import DesignKit
@@ -32,6 +33,9 @@ public struct AttendanceView: View {
         .padding(.Number16)
       }
     }
+    .onAppear {
+      store.send(.onAppear)
+    }
   }
   
   @ViewBuilder
@@ -42,17 +46,26 @@ public struct AttendanceView: View {
   
   @ViewBuilder
   private var attendanceStateView: some View {
-    VStack(spacing: .Number24){
-      Spacer()
-      VStack(spacing: .Number16) {
-        titleView
-        Text(store.attendanceStatus.description)
-          .multilineTextAlignment(.center)
-          .font(FontSet.Body.body3)
-          .foregroundStyle(ColorSet.Text.Secondary)
+    ZStack{
+      VStack(spacing: .Number24){
+        Spacer()
+        VStack(spacing: .Number16) {
+          titleView
+          Text(store.attendanceStatus.description)
+            .multilineTextAlignment(.center)
+            .font(FontSet.Body.body3)
+            .foregroundStyle(ColorSet.Text.Secondary)
+        }
+        AttendanceTrackerView(continuityCount: store.continuityCount, isContinuing: store.isContinuity)
+        Spacer()
       }
-      AttendanceTrackerView(continuityCount: store.continuitityCount, isContinuing: store.isContinuity)
-      Spacer()
+      VStack {
+        Spacer()
+        SnackBar(attributedMessage: $store.toastMessage) {
+          store.send(.showToastMessage(nil))
+        }
+      }
+      .padding(.horizontal, .Number16)
     }
   }
   

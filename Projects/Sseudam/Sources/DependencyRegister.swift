@@ -151,5 +151,9 @@ struct DependencyRegister {
     CheckPetInfoUseCaseRegister {
       CheckPetInfoUseCase.live(repository: petRepository)
     }
+    
+    FetchPetSeasonInfoUseCaseRegister {
+      FetchPetSeasonInfoUseCase.live(repository: petRepository)
+    }
   }
 }

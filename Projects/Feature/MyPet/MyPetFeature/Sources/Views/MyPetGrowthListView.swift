@@ -7,27 +7,23 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 import DesignKit
 
 public struct BigBottomSheetContentView: View {
-  // 샘플 데이터
-  
-  private let catCards: [CatCard]
-  private let growthRecords: [GrowthRecord]
+  @Bindable var store: StoreOf<MyPetGrowthListFeature>
   
   @Binding private var startBottomSheetInsideScroll: Bool
   @Binding private var bottomSheetDragEnabled: Bool
   
   public init(
-    catCards: [CatCard],
-    growthRecords: [GrowthRecord],
+    store: StoreOf<MyPetGrowthListFeature>,
     startBottomSheetInsideScroll: Binding<Bool>,
     bottomSheetDragEnabled: Binding<Bool>
   ) {
-    self.catCards = catCards
-    self.growthRecords = growthRecords
     self._startBottomSheetInsideScroll = startBottomSheetInsideScroll
     self._bottomSheetDragEnabled = bottomSheetDragEnabled
+    self.store = store
   }
   
   public var body: some View {
@@ -35,7 +31,7 @@ public struct BigBottomSheetContentView: View {
       // 고양이 카드 가로 스크롤
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: .Number12) {
-          ForEach(catCards) { CatCardCell(card: $0) }
+          ForEach(store.catCards) { CatCardCell(card: $0) }
         }
         .padding(.horizontal, .Number16)
         .padding(.vertical, .Number12)
@@ -72,7 +68,7 @@ public struct BigBottomSheetContentView: View {
       // 성장 기록 리스트 (스크롤 가능)
       ScrollView(.vertical, showsIndicators: false) {
         VStack {
-          ForEach(growthRecords) { GrowthRecordCell(record: $0) }
+          ForEach(store.growthRecords) { GrowthRecordCell(record: $0) }
         }
       }
     }

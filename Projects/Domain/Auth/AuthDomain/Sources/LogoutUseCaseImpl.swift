@@ -13,6 +13,7 @@ extension LogoutUseCase {
   public static func live(repository: AuthRepository) -> LogoutUseCase {
     .init {
       try await repository.logout()
+      try await repository.removeUserInfoCache()
     }
   }
 }

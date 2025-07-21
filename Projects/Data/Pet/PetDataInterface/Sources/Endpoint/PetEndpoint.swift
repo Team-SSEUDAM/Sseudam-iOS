@@ -21,4 +21,13 @@ public enum PetEndpoint: Sendable {
       parameters: .none
     )
   }
+  
+  public static func getPetSeasonInfo() -> Endpoint<PetSeasonInfoDTO> {
+    return Endpoint(
+      headers: .authorization(UserDefaultsKeys.accessToken),
+      method: .get,
+      path: "/pets/season",
+      parameters: .none
+    )
+  }
 }

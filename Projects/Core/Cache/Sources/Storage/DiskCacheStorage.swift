@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Utility
 
 /// `DiskCacheStorage`는 디스크에 캐시 데이터를 저장하고 관리
 /// 모든 작업은 백그라운드에서 수행되어 메인 스레드를 블로킹하지 않습니다.
@@ -85,15 +86,15 @@ extension DiskCacheStorage {
   /// - Parameters:
   ///   - key: 제거할 캐시의 key
   ///   - withDirectory: true인 경우 디렉토리 전체를 삭제
-  static func removeDiskCache(for key: Key, withDirectory: Bool = false) async throws {
-    try await Task.detached(priority: .background) {
+  static func removeDiskCache(for key: Key, withDirectory: Bool = false) {
+    Task.detached(priority: .background) {
       if withDirectory {
         try await removeAllInDirectory(for: key)
       } else {
         let fileURL = try cacheFileURL(for: key)
         try await removeFile(at: fileURL)
       }
-    }.value
+    }
   }
   
   /// 특정 디렉토리 내의 만료된 캐시들을 삭제합니다.

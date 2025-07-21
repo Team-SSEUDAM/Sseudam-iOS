@@ -23,17 +23,21 @@ public struct GrowthRecordCell: View {
       HStack(alignment: .center, spacing: .Number12) {
         // 썸네일 이미지
         RoundedRectangle(cornerRadius: .Number8)
-          .fill(record.isLocked ? ColorSet.Background.Tertiary : ColorSet.Gray._100)
+          .fill(record.catCard.isLocked ? ColorSet.Background.Tertiary : ColorSet.Gray._100)
           .frame(width: .Number64, height: .Number64)
           .overlay(
             Group {
-              if record.isLocked {
+              if record.catCard.isLocked {
                 Icon(
                   image: .lock,
                   size: .Number24,
                   renderingMode: .template,
                   color: ColorSet.Icon.Tertiary
                 )
+              } else {
+                CatImageSet.image(name: record.catCard.imageURL)
+                  .resizable()
+                  .scaledToFit()
               }
             }
           )
@@ -41,15 +45,18 @@ public struct GrowthRecordCell: View {
         // 정보 영역
         VStack(alignment: .leading, spacing: .Number4) {
           HStack(alignment: .center, spacing: .Number6) {
-            Badge(text: .constant(record.level), state: .primary)
+            Badge(
+              text: .constant("Lv.\(record.levelType.rawInt)"),
+              state: .primary
+            )
             
-            Text(record.title)
+            Text(record.nickname)
               .font(FontSet.Body.body2)
               .foregroundColor(ColorSet.Text.Primary)
               .lineLimit(1)
           }
           
-          if let date = record.date {
+          if let date = record.didAchieveDate {
             Text(date)
               .font(FontSet.Caption.caption1)
               .foregroundColor(ColorSet.Text.Tertiary)
@@ -61,12 +68,12 @@ public struct GrowthRecordCell: View {
       }
       
       // 쓰담 수
-      Text(record.stampCount)
+      Text("\(record.goalStamp)쓰담")
         .font(FontSet.Caption.caption1)
         .foregroundColor(ColorSet.Text.Tertiary)
     }
     .padding(.horizontal, .Number16)
     .padding(.vertical, .Number8)
-    .opacity(record.isLocked ? 0.4 : 1.0)
+    .opacity(record.catCard.isLocked ? 0.4 : 1.0)
   }
 }

@@ -21,7 +21,7 @@ public struct MyPetCardView: View {
   
   public var action: @Sendable () -> Void
   
-  @State private var progress: CGFloat = 0.0
+  private var progress: CGFloat { goalStamp > 0 ? CGFloat(currentStamps) / CGFloat(goalStamp) : 0.0 }
   
   public init(
     myPetInfo: PetInfoEntity?,
@@ -101,11 +101,5 @@ public struct MyPetCardView: View {
     .background(ColorSet.Background.Primary)
     .cornerRadius(.Number16)
     .elevation(level: .medium, cornerRadius: .Number16)
-    .onChange(of: myPetInfo) { _, _ in
-      withAnimation(.easeInOut(duration: 1.0)) {
-        print("Current Stamps: \(currentStamps), Goal Stamp: \(goalStamp) || Progress: \(progress)")
-        progress = goalStamp > 0 ? CGFloat(currentStamps) / CGFloat(goalStamp) : 0.0
-      }
-    }
   }
 }

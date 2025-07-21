@@ -76,7 +76,7 @@ public actor TwoTierCache<Key: CacheKey, Value: Codable & Sendable> {
       
       /// 초과분 제거 (메모리에서만)
       let toRemove = sortedEntries.prefix(entries.count - maxCount)
-      for (key, _) in toRemove { try memoryStorage.remove(forKey: key) }
+      for (key, _) in toRemove { memoryStorage.remove(forKey: key) }
       
     case let .fifo(maxCount):
       let allKeys = try memoryStorage.allKeys()
@@ -95,7 +95,7 @@ public actor TwoTierCache<Key: CacheKey, Value: Codable & Sendable> {
       
       /// 초과분 제거 (메모리에서만)
       let toRemove = sortedEntries.prefix(entries.count - maxCount)
-      for (key, _) in toRemove { try memoryStorage.remove(forKey: key) }
+      for (key, _) in toRemove { memoryStorage.remove(forKey: key) }
       
     case let .size(maxBytes): break
       /// TODO: 크기 기반 제거 정책 구현
@@ -163,19 +163,19 @@ public extension TwoTierCache {
   }
   
   /// Memory & Disk Cache에서 key에 해당하는 캐시 항목 제거
-  func remove(forKey key: Key) async {
+  func remove(forKey key: Key) {
     /// 1. Memory Cache에서 제거 (동기, 빠름)
-    try? memoryStorage.remove(forKey: key)
+    memoryStorage.remove(forKey: key)
     /// 2. Disk Cache에서 제거 (비동기, 백그라운드)
-    try? await DiskStorage.removeDiskCache(for: key)
+    DiskStorage.removeDiskCache(for: key)
   }
   
   /// Memory & Disk Cache 모두 초기화
-  func removeAll() async {
+  func removeAll() {
     /// 1. Memory Cache 초기화 (동기, 빠름)
-    try? memoryStorage.removeAll()
+    memoryStorage.removeAll()
     /// 2. Disk Cache 초기화 (비동기, 백그라운드)
-    try? await DiskStorage.removeDiskCache(for: cacheKey, withDirectory: true)
+    DiskStorage.removeDiskCache(for: cacheKey, withDirectory: true)
   }
   
   /// 만료된 캐시 항목 제거
@@ -225,7 +225,7 @@ public extension TwoTierCache {
   
   /// 메모리 캐시만 비우기 (디스크는 유지)
   func clearMemory() {
-    try? memoryStorage.removeAll()
+    memoryStorage.removeAll()
   }
   
   /// 캐시 항목 존재 여부 확인

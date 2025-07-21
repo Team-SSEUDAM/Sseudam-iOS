@@ -29,9 +29,7 @@ public struct LocationFeature {
   
   public enum Action: Equatable {
     case fetchCurrentLocation(Bool)
-    /// 유저의 현위치 가져오기
-    case fetchUserLocation
-    /// 유저 위치로 지도 이동
+    /// 유저의 현위치로 지도 이동
     case moveUserLocation
     /// 유저 위치 저장
     case storeUserLocation(Coordinates)
@@ -56,15 +54,11 @@ public struct LocationFeature {
       case let .fetchCurrentLocation(isRequest):
         state.isCurrentButtonTap = isRequest
         if isRequest {
-          return .send(.fetchUserLocation)
+          return .send(.moveUserLocation)
         } else {
           return .none
         }
-        
-      case .fetchUserLocation:
-        return .run { send in
-          await LocationService.shared.requestUserLocation()
-        }
+          
       case .moveUserLocation:
         return moveUserLocation(
           isCurrentButtonTapped: state.isCurrentButtonTap ,
@@ -78,6 +72,7 @@ public struct LocationFeature {
       case let .moveLocation(point):
         state.point = point
         return .none
+        
       case let .changeInitialMapLoad(isInitial):
         state.isInitialMapLoad = isInitial
         return .none
@@ -93,8 +88,7 @@ extension LocationFeature {
   
   private func moveUserLocation(isCurrentButtonTapped: Bool, isIntialLoad: Bool) -> Effect<Action> {
     return .run { send in
-      if let location = await LocationService.shared.userLocation {
-        let userLocation = Coordinates(latitude: location.0, longitude: location.1)
+      if let userLocation = await LocationService.shared.requestSingleLocation() {
         await send(.storeUserLocation(userLocation))
         await send(.moveLocation(userLocation))
         if isIntialLoad {

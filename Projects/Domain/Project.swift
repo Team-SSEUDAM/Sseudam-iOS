@@ -17,6 +17,7 @@ let project = Project.makeStaticLibraryProject(
     .Domain.Auth.Implement,
     .Domain.User.Implement,
     .Domain.TrashSpot.Implement,
-    .Domain.Pet.Implement
+    .Domain.Pet.Implement,
+    .Domain.Visited.Implement
   ]
 )

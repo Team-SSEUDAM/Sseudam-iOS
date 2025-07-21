@@ -30,5 +30,14 @@ public struct UserEndPoint: Sendable {
       path: "/users"
     )
   }
+  
+  public static func fetchUserInfo() -> Endpoint<UserInfoDTO> {
+    let accessToken = UserDefaultsKeys.accessToken
+    return Endpoint(
+      headers: .authorization(accessToken),
+      method: .get,
+      path: "/users/me"
+    )
+  }
 }
 

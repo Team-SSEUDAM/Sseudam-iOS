@@ -31,6 +31,7 @@ public struct HomeFeature {
     public var path = StackState<Path.State>()
     public var isPresentDetail: Bool = false
     public var toastMessage: String? = nil
+    public var isInitAppear: Bool = true
     public init() {}
   }
 
@@ -46,6 +47,7 @@ public struct HomeFeature {
     case presentAlert(AlertType)
     case hiddenReportButton(Bool)
     
+    case showReportView(detail: TrashSpotDetail?)
     case receiveTrashDetailFromRoot(TrashSpotDetail?)
     case moveToSetting
     case suggestionButtonTapped
@@ -70,11 +72,11 @@ public struct HomeFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
-        return .run { send in
-          await MainActor.run {
-            send(.location(.fetchUserLocation))
-          }
+        if state.isInitAppear {
+          state.isInitAppear = false
+          return .send(.location(.moveUserLocation))
         }
+        return .none
         
       case let .showToastMessage(message):
         state.toastMessage = message
@@ -86,7 +88,7 @@ public struct HomeFeature {
         return .send(.map(.requestMapBounds(isRequest)))
         
       case .location(.delegate(.denyLocationPermission)):
-        return .send(.delegate(.presentAlert(.locationPermission)))
+        return .send(.presentAlert(.locationPermission))
         
         // MARK: - Receive MapFeature delegate action
         
@@ -104,6 +106,11 @@ public struct HomeFeature {
         
       case let .hiddenReportButton(isHidden):
         state.isHiddenReportButton = isHidden
+        return .none
+        
+      case let .showReportView(detail):
+        guard let detail = detail else { return .none }
+        state.path.append(.reportView(ReportFeature.State(detail)))
         return .none
         
         // MARK: - Send Action to HomeRoot

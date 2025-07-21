@@ -43,11 +43,6 @@ public struct HomeView: View {
       .onAppear {
         store.send(.onAppear)
       }
-      .task { @MainActor in
-        for await _ in LocationService.shared.userLocationStream {
-          store.send(.location(.moveUserLocation))
-        }
-      }
     } destination: { store in
       switch store.case {
       case let .reportView(store):

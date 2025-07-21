@@ -34,6 +34,10 @@ import PetDomainInterface
 import PetDomain
 import PetData
 
+import VisitedDomainInterface
+import VisitedDomain
+import VisitedData
+
 import NetworkKit
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
@@ -46,6 +50,7 @@ struct DependencyRegister {
     let trashSpotRepository = TrashSpotRepository.live(networker: networker)
     let reportRepository = ReportRepository.live(networker: networker)
     let petRepository = PetRepository.live(networker: networker)
+    let visitedRepository = VisitedRepository.live(networker: networker)
     
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live
@@ -134,6 +139,10 @@ struct DependencyRegister {
       WithdrawalUseCase.live(repository: userReoository)
     }
     
+    FetchUserInfoUseCaseRegister {
+      FetchUserInfoUseCase.live(repository: userReoository)
+    }
+    
     // MARK: - Trash Spot
     
     FetchTrashSpotUseCaseRegister {
@@ -154,6 +163,15 @@ struct DependencyRegister {
     
     FetchPetSeasonInfoUseCaseRegister {
       FetchPetSeasonInfoUseCase.live(repository: petRepository)
+    }
+    // MARK: - Visited
+    
+    VisitedUseCaseRegister {
+      VisitedUseCase.live(repository: visitedRepository)
+    }
+    
+    CheckRecentVisitUseCaseRegister {
+      CheckRecentVisitUseCase.live(repository: visitedRepository)
     }
   }
 }

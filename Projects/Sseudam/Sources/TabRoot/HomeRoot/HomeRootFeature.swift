@@ -11,6 +11,8 @@ import ComposableArchitecture
 import HomeFeature
 import TrashDetailFeature
 import DesignKit
+import VisitedFeature
+import TrashSpotDomainInterface
 
 @Reducer
 struct HomeRootFeature {
@@ -20,6 +22,8 @@ struct HomeRootFeature {
     var home: HomeFeature.State = HomeFeature.State()
     var trashDetail: TrashDetailFeature.State? = nil
     var isPresentDetail: Bool = false
+    var tempSavingDetailData: TrashSpotDetail? = nil
+    @Presents var modal: ModalDestination.State?
   }
   
   enum Action: BindableAction, Equatable {
@@ -27,9 +31,18 @@ struct HomeRootFeature {
     case home(HomeFeature.Action)
     case trashDetail(TrashDetailFeature.Action)
     
+    case presentDetail(Bool, id: Int?)
+    case presentVisitedComplete(isFirst: Bool)
+    
     case closeAlertAction(AlertType)
     case acceptAlertAction(AlertType)
     
+    case hiddenTabBar(Bool)
+    case presentAlert(AlertType)
+    
+    /// 로그인 후 상태 변경하기 위한 action
+    case checkLoggedin
+    case modal(PresentationAction<ModalDestination.Action>)
     case delegate(Delegate)
   }
   
@@ -37,6 +50,12 @@ struct HomeRootFeature {
     case hiddenTabBar(Bool)
     case presentAlert(AlertType)
   }
+  
+  @Reducer(state: .equatable, action: .equatable)
+  enum ModalDestination {
+    case visitedComplete(VisitedCompleteFeature)
+  }
+  
   
   var body: some ReducerOf<Self> {
     BindingReducer()
@@ -58,30 +77,75 @@ struct HomeRootFeature {
         default: return .none
         }
         
+      case let .hiddenTabBar(isHidden):
+        return .send(.delegate(.hiddenTabBar(isHidden)))
+        
+      case let .presentAlert(type):
+        return .send(.delegate(.presentAlert(type)))
+        
+      case let .presentDetail(isPresent, id):
+        state.trashDetail = isPresent ? .init() : nil
+        state.isPresentDetail = isPresent
+        if isPresent {
+          return .send(.trashDetail(.showDetail(id: id)))
+        }
+        return .none
+        
+      case let .presentVisitedComplete(isFirst):
+        state.modal = .visitedComplete(VisitedCompleteFeature.State(isFirstVisit: isFirst))
+        return .none
+        
+      case .checkLoggedin:
+        let isNeedRefreshDetail = state.isPresentDetail
+        return .run { send in
+          if isNeedRefreshDetail {
+            await send(.trashDetail(.checkLoggedin))
+          }
+        }
+        
+        // MARK: - Receive VisitComplete Delegate Action
+      case let .modal(.presented(.visitedComplete(action))):
+        switch action {
+        case .delegate(.dismiss):
+          state.modal = nil
+          return .none
+        default: return .none
+        }
+        
+        
         // MARK: - Receive HomeFeature Delegate Action
         
       case let .home(.delegate(action)):
         switch action {
         case let .presentDetailView(isPresent, id):
-          state.trashDetail = isPresent ? .init() : nil
-          state.isPresentDetail = isPresent
-          if isPresent {
-            return .send(.trashDetail(.showDetail(id: id)))
-          }
-          return .none
+          return .send(.presentDetail(isPresent, id: id))
           
         case let .presentAlert(alert):
-          return .send(.delegate(.presentAlert(alert)))
-          
-        case let .needToHiddenTabBar(isHidden):
-          return .send(.delegate(.hiddenTabBar(isHidden)))
+          return .send(.presentAlert(alert))
+
+          case let .needToHiddenTabBar(isHidden):
+            return .send(.hiddenTabBar(isHidden))
         }
         
-        // MARK: - Receive TrashDetailFeature Delegate Action
+        // MARK: - Receive TrashDetail Delegate Action
+        
       case let .trashDetail(.delegate(action)):
         switch action {
         case let .reportButtonTapped(detailData):
-          return .send(.home(.receiveTrashDetailFromRoot(detailData)))
+          return .run { @MainActor send in
+            send(.home(.showReportView(detail: detailData)))
+            send(.home(.receiveTrashDetailFromRoot(detailData)))
+          }
+          
+        case let .showToastMessage(message):
+          return .send(.home(.showToastMessage(message)))
+          
+        case let .showAlert(type):
+          return .send(.presentAlert(type))
+          
+        case let .visitedComplete(isFirst):
+          return .send(.presentVisitedComplete(isFirst: isFirst))
+          
         }
         
       default: return .none
@@ -90,5 +154,6 @@ struct HomeRootFeature {
     .ifLet(\.trashDetail, action: \.trashDetail) {
       TrashDetailFeature()
     }
+    .ifLet(\.$modal, action: \.modal)
   }
 }

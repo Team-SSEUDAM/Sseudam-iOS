@@ -34,6 +34,7 @@ public enum Feature: String, ModuleRepresentable {
   case SelectSpotImage
   case Suggestion
   case MyPage
+  case Visited
   public var typePath: String { "Feature" }
 }
 
@@ -46,6 +47,7 @@ public enum Domain: String, ModuleRepresentable {
   case Report
   case TrashSpot
   case Pet
+  case Visited
   public var typePath: String { "Domain" }
 }
 
@@ -58,6 +60,7 @@ public enum Data: String, ModuleRepresentable {
   case Report
   case TrashSpot
   case Pet
+  case Visited
   public var typePath: String { "Data" }
 }
 
@@ -153,7 +156,8 @@ extension TargetDependency {
     public static let SelectSpotImage = Self.project(.feature(.SelectSpotImage))
     public static let TrashDetail = Self.project(.feature(.TrashDetail))
     public static let Auth = Self.project(.feature(.Auth))
-      public static let MyPage = Self.project(.feature(.MyPage))
+    public static let MyPage = Self.project(.feature(.MyPage))
+    public static let Visited = Self.project(.feature(.Visited))
   }
   
   public struct Domain: TargetDependencyDelegate {
@@ -183,10 +187,13 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.TrashSpot, isInterface: true))
       public static let Implement = Self.project(.domain(.TrashSpot))
     }
-    
     public struct Pet: TargetDependencyDelegate {
       public static let Interface = Self.project(.domain(.Pet, isInterface: true))
       public static let Implement = Self.project(.domain(.Pet))
+    }
+    public struct Visited: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Visited, isInterface: true))
+      public static let Implement = Self.project(.domain(.Visited))
     }
   }
   
@@ -216,10 +223,13 @@ extension TargetDependency {
       public static let Interface = Self.project(.data(.TrashSpot, isInterface: true))
       public static let Implement = Self.project(.data(.TrashSpot))
     }
-    
     public struct Pet: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Pet, isInterface: true))
       public static let Implement = Self.project(.data(.Pet))
+    }
+    public struct Visited: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Visited, isInterface: true))
+      public static let Implement = Self.project(.data(.Visited))
     }
   }
   

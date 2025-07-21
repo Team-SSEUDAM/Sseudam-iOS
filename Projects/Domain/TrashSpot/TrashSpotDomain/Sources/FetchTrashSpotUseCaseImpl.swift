@@ -8,6 +8,7 @@
 
 import Foundation
 import TrashSpotDomainInterface
+import Utility
 
 extension FetchTrashSpotUseCase {
   public static func live(repository: TrashSpotRepository) -> FetchTrashSpotUseCase {

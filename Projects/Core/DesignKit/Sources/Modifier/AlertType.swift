@@ -13,6 +13,7 @@ public enum AlertType: Equatable {
   case locationPermission
   case logout
   case withdrawal
+  case login
   
   var title: String {
     switch self {
@@ -20,6 +21,7 @@ public enum AlertType: Equatable {
     case .locationPermission: "위치접근 동의가 필요합니다"
     case .logout: "정말 로그아웃할까요?"
     case .withdrawal: "정말 탈퇴할까요?"
+    case .login: "로그인이\n필요한 기능입니다"
     }
   }
   
@@ -52,6 +54,7 @@ public enum AlertType: Equatable {
     case .locationPermission: "설정으로 이동"
     case .logout: "로그아웃"
     case .withdrawal: "탈퇴하기"
+    case .login: "로그인하러 가기"
     }
   }
 }

@@ -211,7 +211,7 @@ extension MapViewRepresentable {
 extension MapViewRepresentable {
   
   /// 카메라 이동 메서드
-  private func moveCamera(_ view: NMFNaverMapView, to point: Coordinates?, zoomLevel: Double = 16) {
+  private func moveCamera(_ view: NMFNaverMapView, to point: Coordinates?, zoomLevel: Double = 18) {
     if let point = point {
       let coord = NMGLatLng(lat: point.latitude, lng: point.longitude)
       let cameraUpdate = NMFCameraUpdate(scrollTo: coord, zoomTo: zoomLevel)

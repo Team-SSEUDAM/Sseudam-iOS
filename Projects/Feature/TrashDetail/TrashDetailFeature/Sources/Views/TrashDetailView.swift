@@ -10,9 +10,11 @@ import SwiftUI
 import ComposableArchitecture
 import DesignKit
 import TrashSpotDomainInterface
+import Utility
 
 public struct TrashDetailView: View {
   @Bindable var store: StoreOf<TrashDetailFeature>
+  @Environment(\.scenePhase) private var scenePhase
   
   public init(store: StoreOf<TrashDetailFeature>) {
     self.store = store
@@ -52,6 +54,27 @@ public struct TrashDetailView: View {
     }
     .padding(.horizontal, .Number16)
     .padding(.vertical, .Number20)
+    .onAppear {
+      LocationService.shared.startTracking()
+    }
+    .onDisappear {
+      LocationService.shared.stopTracking()
+    }
+    .task { @MainActor in
+      for await _ in LocationService.shared.userLocationStream {
+        store.send(.visited(.fetchUserLocation))
+      }
+    }
+    .onChange(of: scenePhase) { _, newValue in
+      switch newValue {
+      case .active:
+        LocationService.shared.startTracking()
+      case .background:
+        LocationService.shared.stopTracking()
+      default:
+        break
+      }
+    }
   }
   
   @ViewBuilder
@@ -154,11 +177,17 @@ public struct TrashDetailView: View {
         .frame(width: (geo.size.width - .Number8) / 3)
         
         PrimaryButton(
-          title: .constant("이 곳에 쓰레기 버리기"),
+          title: $store.visited.visitedButtonText,
           size: .medium,
-          state: .constant(.normal)
+          state: $store.visited.visitedButtonState
         ) {
-          
+          print(store.visited.visitedButtonState, store.visited)
+          store.send(.visited(.visitButtonTapped))
+        }
+        .onTapGesture {
+          if !store.visited.visitedState.buttonEnable {
+            store.send(.visited(.visitButtonTapped))
+          }
         }
         .frame(width: (geo.size.width - .Number8) * 2 / 3)
         

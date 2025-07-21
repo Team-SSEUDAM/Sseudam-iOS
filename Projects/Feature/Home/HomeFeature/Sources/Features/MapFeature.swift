@@ -179,7 +179,7 @@ extension MapFeature {
       } catch let error as NetworkError {
         return await send(.delegate(.showToastMessage(error.localizedDescription)))
       } catch {
-        return await send(.delegate(.showToastMessage(error.localizedDescription)))
+        return await send(.delegate(.showToastMessage("서버에 연결할 수 없습니다")))
       }
       
     }

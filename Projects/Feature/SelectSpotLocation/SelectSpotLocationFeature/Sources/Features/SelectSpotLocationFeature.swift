@@ -109,8 +109,7 @@ extension SelectSpotLocationFeature {
   
   private func moveUserLocation() -> Effect<Action> {
     return .run { send in
-      if let location = await LocationService.shared.userLocation {
-        let userLocation = Coordinates(latitude: location.0, longitude: location.1)
+      if let userLocation = await LocationService.shared.userLocation {
         await send(.initUserLocation(userLocation))
       }
     }

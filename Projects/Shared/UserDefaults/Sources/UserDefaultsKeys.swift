@@ -17,4 +17,8 @@ public struct UserDefaultsKeys {
   
   @UserDefault("username", default: nil)
   public static var username: String?
+  
+  @UserDefault("userId", default: nil)
+  public static var userId: Int?
+  
 }

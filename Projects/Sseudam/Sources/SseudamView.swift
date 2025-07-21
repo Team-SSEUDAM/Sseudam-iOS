@@ -46,6 +46,22 @@ struct SseudamView: View {
           
         }
       }
+      if let alert =  store.presentAlert {
+        Alert(
+          type: alert,
+          isErrorType: alert.isErrorType,
+          closeAction: {
+            Task { @MainActor in
+              store.send(.closeAlertAction)
+            }
+          },
+          acceptAction: {
+            Task { @MainActor in
+              store.send(.acceptAlertAction)
+            }
+          }
+        )
+      }
     }
     .ignoresSafeArea(edges: .bottom)
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in

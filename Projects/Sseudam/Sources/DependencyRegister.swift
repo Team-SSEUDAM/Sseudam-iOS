@@ -161,15 +161,13 @@ struct DependencyRegister {
       CheckPetInfoUseCase.live(repository: petRepository)
     }
     
-<<<<<<< HEAD
     FetchPetSeasonInfoUseCaseRegister {
       FetchPetSeasonInfoUseCase.live(repository: petRepository)
-=======
+    }
     // MARK: - Visited
     
     VisitedUseCaseRegister {
       VisitedUseCase.live(repository: visitedRepository)
->>>>>>> 6f4d10d (feat: #37 인증하기 api 연결 작업)
     }
     
     CheckRecentVisitUseCaseRegister {

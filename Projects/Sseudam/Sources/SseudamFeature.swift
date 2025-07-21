@@ -74,7 +74,8 @@ struct SseudamFeature {
         return .none
         
       case .onAppear:
-        state.modal = .attendance(AttendanceFeature.State())
+        // TODO: - 출석 api 연결
+//        state.modal = .attendance(AttendanceFeature.State())
         return .none
         
       case let .homeRoot(.delegate(.presentAlert(type))):

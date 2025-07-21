@@ -18,6 +18,8 @@ public struct AttendanceFeature {
   @ObservableState
   public struct State: Equatable {
     public let attendanceStatus: AttendanceStatus = .success(day: 3)
+    public let continuitityCount: Int = 2
+    public let isContinuity: Bool = false
     public init() {}
   }
 

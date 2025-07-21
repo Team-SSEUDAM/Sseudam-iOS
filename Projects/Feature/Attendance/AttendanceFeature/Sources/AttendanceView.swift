@@ -51,7 +51,7 @@ public struct AttendanceView: View {
           .font(FontSet.Body.body3)
           .foregroundStyle(ColorSet.Text.Secondary)
       }
-      AttendanceTrackerView(continuityCount: 3, isContinuing: false)
+      AttendanceTrackerView(continuityCount: store.continuitityCount, isContinuing: store.isContinuity)
       Spacer()
     }
   }

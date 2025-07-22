@@ -31,7 +31,7 @@ public struct Interceptor: TokenRefresher {
         UserDefaultsKeys.isLoggedIn = false
         KeyChainService.delete(forKey: .refreshToken)
         UserDefaultsKeys.accessToken = nil
-        throw TokenError.expiredToken
+        throw TokenError.invalidToken
       }
       
     }

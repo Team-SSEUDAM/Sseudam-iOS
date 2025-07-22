@@ -9,6 +9,7 @@
 import SwiftUI
 import DesignKit
 import ComposableArchitecture
+import DotLottie
 
 public struct LoginView: View {
   @Bindable var store: StoreOf<LoginFeature>
@@ -44,6 +45,23 @@ public struct LoginView: View {
         }
         
       }
+      if store.isLoading {
+        loadingView
+      }
+    }
+  }
+  
+  @ViewBuilder
+  private var loadingView: some View {
+    ZStack {
+      Color.black.opacity(0.001)
+        .ignoresSafeArea()
+      DotLottieAnimation(
+        fileName: LottieSet.dot_loading.name,
+        config: AnimationConfig(autoplay: true, loop: true)
+      )
+      .view()
+      .frame(width: .Number100, height: .Number100)
     }
   }
   

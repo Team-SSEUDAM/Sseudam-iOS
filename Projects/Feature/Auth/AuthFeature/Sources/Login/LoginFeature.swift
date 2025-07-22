@@ -21,6 +21,7 @@ public struct LoginFeature {
   public struct State: Equatable {
     var email: String? = nil
     var toastMessage: String? = nil
+    var isLoading: Bool = false
     public init() {}
   }
   
@@ -69,15 +70,18 @@ public struct LoginFeature {
         return requestAppleLoginAuthroization()
         
       case let .appleLoginServerRequest(token, email):
+        state.isLoading = true
         return requestAppleLogin(token: token, email: email)
         
       case .presentSignUp:
+        state.isLoading = false
         return .send(.delegate(.presentSignUp(email: state.email)))
         
       case let .loginResult(.success(result)):
         return handleLoginResult(data: result)
         
       case let .loginResult(.failure(error)):
+        state.isLoading = false
         return .send(.showToastMessage(error.localizedDescription))
         
       case let .storeEmail(email):

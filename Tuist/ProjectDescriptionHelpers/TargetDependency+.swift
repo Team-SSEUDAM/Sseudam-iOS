@@ -35,6 +35,7 @@ public enum Feature: String, ModuleRepresentable {
   case Suggestion
   case MyPage
   case Visited
+  case Attendance
   public var typePath: String { "Feature" }
 }
 
@@ -48,6 +49,7 @@ public enum Domain: String, ModuleRepresentable {
   case TrashSpot
   case Pet
   case Visited
+  case Attendance
   public var typePath: String { "Domain" }
 }
 
@@ -61,6 +63,7 @@ public enum Data: String, ModuleRepresentable {
   case TrashSpot
   case Pet
   case Visited
+  case Attendance
   public var typePath: String { "Data" }
 }
 
@@ -158,6 +161,7 @@ extension TargetDependency {
     public static let Auth = Self.project(.feature(.Auth))
     public static let MyPage = Self.project(.feature(.MyPage))
     public static let Visited = Self.project(.feature(.Visited))
+    public static let Attendance = Self.project(.feature(.Attendance))
   }
   
   public struct Domain: TargetDependencyDelegate {
@@ -195,6 +199,10 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.Visited, isInterface: true))
       public static let Implement = Self.project(.domain(.Visited))
     }
+    public struct Attendance: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Attendance, isInterface: true))
+      public static let Implement = Self.project(.domain(.Attendance))
+    }
   }
   
   public struct Data: TargetDependencyDelegate {
@@ -230,6 +238,10 @@ extension TargetDependency {
     public struct Visited: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Visited, isInterface: true))
       public static let Implement = Self.project(.data(.Visited))
+    }
+    public struct Attendance: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Attendance, isInterface: true))
+      public static let Implement = Self.project(.data(.Attendance))
     }
   }
   

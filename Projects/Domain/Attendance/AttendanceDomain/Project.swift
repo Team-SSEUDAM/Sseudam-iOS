@@ -1,19 +1,18 @@
 //
-//  {{ feature }}Project.swift
+//  AttendanceProject.swift
 //
-//  {{ feature }}Data
+//  AttendanceDomain
 //
-//  Created by {{ author }}
+//  Created by Jiyeon
 //
 
 import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project.makeStaticLibraryProject(
-  for: Data.{{ feature }},
+  for: Domain.Attendance,
   dependencies: [
-    .Data.{{ feature }}.Interface,
+    .Domain.Attendance.Interface
   ]
 )
-
 

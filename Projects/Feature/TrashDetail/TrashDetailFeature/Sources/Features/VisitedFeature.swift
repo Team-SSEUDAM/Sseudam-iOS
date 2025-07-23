@@ -303,7 +303,7 @@ extension VisitedFeature {
        
       }
     case .far:
-      return .send(.showToastMessage("인증하려면 쓰레기통 5m 이내로 이동해주세요."))
+      return .send(.showToastMessage("인증하려면 쓰레기통에 더 가까이 이동해주세요."))
     case .enableVisit:
       return .none
     case .unknown:

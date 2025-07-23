@@ -101,10 +101,11 @@ extension SettingView {
   private var NotiSection: some View {
     SettingItemListView(title: "푸시 알림") {
       SettingItemView(item: .notification, trailingContent: {
-        Toggle(isOn: $store.isNotiOn) { }
-          .customToggleStyle()
-          .onChange(of: store.isNotiOn) { _, _ in
-            store.send(.notiAllow)
+        Text("설정으로 이동")
+          .font(FontSet.Label.label2)
+          .foregroundStyle(ColorSet.Text.Accent)
+          .onTapGesture {
+            store.send(.moveToNotiSetting)
           }
       })
     }

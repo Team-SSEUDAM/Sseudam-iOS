@@ -143,7 +143,7 @@ public struct MapFeature {
         return .send(.requestMapBounds(true))
         
       case let .requestExpandedMapBounds(bounds):
-        let expandedBounds = expandBounds(bounds, ratio: 0.35) // 확장비율 조정
+        let expandedBounds = expandBounds(bounds, ratio: 1.5) // 확장비율 조정
         return .send(.fetchTrashItems(expandedBounds))
         
      

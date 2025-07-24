@@ -14,6 +14,7 @@ import UserDomainInterface
 import Utility
 import UserDefaults
 import DesignKit
+import UIKit
 
 @Reducer
 public struct SettingFeature {
@@ -44,6 +45,7 @@ public struct SettingFeature {
     case withdrawal
     case withdrawalResult(Result<EmptyEquatable, NetworkError>)
     
+    case moveToNotiSetting
     case feedback
     case serviceTerm
     case privacyTerm
@@ -115,7 +117,11 @@ public struct SettingFeature {
         ])
         
       case let .withdrawalResult(.failure(error)):
+        print(error)
         return .send(.showToastMessage("탈퇴에 실패했어요"))
+        
+      case .moveToNotiSetting:
+        return openExternalLink(url: URL(string: UIApplication.openSettingsURLString))
         
       case .feedback:
         return openExternalLink(url: ExternalURL.feedBack)

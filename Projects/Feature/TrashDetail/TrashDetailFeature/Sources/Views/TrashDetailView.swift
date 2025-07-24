@@ -11,6 +11,7 @@ import ComposableArchitecture
 import DesignKit
 import TrashSpotDomainInterface
 import Utility
+import DotLottie
 
 public struct TrashDetailView: View {
   @Bindable var store: StoreOf<TrashDetailFeature>
@@ -28,11 +29,24 @@ public struct TrashDetailView: View {
       } else {
         if let data = store.trashDetail {
           DetailContent(data: data)
-        } else {
+        } else if store.isFailLoadDetail {
           ErrorView
+        } else {
+          loadingView
         }
       }
+      
     }
+  }
+  
+  @ViewBuilder
+  private var loadingView: some View {
+    DotLottieAnimation(
+      fileName: LottieSet.dot_loading.name,
+      config: AnimationConfig(autoplay: true, loop: true)
+    )
+    .view()
+    .frame(width: .Number100, height: .Number100)
   }
   
   @ViewBuilder

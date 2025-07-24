@@ -45,5 +45,7 @@ public enum ImageSet: String {
   case attendanceSuccess = "attendance_success"
   case attendanceFail = "attendance_fail"
   case attendanceEmpty = "attendance_empty"
+  case welcome = "welcome"
+  case sseudam = "sseudam_img"
   public var swiftUIImage: DesignKitImages { DesignKitImages(name: self.rawValue) }
 }

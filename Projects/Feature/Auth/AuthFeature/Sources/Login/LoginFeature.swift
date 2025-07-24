@@ -21,6 +21,7 @@ public struct LoginFeature {
   public struct State: Equatable {
     var email: String? = nil
     var toastMessage: String? = nil
+    var isLoading: Bool = false
     public init() {}
   }
   
@@ -37,6 +38,7 @@ public struct LoginFeature {
     case fetchUserInfo
     case fetchUserInfoResult(Result<UserInfoEntity, NetworkError>)
     case showToastMessage(String?)
+    case showLoading(Bool)
   }
   
   public enum Delegate: Equatable {
@@ -69,16 +71,25 @@ public struct LoginFeature {
         return requestAppleLoginAuthroization()
         
       case let .appleLoginServerRequest(token, email):
-        return requestAppleLogin(token: token, email: email)
+        return .merge([
+          .send(.showLoading(true)),
+          requestAppleLogin(token: token, email: email)
+        ])
         
       case .presentSignUp:
-        return .send(.delegate(.presentSignUp(email: state.email)))
+        return .merge([
+          .send(.showLoading(false)),
+          .send(.delegate(.presentSignUp(email: state.email)))
+        ])
         
       case let .loginResult(.success(result)):
         return handleLoginResult(data: result)
         
       case let .loginResult(.failure(error)):
-        return .send(.showToastMessage(error.localizedDescription))
+        return .merge([
+          .send(.showLoading(false)),
+          .send(.showToastMessage(error.localizedDescription))
+        ])
         
       case let .storeEmail(email):
         state.email = email
@@ -93,6 +104,10 @@ public struct LoginFeature {
         
       case let .fetchUserInfoResult(.failure(error)):
         return .send(.showToastMessage(error.localizedDescription))
+        
+      case let .showLoading(isLoading):
+        state.isLoading = isLoading
+        return .none
         
       default: return .none
       }

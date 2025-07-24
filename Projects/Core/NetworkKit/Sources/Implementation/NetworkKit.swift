@@ -162,7 +162,7 @@ extension NetworkKit {
       )
     }
     // 401에러면서 토큰 재발급 요청이 아닌 경우 재발급 요청 수행
-    if httpResponse.statusCode == 401 && !endpoint.isRefreshToken {
+    if httpResponse.statusCode == 401 && endpoint.isEnableRefreshToken {
       return try await refreshTokenAndRetry(for: endpoint)
     }
     

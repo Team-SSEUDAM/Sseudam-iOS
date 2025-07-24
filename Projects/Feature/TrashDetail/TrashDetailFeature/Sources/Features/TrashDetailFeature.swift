@@ -22,6 +22,8 @@ public struct TrashDetailFeature {
     public var visited: VisitedFeature.State = .init()
     var isEmptyList: Bool = false
     var trashDetail: TrashSpotDetail? = nil
+    var isLoading: Bool = true
+    var isFailLoadDetail: Bool = false
     public init() {}
   }
 
@@ -32,6 +34,7 @@ public struct TrashDetailFeature {
     
     case onDisappaer
     case showDetail(id: Int?)
+    case showLoading(Bool)
     case noTrashData
     case reportButtonTapped
     
@@ -64,21 +67,26 @@ public struct TrashDetailFeature {
       VisitedFeature()
     }
     
-    Reduce {
-      state,
-      action in
+    Reduce { state, action in
       switch action {
-        
       case let .showDetail(id):
+        state.isFailLoadDetail = false
         if let id = id {
-          return .concatenate([
-            .send(.emptyTrashData(false)),
-            .send(.setInitVisitedState),
-            .send(.fetchTrashDetail(id: id))
-          ])
+          return .run { send in
+            await send(.showLoading(true))
+            await send(.emptyTrashData(false))
+            await send(.setInitVisitedState)
+            await send(.fetchTrashDetail(id: id))
+          }
         } else {
-          return .send(.emptyTrashData(true))
+          return .merge([
+            .send(.showLoading(false)),
+            .send(.emptyTrashData(true))
+          ])
         }
+      case let .showLoading(isShow):
+        state.isLoading = isShow
+        return .none
         
       case .setInitVisitedState:
         return .send(.visited(.initialVisitedData))
@@ -95,12 +103,19 @@ public struct TrashDetailFeature {
         
       case let .fetchTrashDetailResult(.success(data)):
         state.trashDetail = data
-        return .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point)))
+        return .merge([
+          .send(.showLoading(false)),
+          .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point)))
+        ])
         
       case let .fetchTrashDetailResult(.failure(error)):
         print(error)
         state.trashDetail = nil
-        return .send(.visited(.initialVisitedData))
+        state.isFailLoadDetail = true
+        return .merge([
+          .send(.showLoading(false)),
+          .send(.visited(.initialVisitedData))
+        ])
         
       case .checkLoggedin:
         return checkLoginState()

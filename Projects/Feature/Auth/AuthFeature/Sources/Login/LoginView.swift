@@ -9,6 +9,7 @@
 import SwiftUI
 import DesignKit
 import ComposableArchitecture
+import DotLottie
 
 public struct LoginView: View {
   @Bindable var store: StoreOf<LoginFeature>
@@ -31,10 +32,6 @@ public struct LoginView: View {
         )
         VStack(alignment: .center, spacing: .Number16) {
           Spacer()
-          // TODO: - 앱 로고 이미지로 바꾸기
-          RoundedRectangle(cornerRadius: .Number8)
-            .frame(width: .Number100, height: .Number100)
-            .foregroundStyle(ColorSet.Background.Secondary)
           TitleView
           Spacer()
           VStack(spacing: .Number16) {
@@ -44,15 +41,30 @@ public struct LoginView: View {
         }
         
       }
+      if store.isLoading {
+        loadingView
+      }
+    }
+  }
+  
+  @ViewBuilder
+  private var loadingView: some View {
+    ZStack {
+      Color.black.opacity(0.001)
+        .ignoresSafeArea()
+      DotLottieAnimation(
+        fileName: LottieSet.dot_loading.name,
+        config: AnimationConfig(autoplay: true, loop: true)
+      )
+      .view()
+      .frame(width: .Number100, height: .Number100)
     }
   }
   
   @ViewBuilder
   private var TitleView: some View {
     VStack(alignment: .center, spacing: .Number8) {
-      Text("쓰담")
-        .font(FontSet.Heading.heading1)
-        .foregroundStyle(ColorSet.Text.Primary)
+      Image(asset: ImageSet.sseudam.swiftUIImage)
       Text("이메일이나 비밀번호 없이 3초 안에 로그인하세요")
         .font(FontSet.Body.body3)
         .foregroundStyle(ColorSet.Text.Secondary)
@@ -63,7 +75,12 @@ public struct LoginView: View {
   private var AppleLogin: some View {
     PrimaryButton(
       icon: {
-        Icon(image: .apple, size: .Number20, color: .white)
+        Icon(
+          image: .apple,
+          size: .Number20,
+          renderingMode: .template ,
+          color: ColorSet.Background.Primary
+        )
       },
       title: .constant("Apple로 계속하기"),
       size: .large,

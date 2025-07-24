@@ -25,11 +25,7 @@ public struct SignUpCompleteView: View {
       VStack {
         VStack(alignment: .center, spacing: .Number16) {
           Spacer()
-          // TODO: - 앱 로고 이미지로 바꾸기
-          RoundedRectangle(cornerRadius: .Number8)
-            .frame(width: 200, height: 200)
-            .foregroundStyle(ColorSet.Background.Secondary)
-          TitleView
+          ContentView
           Spacer()
           PrimaryButton(
             title: .constant("쓰담 시작하기"), 
@@ -44,12 +40,16 @@ public struct SignUpCompleteView: View {
   }
   
   @ViewBuilder
-  private var TitleView: some View {
-    VStack(alignment: .center, spacing: .Number8) {
-      Text("\(store.state.nickname ?? "")님,\n만나서 반가워요!")
-        .font(FontSet.Heading.heading1)
-        .foregroundStyle(ColorSet.Text.Primary)
-        .multilineTextAlignment(.center)
+  private var ContentView: some View {
+    VStack(alignment: .center, spacing: .Number16) {
+      Image(asset: ImageSet.welcome.swiftUIImage)
+        .frame(width: .Number200, height: .Number200)
+      if let nickname = store.state.nickname {
+        Text("\(nickname)님,\n만나서 반가워요!")
+          .font(FontSet.Heading.heading1)
+          .foregroundStyle(ColorSet.Text.Primary)
+          .multilineTextAlignment(.center)
+      }
       Text("쓰담과 함께하는 올바른 환경 습관,\n지금 시작해볼까요?")
         .font(FontSet.Body.body3)
         .foregroundStyle(ColorSet.Text.Secondary)

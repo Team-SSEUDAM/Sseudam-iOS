@@ -238,8 +238,9 @@ extension MapViewRepresentable {
             longitude: currentPosition.lng
           )
           moveCamera(view, to: mapPoint, zoomLevel: 17)
+        } else {
+          fitMarkersZoomOnly(view: view, items: items)
         }
-        fitMarkersZoomOnly(view: view, items: items)
         context.coordinator.isFirstLoadData = false
       } else {
         fitMarkersInCenter(view: view, items: items)
@@ -285,7 +286,7 @@ extension MapViewRepresentable {
     
     let targetZoom = log2(worldMeters / neededMeters)
     // 제한(줌 너무 가까이/멀리 못 가게)
-    let clampedZoom = max(min(targetZoom, 21), 8)
+    let clampedZoom = max(min(targetZoom, 18), 8)
     
     let cameraUpdate = NMFCameraUpdate(scrollTo: center, zoomTo: clampedZoom)
     cameraUpdate.animation = .easeIn

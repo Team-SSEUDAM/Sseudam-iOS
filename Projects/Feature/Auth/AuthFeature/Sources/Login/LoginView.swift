@@ -81,7 +81,13 @@ public struct LoginView: View {
   private var AppleLogin: some View {
     PrimaryButton(
       icon: {
-        Icon(image: .apple, size: .Number20, color: .white)
+        Icon(
+          image: .apple,
+          size: .Number20,
+          renderingMode: .template ,
+          color: ColorSet.Background.Primary
+        )
+          
       },
       title: .constant("Apple로 계속하기"),
       size: .large,

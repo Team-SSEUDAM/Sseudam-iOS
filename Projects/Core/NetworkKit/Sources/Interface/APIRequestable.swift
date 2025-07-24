@@ -50,6 +50,9 @@ public extension APIRequestable {
   var headers: APIHeaderType { .plain }
   var isRefreshToken: Bool { return false }
   var isNotSseudamAPI: Bool { return false }
+  var isEnableRefreshToken: Bool {
+    return !isRefreshToken && !isNotSseudamAPI
+  }
   
   func toURLRequest() throws -> URLRequest {
     let url = try configureURL()

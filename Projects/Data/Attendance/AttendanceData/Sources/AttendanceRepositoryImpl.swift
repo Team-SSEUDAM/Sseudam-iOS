@@ -12,11 +12,12 @@ import AttendanceDataInterface
 import NetworkKit
 
 public extension AttendanceRepository {
-  static var live: AttendanceRepository {
+  static func live(networker: NetworkKit) -> AttendanceRepository {
     AttendanceRepository(
-      fetchData: {
-        // 실제 네트워크 작업 구현
-        return
+      checkAttendance: { userId in
+        let parameter = AttendanceBody(user: userId)
+        let endpoint = AttendanceEndPoint.checkAttendance(parameter: parameter)
+        return try await networker.execute(with: endpoint, timeout: 30).toEntity()
       }
     )
   }

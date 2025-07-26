@@ -30,4 +30,13 @@ public enum PetEndpoint: Sendable {
       parameters: .none
     )
   }
+  
+  public static func getPetHistoryInfo() -> Endpoint<PetHistoryInfoDTO> {
+    return Endpoint(
+      headers: .authorization(UserDefaultsKeys.accessToken),
+      method: .get,
+      path: "/pets/history",
+      parameters: .none
+    )
+  }
 }

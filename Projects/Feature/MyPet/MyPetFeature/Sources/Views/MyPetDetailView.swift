@@ -25,6 +25,9 @@ public struct MyPetDetailView: View {
     }
     .background(ColorSet.Background.Primary)
     .navigationBarBackButtonHidden(true)
+    .onAppear() {
+      store.send(.willFetchPetHistoryInfo)
+    }
   }
   
   

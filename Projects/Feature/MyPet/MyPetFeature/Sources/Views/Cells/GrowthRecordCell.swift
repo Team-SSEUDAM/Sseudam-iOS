@@ -22,11 +22,11 @@ public struct GrowthRecordCell: View {
     HStack(alignment: .center, spacing: .Number16) {
       HStack(alignment: .center, spacing: .Number12) {
         // 썸네일 이미지
-        RoundedRectangle(cornerRadius: .Number8)
+        Rectangle()
           .fill(record.catCard.isLocked ? ColorSet.Background.Tertiary : ColorSet.Gray._100)
           .frame(width: .Number64, height: .Number64)
           .overlay(
-            Group {
+            ZStack {
               if record.catCard.isLocked {
                 Icon(
                   image: .lock,
@@ -35,12 +35,17 @@ public struct GrowthRecordCell: View {
                   color: ColorSet.Icon.Tertiary
                 )
               } else {
+                VStack(spacing: 0) {
+                  Color(hex: "E0F2FF")
+                  Color(hex: "9FD5FB")
+                }
                 CatImageSet.image(name: record.catCard.imageURL)
                   .resizable()
                   .scaledToFit()
               }
             }
           )
+          .clipCorners(.Number8, corners: .allCorners)
         
         // 정보 영역
         VStack(alignment: .leading, spacing: .Number4) {

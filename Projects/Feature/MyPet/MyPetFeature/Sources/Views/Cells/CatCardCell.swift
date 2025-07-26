@@ -19,11 +19,11 @@ public struct CatCardCell: View {
   }
   
   public var body: some View {
-    RoundedRectangle(cornerRadius: .Number8)
+    Rectangle()
       .fill(card.isLocked ? ColorSet.Background.Tertiary : ColorSet.Gray._100)
       .frame(width: .Number64, height: .Number64)
       .overlay(
-        Group {
+        ZStack {
           if card.isLocked {
             Icon(
               image: .lock,
@@ -32,12 +32,17 @@ public struct CatCardCell: View {
               color: ColorSet.Icon.Tertiary
             )
           } else {
+            VStack(spacing: 0) {
+              Color(hex: "E0F2FF")
+              Color(hex: "9FD5FB")
+            }
             CatImageSet.image(name: card.imageURL)
               .resizable()
               .scaledToFit()
           }
         }
       )
+      .clipCorners(.Number8, corners: .allCorners)
       .opacity(card.isLocked ? 0.4 : 1.0)
   }
 }

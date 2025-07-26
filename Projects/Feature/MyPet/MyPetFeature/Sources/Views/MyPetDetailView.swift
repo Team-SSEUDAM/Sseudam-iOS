@@ -36,7 +36,8 @@ public struct MyPetDetailView: View {
         TouchArea(image: .leftChevron) {
           store.send(.backButtonTapped)
         }
-      }
+      },
+      title: "내가 돌본 펫"
     )
   }
 }

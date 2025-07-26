@@ -22,10 +22,15 @@ public struct AttendanceFeature {
     public var continuityCount: Int
     public var isContinuity: Bool
     public var toastMessage: AttributedString? = nil
+    public var buttonTitle: String = "확인"
+    
     public init(_ data: AttendanceEntity) {
       continuityCount = data.continuity
       isContinuity = data.isContinuity
       attendanceStatus = data.status
+      if data.status == .fail {
+        buttonTitle = "다음"
+      }
     }
   }
 
@@ -34,6 +39,9 @@ public struct AttendanceFeature {
     case onAppear
     case showToastMessage(AttributedString?)
     case confirmButtonTapped
+    
+    case handleContinuityFail
+    case nextButtonTapped
     
     case dismiss
     case delegate(Delegate)
@@ -50,7 +58,10 @@ public struct AttendanceFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
-        return sseudamToast(continuityCnt: state.continuityCount)
+        if state.attendanceStatus != .fail {
+          return sseudamToast(continuityCnt: state.continuityCount)
+        }
+        return .none
         
       case let .showToastMessage(msg):
         state.toastMessage = msg
@@ -59,6 +70,13 @@ public struct AttendanceFeature {
       case .confirmButtonTapped:
         return .send(.dismiss)
         
+      case .handleContinuityFail:
+        state.buttonTitle = "확인"
+        state.attendanceStatus = .first
+        state.continuityCount = 1
+        state.isContinuity = true
+        return sseudamToast(continuityCnt: 1)
+        
       case .dismiss:
         return .send(.delegate(.dismiss))
         
@@ -66,7 +84,9 @@ public struct AttendanceFeature {
       }
     }
   }
-  
+}
+
+extension AttendanceFeature {
   private func sseudamToast(continuityCnt: Int) -> Effect<Action> {
     let point = continuityCnt == 5 ? "5쓰담" : "2쓰담"
     var attributed: AttributedString {

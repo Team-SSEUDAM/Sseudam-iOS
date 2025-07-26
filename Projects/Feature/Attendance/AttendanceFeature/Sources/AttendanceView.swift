@@ -25,10 +25,14 @@ public struct AttendanceView: View {
         pointView
         attendanceStateView
         PrimaryButton(
-          title: .constant("확인"),
+          title: $store.buttonTitle,
           state: .constant(.normal)
         ) {
-          store.send(.confirmButtonTapped)
+          if store.attendanceStatus == .fail {
+            store.send(.handleContinuityFail)
+          } else {
+            store.send(.confirmButtonTapped)
+          }
         }
         .padding(.Number16)
       }

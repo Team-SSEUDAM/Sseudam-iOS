@@ -21,17 +21,7 @@ public struct AttendanceDTO: DTO {
     .init(
       userId: userId,
       continuity: continuity,
-      isContinity: isContinuity
+      isContinuity: isContinuity
     )
   }
 }
-
-/*
- {
-   "userId": 1,
-   "date": "2025-06-30",
-   "continuity": 3,
-   "isContinuity": true,
-   "createdAt": "2025-06-30T12:00:00"
- }
- */

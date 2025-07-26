@@ -9,6 +9,7 @@
 import SwiftUI
 import DesignKit
 import ComposableArchitecture
+import UserDefaults
 
 import HomeFeature
 import MyPetFeature
@@ -28,19 +29,21 @@ struct SseudamFeature {
     var myPetRoot: MyPetRootFeature.State = .init()
     var mypageRoot: MyPageRootFeature.State = .init()
     var authFlow: AuthFlowFeature.State? = nil
+    var userEntry: UserEntryFeature.State? = nil
     var presentAlert: AlertType? = nil
-    @Presents var modal: Modal.State?
   }
   
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case selectTab(TabBarItem)
     case onAppear
+    case checkUserEntryState(userId: Int)
     
     case homeRoot(HomeRootFeature.Action)
     case myPetRoot(MyPetRootFeature.Action)
     case mypageRoot(MyPageRootFeature.Action)
     case authFlow(AuthFlowFeature.Action)
+    case userEntry(UserEntryFeature.Action)
     
     case requestLogin(isPresent: Bool)
     
@@ -48,12 +51,6 @@ struct SseudamFeature {
     case acceptAlertAction
     case dismissAlert(Bool)
     
-    case modal(PresentationAction<Modal.Action>)
-  }
-  
-  @Reducer(state: .equatable, action: .equatable)
-  enum Modal {
-    case attendance(AttendanceFeature)
   }
   
   var body: some ReducerOf<Self> {
@@ -74,9 +71,11 @@ struct SseudamFeature {
         return .none
         
       case .onAppear:
-        // TODO: - 출석 api 연결
-//        state.modal = .attendance(AttendanceFeature.State())
-        return .none
+        return checkIsLoggedIn()
+        
+      case let .checkUserEntryState(userId):
+        state.userEntry = .init(userId: userId)
+        return .send(.userEntry(.checkAttendance))
         
       case let .homeRoot(.delegate(.presentAlert(type))):
         state.presentAlert = type
@@ -127,13 +126,12 @@ struct SseudamFeature {
         state.presentAlert = nil
         return .none
         
-        // MARK: - Attendance
-      case let .modal(.presented(.attendance(action))):
+        // MARK: - UserEntry
+      case let .userEntry(.delegate(action)):
         switch action {
-        case .delegate(.dismiss):
-          state.modal = nil
+        case .checkComplete:
+          state.userEntry = nil
           return .none
-        default: return .none
         }
         
       default: return .none
@@ -142,12 +140,22 @@ struct SseudamFeature {
     .ifLet(\.authFlow, action: \.authFlow) {
       AuthFlowFeature()
     }
-    .ifLet(\.$modal, action: \.modal)
+    .ifLet(\.userEntry, action: \.userEntry) {
+      UserEntryFeature()
+    }
   }
   
 }
 
 extension SseudamFeature {
+  
+  private func checkIsLoggedIn() -> Effect<Action> {
+    if UserDefaultsKeys.isLoggedIn ?? false ,
+       let userId = UserDefaultsKeys.userId {
+      return .send(.checkUserEntryState(userId: userId))
+    }
+    return .none
+  }
 
   private func alertEffect(
     for type: AlertType,

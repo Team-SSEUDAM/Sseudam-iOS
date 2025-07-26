@@ -7,13 +7,7 @@
 //
 
 import Foundation
-
-public enum AttendanceStatus: Equatable {
-  case first
-  case success(day: Int)
-  case fail
-  case continuedSuccess
-}
+import AttendanceDomainInterface
 
 extension AttendanceStatus {
   var description: String {

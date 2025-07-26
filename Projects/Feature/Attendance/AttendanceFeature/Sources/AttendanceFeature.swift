@@ -9,21 +9,24 @@
 import Foundation
 import ComposableArchitecture
 import DesignKit
+import AttendanceDomainInterface
 
 @Reducer
 public struct AttendanceFeature {
   
-  public init() {
-    
-  }
+  public init() { }
   
   @ObservableState
   public struct State: Equatable {
-    public var attendanceStatus: AttendanceStatus = .success(day: 3)
-    public var continuityCount: Int = 2
-    public var isContinuity: Bool = false
+    public var attendanceStatus: AttendanceStatus
+    public var continuityCount: Int
+    public var isContinuity: Bool
     public var toastMessage: AttributedString? = nil
-    public init() {}
+    public init(_ data: AttendanceEntity) {
+      continuityCount = data.continuity
+      isContinuity = data.isContinuity
+      attendanceStatus = data.status
+    }
   }
 
   public enum Action: BindableAction, Equatable {
@@ -39,6 +42,8 @@ public struct AttendanceFeature {
   public enum Delegate: Equatable {
     case dismiss
   }
+  
+  
 
   public var body: some ReducerOf<Self> {
     BindingReducer()

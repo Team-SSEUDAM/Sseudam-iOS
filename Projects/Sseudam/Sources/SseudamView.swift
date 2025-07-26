@@ -77,7 +77,7 @@ struct SseudamView: View {
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.complete, action: \.authFlow.modal.complete)) { store in
       SignUpCompleteView(store: store)
     }
-    .fullScreenCover(item: $store.scope(state: \.modal?.attendance, action: \.modal.attendance)) { store in
+    .fullScreenCover(item: $store.scope(state: \.userEntry?.modal?.attendance, action: \.userEntry.modal.attendance)) { store in
       AttendanceView(store: store)
     }
     .transaction { transaction in

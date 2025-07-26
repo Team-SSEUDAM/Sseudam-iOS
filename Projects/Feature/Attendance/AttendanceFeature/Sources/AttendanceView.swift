@@ -56,7 +56,10 @@ public struct AttendanceView: View {
             .font(FontSet.Body.body3)
             .foregroundStyle(ColorSet.Text.Secondary)
         }
-        AttendanceTrackerView(continuityCount: store.continuityCount, isContinuing: store.isContinuity)
+        AttendanceTrackerView(
+          continuityCount: store.continuityCount,
+          isContinuing: store.isContinuity
+        )
         Spacer()
       }
       VStack {
@@ -84,7 +87,7 @@ public struct AttendanceView: View {
       .multilineTextAlignment(.center)
       .font(FontSet.Heading.heading1)
     default:
-      Text(store.attendanceStatus.description)
+      Text(store.attendanceStatus.title)
         .multilineTextAlignment(.center)
         .font(FontSet.Heading.heading1)
         .foregroundStyle(ColorSet.Text.Primary)

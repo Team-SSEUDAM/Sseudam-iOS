@@ -48,4 +48,18 @@ extension String {
     formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
     return formatter.date(from: self)
   }
+  
+  /// 닉네임을 마지막 띄어쓰기를 기준으로 두 줄로 분리
+  ///
+  /// - Returns: (첫째줄, 둘째줄) 튜플. 띄어쓰기가 없으면 (전체, nil) 반환
+  public func splitNicknameForTwoLines() -> (first: String, second: String?) {
+    let words = self.split(separator: " ").map{ String($0) }
+    guard words.count > 1 else {
+      return (words.first!, nil)
+    }
+    
+    let lastWord = words.last!
+    let firstPart = words.dropLast().joined(separator: " ")
+    return (firstPart, lastWord)
+  }
 }

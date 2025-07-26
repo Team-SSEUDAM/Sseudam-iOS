@@ -21,7 +21,7 @@ public struct MyPetDetailView: View {
   public var body: some View {
     VStack {
       navigationBar
-      Spacer()
+      PetHistoryGridView
     }
     .background(ColorSet.Background.Primary)
     .navigationBarBackButtonHidden(true)
@@ -38,6 +38,34 @@ public struct MyPetDetailView: View {
         }
       },
       title: "내가 돌본 펫"
+    )
+  }
+  
+  @ViewBuilder
+  private var PetHistoryGridView: some View {
+    ScrollView {
+      LazyVGrid(
+        columns: [GridItem(.flexible()), GridItem(.flexible())],
+        spacing: .Number12
+      ) {
+        ForEach(store.catHistoryCard) { record in
+          CatHistoryCardCell(record: record)
+        }
+      }
+      .padding(.horizontal, .Number16)
+      .padding(.top, .Number16)
+    }
+    .background(
+      LinearGradient(
+        gradient: Gradient(
+          colors: [
+            ColorSet.Background.Primary,
+            ColorSet.Background.Tertiary
+          ]
+        ),
+        startPoint: .top,
+        endPoint: .bottom
+      )
     )
   }
 }

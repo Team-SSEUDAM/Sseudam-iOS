@@ -21,7 +21,8 @@ public struct AttendanceDTO: DTO {
     .init(
       userId: userId,
       continuity: continuity,
-      isContinuity: isContinuity
+      isContinuity: isContinuity,
+      attendanceDate: createdAt.toDateFromISO8601
     )
   }
 }

@@ -26,4 +26,9 @@ extension Date {
       let interval = self.timeIntervalSinceNow
       return interval > 0 ? interval : nil
   }
+  
+  /// 타겟 날짜가 오늘 날짜인지 여부
+  public var isSameDayAsToday: Bool {
+    Calendar.current.isDateInToday(self)
+  }
 }

@@ -33,6 +33,7 @@ struct UserEntryFeature {
     
     case checkAttendance
     case checkAttendanceResult(Result<AttendanceEntity, NetworkError>)
+    case saveAttendanceDate(Date)
     
     case modal(PresentationAction<Modal.Action>)
   }
@@ -58,13 +59,22 @@ struct UserEntryFeature {
         
         // MARK: - Attendance
       case .checkAttendance:
-        return checkAttendance(userId: state.userId)
+        if isFirstAppOpenToday() {
+          return checkAttendance(userId: state.userId)
+        } else {
+          return .send(.checkComplete)
+        }
         
       case let .checkAttendanceResult(.success(data)):
         state.modal = .attendance(AttendanceFeature.State(data))
+        return .send(.saveAttendanceDate(data.attendanceDate ?? Date()))
+        
+      case let .saveAttendanceDate(date):
+        UserDefaultsKeys.lastEntryDate = date
         return .none
         
       case let .checkAttendanceResult(.failure(error)):
+        print(error)
         return .send(.checkComplete)
         
       case let .modal(.presented(.attendance(action))):
@@ -75,12 +85,22 @@ struct UserEntryFeature {
         default: return .none
         }
         
-        
-        
       default: return .none
       }
     }
     .ifLet(\.$modal, action: \.modal)
+  }
+}
+
+extension UserEntryFeature {
+  /// 오늘 첫 진입 여부, 첫 진입 시 출석체크
+  private func isFirstAppOpenToday() -> Bool {
+    let lastDate = UserDefaultsKeys.lastEntryDate
+    
+    guard let lastDate = lastDate else {
+      return true
+    }
+    return !lastDate.isSameDayAsToday
   }
   
   private func checkAttendance(userId: Int) -> Effect<Action> {

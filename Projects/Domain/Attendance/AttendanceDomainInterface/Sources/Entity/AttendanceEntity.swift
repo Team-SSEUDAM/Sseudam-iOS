@@ -13,8 +13,9 @@ public struct AttendanceEntity: Sendable, Equatable {
   public let continuity: Int
   public let isContinuity: Bool
   public let status: AttendanceStatus
+  public let attendanceDate: Date?
   
-  public init(userId: Int, continuity: Int, isContinuity: Bool) {
+  public init(userId: Int, continuity: Int, isContinuity: Bool, attendanceDate: Date?) {
     self.userId = userId
     self.continuity = continuity
 
@@ -32,5 +33,6 @@ public struct AttendanceEntity: Sendable, Equatable {
     }
 
     self.status = status
+    self.attendanceDate = attendanceDate
   }
 }

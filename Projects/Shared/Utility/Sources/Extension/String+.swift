@@ -45,7 +45,7 @@ extension String {
   public var toDateFromISO8601: Date? {
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
-    formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
     return formatter.date(from: self)
   }
   

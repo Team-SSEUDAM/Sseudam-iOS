@@ -32,6 +32,7 @@ public enum SampleCacheKey: CacheKey {
 public enum MyPetCacheKey: CacheKey {
   case myPetInfo
   case myPetSeasonInfo
+  case myPetHistoryInfo
   
   public var directory: String { "MyPet" }
   public var fileName: String { "\(identifier).cache" }
@@ -40,6 +41,7 @@ public enum MyPetCacheKey: CacheKey {
     switch self {
     case .myPetInfo: "my_pet_info"
     case .myPetSeasonInfo: "my_pet_season_info"
+    case .myPetHistoryInfo: "my_pet_history_info"
     }
   }
 }

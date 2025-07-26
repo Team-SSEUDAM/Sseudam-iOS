@@ -20,8 +20,16 @@ public struct PetHistoryInfoEntity: Sendable, Equatable {
     self.petHistory = petHistory
   }
   
-  public func makeCacheModel() {
-    
+  public init(
+    _ cacheModel: MyPetHistoryInfoCacheModel
+  ) {
+    self.petHistory = cacheModel.historyInfo.map { PetHistoryEachInfo($0) }
+  }
+  
+  public func makeCacheModel() -> MyPetHistoryInfoCacheModel {
+    return MyPetHistoryInfoCacheModel(
+      petHistory.map { $0.makeCacheModel($0) }
+    )
   }
 }
 
@@ -41,5 +49,25 @@ public struct PetHistoryEachInfo: Sendable, Equatable {
     self.point = point
     self.levelType = CatLevel(rawValue: levelType) ?? .level1
     self.season = CatType(rawValue: season) ?? ._2025_07
+  }
+  
+  public init(
+    _ cacheModel: PetHistoryEachCacheModel
+  ) {
+    self.init(
+      nickname: cacheModel.nickname,
+      point: cacheModel.point,
+      levelType: cacheModel.levelType,
+      season: cacheModel.season
+    )
+  }
+  
+  fileprivate func makeCacheModel(_ data: Self) -> PetHistoryEachCacheModel {
+    return PetHistoryEachCacheModel(
+      nickname: data.nickname,
+      point: data.point,
+      levelType: data.levelType.rawValue,
+      season: data.season.rawValue
+    )
   }
 }

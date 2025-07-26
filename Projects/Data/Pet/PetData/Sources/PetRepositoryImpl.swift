@@ -59,13 +59,21 @@ public extension PetRepository {
         let endpoint = PetEndpoint.getPetHistoryInfo()
         let entity = try await networker.execute(with: endpoint).toEntity()
         
-//        let cacheKey = MyPetCacheKey.myPetHistoryInfo
-//        let cache = try await CacheActor.shared.MY_PET_HISTORY_INFO_CACHE
-//        let cacheModel = entity.makeCacheModel()
+        let cacheKey = MyPetCacheKey.myPetHistoryInfo
+        let cache = try await CacheActor.shared.MY_PET_HISTORY_INFO_CACHE
+        let cacheModel = entity.makeCacheModel()
         
-//        await cache.remove(forKey: cacheKey)
-//        try await cache.insert(cacheModel, forKey: cacheKey)
+        await cache.remove(forKey: cacheKey)
+        try await cache.insert(cacheModel, forKey: cacheKey)
         return entity
+      },
+      getPetHistoryInfoFromCache: {
+        let cacheKey = MyPetCacheKey.myPetHistoryInfo
+        let cache = try await CacheActor.shared.MY_PET_HISTORY_INFO_CACHE
+        guard let hitData = await cache.value(forKey: cacheKey) else {
+          throw CacheError.fileNotFound /// 이 때, api 호출 필요
+        }
+        return PetHistoryInfoEntity(hitData)
       }
     )
   }

@@ -14,8 +14,7 @@ extension FetchPetHistoryInfoUseCase {
   public static func live(repository: PetRepository) -> FetchPetHistoryInfoUseCase {
     .init {
       do {
-//        let entity = try await repository.getPetHistoryInfoFromCache()
-        let entity = try await repository.getPetHistoryInfo()
+        let entity = try await repository.getPetHistoryInfoFromCache()
         return entity
       } catch let error as CacheError {
         switch error {

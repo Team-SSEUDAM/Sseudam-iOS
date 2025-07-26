@@ -54,6 +54,10 @@ public extension PetRepository {
           throw CacheError.fileNotFound /// 이 때, api 호출 필요
         }
         return PetSeasonInfoEntity(hitData)
+      },
+      putPetNickname: { nickname in
+        let endpoint = PetEndpoint.putPetNickname(nickname)
+        let result = try await networker.execute(with: endpoint)
       }
     )
   }

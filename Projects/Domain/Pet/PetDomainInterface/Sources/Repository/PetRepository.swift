@@ -15,16 +15,19 @@ public struct PetRepository {
   public var getPetInfoFromCache: @Sendable () async throws -> PetInfoEntity
   public var getPetSeasonInfo: @Sendable () async throws -> PetSeasonInfoEntity
   public var getPetSeasonInfoFromCache: @Sendable () async throws -> PetSeasonInfoEntity
+  public var putPetNickname: @Sendable (String) async throws -> Void
 
   public init(
     getPetInfo: @Sendable @escaping () async throws -> PetInfoEntity,
     getPetInfoFromCache: @Sendable @escaping () async throws -> PetInfoEntity,
     getPetSeasonInfo: @Sendable @escaping () async throws -> PetSeasonInfoEntity,
-    getPetSeasonInfoFromCache: @Sendable @escaping () async throws -> PetSeasonInfoEntity
+    getPetSeasonInfoFromCache: @Sendable @escaping () async throws -> PetSeasonInfoEntity,
+    putPetNickname: @Sendable @escaping (String) async throws -> Void
   ) {
     self.getPetInfo = getPetInfo
     self.getPetInfoFromCache = getPetInfoFromCache
     self.getPetSeasonInfo = getPetSeasonInfo
     self.getPetSeasonInfoFromCache = getPetSeasonInfoFromCache
+    self.putPetNickname = putPetNickname
   }
 }

@@ -24,6 +24,7 @@ public struct MyPetFeature {
   public struct State {
     public var path = StackState<Path.State>()
     public var petGrowthList: MyPetGrowthListFeature.State
+    public var changePetNickname: ChangeMyPetNicknameFeature.State
     
     public var myPetInfo: PetInfoEntity?
     
@@ -44,6 +45,7 @@ public struct MyPetFeature {
     
     public init() {
       self.petGrowthList = MyPetGrowthListFeature.State()
+      self.changePetNickname = ChangeMyPetNicknameFeature.State()
     }
   }
   
@@ -51,6 +53,8 @@ public struct MyPetFeature {
     case binding(BindingAction<State>)
     case path(StackActionOf<Path>)
     case petGrowthList(MyPetGrowthListFeature.Action)
+    case changePetNickname(ChangeMyPetNicknameFeature.Action)
+    
     case onAppear
     case checkLoggedIn
     case fetchMyPetInfo
@@ -89,6 +93,9 @@ public struct MyPetFeature {
     Scope(state: \.petGrowthList, action: \.petGrowthList) {
       MyPetGrowthListFeature()
     }
+    Scope(state: \.changePetNickname, action: \.changePetNickname) {
+      ChangeMyPetNicknameFeature()
+    }
     Reduce { state, action in
       switch action {
       case .onAppear:
@@ -118,8 +125,9 @@ public struct MyPetFeature {
         state.path.append(.petDetail(MyPetDetailFeature.State()))
         return .send(.delegate(.needToHiddenTabBar(true)))
       case .petNicknameButtonTapped:
-        print("petNicknameButtonTapped")
-        return .none
+        let initName = state.myPetInfo?.nickname
+        state.path.append(.changeNickname(ChangeMyPetNicknameFeature.State(name: initName)))
+        return .send(.delegate(.needToHiddenTabBar(true)))
         
       case let .catImageTapped(location):
         /// 이전 로띠가 표시 중이면 무시
@@ -176,8 +184,21 @@ public struct MyPetFeature {
           state.path.removeLast()
           return .none
           
+        case .element(id: _, action: .changeNickname(.pop)):
+          state.path.removeLast()
+          return .none
+          
         default: return .none
         }
+        
+      case let .changePetNickname(action):
+        switch action {
+        case .delegate(.didChangeNickname):
+          return .send(.fetchMyPetInfo)
+          
+        default: break
+        }
+        return .none
         
       default: return .none
       }
@@ -207,5 +228,6 @@ extension MyPetFeature {
   @Reducer(state: .equatable, action: .equatable)
   public enum Path {
     case petDetail(MyPetDetailFeature)
+    case changeNickname(ChangeMyPetNicknameFeature)
   }
 }

@@ -1,13 +1,14 @@
 //
 //  TrashType.swift
-//  DesignKit
+//  TrashSpotDomainInterface
 //
-//  Created by Jiyeon on 6/20/25.
+//  Created by 조용인 on 7/27/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
 import SwiftUI
 import UIKit
+import DesignKit
 import NMapsMap
 
 public enum TrashType: String, Sendable {

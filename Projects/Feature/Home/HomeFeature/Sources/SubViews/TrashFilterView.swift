@@ -1,12 +1,14 @@
 //
 //  TrashFilterView.swift
-//  DesignKit
+//  HomeFeature
 //
-//  Created by Jiyeon on 6/21/25.
+//  Created by 조용인 on 7/27/25.
 //  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
 //
 
 import SwiftUI
+import TrashSpotDomainInterface
+import DesignKit
 
 /// 쓰레기통 종류 필터에 사용하기 위한 FilterView
 public struct TrashFilterView: View {
@@ -40,5 +42,33 @@ public struct TrashFilterView: View {
       Spacer()
     }
   }
-  
+}
+
+public enum TrashFilterType: Hashable {
+  case all
+  case general
+  case recycle
+
+  var title: String {
+    switch self {
+    case .all:
+      "전체"
+    case .general:
+      "일반 쓰레기"
+    case .recycle:
+      "재활용 쓰레기"
+    }
+  }
+
+  var icon: ImageSet? {
+    switch self {
+    case .all:
+      return nil
+    case .general:
+      return .delete
+    case .recycle:
+      return .recycle
+    }
+  }
+
 }

@@ -38,31 +38,8 @@ struct SseudamView: View {
         MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
           .tag(TabBarItem.myPage)
       }
-      VStack {
-        Spacer()
-        if !store.isTabbarHidden {
-          CustomTabBar(selectedTab: $store.selectedTab) {
-            store.send(.selectTab($0))
-          }
-          
-        }
-      }
-      if let alert =  store.presentAlert {
-        Alert(
-          type: alert,
-          isErrorType: alert.isErrorType,
-          closeAction: {
-            Task { @MainActor in
-              store.send(.closeAlertAction)
-            }
-          },
-          acceptAction: {
-            Task { @MainActor in
-              store.send(.acceptAlertAction)
-            }
-          }
-        )
-      }
+      TabBar
+      AlertView
     }
     .onAppear {
       store.send(.onAppear)
@@ -82,6 +59,39 @@ struct SseudamView: View {
     }
     .transaction { transaction in
       transaction.disablesAnimations = true
+    }
+  }
+  
+  @ViewBuilder
+  var TabBar: some View {
+    VStack {
+      Spacer()
+      if !store.isTabbarHidden {
+        CustomTabBar(selectedTab: $store.selectedTab) {
+          store.send(.selectTab($0))
+        }
+        
+      }
+    }
+  }
+  
+  @ViewBuilder
+  var AlertView: some View {
+    if let alert =  store.presentAlert {
+      Alert(
+        type: alert,
+        isErrorType: alert.isErrorType,
+        closeAction: {
+          Task { @MainActor in
+            store.send(.closeAlertAction)
+          }
+        },
+        acceptAction: {
+          Task { @MainActor in
+            store.send(.acceptAlertAction)
+          }
+        }
+      )
     }
   }
   

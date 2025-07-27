@@ -42,8 +42,8 @@ public struct CatHistoryCardCell: View {
       .overlay(
         ZStack {
           VStack(spacing: 0) {
-            Color(hex: "E0F2FF")
-            Color(hex: "9FD5FB")
+            ColorSet.HexColor._E0F2Ff
+            ColorSet.HexColor._9Fd5Fb
           }
           CatImageSet.image(name: record.imageURL)
             .resizable()

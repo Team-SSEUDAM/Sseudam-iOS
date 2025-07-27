@@ -110,6 +110,12 @@ extension DesignKitAsset {
       public static let Kakao = DesignKitAsset.Colors.kakao.swiftUIColor
       public static let Apple = ColorSet.Gray._1000
     }
+    
+    public struct HexColor: Sendable {
+      public static let _006F9D = DesignKitAsset.Colors._006F9D.swiftUIColor
+      public static let _9Fd5Fb = DesignKitAsset.Colors._9Fd5Fb.swiftUIColor
+      public static let _E0F2Ff = DesignKitAsset.Colors.e0F2Ff.swiftUIColor
+    }
   }
 }
 

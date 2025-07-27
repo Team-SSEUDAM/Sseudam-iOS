@@ -95,13 +95,12 @@ struct UserEntryFeature {
 extension UserEntryFeature {
   /// 오늘 첫 진입 여부, 첫 진입 시 출석체크
   private func isFirstAppOpenToday() -> Bool {
-    return true
-//    let lastDate = UserDefaultsKeys.lastEntryDate
-//    
-//    guard let lastDate = lastDate else {
-//      return true
-//    }
-//    return !lastDate.isSameDayAsToday
+    let lastDate = UserDefaultsKeys.lastEntryDate
+    
+    guard let lastDate = lastDate else {
+      return true
+    }
+    return !lastDate.isSameDayAsToday
   }
   
   private func checkAttendance(userId: Int) -> Effect<Action> {

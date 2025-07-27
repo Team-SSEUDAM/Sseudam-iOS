@@ -102,11 +102,12 @@ struct SseudamFeature {
         return .none
         
       case .authFlow(.delegate(.changeLoginState)):
-        return .run { send in
-          await send(.mypageRoot(.checkLoggedin))
-          await send(.myPetRoot(.checkLoggedin))
-          await send(.homeRoot(.checkLoggedin))
-        }
+        return .merge(
+          checkIsLoggedIn(),
+          .send(.mypageRoot(.checkLoggedin)),
+          .send(.myPetRoot(.checkLoggedin)),
+          .send(.homeRoot(.checkLoggedin))
+        )
         
       case let .requestLogin(isPresent):
         state.authFlow = isPresent ? .init() : nil

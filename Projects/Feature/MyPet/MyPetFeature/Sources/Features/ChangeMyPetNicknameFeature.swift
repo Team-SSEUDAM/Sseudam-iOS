@@ -20,7 +20,7 @@ public struct ChangeMyPetNicknameFeature {
   /// 닉네임 유효성 검사 결과
   public enum NameValidationResult: Equatable {
     case valid
-    case equelInitName      // 초기 이름과 동일한 경우
+    case equalInitName      // 초기 이름과 동일한 경우
     case tooShort           // error1: 0~1자 일때
     case tooLong            // error2: 13자 이상일때
     case startsWithSpace    // error4: 공백으로 시작
@@ -32,7 +32,7 @@ public struct ChangeMyPetNicknameFeature {
       switch self {
       case .valid:
         return "사용 가능한 고양이 이름이에요."
-      case .equelInitName:
+      case .equalInitName:
         return ""
       case .tooShort:
         return "고양이 이름은 2자 이상 입력해주세요."
@@ -56,7 +56,7 @@ public struct ChangeMyPetNicknameFeature {
         return .accent
       case .tooShort, .tooLong, .startsWithSpace, .serverError:
         return .error
-      case .empty, .equelInitName:
+      case .empty, .equalInitName:
         return .normal
       }
     }
@@ -187,7 +187,7 @@ extension ChangeMyPetNicknameFeature {
     _ name: String,
     initName: String?
   ) -> NameValidationResult {
-    if name == initName { return .equelInitName }
+    if name == initName { return .equalInitName }
     /// 빈 문자열
     if name.isEmpty { return .empty}
     /// error4: 공백으로 시작 (우선순위 4)

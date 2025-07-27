@@ -18,11 +18,11 @@ public struct AttendanceDTO: DTO {
   let createdAt: String
   
   public func toEntity() throws -> AttendanceEntity {
-    .init(
+    return  .init(
       userId: userId,
       continuity: continuity,
       isContinuity: isContinuity,
-      attendanceDate: createdAt.toDateFromISO8601
+      attendanceDate: createdAt.toUTCDate
     )
   }
 }

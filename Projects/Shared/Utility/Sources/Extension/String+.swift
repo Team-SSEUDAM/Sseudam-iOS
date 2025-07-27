@@ -42,7 +42,16 @@ extension String {
     return self.toFormattedDate(format) == self ? nil : self.toFormattedDate(format)
   }
   
-  public var toDateFromISO8601: Date? {
+  /// KST 기준 변환
+  public var toKSTDate: Date? {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
+    formatter.timeZone = TimeZone(identifier: "Asia/Seoul")
+    return formatter.date(from: self)
+  }
+
+  /// UTC 기준 변환
+  public var toUTCDate: Date? {
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS"
     formatter.timeZone = TimeZone(secondsFromGMT: 0)

@@ -105,13 +105,16 @@ public struct ChangeMyPetNicknameFeature {
   
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
-    case backButtonTapped
-    case pop
-    case focusChanged(Bool)
     case delegate(Delegate)
+    case focusChanged(Bool)
+    
+    case setButtonState(Bool)
     
     case changeNicknameButtonTapped
     case changeNicknameButtonTappedResult(Result<String, NetworkError>)
+    
+    case backButtonTapped
+    case pop
     
     public enum Delegate: Equatable {
       case didChangeNickname
@@ -125,13 +128,12 @@ public struct ChangeMyPetNicknameFeature {
     Reduce { state, action in
       switch action {
       case .binding(\.name):
-        state.validationResult = validateNameInput(
-          state.name,
-          initName: state.initName
-        )
-        state.buttonState = state.validationResult.isButtonEnabled
-        ? .normal
-        : .disabled
+        state.validationResult = validateNameInput(state.name, state.initName)
+        let isButtonEnabled = state.validationResult.isButtonEnabled
+        return .send(.setButtonState(isButtonEnabled))
+        
+      case let .setButtonState(isEnabled):
+        state.buttonState = isEnabled ? .normal : .disabled
         return .none
         
       case let .focusChanged(isFocused):
@@ -185,7 +187,7 @@ extension ChangeMyPetNicknameFeature {
   /// 우선순위: error1(길이 부족) > error2(길이 초과) > error3(특수문자/이모지) > error4(공백으로 시작)
   private func validateNameInput(
     _ name: String,
-    initName: String?
+    _ initName: String?
   ) -> NameValidationResult {
     if name == initName { return .equalInitName }
     /// 빈 문자열

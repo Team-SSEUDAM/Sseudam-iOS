@@ -24,7 +24,6 @@ public struct MyPetFeature {
   public struct State {
     public var path = StackState<Path.State>()
     public var petGrowthList: MyPetGrowthListFeature.State
-    public var changePetNickname: ChangeMyPetNicknameFeature.State
     
     public var myPetInfo: PetInfoEntity?
     
@@ -45,7 +44,6 @@ public struct MyPetFeature {
     
     public init() {
       self.petGrowthList = MyPetGrowthListFeature.State()
-      self.changePetNickname = ChangeMyPetNicknameFeature.State()
     }
   }
   
@@ -53,7 +51,6 @@ public struct MyPetFeature {
     case binding(BindingAction<State>)
     case path(StackActionOf<Path>)
     case petGrowthList(MyPetGrowthListFeature.Action)
-    case changePetNickname(ChangeMyPetNicknameFeature.Action)
     
     case onAppear
     case checkLoggedIn
@@ -92,9 +89,6 @@ public struct MyPetFeature {
     BindingReducer()
     Scope(state: \.petGrowthList, action: \.petGrowthList) {
       MyPetGrowthListFeature()
-    }
-    Scope(state: \.changePetNickname, action: \.changePetNickname) {
-      ChangeMyPetNicknameFeature()
     }
     Reduce { state, action in
       switch action {
@@ -184,21 +178,15 @@ public struct MyPetFeature {
           state.path.removeLast()
           return .none
           
+        case .element(id: _, action: .changeNickname(.delegate(.didChangeNickname))):
+          return .send(.fetchMyPetInfo)
+          
         case .element(id: _, action: .changeNickname(.pop)):
           state.path.removeLast()
           return .none
           
         default: return .none
         }
-        
-      case let .changePetNickname(action):
-        switch action {
-        case .delegate(.didChangeNickname):
-          return .send(.fetchMyPetInfo)
-          
-        default: break
-        }
-        return .none
         
       default: return .none
       }

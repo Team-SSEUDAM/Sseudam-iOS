@@ -109,6 +109,7 @@ public struct ChangeMyPetNicknameFeature {
     case focusChanged(Bool)
     
     case setButtonState(Bool)
+    case setIsLoading(Bool)
     
     case changeNicknameButtonTapped
     case changeNicknameButtonTappedResult(Result<String, NetworkError>)
@@ -141,11 +142,9 @@ public struct ChangeMyPetNicknameFeature {
         return .none
         
       case .changeNicknameButtonTapped:
-        state.isLoading = true
         return changeNickname(name: state.name)
 
       case let .changeNicknameButtonTappedResult(result):
-        state.isLoading = false
         switch result {
         case .success:
           return .run { send in
@@ -157,8 +156,10 @@ public struct ChangeMyPetNicknameFeature {
           state.buttonState = .disabled
           return .none
         }
+        
       case .backButtonTapped:
         return .send(.pop)
+        
       default:
         return .none
       }
@@ -173,12 +174,17 @@ extension ChangeMyPetNicknameFeature {
   ) -> Effect<Action> {
     return .run { send in
       do {
+        await send(.setIsLoading(true))
         try await changePetNicknameUseCase.execute(name)
         await send(.changeNicknameButtonTappedResult(.success(name)))
+        await send(.setIsLoading(false))
       } catch let error as NetworkError {
         await send(.changeNicknameButtonTappedResult(.failure(error)))
+        await send(.setIsLoading(false))
       } catch {
-        await send(.changeNicknameButtonTappedResult(.failure(NetworkError.customError(message: error.localizedDescription))))
+        let message = NetworkError.customError(message: error.localizedDescription)
+        await send(.changeNicknameButtonTappedResult(.failure(message)))
+        await send(.setIsLoading(false))
       }
     }
   }

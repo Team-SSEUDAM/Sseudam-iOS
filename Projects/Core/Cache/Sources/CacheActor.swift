@@ -70,6 +70,16 @@ extension CacheActor {
       )
     }
   }
+  
+  public var MY_PET_HISTORY_INFO_CACHE: TwoTierCache<MyPetCacheKey, MyPetHistoryInfoCacheModel> {
+    get async throws {
+      return try await cache(
+        .myPetHistoryInfo,
+        ttl: .high,
+        eviction: .none
+      )
+    }
+  }
 }
 
 /*

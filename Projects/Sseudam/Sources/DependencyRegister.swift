@@ -166,11 +166,15 @@ struct DependencyRegister {
       FetchPetSeasonInfoUseCase.live(repository: petRepository)
     }
     
+    FetchPetHistoryInfoUseCaseRegister {
+      FetchPetHistoryInfoUseCase.live(repository: petRepository)
+    }
+
     ChangePetNicknameUseCaseRegister {
       ChangePetNicknameUseCase.live(repository: petRepository)
-    }
-    // MARK: - Visited
+    }    
     
+    // MARK: - Visited
     VisitedUseCaseRegister {
       VisitedUseCase.live(repository: visitedRepository)
     }

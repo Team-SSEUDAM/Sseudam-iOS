@@ -92,8 +92,8 @@ public struct MyPetView: View {
               .fill(
                 RadialGradient(
                   gradient: Gradient(stops: [
-                    .init(color: Color(hex: "#006F9D").opacity(0.3), location: 0),
-                    .init(color: Color(hex: "#006F9D").opacity(0), location: 1)
+                    .init(color: ColorSet.HexColor._006F9D.opacity(0.3), location: 0),
+                    .init(color: ColorSet.HexColor._006F9D.opacity(0), location: 1)
                   ]),
                   center: .center,
                   startRadius: 0,

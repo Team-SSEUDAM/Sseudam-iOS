@@ -26,7 +26,8 @@ public struct PetSeasonInfoEntity: Sendable, Equatable {
   }
   
   public func makeCacheModel() -> MyPetSeasonInfoCacheModel {
-    return MyPetSeasonInfoCacheModel(seasonPetInfo.map { $0.makeCacheModel($0) }
+    return MyPetSeasonInfoCacheModel(
+      seasonPetInfo.map { $0.makeCacheModel($0) }
     )
   }
 }

@@ -157,6 +157,7 @@ struct DependencyRegister {
       FetchTrashSpotRawDetailUseCase.live(repository: trashSpotRepository)
     }
     
+    // MARK: - Pet
     CheckPetInfoUseCaseRegister {
       CheckPetInfoUseCase.live(repository: petRepository)
     }
@@ -164,6 +165,11 @@ struct DependencyRegister {
     FetchPetSeasonInfoUseCaseRegister {
       FetchPetSeasonInfoUseCase.live(repository: petRepository)
     }
+    
+    FetchPetHistoryInfoUseCaseRegister {
+      FetchPetHistoryInfoUseCase.live(repository: petRepository)
+    }
+    
     // MARK: - Visited
     
     VisitedUseCaseRegister {

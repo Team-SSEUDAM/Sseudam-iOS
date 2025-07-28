@@ -24,9 +24,11 @@ public struct AttendanceEntity: Sendable, Equatable {
     case 1:
       self.isContinuity = true
       status = .first
+      
     case 5:
       self.isContinuity = isContinuity
       status = .continuedSuccess
+      
     default:
       self.isContinuity = isContinuity
       status = isContinuity ? .success(day: continuity) : .fail

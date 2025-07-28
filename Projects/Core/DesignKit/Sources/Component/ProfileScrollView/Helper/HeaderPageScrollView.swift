@@ -10,7 +10,15 @@ import SwiftUI
 
 public struct PageLabel {
   public var title: String
-  public var symbolImage: String
+  public var symbolImage: String?
+  
+  public init(
+    title: String,
+    symbolImage: String? = nil
+  ) {
+    self.title = title
+    self.symbolImage = symbolImage
+  }
 }
 
 public struct HeaderPageScrollView<Header: View, Page: View>: View {
@@ -190,7 +198,7 @@ public struct HeaderPageScrollView<Header: View, Page: View>: View {
         ForEach(pageLabels, id: \.title) { label in
           Group {
             if displaysSymbols {
-              Image(systemName: label.symbolImage)
+              Image(systemName: label.symbolImage ?? "")
             } else {
               Text(label.title)
                 .font(FontSet.Title.title3)

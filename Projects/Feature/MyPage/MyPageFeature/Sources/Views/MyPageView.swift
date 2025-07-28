@@ -50,24 +50,19 @@ public struct MyPageView: View {
       ColorSet.Background.Primary
         .ignoresSafeArea()
       if store.isLoggedIn {
-        NavigationContent
+        VStack(spacing: .Number0) {
+          NavigationBarView
+          PageScrollView
+        }
       } else {
         ZStack {
-          NavigationContent
+          VStack(spacing: .Number0) {
+            NavigationBarView
+            Spacer()
+          }
           requireLoginView
         }
       }
-    }
-  }
-  
-  @ViewBuilder
-  private var NavigationContent: some View {
-    VStack {
-      NavigationBarView
-      UserInfoView
-        .frame(maxWidth: .infinity)
-        .background(ColorSet.Background.Secondary)
-      Spacer()
     }
   }
   
@@ -79,6 +74,27 @@ public struct MyPageView: View {
         TouchArea(image: .settings) {
           store.send(.settingButtonTapped)
         }
+      }
+    )
+  }
+  
+  @ViewBuilder
+  private var PageScrollView: some View {
+    HeaderPageScrollView(
+      displaysSymbols: false,
+      header: {
+        UserInfoView
+          .frame(maxWidth: .infinity)
+          .background(ColorSet.Background.Primary)
+      }, pageLabels: {
+        PageLabel(title: "제보한 내역")
+        PageLabel(title: "버린 내역")
+      }, pages: [
+        Text("제보한 내역"),
+        Text("버린 내역")
+      ],
+      onRefresh: {
+        print("Refresh triggered")
       }
     )
   }

@@ -37,6 +37,8 @@ public struct MyPetView: View {
       switch store.case {
       case let .petDetail(store):
         MyPetDetailView(store: store)
+      case let .changeNickname(store):
+        ChangeMyPetNicknameView(store: store)
       }
     }
     .onChange(of: store.path) { oldValue, newValue in

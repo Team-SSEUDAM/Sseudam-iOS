@@ -39,4 +39,13 @@ public enum PetEndpoint: Sendable {
       parameters: .none
     )
   }
+  
+  public static func putPetNickname(_ nickname: String) -> Endpoint<EmptyResponse> {
+    return Endpoint(
+      headers: .authorization(UserDefaultsKeys.accessToken),
+      method: .put,
+      path: "/pets/name",
+      parameters: .body(["nickname": nickname])
+    )
+  }
 }

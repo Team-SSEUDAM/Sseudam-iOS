@@ -55,7 +55,7 @@ extension CacheActor {
     get async throws {
       return try await cache(
         .myPetInfo,
-        ttl: .high,
+        ttl: .low,
         eviction: .none
       )
     }
@@ -65,7 +65,7 @@ extension CacheActor {
     get async throws {
       return try await cache(
         .myPetSeasonInfo,
-        ttl: .high,
+        ttl: .low,
         eviction: .none
       )
     }

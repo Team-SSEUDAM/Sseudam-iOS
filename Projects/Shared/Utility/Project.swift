@@ -19,7 +19,7 @@ let project = Project(
       destinations: .iOS,
       product: .staticLibrary,
       bundleId: "Sseudam.a2bo.ios.Utility",
-      deploymentTargets: .iOS("17.0"),
+      deploymentTargets: .iOS("18.0"),
       infoPlist: .extendingDefault(with: [:]),
       sources: ["Sources/**"],
       resources: ["Resources/**"]

@@ -50,21 +50,19 @@ public struct MyPageView: View {
       ColorSet.Background.Primary
         .ignoresSafeArea()
       if store.isLoggedIn {
-        NavigationContent
+        VStack(spacing: .Number0) {
+          NavigationBarView
+          PageScrollView
+        }
       } else {
         ZStack {
-          NavigationContent
+          VStack(spacing: .Number0) {
+            NavigationBarView
+            Spacer()
+          }
           requireLoginView
         }
       }
-    }
-  }
-  
-  @ViewBuilder
-  private var NavigationContent: some View {
-    VStack {
-      NavigationBarView
-      Spacer()
     }
   }
   
@@ -78,6 +76,49 @@ public struct MyPageView: View {
         }
       }
     )
+  }
+  
+  @ViewBuilder
+  private var PageScrollView: some View {
+    HeaderPageScrollView(
+      displaysSymbols: false,
+      header: {
+        UserInfoView
+          .frame(maxWidth: .infinity)
+          .background(ColorSet.Background.Primary)
+      }, pageLabels: {
+        PageLabel(title: "제보한 내역")
+        PageLabel(title: "버린 내역")
+      }, pages: [
+        Text("제보한 내역"),
+        Text("버린 내역")
+      ],
+      onRefresh: {
+        print("Refresh triggered")
+      }
+    )
+  }
+  
+  @ViewBuilder
+  private var UserInfoView: some View {
+    VStack(alignment: .center, spacing: .Number12) {
+      Icon(image: .addSpot, size: .Number72)
+      HStack(alignment: .center, spacing: .Number4) {
+        Text("{store.userName}")
+          .font(FontSet.Heading.heading3)
+          .foregroundStyle(ColorSet.Text.Primary)
+        Icon(
+          image: .edit,
+          renderingMode: .template,
+          color: ColorSet.Icon.Tertiary
+        )
+        .onTapGesture {
+          print("Edit Profile Tapped")
+        }
+      }
+    }
+    .padding(.vertical, .Number28)
+    .padding(.horizontal, .Number16)
   }
 
   

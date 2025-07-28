@@ -34,7 +34,7 @@ public extension Target {
       destinations: [.iPhone],
       product: .app,
       bundleId: organization + ".\(env.rawValue)",
-      deploymentTargets: .iOS("17.0"),
+      deploymentTargets: .iOS("18.0"),
       infoPlist: .extendingDefault(with: infoPlist),
       sources: ["Sources/**"],
       resources: ["Resources/**"],
@@ -143,7 +143,7 @@ public extension Target {
       destinations: .iOS,
       product: product,
       bundleId: "\(organization).\(targetName)",
-      deploymentTargets: .iOS("17.0"),
+      deploymentTargets: .iOS("18.0"),
       infoPlist: infoPlist == [:] ? .default : .extendingDefault(with: infoPlist),
       sources: ["\(sourcesPath)"],
       dependencies: dependencies

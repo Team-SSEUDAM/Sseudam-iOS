@@ -38,6 +38,10 @@ import VisitedDomainInterface
 import VisitedDomain
 import VisitedData
 
+import AttendanceDomainInterface
+import AttendanceDomain
+import AttendanceData
+
 import NetworkKit
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
@@ -51,7 +55,7 @@ struct DependencyRegister {
     let reportRepository = ReportRepository.live(networker: networker)
     let petRepository = PetRepository.live(networker: networker)
     let visitedRepository = VisitedRepository.live(networker: networker)
-    
+    let attendanceRepository = AttendanceRepository.live(networker: networker)
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live
 
@@ -181,6 +185,11 @@ struct DependencyRegister {
     
     CheckRecentVisitUseCaseRegister {
       CheckRecentVisitUseCase.live(repository: visitedRepository)
+    }
+    
+    // MARK: - Attendance
+    AttendanceUseCaseRegister {
+      AttendanceUseCase.live(repository: attendanceRepository)
     }
   }
 }

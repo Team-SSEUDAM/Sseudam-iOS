@@ -21,4 +21,7 @@ public struct UserDefaultsKeys {
   @UserDefault("userId", default: nil)
   public static var userId: Int?
   
+  @UserDefault("lastEntryDate", default: nil)
+  public static var lastEntryDate: Date?
+  
 }

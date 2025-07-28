@@ -11,8 +11,8 @@ import AttendanceDomainInterface
 
 extension AttendanceUseCase {
   public static func live(repository: AttendanceRepository) -> AttendanceUseCase {
-    .init {
-      try await repository.fetchData()
+    .init { userId in
+      try await repository.checkAttendance(userId)
     }
   }
 }

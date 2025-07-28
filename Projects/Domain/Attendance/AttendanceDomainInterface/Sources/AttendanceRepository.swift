@@ -9,9 +9,11 @@
 import Foundation
 
 public struct AttendanceRepository {
-  public var fetchData: @Sendable () async throws -> Void
+  public var checkAttendance: @Sendable (_ userId: Int) async throws -> AttendanceEntity
 
-  public init(fetchData: @Sendable @escaping () async throws -> Void) {
-    self.fetchData = fetchData
+  public init(
+    checkAttendance: @Sendable @escaping (_ userId: Int) async throws -> AttendanceEntity
+  ) {
+    self.checkAttendance = checkAttendance
   }
 }

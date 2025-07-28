@@ -24,11 +24,11 @@ public struct CheckRecentVisitDTO: DTO {
   }
   
   public func toEntity() throws -> CheckRecentVisitEntity {
-    let lastVisitedAt: Date? = lastVisitedAt?.toDateFromISO8601
+    let lastVisitedAt: Date? = lastVisitedAt?.toKSTDate
     let expiredAt: Date? = lastVisitedAt?.addingTimeInterval(300)
     var isExpired: Bool = true
     if let expiredAt = expiredAt {
-      isExpired =  expiredAt.remainingFromNow() == nil
+      isExpired = expiredAt.remainingFromNow() == nil
     }
     return .init(expiredAt: expiredAt, isExpired: isExpired)
   }

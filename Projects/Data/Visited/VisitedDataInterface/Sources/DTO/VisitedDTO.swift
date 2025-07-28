@@ -21,7 +21,7 @@ public struct VisitedDTO: DTO {
   
   public func toEntity() throws -> VisitedCompleteEntity {
     return .init(
-      visitedAt: visitedAt.toDateFromISO8601,
+      visitedAt: visitedAt.toKSTDate,
       isTodayFirst: isToday
     )
   }

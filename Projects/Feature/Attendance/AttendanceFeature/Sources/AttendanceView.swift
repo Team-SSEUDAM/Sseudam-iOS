@@ -25,10 +25,14 @@ public struct AttendanceView: View {
         pointView
         attendanceStateView
         PrimaryButton(
-          title: .constant("확인"),
+          title: $store.buttonTitle,
           state: .constant(.normal)
         ) {
-          store.send(.confirmButtonTapped)
+          if store.attendanceStatus == .fail {
+            store.send(.handleContinuityFail)
+          } else {
+            store.send(.confirmButtonTapped)
+          }
         }
         .padding(.Number16)
       }
@@ -56,7 +60,10 @@ public struct AttendanceView: View {
             .font(FontSet.Body.body3)
             .foregroundStyle(ColorSet.Text.Secondary)
         }
-        AttendanceTrackerView(continuityCount: store.continuityCount, isContinuing: store.isContinuity)
+        AttendanceTrackerView(
+          continuityCount: store.continuityCount,
+          isContinuing: store.isContinuity
+        )
         Spacer()
       }
       VStack {
@@ -84,7 +91,7 @@ public struct AttendanceView: View {
       .multilineTextAlignment(.center)
       .font(FontSet.Heading.heading1)
     default:
-      Text(store.attendanceStatus.description)
+      Text(store.attendanceStatus.title)
         .multilineTextAlignment(.center)
         .font(FontSet.Heading.heading1)
         .foregroundStyle(ColorSet.Text.Primary)

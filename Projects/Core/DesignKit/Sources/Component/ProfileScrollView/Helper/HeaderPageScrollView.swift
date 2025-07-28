@@ -13,7 +13,6 @@ public struct PageLabel {
   public var symbolImage: String
 }
 
-@available(iOS 18.0, *)
 public struct HeaderPageScrollView<Header: View, Page: View>: View {
   
   public var displaysSymbols: Bool = false
@@ -268,12 +267,10 @@ public struct PageLabelBuilder {
   }
 }
 
-@available(iOS 18.0, *)
 #Preview {
   ContentView()
 }
 
-@available(iOS 18.0, *)
 extension ScrollGeometry {
   init() {
     self.init(contentOffset: .zero, contentSize: .zero, contentInsets: .init(.zero), containerSize: .zero)

@@ -8,7 +8,6 @@
 
 import SwiftUI
 
-@available(iOS 18.0, *)
 struct ContentView: View {
   var body: some View {
     HeaderPageScrollView(
@@ -47,7 +46,6 @@ struct ContentView: View {
   }
 }
 
-@available(iOS 18.0, *)
 #Preview {
     ContentView()
 }

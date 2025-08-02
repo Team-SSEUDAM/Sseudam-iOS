@@ -50,6 +50,7 @@ public enum Domain: String, ModuleRepresentable {
   case Pet
   case Visited
   case Attendance
+  case ImageDownload
   public var typePath: String { "Domain" }
 }
 
@@ -64,6 +65,7 @@ public enum Data: String, ModuleRepresentable {
   case Pet
   case Visited
   case Attendance
+  case ImageDownload
   public var typePath: String { "Data" }
 }
 
@@ -203,6 +205,10 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.Attendance, isInterface: true))
       public static let Implement = Self.project(.domain(.Attendance))
     }
+    public struct ImageDownload: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.ImageDownload, isInterface: true))
+      public static let Implement = Self.project(.domain(.ImageDownload))
+    }
   }
   
   public struct Data: TargetDependencyDelegate {
@@ -242,6 +248,10 @@ extension TargetDependency {
     public struct Attendance: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.Attendance, isInterface: true))
       public static let Implement = Self.project(.data(.Attendance))
+    }
+    public struct ImageDownload: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.ImageDownload, isInterface: true))
+      public static let Implement = Self.project(.data(.ImageDownload))
     }
   }
   

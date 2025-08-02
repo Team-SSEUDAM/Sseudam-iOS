@@ -8,6 +8,7 @@
 
 import ComposableArchitecture
 import TrashSpotDomainInterface
+import ImageDownloadDomainInterface
 import Utility
 import UserDefaults
 import DesignKit
@@ -43,6 +44,8 @@ public struct TrashDetailFeature {
     case fetchTrashDetail(id: Int)
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
     
+    case fetchTrashImage(imgUrl: String?)
+    
     /// 로그인 후 상태 변경하기 위한 action
     case checkLoggedin
     
@@ -60,6 +63,7 @@ public struct TrashDetailFeature {
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
+  @Dependency(\.ImageDownloadUseCase) var imageDownloadUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -105,7 +109,8 @@ public struct TrashDetailFeature {
         state.trashDetail = data
         return .merge([
           .send(.showLoading(false)),
-          .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point)))
+          .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point))),
+          .send(.fetchTrashImage(imgUrl: data.imageUrl))
         ])
         
       case let .fetchTrashDetailResult(.failure(error)):
@@ -116,6 +121,20 @@ public struct TrashDetailFeature {
           .send(.showLoading(false)),
           .send(.visited(.initialVisitedData))
         ])
+        
+      case let .fetchTrashImage(imgUrl):
+        print(imgUrl)
+        guard let imgUrl = imgUrl else { return .none }
+        return .run { send in
+          do {
+            let data = try await imageDownloadUseCase.execute(imgUrl)
+            dump(data)
+          } catch let error as ImageDownloadError {
+            print(error)
+          } catch {
+            print(error)
+          }
+        }
         
       case .checkLoggedin:
         return checkLoginState()

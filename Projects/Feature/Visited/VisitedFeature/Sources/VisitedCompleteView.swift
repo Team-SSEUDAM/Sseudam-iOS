@@ -95,10 +95,10 @@ public struct VisitedCompleteView: View {
   @ViewBuilder
   private var bottomView: some View {
     VStack {
-      Spacer()
       SnackBar(attributedMessage: $store.toastMessage) {
         store.send(.resetToastMessage)
       }
+      
       if animateButton {
         PrimaryButton(
           title: .constant("확인"),

@@ -62,7 +62,11 @@ public struct TrashDetailView: View {
           )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        trashImageView(image: nil)
+        if data.isPublicData {
+          publicDataImageView
+        } else {
+          trashImageView
+        }
       }
       ButtonsView
     }
@@ -92,16 +96,21 @@ public struct TrashDetailView: View {
   }
   
   @ViewBuilder
-  private func trashImageView(image: Image?) -> some View {
-    if let _ = image {
+  private var trashImageView: some View {
+    if let data = store.trashImageData,
+       let image = UIImage.downsampled(from: data, to: .init(width: .Number80, height: .Number80)) {
+      Image(uiImage: image)
+        .resizable()
+        .clipShape(RoundedRectangle(cornerRadius: .Number8))
+        .frame(width: .Number80, height: .Number80)
+    } else {
       Rectangle()
         .fill(ColorSet.Background.Secondary)
         .clipShape(RoundedRectangle(cornerRadius: .Number8))
         .frame(width: .Number80, height: .Number80)
-    } else {
-      publicDataImageView
     }
   }
+  
   
   @ViewBuilder
   private var publicDataImageView: some View {

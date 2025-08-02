@@ -6,6 +6,7 @@
 //  Created by JiYeon
 //
 
+import Foundation
 import ComposableArchitecture
 import TrashSpotDomainInterface
 import ImageDownloadDomainInterface
@@ -23,6 +24,7 @@ public struct TrashDetailFeature {
     public var visited: VisitedFeature.State = .init()
     var isEmptyList: Bool = false
     var trashDetail: TrashSpotDetail? = nil
+    var trashImageData: Data? = nil
     var isLoading: Bool = true
     var isFailLoadDetail: Bool = false
     public init() {}
@@ -45,6 +47,7 @@ public struct TrashDetailFeature {
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
     
     case fetchTrashImage(imgUrl: String?)
+    case storeImageData(data: Data?)
     
     /// 로그인 후 상태 변경하기 위한 action
     case checkLoggedin
@@ -123,18 +126,21 @@ public struct TrashDetailFeature {
         ])
         
       case let .fetchTrashImage(imgUrl):
-        print(imgUrl)
         guard let imgUrl = imgUrl else { return .none }
         return .run { send in
           do {
             let data = try await imageDownloadUseCase.execute(imgUrl)
-            dump(data)
+            await send(.storeImageData(data: data))
           } catch let error as ImageDownloadError {
             print(error)
           } catch {
             print(error)
           }
         }
+        
+      case let .storeImageData(data):
+        state.trashImageData = data
+        return .none
         
       case .checkLoggedin:
         return checkLoginState()

@@ -47,6 +47,7 @@ public struct TrashDetailFeature {
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
     
     case fetchTrashImage(imgUrl: String?)
+    case fetchTrashImageResult(Result<Data, ImageDownloadError>)
     case storeImageData(data: Data?)
     
     /// 로그인 후 상태 변경하기 위한 action
@@ -127,16 +128,14 @@ public struct TrashDetailFeature {
         
       case let .fetchTrashImage(imgUrl):
         guard let imgUrl = imgUrl else { return .none }
-        return .run { send in
-          do {
-            let data = try await imageDownloadUseCase.execute(imgUrl)
-            await send(.storeImageData(data: data))
-          } catch let error as ImageDownloadError {
-            print(error)
-          } catch {
-            print(error)
-          }
-        }
+        return fetchTrashImage(imgUrl: imgUrl)
+        
+      case let .fetchTrashImageResult(.success(data)):
+        return .send(.storeImageData(data: data))
+        
+      case let .fetchTrashImageResult(.failure(error)):
+        print(error)
+        return .none
         
       case let .storeImageData(data):
         state.trashImageData = data
@@ -191,6 +190,22 @@ public struct TrashDetailFeature {
         return await(send(.fetchTrashDetailResult(.success(data))))
       } catch {
         return await(send(.fetchTrashDetailResult(.failure(.customError(message: error.localizedDescription)))))
+      }
+    }
+  }
+  
+  private func fetchTrashImage(imgUrl: String) -> Effect<Action> {
+    return .run { send in
+      do {
+        if let data = try await imageDownloadUseCase.execute(imgUrl) {
+          await send(.fetchTrashImageResult(.success(data)))
+        } else {
+          await send(.fetchTrashImageResult(.failure(.emptyData)))
+        }
+      } catch let error as ImageDownloadError {
+        await send(.fetchTrashImageResult(.failure(error)))
+      } catch {
+        await send(.fetchTrashImageResult(.failure(.customImageError(error.localizedDescription))))
       }
     }
   }

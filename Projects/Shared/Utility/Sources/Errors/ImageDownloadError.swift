@@ -14,6 +14,7 @@ public enum ImageDownloadError: Error, LocalizedError, Sendable, Equatable {
   case timeout(TimeInterval)
   case cancelled
   case unknown
+  case customImageError(String)
   
   public var errorDescription: String {
     switch self {
@@ -27,6 +28,8 @@ public enum ImageDownloadError: Error, LocalizedError, Sendable, Equatable {
       return "이미지 다운로드 요청이 취소되었습니다."
     case .unknown:
       return "이미지 다운로드에 실패하였습니다."
+    case let .customImageError(errorMsg):
+      return "이미지 다운로드에 실패하였습니다 - \(errorMsg)"
     }
   }
 }

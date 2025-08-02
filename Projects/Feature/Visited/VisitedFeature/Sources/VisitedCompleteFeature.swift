@@ -23,9 +23,11 @@ public struct VisitedCompleteFeature {
     var toastMessage: AttributedString? = nil
     var sseudamCount: String
     var animationState: AnimationState = .init()
+    var isShowConfetti: Bool = false
+    var isShowFirstVisitMessage: Bool = false
     var isShowButton: Bool = false
     public init(isFirstVisit: Bool) {
-      self.isFirstVisit = isFirstVisit
+      self.isFirstVisit = true//isFirstVisit
       sseudamCount = isFirstVisit ? "7쓰담" : "5쓰담"
     }
   }
@@ -35,7 +37,9 @@ public struct VisitedCompleteFeature {
     case onAppear
     case startAnimation
     case startSuccess
-    case startConfetti
+    case startConfettie
+    case stopConfettie
+    case showFirstVisitText
     case showButton
     case comfirmButtonTapped
     case showToastMessage
@@ -56,14 +60,28 @@ public struct VisitedCompleteFeature {
         return .send(.startAnimation)
         
       case .startAnimation:
-        return startAnimation()
+        return startAnimation(isFirstVisit: state.isFirstVisit)
         
       case .startSuccess:
+        let duration = state.animationState.success.duration()
+        
+        state.animationState.success.setSpeed(speed: duration / 1.0)
+        
         state.animationState.success.play()
+        
         return .none
         
-      case .startConfetti:
+      case .startConfettie:
+        state.isShowConfetti = true
         state.animationState.confetti.play()
+        return .none
+        
+      case .stopConfettie:
+        state.animationState.confetti.stop()
+        return .none
+        
+      case .showFirstVisitText:
+        state.isShowFirstVisitMessage = true
         return .none
         
       case .showButton:
@@ -94,14 +112,18 @@ public struct VisitedCompleteFeature {
     }
   }
   
-  private func startAnimation() -> Effect<Action> {
+  private func startAnimation(isFirstVisit: Bool) -> Effect<Action> {
     return .run { send in
       await send(.startSuccess)
       try await Task.sleep(nanoseconds: 400_000_000)
-      await send(.startConfetti)
+      await send(.startConfettie)
+      if isFirstVisit {
+        try await Task.sleep(nanoseconds: 800_000_000)
+        await send(.showFirstVisitText)
+      }
       try await Task.sleep(nanoseconds: 800_000_000)
       await send(.showButton)
-      try await Task.sleep(nanoseconds: 1_000_000_000)
+      try await Task.sleep(nanoseconds: 400_000_000)
       await send(.showToastMessage)
     }
     
@@ -112,11 +134,11 @@ extension VisitedCompleteFeature {
   
   public struct AnimationState: Equatable {
     var confetti = DotLottieAnimation(
-      fileName: LottieSet.success.name,
+      fileName: LottieSet.confetti.name,
       config: AnimationConfig(autoplay: false, loop: false)
     )
     var success = DotLottieAnimation(
-      fileName: LottieSet.confetti.name,
+      fileName: LottieSet.success.name,
       config: AnimationConfig(autoplay: false, loop: false)
     )
     

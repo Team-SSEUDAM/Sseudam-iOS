@@ -22,7 +22,6 @@ public struct VisitedCompleteView: View {
   public var body: some View {
     ZStack(alignment: .top) {
       ColorSet.Background.Primary
-      ConfettiView
       mainContentView
       bottomView
     }
@@ -35,7 +34,10 @@ public struct VisitedCompleteView: View {
   private var mainContentView: some View {
     VStack {
       Spacer()
-      completeView
+      ZStack {
+        completeView
+        firstVisitView
+      }
       
     }
     .padding(.horizontal, .Number16)
@@ -43,32 +45,50 @@ public struct VisitedCompleteView: View {
   
   @ViewBuilder
   private var completeView: some View {
-    
-    VStack(spacing: .Number16) {
+    ZStack {
+      ConfettiView
+      VStack(spacing: .Number16) {
+        Spacer()
+        DotLottieView(dotLottie: store.animationState.success)
+          .frame(width: 120, height: 120)
+        Text("방문 인증이 완료되었어요")
+          .font(FontSet.Heading.heading1)
+          .foregroundStyle(ColorSet.Text.Primary)
+        Spacer()
+      }
+    }
+    .opacity(store.isShowFirstVisitMessage ? 0 : 1)
+    .animation(.easeInOut(duration: 0.4), value: store.isShowFirstVisitMessage)
+    .padding(.horizontal, .Number16)
+  }
+  
+  @ViewBuilder
+  private var firstVisitView: some View {
+    VStack(alignment: .center) {
       Spacer()
-      DotLottieView(dotLottie: store.animationState.confetti)
-        .frame(width: 120, height: 120)
-        
-      
-      Text("방문 인증이 완료되었어요")
+      Text("오늘 첫 인증이군요!\n보너스로 2쓰담을 더 드릴게요")
+        .multilineTextAlignment(.center)
         .font(FontSet.Heading.heading1)
         .foregroundStyle(ColorSet.Text.Primary)
+        .offset(y: store.isShowFirstVisitMessage ? 0 : 20)
+        .opacity(store.isShowFirstVisitMessage ? 1 : 0)
+        .animation(.easeOut(duration: 0.4).delay(0.2), value: store.isShowFirstVisitMessage)
+              
       Spacer()
     }
-    .padding(.horizontal, .Number16)
-    
-    
-    
+
   }
   
   @ViewBuilder
   private var ConfettiView: some View {
-    VStack(alignment: .center, spacing: .Number0) {
-      DotLottieView(dotLottie: store.animationState.success)
-      .scaleEffect(2.5)
-      .frame(height: 600)
-      .clipped()
-      Spacer()
+    if store.isShowConfetti {
+      VStack(alignment: .center, spacing: .Number0) {
+        DotLottieView(dotLottie: store.animationState.confetti)
+          .scaleEffect(2.5)
+          .frame(height: 600)
+          .clipped()
+        Spacer()
+      }
     }
   }
   

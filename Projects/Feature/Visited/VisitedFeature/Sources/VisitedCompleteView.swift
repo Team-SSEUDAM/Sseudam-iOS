@@ -24,7 +24,6 @@ public struct VisitedCompleteView: View {
       ConfettiView
       mainContentView
       bottomView
-      
     }
     .onAppear {
       store.send(.onAppear)
@@ -46,8 +45,6 @@ public struct VisitedCompleteView: View {
     
     VStack(spacing: .Number16) {
       Spacer()
-      // TODO: - 아이콘 변경 필요
-      //      Icon(image: .check, size: .Number64)
       DotLottieAnimation(
         fileName: LottieSet.success.name,
         config: AnimationConfig(autoplay: true, loop: false)

@@ -35,6 +35,15 @@ public struct VisitedCompleteFeature {
     case delegate(Delegate)
   }
   
+  enum AnimationStep: Hashable {
+    case success
+    case confetti
+    case button
+    case toast
+    case levelUp
+  }
+  
+  
   public enum Delegate: Equatable {
     case dismiss
   }

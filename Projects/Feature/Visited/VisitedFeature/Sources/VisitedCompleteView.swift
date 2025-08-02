@@ -13,6 +13,8 @@ import DotLottie
 
 public struct VisitedCompleteView: View {
   @Bindable var store: StoreOf<VisitedCompleteFeature>
+  
+  private var dotLottieView: DotLottieView? = nil
 
   public init(store: StoreOf<VisitedCompleteFeature>) {
     self.store = store
@@ -45,12 +47,10 @@ public struct VisitedCompleteView: View {
     
     VStack(spacing: .Number16) {
       Spacer()
-      DotLottieAnimation(
-        fileName: LottieSet.success.name,
-        config: AnimationConfig(autoplay: true, loop: false)
-      )
-      .view()
-      .frame(width: 120, height: 120)
+      DotLottieView(dotLottie: store.animationState.confetti)
+        .frame(width: 120, height: 120)
+        
+      
       Text("방문 인증이 완료되었어요")
         .font(FontSet.Heading.heading1)
         .foregroundStyle(ColorSet.Text.Primary)
@@ -65,11 +65,7 @@ public struct VisitedCompleteView: View {
   @ViewBuilder
   private var ConfettiView: some View {
     VStack(alignment: .center, spacing: .Number0) {
-      DotLottieAnimation(
-        fileName: LottieSet.confetti.name,
-        config: AnimationConfig(autoplay: true, loop: false)
-      )
-      .view()
+      DotLottieView(dotLottie: store.animationState.success)
       .scaleEffect(2.5)
       .frame(height: 600)
       .clipped()

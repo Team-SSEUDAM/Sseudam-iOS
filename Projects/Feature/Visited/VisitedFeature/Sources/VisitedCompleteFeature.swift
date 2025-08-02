@@ -9,6 +9,7 @@
 import Foundation
 import ComposableArchitecture
 import DesignKit
+import DotLottie
 
 @Reducer
 public struct VisitedCompleteFeature {
@@ -17,9 +18,12 @@ public struct VisitedCompleteFeature {
   
   @ObservableState
   public struct State: Equatable {
+    
     var isFirstVisit: Bool
     var toastMessage: AttributedString? = nil
     var sseudamCount: String
+    var animationState: AnimationState = .init()
+    
     public init(isFirstVisit: Bool) {
       self.isFirstVisit = isFirstVisit
       sseudamCount = isFirstVisit ? "7쓰담" : "5쓰담"
@@ -35,14 +39,6 @@ public struct VisitedCompleteFeature {
     case delegate(Delegate)
   }
   
-  enum AnimationStep: Hashable {
-    case success
-    case confetti
-    case button
-    case toast
-    case levelUp
-  }
-  
   
   public enum Delegate: Equatable {
     case dismiss
@@ -53,6 +49,7 @@ public struct VisitedCompleteFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
+        state.animationState.confetti.play()
         return .send(.showToastMessage)
         
       case .comfirmButtonTapped:
@@ -76,6 +73,24 @@ public struct VisitedCompleteFeature {
         
         default: return .none
       }
+    }
+  }
+}
+
+extension VisitedCompleteFeature {
+  
+  public struct AnimationState: Equatable {
+    var confetti = DotLottieAnimation(
+      fileName: LottieSet.success.name,
+      config: AnimationConfig(autoplay: false, loop: false)
+    )
+    var success = DotLottieAnimation(
+      fileName: LottieSet.confetti.name,
+      config: AnimationConfig(autoplay: true, loop: false)
+    )
+    
+    public static func == (lhs: VisitedCompleteFeature.AnimationState, rhs: VisitedCompleteFeature.AnimationState) -> Bool {
+      return true
     }
   }
 }

@@ -119,9 +119,6 @@ public struct VisitedCompleteView: View {
     }
   }
   
-  
-  
-  
 }
 
 

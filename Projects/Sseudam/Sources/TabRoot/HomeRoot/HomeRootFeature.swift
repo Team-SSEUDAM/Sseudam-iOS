@@ -84,12 +84,11 @@ struct HomeRootFeature {
         return .send(.delegate(.presentAlert(type)))
         
       case let .presentDetail(isPresent, id):
-        state.modal = .visitedComplete(VisitedCompleteFeature.State(isFirstVisit: false))
-//        state.trashDetail = isPresent ? .init() : nil
-//        state.isPresentDetail = isPresent
-//        if isPresent {
-//          return .send(.trashDetail(.showDetail(id: id)))
-//        }
+        state.trashDetail = isPresent ? .init() : nil
+        state.isPresentDetail = isPresent
+        if isPresent {
+          return .send(.trashDetail(.showDetail(id: id)))
+        }
         return .none
         
       case let .presentVisitedComplete(isFirst):

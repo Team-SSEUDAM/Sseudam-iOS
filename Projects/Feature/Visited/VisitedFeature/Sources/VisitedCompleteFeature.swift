@@ -26,8 +26,9 @@ public struct VisitedCompleteFeature {
     var isShowConfetti: Bool = false
     var isShowFirstVisitMessage: Bool = false
     var isShowButton: Bool = false
+    
     public init(isFirstVisit: Bool) {
-      self.isFirstVisit = true//isFirstVisit
+      self.isFirstVisit = isFirstVisit
       sseudamCount = isFirstVisit ? "7쓰담" : "5쓰담"
     }
   }
@@ -37,8 +38,7 @@ public struct VisitedCompleteFeature {
     case onAppear
     case startAnimation
     case startSuccess
-    case startConfettie
-    case stopConfettie
+    case startConfetti
     case showFirstVisitText
     case showButton
     case comfirmButtonTapped
@@ -64,20 +64,13 @@ public struct VisitedCompleteFeature {
         
       case .startSuccess:
         let duration = state.animationState.success.duration()
-        
         state.animationState.success.setSpeed(speed: duration / 1.0)
-        
         state.animationState.success.play()
-        
         return .none
         
-      case .startConfettie:
+      case .startConfetti:
         state.isShowConfetti = true
         state.animationState.confetti.play()
-        return .none
-        
-      case .stopConfettie:
-        state.animationState.confetti.stop()
         return .none
         
       case .showFirstVisitText:
@@ -116,7 +109,7 @@ public struct VisitedCompleteFeature {
     return .run { send in
       await send(.startSuccess)
       try await Task.sleep(nanoseconds: 400_000_000)
-      await send(.startConfettie)
+      await send(.startConfetti)
       if isFirstVisit {
         try await Task.sleep(nanoseconds: 800_000_000)
         await send(.showFirstVisitText)

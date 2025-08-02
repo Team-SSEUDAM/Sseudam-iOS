@@ -23,7 +23,7 @@ public struct VisitedCompleteFeature {
     var toastMessage: AttributedString? = nil
     var sseudamCount: String
     var animationState: AnimationState = .init()
-    
+    var isShowButton: Bool = false
     public init(isFirstVisit: Bool) {
       self.isFirstVisit = isFirstVisit
       sseudamCount = isFirstVisit ? "7쓰담" : "5쓰담"
@@ -33,6 +33,10 @@ public struct VisitedCompleteFeature {
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case onAppear
+    case startAnimation
+    case startSuccess
+    case startConfetti
+    case showButton
     case comfirmButtonTapped
     case showToastMessage
     case resetToastMessage
@@ -49,8 +53,22 @@ public struct VisitedCompleteFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
+        return .send(.startAnimation)
+        
+      case .startAnimation:
+        return startAnimation()
+        
+      case .startSuccess:
+        state.animationState.success.play()
+        return .none
+        
+      case .startConfetti:
         state.animationState.confetti.play()
-        return .send(.showToastMessage)
+        return .none
+        
+      case .showButton:
+        state.isShowButton = true
+        return .none
         
       case .comfirmButtonTapped:
         return .send(.delegate(.dismiss))
@@ -75,6 +93,19 @@ public struct VisitedCompleteFeature {
       }
     }
   }
+  
+  private func startAnimation() -> Effect<Action> {
+    return .run { send in
+      await send(.startSuccess)
+      try await Task.sleep(nanoseconds: 400_000_000)
+      await send(.startConfetti)
+      try await Task.sleep(nanoseconds: 800_000_000)
+      await send(.showButton)
+      try await Task.sleep(nanoseconds: 1_000_000_000)
+      await send(.showToastMessage)
+    }
+    
+  }
 }
 
 extension VisitedCompleteFeature {
@@ -86,7 +117,7 @@ extension VisitedCompleteFeature {
     )
     var success = DotLottieAnimation(
       fileName: LottieSet.confetti.name,
-      config: AnimationConfig(autoplay: true, loop: false)
+      config: AnimationConfig(autoplay: false, loop: false)
     )
     
     public static func == (lhs: VisitedCompleteFeature.AnimationState, rhs: VisitedCompleteFeature.AnimationState) -> Bool {

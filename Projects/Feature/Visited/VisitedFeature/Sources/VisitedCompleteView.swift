@@ -13,9 +13,8 @@ import DotLottie
 
 public struct VisitedCompleteView: View {
   @Bindable var store: StoreOf<VisitedCompleteFeature>
+  @State private var animateButton: Bool = false
   
-  private var dotLottieView: DotLottieView? = nil
-
   public init(store: StoreOf<VisitedCompleteFeature>) {
     self.store = store
   }
@@ -80,15 +79,24 @@ public struct VisitedCompleteView: View {
       SnackBar(attributedMessage: $store.toastMessage) {
         store.send(.resetToastMessage)
       }
-      PrimaryButton(
-        title: .constant("확인"),
-        state: .constant(.normal)
-      ) {
-        store.send(.comfirmButtonTapped)
+      if animateButton {
+        PrimaryButton(
+          title: .constant("확인"),
+          state: .constant(.normal)
+        ) {
+          store.send(.comfirmButtonTapped)
+        }
+        .padding(.vertical, .Number16)
       }
-      .padding(.vertical, .Number16)
     }
     .padding(.horizontal, .Number16)
+    .onChange(of: store.isShowButton) { oldValue, newValue in
+      if newValue {
+        withAnimation(.easeIn(duration: 0.3)) {
+          animateButton = true
+        }
+      }
+    }
   }
   
   

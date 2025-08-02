@@ -9,6 +9,7 @@
 import SwiftUI
 import ComposableArchitecture
 import DesignKit
+import DotLottie
 
 public struct VisitedCompleteView: View {
   @Bindable var store: StoreOf<VisitedCompleteFeature>
@@ -18,8 +19,9 @@ public struct VisitedCompleteView: View {
   }
 
   public var body: some View {
-    ZStack {
+    ZStack(alignment: .top) {
       ColorSet.Background.Primary
+      ConfettiView
       mainContentView
       bottomView
       
@@ -41,16 +43,41 @@ public struct VisitedCompleteView: View {
   
   @ViewBuilder
   private var completeView: some View {
-    VStack(spacing: .Number8) {
+    
+    VStack(spacing: .Number16) {
       Spacer()
       // TODO: - 아이콘 변경 필요
-      Icon(image: .check, size: .Number64)
+      //      Icon(image: .check, size: .Number64)
+      DotLottieAnimation(
+        fileName: LottieSet.success.name,
+        config: AnimationConfig(autoplay: true, loop: false)
+      )
+      .view()
+      .frame(width: 120, height: 120)
       Text("방문 인증이 완료되었어요")
         .font(FontSet.Heading.heading1)
         .foregroundStyle(ColorSet.Text.Primary)
       Spacer()
     }
+    .padding(.horizontal, .Number16)
     
+    
+    
+  }
+  
+  @ViewBuilder
+  private var ConfettiView: some View {
+    VStack(alignment: .center, spacing: .Number0) {
+      DotLottieAnimation(
+        fileName: LottieSet.confetti.name,
+        config: AnimationConfig(autoplay: true, loop: false)
+      )
+      .view()
+      .scaleEffect(2.5)
+      .frame(height: 600)
+      .clipped()
+      Spacer()
+    }
   }
   
   @ViewBuilder
@@ -71,7 +98,7 @@ public struct VisitedCompleteView: View {
     .padding(.horizontal, .Number16)
   }
   
- 
+  
   
   
 }

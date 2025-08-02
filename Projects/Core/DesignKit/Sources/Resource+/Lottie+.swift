@@ -12,6 +12,8 @@ public enum LottieSet: String {
   case loading = "loading"
   case tap_shine = "tap_shine"
   case dot_loading = "dot_loading"
+  case success = "success"
+  case confetti = "confetti"
   
   
   public var name: String { return rawValue }

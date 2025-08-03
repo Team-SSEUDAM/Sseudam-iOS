@@ -46,7 +46,7 @@ public struct TrashDetailFeature {
     case fetchTrashDetail(id: Int)
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
     
-    case fetchTrashImage(imgUrl: String?)
+    case fetchTrashImage(imgUrl: String?, id: Int)
     case fetchTrashImageResult(Result<Data, ImageDownloadError>)
     case storeImageData(data: Data?)
     
@@ -114,7 +114,7 @@ public struct TrashDetailFeature {
         return .merge([
           .send(.showLoading(false)),
           .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point))),
-          .send(.fetchTrashImage(imgUrl: data.imageUrl))
+          .send(.fetchTrashImage(imgUrl: data.imageUrl, id: data.id))
         ])
         
       case let .fetchTrashDetailResult(.failure(error)):
@@ -126,9 +126,9 @@ public struct TrashDetailFeature {
           .send(.visited(.initialVisitedData))
         ])
         
-      case let .fetchTrashImage(imgUrl):
+      case let .fetchTrashImage(imgUrl, id):
         guard let imgUrl = imgUrl else { return .none }
-        return fetchTrashImage(imgUrl: imgUrl)
+        return fetchTrashImage(imgUrl: imgUrl, id: id)
         
       case let .fetchTrashImageResult(.success(data)):
         return .send(.storeImageData(data: data))
@@ -194,10 +194,10 @@ public struct TrashDetailFeature {
     }
   }
   
-  private func fetchTrashImage(imgUrl: String) -> Effect<Action> {
+  private func fetchTrashImage(imgUrl: String, id: Int) -> Effect<Action> {
     return .run { send in
       do {
-        if let data = try await imageDownloadUseCase.execute(imgUrl) {
+        if let data = try await imageDownloadUseCase.execute(imgUrl, id) {
           await send(.fetchTrashImageResult(.success(data)))
         } else {
           await send(.fetchTrashImageResult(.failure(.emptyData)))

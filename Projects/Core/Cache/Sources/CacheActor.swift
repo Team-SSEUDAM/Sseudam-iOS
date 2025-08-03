@@ -80,6 +80,16 @@ extension CacheActor {
       )
     }
   }
+  
+  public func TRASH_IMAGE_CACHE(id: Int) async throws -> TwoTierCache<ImageCacheKey, TrashImageCacheModel> {
+      return try await cache(
+        .trashImage(id: id),
+        ttl: .high,
+        eviction: .none
+      )
+    
+  }
+  
 }
 
 /*

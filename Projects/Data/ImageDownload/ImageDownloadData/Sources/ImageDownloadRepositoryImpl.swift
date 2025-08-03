@@ -10,15 +10,32 @@ import Foundation
 import ImageDownloadDomainInterface
 import ImageDownloadDataInterface
 import NetworkKit
+import Cache
+import Utility
 
 public extension ImageDownloadRepository {
   static var live: ImageDownloadRepository {
     ImageDownloadRepository(
-      fetchImage: { urlStr in
-        // 실제 네트워크 작업 구현
+      fetchImage: { urlStr, id in
         guard let url = URL(string: urlStr) else { return nil }
         let imageDownloader = ImageDownloader()
-        return try await imageDownloader.downloadData(from: url)
+        let data = try await imageDownloader.downloadData(from: url)
+        
+        let cacheKey = ImageCacheKey.trashImage(id: id)
+        let cache = try await CacheActor.shared.TRASH_IMAGE_CACHE(id: id)
+        let cacheModel = TrashImageCacheModel(imageData: data)
+        
+        await cache.remove(forKey: cacheKey)
+        try await cache.insert(cacheModel, forKey: cacheKey)
+        return data
+      },
+      fetchImageCache: { id in
+        let cacheKey = ImageCacheKey.trashImage(id: id)
+        let cache = try await CacheActor.shared.TRASH_IMAGE_CACHE(id: id)
+        guard let hitData = await cache.value(forKey: cacheKey) else {
+          throw CacheError.fileNotFound
+        }
+        return hitData.imageData
       }
     )
   }

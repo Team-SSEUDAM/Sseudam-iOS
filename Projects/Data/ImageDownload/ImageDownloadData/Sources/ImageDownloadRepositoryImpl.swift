@@ -35,6 +35,7 @@ public extension ImageDownloadRepository {
         guard let hitData = await cache.value(forKey: cacheKey) else {
           throw CacheError.fileNotFound
         }
+        print("📷 FETCH IMAGE FROM CACHE")
         return hitData.imageData
       }
     )

@@ -9,8 +9,14 @@
 import Foundation
 import Utility
 
-public final class ImageDownloader: ImageDownloaderProtocol {
-  public init() {}
+public struct ImageDownloader: ImageDownloaderProtocol {
+  
+  private let session: URLSession
+  public init(
+    session: URLSession = .shared
+  ) {
+    self.session = session
+  }
 
   public func downloadData(from url: URL, timeout: TimeInterval = 30.0) async throws -> Data {
     try await withThrowingTaskGroup(of: Data.self) { group in
@@ -20,15 +26,15 @@ public final class ImageDownloader: ImageDownloaderProtocol {
           timeoutInterval: timeout
         )
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await self.session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse,
               (200...299).contains(httpResponse.statusCode) else {
-          throw ImageDownloadError.unknown
+          throw handleDownloadError(ImageDownloadError.unknown, url: url)
         }
 
         guard !data.isEmpty else {
-          throw ImageDownloadError.emptyData
+          throw handleDownloadError(ImageDownloadError.emptyData, url: url)
         }
 
         return data
@@ -36,7 +42,7 @@ public final class ImageDownloader: ImageDownloaderProtocol {
 
       group.addTask {
         try await Task.sleep(nanoseconds: UInt64(timeout * 1_000_000_000))
-        throw ImageDownloadError.timeout(timeout)
+        throw handleDownloadError(ImageDownloadError.timeout(timeout), url: url)
       }
 
       do {
@@ -44,15 +50,29 @@ public final class ImageDownloader: ImageDownloaderProtocol {
           group.cancelAll()
           return result
         } else {
-          throw ImageDownloadError.unknown
+          throw handleDownloadError(ImageDownloadError.unknown, url: url)
         }
       } catch is CancellationError {
         group.cancelAll()
-        throw ImageDownloadError.cancelled
+        throw handleDownloadError(ImageDownloadError.cancelled, url: url)
       } catch {
         group.cancelAll()
-        throw error
+        throw handleDownloadError(error, url: url)
       }
     }
+  }
+  
+  private func handleDownloadError(_ error: Error, url: URL) -> Error {
+    var description: String = error.localizedDescription
+    if let error = error as? ImageDownloadError {
+      description = error.errorDescription
+    }
+    print("""
+    ======== ❌ Fail Download Image ========
+    ✔️ message: \(description)
+    ✔️ url: \(url)
+    ========================================
+    """)
+    return error
   }
 }

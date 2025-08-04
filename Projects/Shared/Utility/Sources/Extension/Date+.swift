@@ -29,6 +29,9 @@ extension Date {
   
   /// 타겟 날짜가 오늘 날짜인지 여부
   public var isSameDayAsToday: Bool {
-    Calendar.current.isDateInToday(self)
+    var calendar = Calendar.current
+    calendar.timeZone = TimeZone(secondsFromGMT: 0)! // UTC 기준
+    return calendar.isDate(self, inSameDayAs: Date())
   }
+  
 }

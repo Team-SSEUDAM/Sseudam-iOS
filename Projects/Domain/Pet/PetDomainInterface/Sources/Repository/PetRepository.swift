@@ -26,7 +26,7 @@ public struct PetRepository {
     getPetSeasonInfo: @Sendable @escaping () async throws -> PetSeasonInfoEntity,
     getPetSeasonInfoFromCache: @Sendable @escaping () async throws -> PetSeasonInfoEntity,
     getPetHistoryInfo: @Sendable @escaping () async throws -> PetHistoryInfoEntity,
-    getPetHistoryInfoFromCache: @Sendable @escaping () async throws -> PetHistoryInfoEntity
+    getPetHistoryInfoFromCache: @Sendable @escaping () async throws -> PetHistoryInfoEntity,
     putPetNickname: @Sendable @escaping (String) async throws -> Void
   ) {
     self.getPetInfo = getPetInfo

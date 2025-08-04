@@ -198,8 +198,8 @@ struct DependencyRegister {
     }
     
     // MARK: - ImageDownload
-    ImageDownloadUseCaseRegister {
-      ImageDownloadUseCase.live(repository: imageDownloadRepoaitory)
+    TrashImageDownloadUseCaseRegister {
+      TrashImageDownloadUseCase.live(repository: imageDownloadRepoaitory)
     }
   }
 }

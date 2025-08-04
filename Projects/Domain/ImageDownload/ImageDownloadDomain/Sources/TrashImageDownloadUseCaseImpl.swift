@@ -10,17 +10,17 @@ import Foundation
 import ImageDownloadDomainInterface
 import Utility
 
-extension ImageDownloadUseCase {
-  public static func live(repository: ImageDownloadRepository) -> ImageDownloadUseCase {
+extension TrashImageDownloadUseCase {
+  public static func live(repository: ImageDownloadRepository) -> TrashImageDownloadUseCase {
     .init { url, id in
       do {
-        let data = try await repository.fetchImageCache(id)
+        let data = try await repository.fetchTrashImageCache(id)
         
         return data
       } catch let error as CacheError {
         switch error {
         case .fileNotFound:
-          let data = try await repository.fetchImage(url, id)
+          let data = try await repository.fetchTrashImage(url, id)
           return data
           
         default: throw error

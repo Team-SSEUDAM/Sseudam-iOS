@@ -16,7 +16,7 @@ import Utility
 public extension ImageDownloadRepository {
   static var live: ImageDownloadRepository {
     ImageDownloadRepository(
-      fetchImage: { urlStr, id in
+      fetchTrashImage: { urlStr, id in
         guard let url = URL(string: urlStr) else { return nil }
         let imageDownloader = ImageDownloader()
         let data = try await imageDownloader.downloadData(from: url)
@@ -29,7 +29,7 @@ public extension ImageDownloadRepository {
         try await cache.insert(cacheModel, forKey: cacheKey)
         return data
       },
-      fetchImageCache: { id in
+      fetchTrashImageCache: { id in
         let cacheKey = ImageCacheKey.trashImage(id: id)
         let cache = try await CacheActor.shared.TRASH_IMAGE_CACHE(id: id)
         guard let hitData = await cache.value(forKey: cacheKey) else {

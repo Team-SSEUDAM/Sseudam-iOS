@@ -80,22 +80,19 @@ public struct MyPageView: View {
   
   @ViewBuilder
   private var PageScrollView: some View {
-    HeaderPageScrollView(
-      displaysSymbols: false,
-      header: {
+    HeaderPageScrollView(displaysSymbols: false) {
         UserInfoView
           .frame(maxWidth: .infinity)
           .background(ColorSet.Background.Primary)
-      }, pageLabels: {
+      } pageLabels: {
         PageLabel(title: "제보한 내역")
         PageLabel(title: "버린 내역")
-      }, pages: [
+      } pages: {
         DummySuggestList
-      ],
-      onRefresh: {
+        DummyThrownList
+      } onRefresh: {
         print("Refresh triggered")
       }
-    )
   }
   
   @ViewBuilder

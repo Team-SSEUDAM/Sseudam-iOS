@@ -6,8 +6,10 @@
 //  Created by JiYeon
 //
 
+import Foundation
 import ComposableArchitecture
 import TrashSpotDomainInterface
+import ImageDownloadDomainInterface
 import Utility
 import UserDefaults
 import DesignKit
@@ -22,6 +24,7 @@ public struct TrashDetailFeature {
     public var visited: VisitedFeature.State = .init()
     var isEmptyList: Bool = false
     var trashDetail: TrashSpotDetail? = nil
+    var trashImageData: Data? = nil
     var isLoading: Bool = true
     var isFailLoadDetail: Bool = false
     public init() {}
@@ -43,6 +46,10 @@ public struct TrashDetailFeature {
     case fetchTrashDetail(id: Int)
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
     
+    case fetchTrashImage(imgUrl: String?, id: Int)
+    case fetchTrashImageResult(Result<Data, ImageDownloadError>)
+    case storeImageData(data: Data?)
+    
     /// 로그인 후 상태 변경하기 위한 action
     case checkLoggedin
     
@@ -60,6 +67,7 @@ public struct TrashDetailFeature {
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
+  @Dependency(\.ImageDownloadUseCase) var imageDownloadUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -105,7 +113,8 @@ public struct TrashDetailFeature {
         state.trashDetail = data
         return .merge([
           .send(.showLoading(false)),
-          .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point)))
+          .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point))),
+          .send(.fetchTrashImage(imgUrl: data.imageUrl, id: data.id))
         ])
         
       case let .fetchTrashDetailResult(.failure(error)):
@@ -116,6 +125,21 @@ public struct TrashDetailFeature {
           .send(.showLoading(false)),
           .send(.visited(.initialVisitedData))
         ])
+        
+      case let .fetchTrashImage(imgUrl, id):
+        guard let imgUrl = imgUrl else { return .none }
+        return fetchTrashImage(imgUrl: imgUrl, id: id)
+        
+      case let .fetchTrashImageResult(.success(data)):
+        return .send(.storeImageData(data: data))
+        
+      case let .fetchTrashImageResult(.failure(error)):
+        print(error)
+        return .none
+        
+      case let .storeImageData(data):
+        state.trashImageData = data
+        return .none
         
       case .checkLoggedin:
         return checkLoginState()
@@ -166,6 +190,22 @@ public struct TrashDetailFeature {
         return await(send(.fetchTrashDetailResult(.success(data))))
       } catch {
         return await(send(.fetchTrashDetailResult(.failure(.customError(message: error.localizedDescription)))))
+      }
+    }
+  }
+  
+  private func fetchTrashImage(imgUrl: String, id: Int) -> Effect<Action> {
+    return .run { send in
+      do {
+        if let data = try await imageDownloadUseCase.execute(imgUrl, id) {
+          await send(.fetchTrashImageResult(.success(data)))
+        } else {
+          await send(.fetchTrashImageResult(.failure(.emptyData)))
+        }
+      } catch let error as ImageDownloadError {
+        await send(.fetchTrashImageResult(.failure(error)))
+      } catch {
+        await send(.fetchTrashImageResult(.failure(.customImageError(error.localizedDescription))))
       }
     }
   }

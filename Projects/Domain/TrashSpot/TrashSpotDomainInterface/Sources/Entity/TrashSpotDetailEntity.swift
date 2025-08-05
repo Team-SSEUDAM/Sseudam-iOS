@@ -20,6 +20,7 @@ public struct TrashSpotDetail: Equatable, Sendable {
   public var trashType: TrashType
   public var visitedCount: Int
   public var imageUrl: String?
+  public var isPublicData: Bool
   
   public init(
     id: Int,
@@ -41,5 +42,6 @@ public struct TrashSpotDetail: Equatable, Sendable {
     self.trashType = trashType
     self.visitedCount = visitedCount
     self.imageUrl = imageUrl
+    self.isPublicData = imageUrl == .none
   }
 }

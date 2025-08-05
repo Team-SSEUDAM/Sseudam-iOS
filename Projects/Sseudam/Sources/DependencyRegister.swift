@@ -42,6 +42,10 @@ import AttendanceDomainInterface
 import AttendanceDomain
 import AttendanceData
 
+import ImageDownloadDomainInterface
+import ImageDownloadDomain
+import ImageDownloadData
+
 import NetworkKit
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
@@ -58,6 +62,7 @@ struct DependencyRegister {
     let attendanceRepository = AttendanceRepository.live(networker: networker)
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live
+    let imageDownloadRepoaitory = ImageDownloadRepository.live
 
     // MARK: - Home
       
@@ -190,6 +195,11 @@ struct DependencyRegister {
     // MARK: - Attendance
     AttendanceUseCaseRegister {
       AttendanceUseCase.live(repository: attendanceRepository)
+    }
+    
+    // MARK: - ImageDownload
+    TrashImageDownloadUseCaseRegister {
+      TrashImageDownloadUseCase.live(repository: imageDownloadRepoaitory)
     }
   }
 }

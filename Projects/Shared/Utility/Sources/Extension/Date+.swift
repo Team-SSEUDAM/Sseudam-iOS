@@ -32,6 +32,7 @@ extension Date {
     var calendar = Calendar.current
     calendar.timeZone = TimeZone(secondsFromGMT: 0)! // UTC 기준
     return calendar.isDate(self, inSameDayAs: Date())
+    
   }
   
 }

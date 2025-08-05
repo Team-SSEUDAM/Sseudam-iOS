@@ -90,8 +90,7 @@ public struct MyPageView: View {
         PageLabel(title: "제보한 내역")
         PageLabel(title: "버린 내역")
       }, pages: [
-        Text("제보한 내역"),
-        Text("버린 내역")
+        DummySuggestList
       ],
       onRefresh: {
         print("Refresh triggered")
@@ -143,6 +142,14 @@ public struct MyPageView: View {
       
       Spacer()
     }
+  }
+  
+  @ViewBuilder
+  private var DummySuggestList: some View {
+    ForEach(0..<10) { index in
+      SuggestCell()
+    }
+    .background(ColorSet.Background.Primary)
   }
 }
 

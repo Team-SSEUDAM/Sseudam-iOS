@@ -146,10 +146,22 @@ public struct MyPageView: View {
   
   @ViewBuilder
   private var DummySuggestList: some View {
-    ForEach(0..<10) { index in
-      SuggestCell()
+    LazyVStack(spacing: .Number0) {
+      ForEach(0..<10) { index in
+        SuggestCell()
+      }
+      .background(ColorSet.Background.Primary)
     }
-    .background(ColorSet.Background.Primary)
+  }
+  
+  @ViewBuilder
+  private var DummyThrownList: some View {
+    LazyVStack(spacing: .Number0) {
+      ForEach(0..<10) { index in
+        ThrownCell()
+      }
+      .background(ColorSet.Background.Primary)
+    }
   }
 }
 

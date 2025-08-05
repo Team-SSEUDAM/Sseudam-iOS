@@ -16,6 +16,7 @@ import DotLottie
 public struct TrashDetailView: View {
   @Bindable var store: StoreOf<TrashDetailFeature>
   @Environment(\.scenePhase) private var scenePhase
+  @State private var downsampledImage: UIImage?
   
   public init(store: StoreOf<TrashDetailFeature>) {
     self.store = store
@@ -35,7 +36,6 @@ public struct TrashDetailView: View {
           loadingView
         }
       }
-      
     }
   }
   
@@ -97,17 +97,25 @@ public struct TrashDetailView: View {
   
   @ViewBuilder
   private var trashImageView: some View {
-    if let data = store.trashImageData,
-       let image = UIImage.downsampled(from: data, to: .init(width: .Number80, height: .Number80)) {
+    if let image = downsampledImage {
       Image(uiImage: image)
         .resizable()
         .clipShape(RoundedRectangle(cornerRadius: .Number8))
         .frame(width: .Number80, height: .Number80)
-    } else {
+    }
+    else {
       Rectangle()
         .fill(ColorSet.Background.Secondary)
         .clipShape(RoundedRectangle(cornerRadius: .Number8))
         .frame(width: .Number80, height: .Number80)
+        .task(id: store.trashImageData) { 
+          if let data = store.trashImageData {
+            downsampledImage = await UIImage.downsampledAsync(
+              from: data,
+              to: CGSize(width: .Number80, height: .Number80)
+            )
+          }
+        }
     }
   }
   

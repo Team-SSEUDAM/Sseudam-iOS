@@ -38,4 +38,10 @@ public extension UIImage {
     
     return UIImage(cgImage: cgImage)
   }
+  
+  static func downsampledAsync(from data: Data, to pointSize: CGSize) async -> UIImage? {
+      await Task.detached(priority: .userInitiated) {
+        UIImage.downsampled(from: data, to: pointSize)
+      }.value
+    }
 }

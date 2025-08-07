@@ -46,6 +46,19 @@ public enum MyPetCacheKey: CacheKey {
   }
 }
 
+public enum TrashSpotCacheKey: CacheKey {
+  case trashSpotDetail(id: Int)
+  
+  public var directory: String { "TrashSpotDetail" }
+  public var fileName: String { "\(identifier).cache" }
+  
+  public var identifier: String {
+    switch self {
+    case let .trashSpotDetail(id): "trash_spot_detail_\(id)"
+    }
+  }
+}
+
 public enum ImageCacheKey: CacheKey {
   case trashImage(id: Int)
   

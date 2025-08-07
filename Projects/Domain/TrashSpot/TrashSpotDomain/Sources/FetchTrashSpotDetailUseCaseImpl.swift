@@ -8,11 +8,24 @@
 
 import Foundation
 import TrashSpotDomainInterface
+import Utility
 
 extension FetchTrashSpotDetailUseCase {
   public static func live(repository: TrashSpotRepository) -> FetchTrashSpotDetailUseCase {
     .init { data in
-      try await repository.fetchTrashSpotDetail(data)
+      do {
+        let data = try await repository.fetchTrashSpotDetailCache(data)
+        return data
+      } catch let error as CacheError {
+        switch error {
+        case .fileNotFound:
+          let data = try await repository.fetchTrashSpotDetail(data)
+          return data
+          
+        default: throw error
+        }
+      }
+      
     }
   }
 }

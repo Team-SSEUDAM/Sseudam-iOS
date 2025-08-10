@@ -36,13 +36,16 @@ public struct AttendanceView: View {
   private var pointView: some View {
     HStack {
       Spacer()
-      LevelBar(
-        currentLevel: .level1,
-        currentPoint: 10,
-        addPoint: 2,
-        maxLevelPoint: 20,
-        startAnimation: $store.startLevelAnimation
-      )
+      
+      if let petInfo = store.petInfo {
+        LevelBar(
+          currentLevel: petInfo.levelType,
+          currentPoint: petInfo.currentPoint,
+          addPoint: 2,
+          maxLevelPoint: petInfo.goalPoint,
+          startAnimation: $store.startLevelAnimation
+        )
+      }
     }
     .padding(.top, .Number20)
   }

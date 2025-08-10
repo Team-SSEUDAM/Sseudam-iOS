@@ -10,6 +10,8 @@ import Foundation
 import ComposableArchitecture
 import DesignKit
 import AttendanceDomainInterface
+import PetDomainInterface
+import Utility
 
 @Reducer
 public struct AttendanceFeature {
@@ -29,11 +31,13 @@ public struct AttendanceFeature {
     public var showButton: Bool = false
     public var showToast: Bool = false
     public var startLevelAnimation: Bool = false
+    public var petInfo: PetInfoEntity? = nil
     
-    public init(_ data: AttendanceEntity) {
+    public init(_ data: AttendanceEntity, petInfo: PetInfoEntity?) {
       continuityCount = data.continuity
       isContinuity = data.isContinuity
       attendanceStatus = data.status
+      self.petInfo = petInfo
     }
   }
 
@@ -43,6 +47,7 @@ public struct AttendanceFeature {
     case startAnimation
     case showToastMessage(AttributedString?)
     case confirmButtonTapped
+   
     
     case handleContinuityFail
     case nextButtonTapped
@@ -55,15 +60,15 @@ public struct AttendanceFeature {
   public enum Delegate: Equatable {
     case dismiss
   }
-  
-  
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
       switch action {
       case .onAppear:
-        return .send(.startAnimation)
+        return .merge([
+          .send(.startAnimation)
+        ])
         
       case .startAnimation:
         return startAnimaion(isSuccess: state.attendanceStatus != .fail)
@@ -74,6 +79,7 @@ public struct AttendanceFeature {
         
       case .confirmButtonTapped:
         return .send(.dismiss)
+        
         
       case .handleContinuityFail:
         state.attendanceStatus = .first
@@ -119,6 +125,8 @@ public struct AttendanceFeature {
 }
 
 extension AttendanceFeature {
+  
+  
   private func sseudamToast(continuityCnt: Int) -> Effect<Action> {
     let point = continuityCnt == 5 ? "5쓰담" : "2쓰담"
     var attributed: AttributedString {

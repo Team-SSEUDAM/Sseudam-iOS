@@ -41,10 +41,12 @@ public struct AttendanceView: View {
         LevelBar(
           currentLevel: petInfo.levelType,
           currentPoint: petInfo.currentPoint,
-          addPoint: 2,
+          addPoint: store.sseudamPoint.point,
           maxLevelPoint: petInfo.goalPoint,
           startAnimation: $store.startLevelAnimation
         )
+        .opacity(store.attendanceStatus == .fail ? 0 : 1)
+        .animation(.easeIn(duration: 0.1), value: store.attendanceStatus != .fail)
       }
     }
     .padding(.top, .Number20)

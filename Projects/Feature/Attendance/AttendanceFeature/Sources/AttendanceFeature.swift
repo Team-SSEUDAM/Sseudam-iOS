@@ -32,11 +32,13 @@ public struct AttendanceFeature {
     public var showToast: Bool = false
     public var startLevelAnimation: Bool = false
     public var petInfo: PetInfoEntity? = nil
+    public var sseudamPoint: SseudamPoint
     
     public init(_ data: AttendanceEntity, petInfo: PetInfoEntity?) {
       continuityCount = data.continuity
       isContinuity = data.isContinuity
       attendanceStatus = data.status
+      sseudamPoint = data.continuity == 5 ? .continutityAttendance : .attendance
       self.petInfo = petInfo
     }
   }
@@ -105,7 +107,7 @@ public struct AttendanceFeature {
           
         case .showToastMessage:
           if state.attendanceStatus != .fail {
-            return sseudamToast(continuityCnt: state.continuityCount)
+            return sseudamToast(sseudam: state.sseudamPoint)
           }
           return .none
           
@@ -127,8 +129,8 @@ public struct AttendanceFeature {
 extension AttendanceFeature {
   
   
-  private func sseudamToast(continuityCnt: Int) -> Effect<Action> {
-    let point = continuityCnt == 5 ? "5쓰담" : "2쓰담"
+  private func sseudamToast(sseudam: SseudamPoint) -> Effect<Action> {
+    let point = sseudam.sseudamText
     var attributed: AttributedString {
       var sseudam = AttributedString(point)
       var text = AttributedString("이 적립됐어요!")

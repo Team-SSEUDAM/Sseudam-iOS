@@ -17,8 +17,10 @@ public struct LevelBar: View {
   @Binding private var startAnimation: Bool
   
   @State private var animatedProgress: CGFloat = 0
+  @State private var displayLevel: CatLevel
   @State private var hasAppeared = false
   @State private var hasAnimated = false
+  @State private var isLevelingUp = false
   
   public init(
     currentLevel: CatLevel,
@@ -32,6 +34,7 @@ public struct LevelBar: View {
     self.addPoint = addPoint
     self.maxLevelPoint = maxLevelPoint
     self._startAnimation = startAnimation
+    self._displayLevel = State(initialValue: .level1)
   }
   
   private var initialProgress: CGFloat {
@@ -44,10 +47,26 @@ public struct LevelBar: View {
     return CGFloat(currentPoint + addPoint) / CGFloat(maxLevelPoint)
   }
   
+  /// 레벨업 가능 여부
+  private var willLevelUp: Bool {
+    guard currentLevel != .level5 else { return false }
+    return currentPoint + addPoint >= maxLevelPoint
+  }
+  
+  /// 레벨업 후 남은 올려야 할 남은 포인트
+  private var remainingPointAfterLevelUp: Int {
+    guard willLevelUp else { return 0 }
+    return (currentPoint + addPoint) - maxLevelPoint
+  }
+  
+  private var isMaxLevel: Bool {
+    return currentLevel == .level5
+  }
+  
   
   public var body: some View {
     HStack(spacing: .Number6) {
-      Text("Lv.\(currentLevel.rawInt.description)")
+      Text("Lv.\(displayLevel.rawInt.description)")
         .foregroundStyle(ColorSet.Text.Primary)
         .font(FontSet.Body.body3)
         .foregroundColor(.primary)
@@ -63,14 +82,7 @@ public struct LevelBar: View {
     .onChange(of: startAnimation) { oldValue, newValue in
       guard newValue && !oldValue && !hasAnimated && addPoint > 0 else { return }
       hasAnimated = true
-      
-      withAnimation(.easeInOut(duration: 1.0)) {
-        animatedProgress = finalProgress
-      }
-      
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-        startAnimation = false
-      }
+      startLevelAnimation()
     }
     
   }
@@ -94,5 +106,62 @@ public struct LevelBar: View {
     }
     .frame(width: .Number80, height: .Number8)
   }
+  
+  // MARK: - Animation Logic
+  
+  private func startLevelAnimation() {
+    if isMaxLevel { // Level 5인 경우 최대치까지만 애니메이션
+      let maxProgress: CGFloat = 1.0
+      withAnimation(.easeInOut(duration: 1.0)) {
+        animatedProgress = min(finalProgress, maxProgress)
+      }
+      
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        startAnimation = false
+      }
+    } else if willLevelUp {
+      
+      performLevelUpAnimation()
+    } else {
+      withAnimation(.easeInOut(duration: 1.0)) {
+        animatedProgress = finalProgress
+      }
+      
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        startAnimation = false
+      }
+    }
+  }
+  
+  private func performLevelUpAnimation() {
+    // 현재 레벨의 최대치까지 채우기
+    withAnimation(.easeInOut(duration: 0.6)) {
+      animatedProgress = 1.0
+    }
+    
+    // 레벨업 후 남은 포인트로 새로운 progressbar 시작
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+      // 레벨업
+      if let newLevel = currentLevel.nextLevel {
+        displayLevel = newLevel
+        isLevelingUp = true
+      }
+      
+      // progressbar 리셋 후 남은 포인트만큼 채우기
+      animatedProgress = 0
+      
+      let remainingProgress = CGFloat(remainingPointAfterLevelUp) / CGFloat(maxLevelPoint)
+      
+      withAnimation(.easeInOut(duration: 0.8)) {
+        animatedProgress = remainingProgress
+      }
+      
+      DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+        isLevelingUp = false
+        startAnimation = false
+      }
+    }
+  }
+  
   
 }

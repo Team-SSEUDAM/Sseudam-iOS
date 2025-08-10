@@ -25,6 +25,10 @@ public extension SpotSuggestionRepository {
         let body = SpotNameValidateBody(input)
         let endpoint = SuggestionEndpoint.getSpotNameValidation(body: body)
         return try await NetworkKit().execute(with: endpoint).toEntity()
+      },
+      getSuggestionList: {
+        let endpoint = SuggestionEndpoint.getSuggestionList()
+        return try await NetworkKit().execute(with: endpoint).toEntity()
       }
     )
   }

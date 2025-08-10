@@ -34,4 +34,13 @@ public enum SuggestionEndpoint: Sendable {
       parameters: .body(body)
     )
   }
+  
+  public static func getSuggestionList() -> Endpoint<SpotSuggestionsDTO> {
+    return Endpoint(
+      headers: .authorization(UserDefaultsKeys.accessToken),
+      method: .get,
+      path: "/suggestions",
+      parameters: nil
+    )
+  }
 }

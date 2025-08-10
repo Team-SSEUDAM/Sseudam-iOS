@@ -72,7 +72,7 @@ struct DependencyRegister {
       }
     )
     
-    /// Suggestion
+    // MARK: - Suggestion
     SpotSuggestionUseCaseRegister(
       provider: {
         SpotSuggestionUseCase.live(repository: suggestionRepository)
@@ -88,6 +88,12 @@ struct DependencyRegister {
     SpotNameValidateUseCaseRegister(
       provider: {
         SpotNameValidateUseCase.live(repository: suggestionRepository)
+      }
+    )
+    
+    GetSuggestionListUseCaseRegister(
+      provider: {
+        GetSuggestionListUseCase.live(repository: suggestionRepository)
       }
     )
     

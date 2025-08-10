@@ -20,7 +20,7 @@ public struct ThrownCell: View {
         .foregroundStyle(ColorSet.Text.Primary)
         .truncationMode(.tail)
         .lineLimit(1)
-      Text("{신규 제보} | {YY.MM.DD.}")
+      Text("{YY.MM.DD.}")
         .font(FontSet.Caption.caption1)
         .foregroundStyle(ColorSet.Text.Tertiary)
     }

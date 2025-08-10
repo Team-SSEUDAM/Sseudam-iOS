@@ -34,8 +34,11 @@ public struct AttendanceView: View {
   
   @ViewBuilder
   private var pointView: some View {
-    Spacer()
-      .frame(height: .Number48)
+    HStack {
+      Spacer()
+      LevelBar(currentLevel: .level1, currentPoint: 10, addPoint: 2,maxLevelPoint: 20)
+    }
+    .padding(.top, .Number20)
   }
   
   @ViewBuilder

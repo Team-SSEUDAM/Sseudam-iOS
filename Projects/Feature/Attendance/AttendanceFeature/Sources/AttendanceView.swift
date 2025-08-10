@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 import ComposableArchitecture
 import DesignKit
+import DotLottie
 
 public struct AttendanceView: View {
   @Bindable var store: StoreOf<AttendanceFeature>
@@ -55,6 +56,7 @@ public struct AttendanceView: View {
   @ViewBuilder
   private var attendanceStateView: some View {
     ZStack{
+      ConfettiView
       VStack(spacing: .Number24){
         Spacer()
         VStack(spacing: .Number16) {
@@ -138,6 +140,19 @@ public struct AttendanceView: View {
     .animation(.easeIn(duration: 0.3), value: store.showButton)
     .allowsHitTesting(store.showButton)
     
+  }
+  
+  @ViewBuilder
+  private var ConfettiView: some View {
+    if store.showConfetti {
+      VStack(alignment: .center, spacing: .Number0) {
+        DotLottieView(dotLottie: store.animationState.confetti)
+          .scaleEffect(2.5)
+          .frame(height: 600)
+          .clipped()
+        Spacer()
+      }
+    }
   }
 }
 

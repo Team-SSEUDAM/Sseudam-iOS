@@ -12,6 +12,7 @@ import DesignKit
 import AttendanceDomainInterface
 import PetDomainInterface
 import Utility
+import DotLottie
 
 @Reducer
 public struct AttendanceFeature {
@@ -26,6 +27,8 @@ public struct AttendanceFeature {
     public var toastMessage: AttributedString? = nil
     public var buttonTitle: String = "확인"
     
+    public var animationState: AnimationState = .init()
+    public var showConfetti: Bool = false
     public var showTitle: Bool = false
     public var showDescription: Bool = false
     public var showButton: Bool = false
@@ -68,12 +71,10 @@ public struct AttendanceFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
-        return .merge([
-          .send(.startAnimation)
-        ])
+        return .send(.startAnimation)
         
       case .startAnimation:
-        return startAnimaion(isSuccess: state.attendanceStatus != .fail)
+        return startAnimaion(status: state.attendanceStatus)
         
       case let .showToastMessage(msg):
         state.toastMessage = msg
@@ -82,17 +83,21 @@ public struct AttendanceFeature {
       case .confirmButtonTapped:
         return .send(.dismiss)
         
-        
       case .handleContinuityFail:
         state.attendanceStatus = .first
         state.continuityCount = 1
         state.isContinuity = true
         state.showTitle = false
         state.showDescription = false
-        return startAnimaion(isSuccess: true)
+        return startAnimaion(status: .first)
         
       case let .animation(animation):
         switch animation {
+        case .confetti:
+          state.animationState.confetti.play()
+          state.showConfetti = true
+          return .none
+          
         case .titleMove:
           state.showTitle = true
           return .none
@@ -142,8 +147,11 @@ extension AttendanceFeature {
     return .send(.showToastMessage(attributed))
   }
   
-  private func startAnimaion(isSuccess: Bool) -> Effect<Action> {
+  private func startAnimaion(status: AttendanceStatus) -> Effect<Action> {
     return .run { send in
+      if status == .continuedSuccess {
+        await send(.animation(.confetti))
+      }
       try await Task.sleep(for: .seconds(0.4))
       await send(.animation(.titleMove))
       
@@ -151,7 +159,7 @@ extension AttendanceFeature {
       await send(.animation(.descriptionMove))
       
       try await Task.sleep(for: .seconds(0.8))
-      if isSuccess {
+      if status != .fail {
         await send(.animation(.showButton))
         try await Task.sleep(for: .seconds(0.2))
         
@@ -167,10 +175,22 @@ extension AttendanceFeature {
 
 extension AttendanceFeature {
   public enum AttendanceAnimationAction: Equatable {
+    case confetti
     case titleMove
     case descriptionMove
     case showButton
     case showToastMessage
     case levelBar
+  }
+  
+  public struct AnimationState: Equatable {
+    var confetti = DotLottieAnimation(
+      fileName: LottieSet.confetti.name,
+      config: AnimationConfig(autoplay: false, loop: false)
+    )
+    
+    public static func == (lhs: AttendanceFeature.AnimationState, rhs: AttendanceFeature.AnimationState) -> Bool {
+      return true
+    }
   }
 }

@@ -14,20 +14,24 @@ public struct LevelBar: View {
   private var currentPoint: Int
   private var addPoint: Int
   private var maxLevelPoint: Int
+  @Binding private var startAnimation: Bool
   
   @State private var animatedProgress: CGFloat = 0
   @State private var hasAppeared = false
+  @State private var hasAnimated = false
   
   public init(
     currentLevel: CatLevel,
     currentPoint: Int,
     addPoint: Int = 0,
-    maxLevelPoint: Int
+    maxLevelPoint: Int,
+    startAnimation: Binding<Bool>
   ) {
     self.currentLevel = currentLevel
     self.currentPoint = currentPoint
     self.addPoint = addPoint
     self.maxLevelPoint = maxLevelPoint
+    self._startAnimation = startAnimation
   }
   
   private var initialProgress: CGFloat {
@@ -39,6 +43,7 @@ public struct LevelBar: View {
     guard maxLevelPoint > 0 else { return 0 }
     return CGFloat(currentPoint + addPoint) / CGFloat(maxLevelPoint)
   }
+  
   
   public var body: some View {
     HStack(spacing: .Number6) {
@@ -53,15 +58,21 @@ public struct LevelBar: View {
     .onAppear {
       guard !hasAppeared else { return }
       hasAppeared = true
-      
       animatedProgress = initialProgress
+    }
+    .onChange(of: startAnimation) { oldValue, newValue in
+      guard newValue && !oldValue && !hasAnimated && addPoint > 0 else { return }
+      hasAnimated = true
       
-      if addPoint > 0 {
-        withAnimation(.easeInOut(duration: 1.0).delay(0.3)) {
-          animatedProgress = finalProgress
-        }
+      withAnimation(.easeInOut(duration: 1.0)) {
+        animatedProgress = finalProgress
+      }
+      
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        startAnimation = false
       }
     }
+    
   }
   
   @ViewBuilder

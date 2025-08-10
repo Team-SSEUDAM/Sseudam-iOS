@@ -28,6 +28,7 @@ public struct AttendanceFeature {
     public var showDescription: Bool = false
     public var showButton: Bool = false
     public var showToast: Bool = false
+    public var startLevelAnimation: Bool = false
     
     public init(_ data: AttendanceEntity) {
       continuityCount = data.continuity
@@ -87,16 +88,23 @@ public struct AttendanceFeature {
         case .titleMove:
           state.showTitle = true
           return .none
+          
         case .descriptionMove:
           state.showDescription = true
           return .none
+          
         case .showButton:
           state.showButton = true
           return .none
+          
         case .showToastMessage:
           if state.attendanceStatus != .fail {
             return sseudamToast(continuityCnt: state.continuityCount)
           }
+          return .none
+          
+        case .levelBar:
+          state.startLevelAnimation = true
           return .none
         }
         
@@ -104,23 +112,6 @@ public struct AttendanceFeature {
         return .send(.delegate(.dismiss))
         
         default: return .none
-      }
-    }
-  }
-  
-  private func startAnimaion(isSuccess: Bool) -> Effect<Action> {
-    return .run { send in
-      try await Task.sleep(for: .seconds(0.4))
-      await send(.animation(.titleMove))
-      try await Task.sleep(for: .seconds(0.8))
-      await send(.animation(.descriptionMove))
-      try await Task.sleep(for: .seconds(1.6))
-      if isSuccess {
-        await send(.animation(.showButton))
-        try await Task.sleep(for: .seconds(1.0))
-        await send(.animation(.showToastMessage))
-      } else {
-        await send(.handleContinuityFail)
       }
     }
   }
@@ -140,6 +131,28 @@ extension AttendanceFeature {
     }
     return .send(.showToastMessage(attributed))
   }
+  
+  private func startAnimaion(isSuccess: Bool) -> Effect<Action> {
+    return .run { send in
+      try await Task.sleep(for: .seconds(0.4))
+      await send(.animation(.titleMove))
+      
+      try await Task.sleep(for: .seconds(0.4))
+      await send(.animation(.descriptionMove))
+      
+      try await Task.sleep(for: .seconds(0.8))
+      if isSuccess {
+        await send(.animation(.showButton))
+        try await Task.sleep(for: .seconds(0.2))
+        
+        await send(.animation(.showToastMessage))
+        try await Task.sleep(for: .seconds(0.4))
+        await send(.animation(.levelBar))
+      } else {
+        await send(.handleContinuityFail)
+      }
+    }
+  }
 }
 
 extension AttendanceFeature {
@@ -148,5 +161,6 @@ extension AttendanceFeature {
     case descriptionMove
     case showButton
     case showToastMessage
+    case levelBar
   }
 }

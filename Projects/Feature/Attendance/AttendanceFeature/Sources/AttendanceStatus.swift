@@ -17,7 +17,7 @@ extension AttendanceStatus {
     case .fail:
       return "이번엔 놓쳤지만, 괜찮아요.\n다시 도전해봐요!"
     case .continuedSuccess:
-      return "감사한 마음을 담아 5쓰담을 드릴게요!\n오늘도"
+      return "감사한 마음을 담아 5쓰담을 드릴게요!"
     }
   }
   

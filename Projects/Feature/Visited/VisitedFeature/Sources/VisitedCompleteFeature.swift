@@ -10,6 +10,7 @@ import Foundation
 import ComposableArchitecture
 import DesignKit
 import DotLottie
+import PetDomainInterface
 
 @Reducer
 public struct VisitedCompleteFeature {
@@ -26,10 +27,12 @@ public struct VisitedCompleteFeature {
     var isShowConfetti: Bool = false
     var isShowFirstVisitMessage: Bool = false
     var isShowButton: Bool = false
+    var petInfo: PetInfoEntity? = nil
     
-    public init(isFirstVisit: Bool) {
+    public init(isFirstVisit: Bool, petInfo: PetInfoEntity?) {
       self.isFirstVisit = isFirstVisit
       sseudamCount = isFirstVisit ? "7쓰담" : "5쓰담"
+      self.petInfo = petInfo
     }
   }
 

@@ -12,6 +12,7 @@ import Utility
 import DesignKit
 import UserDefaults
 import VisitedDomainInterface
+import PetDomainInterface
 
 @Reducer
 public struct VisitedFeature {
@@ -35,6 +36,8 @@ public struct VisitedFeature {
     public var isWithinDistance: Bool = false // 5m 범위 내에 있는지
     
     public var checkComplete: Bool = false
+    
+    var petInfo: PetInfoEntity? = nil
     
     public var timer: TimerFeature.State = .init()
   }
@@ -75,9 +78,12 @@ public struct VisitedFeature {
     /// 데이터 조회, 최근 인증 여부 조회 완료
     case checkComplete
     
+    case fetchPetInfo
+    case fetchPetInfoResult(Result<PetInfoEntity, NetworkError>)
+    
     // MARK: - Delegate
     
-    case visitedComplete(isFirst: Bool)
+    case visitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
     case showToastMessage(String?)
     case showAlert(AlertType)
     case delegate(Delegate)
@@ -86,13 +92,14 @@ public struct VisitedFeature {
   }
   
   public enum Delegate: Equatable {
-    case visitedComplete(isFirst: Bool)
+    case visitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
     case showToastMessage(String?)
     case showAlert(AlertType)
   }
   
   @Dependency(\.VisitedUseCase) var visitedUseCase
   @Dependency(\.CheckRecentVisitUseCase) var checkRecentVisitUseCase
+  @Dependency(\.CheckPetInfoUseCase) var checkPetInfoUseCase
   
   public var body: some ReducerOf<Self> {
     Scope(state: \.timer, action: \.timer) {
@@ -145,15 +152,13 @@ public struct VisitedFeature {
         guard state.visitedState == .enableVisit else {
           return .send(.disableVisit)
         }
-        guard let spotId = state.trashSpotId else {
-          return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
-        }
+        
         state.visitedState = .notDetermine
-        return requestVisited(spotId: spotId)
+        return .send(.fetchPetInfo)
         
       case let .requestVisitResult(.success(result)):
         return .merge([
-          .send(.visitedComplete(isFirst: result.isTodayFirst)),
+          .send(.visitedComplete(isFirst: result.isTodayFirst, petInfo: state.petInfo)),
           .send(.successVisit(date: result.visitedAt))
         ])
         
@@ -204,14 +209,30 @@ public struct VisitedFeature {
         state.checkComplete = true
         return .none
         
+      case .fetchPetInfo:
+        return fetchPetInfo()
+        
+      case let .fetchPetInfoResult(.success(entity)):
+        state.petInfo = entity
+        guard let spotId = state.trashSpotId else {
+          return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
+        }
+        return requestVisited(spotId: spotId)
+        
+      case let .fetchPetInfoResult(.failure(error)):
+        guard let spotId = state.trashSpotId else {
+          return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
+        }
+        return requestVisited(spotId: spotId)
+        
       case let .showToastMessage(message):
         return .send(.delegate(.showToastMessage(message)))
       
       case let .showAlert(type):
         return .send(.delegate(.showAlert(type)))
         
-      case let .visitedComplete(isFirst):
-        return .send(.delegate(.visitedComplete(isFirst: isFirst)))
+      case let .visitedComplete(isFirst, petInfo):
+        return .send(.delegate(.visitedComplete(isFirst: isFirst, petInfo: petInfo)))
         
         // MARK: - Timer
         
@@ -234,6 +255,19 @@ public struct VisitedFeature {
 }
 
 extension VisitedFeature {
+  
+  private func fetchPetInfo() -> Effect<Action> {
+    return .run { send in
+      do {
+        let data = try await checkPetInfoUseCase.execute()
+        await send(.fetchPetInfoResult(.success(data)))
+      } catch let error as NetworkError {
+        await send(.fetchPetInfoResult(.failure(error)))
+      } catch {
+        await send(.fetchPetInfoResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
   
   /// 방문 처리
   private func requestVisited(spotId: Int) -> Effect<Action> {

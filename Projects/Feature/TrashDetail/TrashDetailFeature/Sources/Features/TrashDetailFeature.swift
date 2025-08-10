@@ -10,6 +10,8 @@ import Foundation
 import ComposableArchitecture
 import TrashSpotDomainInterface
 import ImageDownloadDomainInterface
+import PetDomainInterface
+
 import Utility
 import UserDefaults
 import DesignKit
@@ -55,7 +57,7 @@ public struct TrashDetailFeature {
     
     case showToastMessage(String?)
     case showAlert(AlertType)
-    case visitedComplete(isFirst: Bool)
+    case visitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
   }
   
   public enum Delegate: Equatable {
@@ -63,7 +65,7 @@ public struct TrashDetailFeature {
     case showToastMessage(String?)
     case showAlert(AlertType)
     /// 방문 완료
-    case visitedComplete(isFirst: Bool)
+    case visitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -145,8 +147,8 @@ public struct TrashDetailFeature {
         return checkLoginState()
         
         // MARK: - Send Delegate To Parent Feature
-      case let .visitedComplete(isFirst):
-        return .send(.delegate(.visitedComplete(isFirst: isFirst)))
+      case let .visitedComplete(isFirst, petInfo):
+        return .send(.delegate(.visitedComplete(isFirst: isFirst, petInfo: petInfo)))
         
       case let .showToastMessage(message):
         return .send(.delegate(.showToastMessage(message)))
@@ -157,8 +159,8 @@ public struct TrashDetailFeature {
         // MARK: - Receive VisitedFeature Delegate Action
       case let .visited(.delegate(action)):
         switch action {
-        case let .visitedComplete(isFirst):
-          return .send(.visitedComplete(isFirst: isFirst))
+        case let .visitedComplete(isFirst, petInfo):
+          return .send(.visitedComplete(isFirst: isFirst, petInfo: petInfo))
           
         case let .showToastMessage(message):
           return .send(.showToastMessage(message))

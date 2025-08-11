@@ -144,28 +144,18 @@ public struct MyPageView: View {
   @ViewBuilder
   private var DummySuggestList: some View {
     LazyVStack(spacing: .Number0) {
-      if let suggestions = store.suggestionList.suggestions {
-        if suggestions.isEmpty {
-          // 빈 상태
-          VStack(spacing: .Number16) {
-            Text("아직 제보한 내역이 없어요")
-              .font(FontSet.Body.body2)
-              .foregroundStyle(ColorSet.Text.Secondary)
-          }
-          .frame(maxWidth: .infinity)
-          .padding(.vertical, .Number32)
-        } else {
-          // 실제 데이터
-          ForEach(suggestions) { suggestion in
+      if let suggestions = store.suggestionList.suggestions, !suggestions.isEmpty {
+        ForEach(suggestions) { suggestion in
+          if let data = store.suggestionList.suggestionsImages[suggestion.id] {
+            SuggestCell(suggestion: suggestion, imageData: data)
+          } else {
             SuggestCell(suggestion: suggestion)
           }
         }
       } else {
-        // 로딩 상태
         VStack(spacing: .Number16) {
-          ProgressView()
-          Text("제보 내역을 불러오는 중...")
-            .font(FontSet.Body.body3)
+          Text("아직 제보한 내역이 없어요")
+            .font(FontSet.Body.body2)
             .foregroundStyle(ColorSet.Text.Secondary)
         }
         .frame(maxWidth: .infinity)

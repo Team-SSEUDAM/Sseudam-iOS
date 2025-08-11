@@ -42,6 +42,7 @@ public extension SpotSuggestionsDTO {
   func toEntity() -> Entity {
     return list.map {
       SuggestionListEntity(
+        id: $0.id,
         imageUrl: $0.imageUrl,
         status: $0.status,
         address: $0.address.site,

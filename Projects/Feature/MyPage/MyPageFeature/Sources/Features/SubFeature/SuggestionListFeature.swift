@@ -10,7 +10,7 @@ import SwiftUI
 import Utility
 import ComposableArchitecture
 import SuggestionDomainInterface
-
+import ImageDownloadDomainInterface
 
 @Reducer
 public struct SuggestionListFeature {
@@ -21,18 +21,24 @@ public struct SuggestionListFeature {
   public struct State: Equatable {
     
     public var suggestions: [SuggestionListEntity]? = nil
-    
+    public var suggestionsImages: [Int: Data?] = [:]
     public init() {}
   }
 
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    
     case fetchSuggestions
     case suggestionsResponse(Result<[SuggestionListEntity], NetworkError>)
+    
+    case fetchTrashImage(imgUrl: String?, id: Int)
+    case fetchTrashImageResult(Result<[Int: Data?], ImageDownloadError>) // id: 사진 데이터
+    case storeImages(images: [Int: Data?])
   }
   
   @Dependency(\.GetSuggestionListUseCase) var getSuggestionListUseCase
-
+  @Dependency(\.ImageDownloadUseCase) var imageDownloadUseCase
+  
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
@@ -46,11 +52,22 @@ public struct SuggestionListFeature {
         case let .success(suggestions):
           print("Fetched suggestions: \(suggestions)")
           state.suggestions = suggestions
-          return .none
+          return fetchTrashImage(suggestions)
           
         case let .failure(error):
           state.suggestions = nil
           print("Error fetching suggestions: \(error)")
+          return .none
+        }
+      case let .fetchTrashImageResult(result):
+        switch result {
+        case let .success(imageData):
+          print("Fetched image data: \(imageData)")
+          state.suggestionsImages = imageData
+          return .none
+        case let .failure(error):
+          print("Error fetching image data: \(error)")
+          // 에러 처리 로직 필요
           return .none
         }
       default:
@@ -70,6 +87,32 @@ extension SuggestionListFeature {
         await send(.suggestionsResponse(.failure(error)))
       } catch {
         await send(.suggestionsResponse(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
+  
+  private func fetchTrashImage(_ datas: [SuggestionListEntity]) -> Effect<Action> {
+    return .run { send in
+      do {
+        try await withThrowingTaskGroup(of: (id: Int, data: Data?).self) { group in
+          
+          for data in datas {
+            group.addTask {
+              let result = try await imageDownloadUseCase.execute(data.imageUrl, data.id)
+              return (id: data.id, data: result)
+            }
+          }
+          
+          var results: [Int: Data?] = [:]
+          for try await imageData in group {
+            results[imageData.id] = imageData.data
+          }
+          return await send(.fetchTrashImageResult(.success(results)))
+        }
+      } catch let error as ImageDownloadError {
+        await send(.fetchTrashImageResult(.failure(error)))
+      } catch {
+        await send(.fetchTrashImageResult(.failure(.customImageError(error.localizedDescription))))
       }
     }
   }

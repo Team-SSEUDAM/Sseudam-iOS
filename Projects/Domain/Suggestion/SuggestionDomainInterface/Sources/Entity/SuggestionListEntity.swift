@@ -10,7 +10,7 @@ import Foundation
 import Utility
 
 public struct SuggestionListEntity: Sendable, Equatable, Identifiable {
-  public var id: String { self.imageUrl }
+  public var id: Int
   public let imageUrl: String
   public let status: State
   public let address: String
@@ -31,11 +31,13 @@ public struct SuggestionListEntity: Sendable, Equatable, Identifiable {
   }
   
   public init(
+    id: Int,
     imageUrl: String,
     status: String,
     address: String,
     date: String
   ) {
+    self.id = id
     self.imageUrl = imageUrl
     self.status = State(rawValue: status) ?? .pending
     self.address = address

@@ -11,6 +11,7 @@ import ComposableArchitecture
 import DesignKit
 import DotLottie
 import PetDomainInterface
+import Utility
 
 @Reducer
 public struct VisitedCompleteFeature {
@@ -22,7 +23,7 @@ public struct VisitedCompleteFeature {
     
     var isFirstVisit: Bool
     var toastMessage: AttributedString? = nil
-    var sseudamCount: String
+    var sseudamPoint: SseudamPoint
     var animationState: AnimationState = .init()
     var isShowConfetti: Bool = false
     var isShowFirstVisitMessage: Bool = false
@@ -31,7 +32,7 @@ public struct VisitedCompleteFeature {
     
     public init(isFirstVisit: Bool, petInfo: PetInfoEntity?) {
       self.isFirstVisit = isFirstVisit
-      sseudamCount = isFirstVisit ? "7쓰담" : "5쓰담"
+      sseudamPoint = isFirstVisit ? .firstVisit : .visit
       self.petInfo = petInfo
     }
   }
@@ -41,7 +42,7 @@ public struct VisitedCompleteFeature {
     case onAppear
     case startAnimation
     case comfirmButtonTapped
-    case showToastMessage
+    case showToastMessage(AttributedString?)
     case resetToastMessage
     case animation(VisitedAnimationAction)
     case delegate(Delegate)
@@ -65,16 +66,8 @@ public struct VisitedCompleteFeature {
       case .comfirmButtonTapped:
         return .send(.delegate(.dismiss))
         
-      case .showToastMessage:
-        var attributed: AttributedString {
-          var sseudam = AttributedString(state.sseudamCount)
-          var text = AttributedString("이 적립됐어요!")
-          sseudam.foregroundColor = ColorSet.Text.InverseAccent
-          text.foregroundColor = ColorSet.Text.Inverse
-          sseudam.append(text)
-          return sseudam
-        }
-        state.toastMessage = attributed
+      case let .showToastMessage(message):
+        state.toastMessage = message
         return .none
         
       case .resetToastMessage:
@@ -103,7 +96,7 @@ public struct VisitedCompleteFeature {
           return .none
           
         case .showToastMessage:
-          return .send(.showToastMessage)
+          return sseudamToast(sseudam: state.sseudamPoint)
           
         case .levelBar:
           return .none
@@ -117,6 +110,20 @@ public struct VisitedCompleteFeature {
 }
 
 extension VisitedCompleteFeature {
+  
+  private func sseudamToast(sseudam: SseudamPoint) -> Effect<Action> {
+    let point = sseudam.sseudamText
+    var attributed: AttributedString {
+      var sseudam = AttributedString(point)
+      var text = AttributedString("이 적립됐어요!")
+      sseudam.foregroundColor = ColorSet.Text.InverseAccent
+      text.foregroundColor = ColorSet.Text.Inverse
+      sseudam.append(text)
+      return sseudam
+    }
+    return .send(.showToastMessage(attributed))
+  }
+  
   private func startAnimation(isFirstVisit: Bool) -> Effect<Action> {
     return .run { send in
       await send(.animation(.success))

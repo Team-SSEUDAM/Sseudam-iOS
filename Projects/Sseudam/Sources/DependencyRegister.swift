@@ -198,6 +198,10 @@ struct DependencyRegister {
       CheckRecentVisitUseCase.live(repository: visitedRepository)
     }
     
+    GetVisitedListUseCaseRegister {
+      GetVisitedListUseCase.live(repository: visitedRepository)
+    }
+    
     // MARK: - Attendance
     AttendanceUseCaseRegister {
       AttendanceUseCase.live(repository: attendanceRepository)

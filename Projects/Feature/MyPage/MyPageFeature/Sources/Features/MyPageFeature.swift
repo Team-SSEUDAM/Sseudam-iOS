@@ -18,6 +18,7 @@ public struct MyPageFeature {
   public struct State: Equatable {
     public var path = StackState<MyPagePath.State>()
     public var suggestionList: SuggestionListFeature.State = .init()
+    public var thrownList: ThrownListFeature.State = .init()
     
     public var isLoggedIn: Bool = false
     public init() {}
@@ -27,8 +28,10 @@ public struct MyPageFeature {
     case binding(BindingAction<State>)
     case path(StackActionOf<MyPagePath>)
     case suggestionList(SuggestionListFeature.Action)
+    case thrownList(ThrownListFeature.Action)
     
     case onAppear
+    case refreshPage
     case checkLoggedIn
     
     case settingButtonTapped
@@ -55,10 +58,16 @@ public struct MyPageFeature {
     Scope(state: \.suggestionList, action: \.suggestionList) {
       SuggestionListFeature()
     }
+    Scope(state: \.thrownList, action: \.thrownList) {
+      ThrownListFeature()
+    }
     Reduce { state, action in
       switch action {
       case .onAppear:
         return .send(.checkLoggedIn)
+        
+      case .refreshPage:
+        return forceFetchInitData()
         
       case .checkLoggedIn:
         state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
@@ -94,6 +103,14 @@ extension MyPageFeature {
   private func fetchInitData() -> Effect<Action> {
     return .run { send in
       await send(.suggestionList(.fetchSuggestions))
+      await send(.thrownList(.fetchThrownList))
+    }
+  }
+  
+  private func forceFetchInitData() -> Effect<Action> {
+    return .run { send in
+      await send(.suggestionList(.forceRefreshSuggestions))
+      await send(.thrownList(.forceRefreshThrownList))
     }
   }
 }

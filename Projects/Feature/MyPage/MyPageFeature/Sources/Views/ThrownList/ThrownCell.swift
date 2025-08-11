@@ -8,19 +8,25 @@
 
 import SwiftUI
 import DesignKit
+import VisitedDomainInterface
 
 public struct ThrownCell: View {
+  private let thrownList: VisitedListEntity?
   
-  public init() {}
+  public init(
+    thrownList: VisitedListEntity? = nil
+  ) {
+    self.thrownList = thrownList
+  }
   
   public var body: some View {
     VStack(alignment: .leading, spacing: .Number0) {
-      Text("{제보 및 신고 장소에 대한 이름}}")
+      Text(thrownList?.site ?? "")
         .font(FontSet.Body.body2)
         .foregroundStyle(ColorSet.Text.Primary)
         .truncationMode(.tail)
         .lineLimit(1)
-      Text("{YY.MM.DD.}")
+      Text(thrownList?.date ?? "")
         .font(FontSet.Caption.caption1)
         .foregroundStyle(ColorSet.Text.Tertiary)
     }

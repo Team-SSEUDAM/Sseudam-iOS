@@ -29,6 +29,7 @@ public struct SuggestionListFeature {
     case binding(BindingAction<State>)
     
     case fetchSuggestions
+    case forceRefreshSuggestions // 강제 새로고침 액션
     case suggestionsResponse(Result<[SuggestionListEntity], NetworkError>)
     
     case fetchTrashImage(imgUrl: String?, id: Int)
@@ -46,6 +47,9 @@ public struct SuggestionListFeature {
       case .fetchSuggestions:
         /// 이미 불러온 경우 중복 호출 방지 -> refresh 시도 할 때만 재 호출 하기 위함.
         return state.suggestions == nil ? fetchSuggestions() : .none
+        
+      case .forceRefreshSuggestions:
+        return fetchSuggestions()
         
       case let .suggestionsResponse(result):
         switch result {

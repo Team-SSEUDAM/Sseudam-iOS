@@ -54,6 +54,7 @@ public struct MyPageView: View {
           NavigationBarView
           PageScrollView
         }
+        .padding(.bottom, .Number50)
       } else {
         ZStack {
           VStack(spacing: .Number0) {
@@ -92,9 +93,13 @@ public struct MyPageView: View {
         let height = geo.size.height - .Number320
         SuggestList(height: height)
       }
-      DummyThrownList
+      GeometryReader { geo in
+        let height = geo.size.height - .Number320
+        ThrownList(height: height)
+      }
     } onRefresh: {
       print("Refresh triggered")
+      store.send(.refreshPage)
     }
   }
   
@@ -176,13 +181,30 @@ public struct MyPageView: View {
   }
   
   @ViewBuilder
-  private var DummyThrownList: some View {
+  private func ThrownList(height: CGFloat) -> some View {
     LazyVStack(spacing: .Number0) {
-      ForEach(0..<10) { index in
-        ThrownCell()
+      if let thrownList = store.thrownList.thrownList, !thrownList.isEmpty {
+        ForEach(thrownList) { thrownList in
+          ThrownCell(thrownList: thrownList)
+        }
+      } else {
+        VStack(alignment: .center, spacing: .Number8) {
+          Spacer()
+            .frame(height: (height - .Number72) / 2)
+          Icon(
+            image: .sentimentDissatisfied,
+            size: .Number40,
+            renderingMode: .template,
+            color: ColorSet.Icon.Tertiary
+          )
+          Text("제보한 내역이 없습니다.")
+            .font(FontSet.Body.body3)
+            .foregroundStyle(ColorSet.Text.Secondary)
+        }
       }
-      .background(ColorSet.Background.Primary)
     }
+    .frame(maxWidth: .infinity)
+    .background(ColorSet.Background.Primary)
   }
 }
 

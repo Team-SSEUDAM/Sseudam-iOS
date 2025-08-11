@@ -13,35 +13,35 @@ import UserDefaults
 
 public struct MyPageView: View {
   @Bindable var store: StoreOf<MyPageFeature>
-
+  
   public init(store: StoreOf<MyPageFeature>) {
     self.store = store
   }
-
+  
   public var body: some View {
     NavigationStack(
       path: $store.scope(state: \.path, action: \.path)
     ) {
-        content
-      } destination: { store in
-        switch store.case {
-        case let .setting(store):
-          SettingView(store: store)
-        }
+      content
+    } destination: { store in
+      switch store.case {
+      case let .setting(store):
+        SettingView(store: store)
       }
-      .onAppear {
-        store.send(.onAppear)
+    }
+    .onAppear {
+      store.send(.onAppear)
+    }
+    .onChange(of: store.path) { oldValue, newValue in
+      if newValue.count == 0 {
+        store.send(.checkLoggedIn)
+        store.send(.delegate(.hiddenTabBar(false)))
       }
-      .onChange(of: store.path) { oldValue, newValue in
-        if newValue.count == 0 {
-          store.send(.checkLoggedIn)
-          store.send(.delegate(.hiddenTabBar(false)))
-        }
-      }
-      .transaction { transaction in
-        transaction.disablesAnimations = false
-      }
-
+    }
+    .transaction { transaction in
+      transaction.disablesAnimations = false
+    }
+    
   }
   
   @ViewBuilder
@@ -81,18 +81,21 @@ public struct MyPageView: View {
   @ViewBuilder
   private var PageScrollView: some View {
     HeaderPageScrollView(displaysSymbols: false) {
-        UserInfoView
-          .frame(maxWidth: .infinity)
-          .background(ColorSet.Background.Primary)
-      } pageLabels: {
-        PageLabel(title: "제보한 내역")
-        PageLabel(title: "버린 내역")
-      } pages: {
-        SuggestList
-        DummyThrownList
-      } onRefresh: {
-        print("Refresh triggered")
+      UserInfoView
+        .frame(maxWidth: .infinity)
+        .background(ColorSet.Background.Primary)
+    } pageLabels: {
+      PageLabel(title: "제보한 내역")
+      PageLabel(title: "버린 내역")
+    } pages: {
+      GeometryReader { geo in
+        let height = geo.size.height - .Number320
+        SuggestList(height: height)
       }
+      DummyThrownList
+    } onRefresh: {
+      print("Refresh triggered")
+    }
   }
   
   @ViewBuilder
@@ -116,7 +119,7 @@ public struct MyPageView: View {
     .padding(.vertical, .Number28)
     .padding(.horizontal, .Number16)
   }
-
+  
   
   @ViewBuilder
   private var requireLoginView: some View {
@@ -133,16 +136,16 @@ public struct MyPageView: View {
         size: .large,
         state: .constant(.normal)
       ) {
-          store.send(.requestLogin)
-        }
-        .frame(width: 129)
+        store.send(.requestLogin)
+      }
+      .frame(width: 129)
       
       Spacer()
     }
   }
   
   @ViewBuilder
-  private var SuggestList: some View {
+  private func SuggestList(height: CGFloat) -> some View {
     LazyVStack(spacing: .Number0) {
       if let suggestions = store.suggestionList.suggestions, !suggestions.isEmpty {
         ForEach(suggestions) { suggestion in
@@ -153,15 +156,22 @@ public struct MyPageView: View {
           }
         }
       } else {
-        VStack(spacing: .Number16) {
-          Text("아직 제보한 내역이 없어요")
-            .font(FontSet.Body.body2)
+        VStack(alignment: .center, spacing: .Number8) {
+          Spacer()
+            .frame(height: (height - .Number72) / 2)
+          Icon(
+            image: .sentimentDissatisfied,
+            size: .Number40,
+            renderingMode: .template,
+            color: ColorSet.Icon.Tertiary
+          )
+          Text("제보한 내역이 없습니다.")
+            .font(FontSet.Body.body3)
             .foregroundStyle(ColorSet.Text.Secondary)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, .Number32)
       }
     }
+    .frame(maxWidth: .infinity)
     .background(ColorSet.Background.Primary)
   }
   

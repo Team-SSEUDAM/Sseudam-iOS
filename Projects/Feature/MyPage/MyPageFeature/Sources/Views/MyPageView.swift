@@ -88,7 +88,7 @@ public struct MyPageView: View {
         PageLabel(title: "제보한 내역")
         PageLabel(title: "버린 내역")
       } pages: {
-        DummySuggestList
+        SuggestList
         DummyThrownList
       } onRefresh: {
         print("Refresh triggered")
@@ -142,7 +142,7 @@ public struct MyPageView: View {
   }
   
   @ViewBuilder
-  private var DummySuggestList: some View {
+  private var SuggestList: some View {
     LazyVStack(spacing: .Number0) {
       if let suggestions = store.suggestionList.suggestions, !suggestions.isEmpty {
         ForEach(suggestions) { suggestion in

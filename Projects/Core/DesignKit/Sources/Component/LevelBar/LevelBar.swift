@@ -16,12 +16,23 @@ public struct LevelBar: View {
   private var maxLevelPoint: Int
   @Binding private var startAnimation: Bool
   
+  /// 애니메이션된 진행도
   @State private var animatedProgress: CGFloat = 0
+  /// 화면에 보여지는 레벨
   @State private var displayLevel: CatLevel
+  /// 뷰가 나타났는지 여부
   @State private var hasAppeared = false
+  /// 애니메이션이 실행되었는지 여부
   @State private var hasAnimated = false
+  /// 레벨업 중인지 여부
   @State private var isLevelingUp = false
   
+  /// - Parameters:
+  ///   - currentLevel: 현재 레벨
+  ///   - currentPoint: 현재 가지고 있는 포인트
+  ///   - addPoint: 추가 될 포인트
+  ///   - maxLevelPoint: 현재 레벨의 포인트 최대치
+  ///   - startAnimation: 애니메이션 시작 여부
   public init(
     currentLevel: CatLevel,
     currentPoint: Int,
@@ -133,6 +144,7 @@ public struct LevelBar: View {
     }
   }
   
+  /// 레벨업 되어 추가 애니메이션이 필요한 경우
   private func performLevelUpAnimation() {
     // 현재 레벨의 최대치까지 채우기
     withAnimation(.easeInOut(duration: 0.6)) {

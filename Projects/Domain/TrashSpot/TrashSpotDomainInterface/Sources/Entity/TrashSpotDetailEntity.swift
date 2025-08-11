@@ -9,6 +9,7 @@
 import Foundation
 import DesignKit
 import Utility
+import Cache
 
 public struct TrashSpotDetail: Equatable, Sendable {
   public var id: Int
@@ -43,5 +44,32 @@ public struct TrashSpotDetail: Equatable, Sendable {
     self.visitedCount = visitedCount
     self.imageUrl = imageUrl
     self.isPublicData = imageUrl == .none
+  }
+  
+  public init(_ cacheModel: TrashDetailCacheModel) {
+    self.id = cacheModel.id
+    self.suggestionerId = cacheModel.suggestionerId
+    self.suggestionerName = cacheModel.suggestionerName
+    self.name = cacheModel.name
+    self.address = cacheModel.address
+    self.point = cacheModel.point
+    self.trashType = TrashType(rawValue: cacheModel.trashType) ?? .general
+    self.visitedCount = cacheModel.visitedCount
+    self.imageUrl = cacheModel.imageUrl
+    self.isPublicData = cacheModel.imageUrl == .none
+  }
+  
+  public func makeCacheModel() -> TrashDetailCacheModel {
+    return .init(
+      id: self.id,
+      suggestionerId: self.suggestionerId,
+      suggestionerName: self.suggestionerName,
+      name: self.name,
+      address: self.address,
+      point: self.point,
+      trashType: self.trashType.rawValue,
+      visitedCount: self.visitedCount,
+      imageUrl: self.imageUrl
+    )
   }
 }

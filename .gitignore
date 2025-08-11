@@ -73,3 +73,6 @@ Config/
 
 *.xcconfig
 *.p8
+
+# Claude Code documentation
+CLAUDE.md

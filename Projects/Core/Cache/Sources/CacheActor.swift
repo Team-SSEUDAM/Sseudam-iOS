@@ -81,13 +81,20 @@ extension CacheActor {
     }
   }
   
+  public func TRASH_SPOT_DETAIL_CACHE(id: Int) async throws -> TwoTierCache<TrashSpotCacheKey, TrashDetailCacheModel> {
+      return try await cache(
+        .trashSpotDetail(id: id),
+        ttl: .medium,
+        eviction: .none
+      )
+  }
+  
   public func TRASH_IMAGE_CACHE(id: Int) async throws -> TwoTierCache<ImageCacheKey, TrashImageCacheModel> {
       return try await cache(
         .trashImage(id: id),
         ttl: .high,
         eviction: .none
       )
-    
   }
   
 }

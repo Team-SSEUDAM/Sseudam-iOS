@@ -29,6 +29,8 @@ public struct VisitedCompleteFeature {
     var isShowFirstVisitMessage: Bool = false
     var isShowButton: Bool = false
     var petInfo: PetInfoEntity? = nil
+    var showLevelBar: Bool = false
+    var startLevelAnimation: Bool = false
     
     public init(isFirstVisit: Bool, petInfo: PetInfoEntity?) {
       self.isFirstVisit = isFirstVisit
@@ -98,7 +100,12 @@ public struct VisitedCompleteFeature {
         case .showToastMessage:
           return sseudamToast(sseudam: state.sseudamPoint)
           
+        case .showLevelBar:
+          state.showLevelBar = true
+          return .none
+          
         case .levelBar:
+          state.startLevelAnimation = true
           return .none
         }
         
@@ -137,9 +144,13 @@ extension VisitedCompleteFeature {
       }
       try await Task.sleep(for: .seconds(0.8))
       await send(.animation(.showButton))
+      await send(.animation(.showLevelBar))
       
       try await Task.sleep(for: .seconds(0.4))
       await send(.animation(.showToastMessage))
+      
+      try await Task.sleep(for: .seconds(0.4))
+      await send(.animation(.levelBar))
     }
     
   }
@@ -153,6 +164,7 @@ extension VisitedCompleteFeature {
     case firstVisit
     case showButton
     case showToastMessage
+    case showLevelBar
     case levelBar
   }
   

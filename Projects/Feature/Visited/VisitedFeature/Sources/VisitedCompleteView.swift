@@ -22,6 +22,7 @@ public struct VisitedCompleteView: View {
   public var body: some View {
     ZStack(alignment: .top) {
       ColorSet.Background.Primary
+      pointView
       mainContentView
       bottomView
     }
@@ -41,6 +42,27 @@ public struct VisitedCompleteView: View {
       
     }
     .padding(.horizontal, .Number16)
+  }
+  
+  private var pointView: some View {
+    VStack {
+      HStack {
+        Spacer()
+        if let petInfo = store.petInfo {
+          LevelBar(
+            currentLevel: petInfo.levelType,
+            currentPoint: petInfo.currentPoint,
+            addPoint: store.sseudamPoint.point,
+            maxLevelPoint: petInfo.goalPoint,
+            startAnimation: $store.startLevelAnimation
+          )
+          .opacity(store.showLevelBar ? 1 : 0)
+          .animation(.easeIn(duration: 0.1), value: store.showLevelBar)
+        }
+      }
+      .padding(.top, .Number20)
+      Spacer()
+    }
   }
   
   @ViewBuilder

@@ -19,6 +19,9 @@ public struct SuggestionListFeature {
   
   @ObservableState
   public struct State: Equatable {
+    
+    public var suggestions: [SuggestionListEntity]? = nil
+    
     public init() {}
   }
 
@@ -35,15 +38,18 @@ public struct SuggestionListFeature {
     Reduce { state, action in
       switch action {
       case .fetchSuggestions:
-        return fetchSuggestions()
+        /// 이미 불러온 경우 중복 호출 방지 -> refresh 시도 할 때만 재 호출 하기 위함.
+        return state.suggestions == nil ? fetchSuggestions() : .none
         
       case let .suggestionsResponse(result):
         switch result {
         case let .success(suggestions):
           print("Fetched suggestions: \(suggestions)")
+          state.suggestions = suggestions
           return .none
           
         case let .failure(error):
+          state.suggestions = nil
           print("Error fetching suggestions: \(error)")
           return .none
         }

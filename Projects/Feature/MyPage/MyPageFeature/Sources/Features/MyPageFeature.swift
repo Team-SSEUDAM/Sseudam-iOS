@@ -17,6 +17,8 @@ public struct MyPageFeature {
   @ObservableState
   public struct State: Equatable {
     public var path = StackState<MyPagePath.State>()
+    public var suggestionList: SuggestionListFeature.State = .init()
+    
     public var isLoggedIn: Bool = false
     public init() {}
   }
@@ -24,6 +26,8 @@ public struct MyPageFeature {
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case path(StackActionOf<MyPagePath>)
+    case suggestionList(SuggestionListFeature.Action)
+    
     case onAppear
     case checkLoggedIn
     
@@ -48,6 +52,9 @@ public struct MyPageFeature {
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
+    Scope(state: \.suggestionList, action: \.suggestionList) {
+      SuggestionListFeature()
+    }
     Reduce { state, action in
       switch action {
       case .onAppear:
@@ -55,7 +62,7 @@ public struct MyPageFeature {
         
       case .checkLoggedIn:
         state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
-        return .none
+        return state.isLoggedIn ? fetchInitData() : .none
         
       case .settingButtonTapped:
         state.path.append(.setting(SettingFeature.State()))
@@ -80,5 +87,13 @@ public struct MyPageFeature {
       }
     }
     .forEach(\.path, action: \.path)
+  }
+}
+
+extension MyPageFeature {
+  private func fetchInitData() -> Effect<Action> {
+    return .run { send in
+      await send(.suggestionList(.fetchSuggestions))
+    }
   }
 }

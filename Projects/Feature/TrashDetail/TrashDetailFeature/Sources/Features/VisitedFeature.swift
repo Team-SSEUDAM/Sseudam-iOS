@@ -149,12 +149,14 @@ public struct VisitedFeature {
         )
         
       case .visitButtonTapped:
-        guard state.visitedState == .enableVisit else {
-          return .send(.disableVisit)
-        }
-        
-        state.visitedState = .notDetermine
-        return .send(.fetchPetInfo)
+        let test: PetInfoEntity = .init(nickname: "", point: 10, levelType: "LEVEL_1", maxLevelStandard: 20)
+        return .send(.visitedComplete(isFirst: true, petInfo: test))
+//        guard state.visitedState == .enableVisit else {
+//          return .send(.disableVisit)
+//        }
+//        
+//        state.visitedState = .notDetermine
+//        return .send(.fetchPetInfo)
         
       case let .requestVisitResult(.success(result)):
         return .merge([

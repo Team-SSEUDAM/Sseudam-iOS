@@ -40,13 +40,10 @@ public struct VisitedCompleteFeature {
     case binding(BindingAction<State>)
     case onAppear
     case startAnimation
-    case startSuccess
-    case startConfetti
-    case showFirstVisitText
-    case showButton
     case comfirmButtonTapped
     case showToastMessage
     case resetToastMessage
+    case animation(VisitedAnimationAction)
     case delegate(Delegate)
   }
   
@@ -64,26 +61,7 @@ public struct VisitedCompleteFeature {
         
       case .startAnimation:
         return startAnimation(isFirstVisit: state.isFirstVisit)
-        
-      case .startSuccess:
-        let duration = state.animationState.success.duration()
-        state.animationState.success.setSpeed(speed: duration / 1.0)
-        state.animationState.success.play()
-        return .none
-        
-      case .startConfetti:
-        state.isShowConfetti = true
-        state.animationState.confetti.play()
-        return .none
-        
-      case .showFirstVisitText:
-        state.isShowFirstVisitMessage = true
-        return .none
-        
-      case .showButton:
-        state.isShowButton = true
-        return .none
-        
+      
       case .comfirmButtonTapped:
         return .send(.delegate(.dismiss))
         
@@ -103,30 +81,73 @@ public struct VisitedCompleteFeature {
         state.toastMessage = nil
         return .none
         
+      case let .animation(animation):
+        switch animation {
+        case .success:
+          let duration = state.animationState.success.duration()
+          state.animationState.success.setSpeed(speed: duration / 1.0)
+          state.animationState.success.play()
+          return .none
+          
+        case .confetti:
+          state.isShowConfetti = true
+          state.animationState.confetti.play()
+          return .none
+          
+        case .firstVisit:
+          state.isShowFirstVisitMessage = true
+          return .none
+          
+        case .showButton:
+          state.isShowButton = true
+          return .none
+          
+        case .showToastMessage:
+          return .send(.showToastMessage)
+          
+        case .levelBar:
+          return .none
+        }
+        
+        
         default: return .none
       }
     }
   }
-  
+}
+
+extension VisitedCompleteFeature {
   private func startAnimation(isFirstVisit: Bool) -> Effect<Action> {
     return .run { send in
-      await send(.startSuccess)
-      try await Task.sleep(nanoseconds: 400_000_000)
-      await send(.startConfetti)
+      await send(.animation(.success))
+      
+      try await Task.sleep(for: .seconds(0.4))
+      await send(.animation(.confetti))
+      
       if isFirstVisit {
-        try await Task.sleep(nanoseconds: 800_000_000)
-        await send(.showFirstVisitText)
+        try await Task.sleep(for: .seconds(0.8))
+        await send(.animation(.firstVisit))
       }
-      try await Task.sleep(nanoseconds: 800_000_000)
-      await send(.showButton)
-      try await Task.sleep(nanoseconds: 400_000_000)
-      await send(.showToastMessage)
+      try await Task.sleep(for: .seconds(0.8))
+      await send(.animation(.showButton))
+      
+      try await Task.sleep(for: .seconds(0.4))
+      await send(.animation(.showToastMessage))
     }
     
   }
 }
 
 extension VisitedCompleteFeature {
+  
+  public enum VisitedAnimationAction: Equatable {
+    case success
+    case confetti
+    case firstVisit
+    case showButton
+    case showToastMessage
+    case levelBar
+  }
   
   public struct AnimationState: Equatable {
     var confetti = DotLottieAnimation(

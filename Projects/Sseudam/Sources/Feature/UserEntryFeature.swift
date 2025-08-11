@@ -14,11 +14,14 @@ import Utility
 import AttendanceFeature
 import AttendanceDomainInterface
 
+import PetDomainInterface
+
 @Reducer
 struct UserEntryFeature {
   @ObservableState
   struct State {
     @Presents var modal: Modal.State?
+    var petInfo: PetInfoEntity? = nil
     var userId: Int
     
     init(userId: Int) {
@@ -32,8 +35,12 @@ struct UserEntryFeature {
     case checkComplete
     
     case checkAttendance
+    case requestCheckAttendance
     case checkAttendanceResult(Result<AttendanceEntity, NetworkError>)
     case saveAttendanceDate(Date)
+    
+    case fetchPetInfo
+    case fetchPetInfoResult(Result<PetInfoEntity, NetworkError>)
     
     case modal(PresentationAction<Modal.Action>)
   }
@@ -48,6 +55,7 @@ struct UserEntryFeature {
   }
   
   @Dependency(\.AttendanceUseCase) var attendanceUseCase
+  @Dependency(\.CheckPetInfoUseCase) var checkPetInfoUseCase
   
   var body: some ReducerOf<Self> {
     BindingReducer()
@@ -60,13 +68,17 @@ struct UserEntryFeature {
         // MARK: - Attendance
       case .checkAttendance:
         if isFirstAppOpenToday() {
-          return checkAttendance(userId: state.userId)
+          return .send(.fetchPetInfo)
         } else {
           return .send(.checkComplete)
         }
         
+      case .requestCheckAttendance:
+        return checkAttendance(userId: state.userId)
+        
       case let .checkAttendanceResult(.success(data)):
-        state.modal = .attendance(AttendanceFeature.State(data))
+        let attendanceState = AttendanceFeature.State(data, petInfo: state.petInfo)
+        state.modal = .attendance(attendanceState)
         return .send(.saveAttendanceDate(data.attendanceDate ?? Date()))
         
       case let .saveAttendanceDate(date):
@@ -76,6 +88,20 @@ struct UserEntryFeature {
       case let .checkAttendanceResult(.failure(error)):
         print(error)
         return .send(.checkComplete)
+        
+        // MARK: - Fetch PetInfo
+        
+      case .fetchPetInfo:
+        return fetchPetInfo()
+        
+      case let .fetchPetInfoResult(.success(entity)):
+        state.petInfo = entity
+        return .send(.requestCheckAttendance)
+        
+      case let .fetchPetInfoResult(.failure(error)):
+        return .send(.requestCheckAttendance)
+        
+        // MARK: - Attendance Delegate
         
       case let .modal(.presented(.attendance(action))):
         switch action {
@@ -112,6 +138,19 @@ extension UserEntryFeature {
         await send(.checkAttendanceResult(.failure(error)))
       } catch {
         await send(.checkAttendanceResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
+  
+  private func fetchPetInfo() -> Effect<Action> {
+    return .run { send in
+      do {
+        let data = try await checkPetInfoUseCase.execute()
+        await send(.fetchPetInfoResult(.success(data)))
+      } catch let error as NetworkError {
+        await send(.fetchPetInfoResult(.failure(error)))
+      } catch {
+        await send(.fetchPetInfoResult(.failure(.customError(message: error.localizedDescription))))
       }
     }
   }

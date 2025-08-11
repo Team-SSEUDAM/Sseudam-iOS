@@ -36,6 +36,16 @@ public enum CatLevel: String, Sendable, CaseIterable {
     }
   }
   
+  public var nextLevel: CatLevel? {
+    switch self {
+    case .level1: return .level2
+    case .level2: return .level3
+    case .level3: return .level4
+    case .level4: return .level5
+    case .level5: return nil
+    }
+  }
+  
   public var interactionText: [String] {
     switch self {
     case .level1: return ["안녕..?", "반가워", "나랑 친구해주는 거야?", "여기 따뜻하고 좋다..~"]

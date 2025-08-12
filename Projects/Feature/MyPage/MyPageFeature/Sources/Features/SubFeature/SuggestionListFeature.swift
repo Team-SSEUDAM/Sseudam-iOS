@@ -21,12 +21,16 @@ public struct SuggestionListFeature {
   public struct State: Equatable {
     
     public var histories: [SuggestionAndReportHistoryEntity]? = nil
+    public var filterdHistories: [SuggestionAndReportHistoryEntity]? = nil
+    public var filterdType: ActionType = .unknown
     public var suggestionsImages: [Int: Data?] = [:]
     public init() {}
   }
 
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    
+    case filterTapped(ActionType)
     
     case fetchHistories
     case forceRefreshHistories // 강제 새로고침 액션
@@ -47,6 +51,15 @@ public struct SuggestionListFeature {
       case .fetchHistories:
         /// 이미 불러온 경우 중복 호출 방지 -> refresh 시도 할 때만 재 호출 하기 위함.
         return state.histories == nil ? fetchSuggestions() : .none
+      
+      case let .filterTapped(type):
+        state.filterdType = type
+        switch type {
+        case .unknown: state.filterdHistories = state.histories
+        case .suggestion: state.filterdHistories = state.histories?.filter { $0.actionType == .suggestion }
+        case .report: state.filterdHistories = state.histories?.filter { $0.actionType == .report }
+        }
+        return .none
         
       case .forceRefreshHistories:
         return fetchSuggestions()
@@ -68,7 +81,7 @@ public struct SuggestionListFeature {
         case let .success(imageData):
           print("Fetched image data: \(imageData)")
           state.suggestionsImages = imageData
-          return .none
+          return .send(.filterTapped(state.filterdType)) // 필터링된 타입으로 다시 필터링하여 UI 업데이트
         case let .failure(error):
           print("Error fetching image data: \(error)")
           // 에러 처리 로직 필요

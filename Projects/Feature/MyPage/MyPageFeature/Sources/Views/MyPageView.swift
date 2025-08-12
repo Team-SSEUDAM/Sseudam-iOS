@@ -91,7 +91,13 @@ public struct MyPageView: View {
     } pages: {
       GeometryReader { geo in
         let height = geo.size.height - .Number320
-        SuggestList(height: height)
+        VStack(alignment: .leading, spacing: .Number0) {
+          SuggestionFilterView { type in
+            store.send(.suggestionList(.filterTapped(type)))
+          }
+          .padding(.Number16)
+          SuggestList(height: height)
+        }
       }
       GeometryReader { geo in
         let height = geo.size.height - .Number320
@@ -152,7 +158,7 @@ public struct MyPageView: View {
   @ViewBuilder
   private func SuggestList(height: CGFloat) -> some View {
     LazyVStack(spacing: .Number0) {
-      if let histories = store.suggestionList.histories, !histories.isEmpty {
+      if let histories = store.suggestionList.filterdHistories, !histories.isEmpty {
         ForEach(histories) { history in
           if let data = store.suggestionList.suggestionsImages[history.id] {
             SuggestCell(history: history, imageData: data)

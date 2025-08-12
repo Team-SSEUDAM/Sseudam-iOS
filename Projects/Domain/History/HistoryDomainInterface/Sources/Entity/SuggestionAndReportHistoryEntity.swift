@@ -31,13 +31,6 @@ public struct SuggestionAndReportHistoryEntity: Sendable, Equatable, Identifiabl
     }
   }
   
-  public enum ActionType: String, Sendable {
-    case suggestion = "SUGGESTION"
-    case report = "REPORT"
-    case unknown = "UNKNOWN"
-  }
-
-  
   public init(
     id: Int,
     imageUrl: String,
@@ -55,3 +48,8 @@ public struct SuggestionAndReportHistoryEntity: Sendable, Equatable, Identifiabl
   }
 }
 
+public enum ActionType: String, Sendable {
+  case suggestion = "SUGGESTION"
+  case report = "REPORT"
+  case unknown = "UNKNOWN"
+}

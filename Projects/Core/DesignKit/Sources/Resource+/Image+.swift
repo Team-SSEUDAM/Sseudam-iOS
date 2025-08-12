@@ -47,5 +47,6 @@ public enum ImageSet: String {
   case attendanceEmpty = "attendance_empty"
   case welcome = "welcome"
   case sseudam = "sseudam_img"
+  case avartar = "avatar"
   public var swiftUIImage: DesignKitImages { DesignKitImages(name: self.rawValue) }
 }

@@ -112,7 +112,7 @@ public struct MyPageView: View {
   @ViewBuilder
   private var UserInfoView: some View {
     VStack(alignment: .center, spacing: .Number12) {
-      Icon(image: .addSpot, size: .Number72)
+      Icon(image: .avartar, size: .Number72)
       HStack(alignment: .center, spacing: .Number4) {
         Text("{store.userName}")
           .font(FontSet.Heading.heading3)

@@ -152,12 +152,12 @@ public struct MyPageView: View {
   @ViewBuilder
   private func SuggestList(height: CGFloat) -> some View {
     LazyVStack(spacing: .Number0) {
-      if let suggestions = store.suggestionList.suggestions, !suggestions.isEmpty {
-        ForEach(suggestions) { suggestion in
-          if let data = store.suggestionList.suggestionsImages[suggestion.id] {
-            SuggestCell(suggestion: suggestion, imageData: data)
+      if let histories = store.suggestionList.histories, !histories.isEmpty {
+        ForEach(histories) { history in
+          if let data = store.suggestionList.suggestionsImages[history.id] {
+            SuggestCell(history: history, imageData: data)
           } else {
-            SuggestCell(suggestion: suggestion)
+            SuggestCell(history: history)
           }
         }
       } else {

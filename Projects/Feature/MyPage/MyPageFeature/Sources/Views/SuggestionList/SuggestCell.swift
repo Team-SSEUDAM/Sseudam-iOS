@@ -9,20 +9,20 @@
 import SwiftUI
 import Utility
 import DesignKit
-import SuggestionDomainInterface
+import HistoryDomainInterface
 
 public struct SuggestCell: View {
   
-  private let suggestion: SuggestionListEntity?
+  private let history: SuggestionAndReportHistoryEntity?
   private let imageData: Data?
   
   @State private var downsampledImage: UIImage?
   
   public init(
-    suggestion: SuggestionListEntity? = nil,
+    history: SuggestionAndReportHistoryEntity? = nil,
     imageData: Data? = nil
   ) {
-    self.suggestion = suggestion
+    self.history = history
     self.imageData = imageData
   }
   
@@ -31,21 +31,21 @@ public struct SuggestCell: View {
       HStack(spacing: .Number12) {
         TrashImageView
         VStack(alignment: .leading, spacing: .Number0) {
-          Text(suggestion?.address ?? "{주소}")
+          Text(history?.address ?? "{주소}")
             .font(FontSet.Body.body2)
             .foregroundStyle(ColorSet.Text.Primary)
             .truncationMode(.tail)
             .lineLimit(1)
-          Text("{신규 제보} | \(suggestion?.date ?? "{YY.MM.DD}")")
+          Text("{신규 제보} | \(history?.date ?? "{YY.MM.DD}")")
             .font(FontSet.Caption.caption1)
             .foregroundStyle(ColorSet.Text.Tertiary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
       }
       Badge(
-        text: .constant(suggestion?.status.ko ?? "{상태}"),
-        state: suggestion?.status == .approved
-        ? .accent : suggestion?.status == .rejected
+        text: .constant(history?.status.ko ?? "{상태}"),
+        state: history?.status == .approved
+        ? .accent : history?.status == .rejected
         ? .error : .primary,
       )
     }

@@ -102,14 +102,14 @@ public struct MyPageFeature {
 extension MyPageFeature {
   private func fetchInitData() -> Effect<Action> {
     return .run { send in
-      await send(.suggestionList(.fetchSuggestions))
+      await send(.suggestionList(.fetchHistories))
       await send(.thrownList(.fetchThrownList))
     }
   }
   
   private func forceFetchInitData() -> Effect<Action> {
     return .run { send in
-      await send(.suggestionList(.forceRefreshSuggestions))
+      await send(.suggestionList(.forceRefreshHistories))
       await send(.thrownList(.forceRefreshThrownList))
     }
   }

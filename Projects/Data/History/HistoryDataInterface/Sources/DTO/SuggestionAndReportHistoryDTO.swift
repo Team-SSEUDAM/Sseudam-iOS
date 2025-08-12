@@ -17,10 +17,9 @@ public struct SuggestionAndReportHistoryDTO: DTO {
   
   public struct SpotSuggestion: Sendable, Codable, Equatable {
     public let id: Int
-    public let spotId: Int
+    public let spotId: Int?
     public let userId: Int
     public let point: Coordinates
-    public let region: String
     public let spotName: String
     public let address: Address
     public let trashType: String

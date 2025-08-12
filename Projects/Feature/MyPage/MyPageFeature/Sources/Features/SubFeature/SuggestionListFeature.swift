@@ -9,7 +9,7 @@
 import SwiftUI
 import Utility
 import ComposableArchitecture
-import SuggestionDomainInterface
+import HistoryDomainInterface
 import ImageDownloadDomainInterface
 
 @Reducer
@@ -20,7 +20,7 @@ public struct SuggestionListFeature {
   @ObservableState
   public struct State: Equatable {
     
-    public var suggestions: [SuggestionListEntity]? = nil
+    public var histories: [SuggestionAndReportHistoryEntity]? = nil
     public var suggestionsImages: [Int: Data?] = [:]
     public init() {}
   }
@@ -28,39 +28,39 @@ public struct SuggestionListFeature {
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     
-    case fetchSuggestions
-    case forceRefreshSuggestions // 강제 새로고침 액션
-    case suggestionsResponse(Result<[SuggestionListEntity], NetworkError>)
+    case fetchHistories
+    case forceRefreshHistories // 강제 새로고침 액션
+    case historiesResponse(Result<[SuggestionAndReportHistoryEntity], NetworkError>)
     
     case fetchTrashImage(imgUrl: String?, id: Int)
     case fetchTrashImageResult(Result<[Int: Data?], ImageDownloadError>) // id: 사진 데이터
     case storeImages(images: [Int: Data?])
   }
   
-  @Dependency(\.GetSuggestionListUseCase) var getSuggestionListUseCase
+  @Dependency(\.GetSuggestionAndHistoryUseCase) var getSuggestionAndHistoryUseCase
   @Dependency(\.ImageDownloadUseCase) var imageDownloadUseCase
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
       switch action {
-      case .fetchSuggestions:
+      case .fetchHistories:
         /// 이미 불러온 경우 중복 호출 방지 -> refresh 시도 할 때만 재 호출 하기 위함.
-        return state.suggestions == nil ? fetchSuggestions() : .none
+        return state.histories == nil ? fetchSuggestions() : .none
         
-      case .forceRefreshSuggestions:
+      case .forceRefreshHistories:
         return fetchSuggestions()
         
-      case let .suggestionsResponse(result):
+      case let .historiesResponse(result):
         switch result {
-        case let .success(suggestions):
-          print("Fetched suggestions: \(suggestions)")
-          state.suggestions = suggestions
-          return fetchTrashImage(suggestions)
+        case let .success(histories):
+          print("Fetched histories: \(histories)")
+          state.histories = histories
+          return fetchTrashImage(histories)
           
         case let .failure(error):
-          state.suggestions = nil
-          print("Error fetching suggestions: \(error)")
+          state.histories = nil
+          print("Error fetching histories: \(error)")
           return .none
         }
       case let .fetchTrashImageResult(result):
@@ -85,17 +85,17 @@ extension SuggestionListFeature {
   private func fetchSuggestions() -> Effect<Action> {
     return .run { send in
       do {
-        let suggestions = try await getSuggestionListUseCase.execute()
-        await send(.suggestionsResponse(.success(suggestions)))
+        let histories = try await getSuggestionAndHistoryUseCase.execute()
+        await send(.historiesResponse(.success(histories)))
       } catch let error as NetworkError {
-        await send(.suggestionsResponse(.failure(error)))
+        await send(.historiesResponse(.failure(error)))
       } catch {
-        await send(.suggestionsResponse(.failure(.customError(message: error.localizedDescription))))
+        await send(.historiesResponse(.failure(.customError(message: error.localizedDescription))))
       }
     }
   }
   
-  private func fetchTrashImage(_ datas: [SuggestionListEntity]) -> Effect<Action> {
+  private func fetchTrashImage(_ datas: [SuggestionAndReportHistoryEntity]) -> Effect<Action> {
     return .run { send in
       do {
         try await withThrowingTaskGroup(of: (id: Int, data: Data?).self) { group in

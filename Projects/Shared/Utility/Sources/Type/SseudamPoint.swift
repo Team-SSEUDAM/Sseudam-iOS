@@ -9,15 +9,18 @@
 import Foundation
 
 public enum SseudamPoint {
-  case continutityAttendance
+  case continuityAttendance
   case attendance
-  
+  case firstVisit
+  case visit
 }
 
 extension SseudamPoint {
   public var point: Int {
     switch self {
-    case .continutityAttendance:
+    case .firstVisit:
+      return 7
+    case .continuityAttendance, .visit:
       return 5
     case .attendance:
       return 2

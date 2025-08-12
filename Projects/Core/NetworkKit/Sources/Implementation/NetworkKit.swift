@@ -65,6 +65,7 @@ public struct NetworkKit: NetworkKitProtocol, Sendable {
       group.addTask { // 실제 네트워크 통신 Task
         let request = try endpoint.toURLRequest()
         let (data, response) = try await self.session.data(for: request)
+        dump(endpoint)
         return try await self.handleResponse(data: data, response: response, endpoint: endpoint)
       }
       group.addTask { // 타임아웃 체크 전용 Task

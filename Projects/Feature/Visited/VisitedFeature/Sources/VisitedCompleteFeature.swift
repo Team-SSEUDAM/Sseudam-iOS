@@ -10,6 +10,8 @@ import Foundation
 import ComposableArchitecture
 import DesignKit
 import DotLottie
+import PetDomainInterface
+import Utility
 
 @Reducer
 public struct VisitedCompleteFeature {
@@ -21,15 +23,19 @@ public struct VisitedCompleteFeature {
     
     var isFirstVisit: Bool
     var toastMessage: AttributedString? = nil
-    var sseudamCount: String
+    var sseudamPoint: SseudamPoint
     var animationState: AnimationState = .init()
     var isShowConfetti: Bool = false
     var isShowFirstVisitMessage: Bool = false
     var isShowButton: Bool = false
+    var petInfo: PetInfoEntity? = nil
+    var showLevelBar: Bool = false
+    var startLevelAnimation: Bool = false
     
-    public init(isFirstVisit: Bool) {
+    public init(isFirstVisit: Bool, petInfo: PetInfoEntity?) {
       self.isFirstVisit = isFirstVisit
-      sseudamCount = isFirstVisit ? "7쓰담" : "5쓰담"
+      sseudamPoint = isFirstVisit ? .firstVisit : .visit
+      self.petInfo = petInfo
     }
   }
 
@@ -37,13 +43,10 @@ public struct VisitedCompleteFeature {
     case binding(BindingAction<State>)
     case onAppear
     case startAnimation
-    case startSuccess
-    case startConfetti
-    case showFirstVisitText
-    case showButton
     case comfirmButtonTapped
-    case showToastMessage
+    case showToastMessage(AttributedString?)
     case resetToastMessage
+    case animation(VisitedAnimationAction)
     case delegate(Delegate)
   }
   
@@ -61,69 +64,109 @@ public struct VisitedCompleteFeature {
         
       case .startAnimation:
         return startAnimation(isFirstVisit: state.isFirstVisit)
-        
-      case .startSuccess:
-        let duration = state.animationState.success.duration()
-        state.animationState.success.setSpeed(speed: duration / 1.0)
-        state.animationState.success.play()
-        return .none
-        
-      case .startConfetti:
-        state.isShowConfetti = true
-        state.animationState.confetti.play()
-        return .none
-        
-      case .showFirstVisitText:
-        state.isShowFirstVisitMessage = true
-        return .none
-        
-      case .showButton:
-        state.isShowButton = true
-        return .none
-        
+      
       case .comfirmButtonTapped:
         return .send(.delegate(.dismiss))
         
-      case .showToastMessage:
-        var attributed: AttributedString {
-          var sseudam = AttributedString(state.sseudamCount)
-          var text = AttributedString("이 적립됐어요!")
-          sseudam.foregroundColor = ColorSet.Text.InverseAccent
-          text.foregroundColor = ColorSet.Text.Inverse
-          sseudam.append(text)
-          return sseudam
-        }
-        state.toastMessage = attributed
+      case let .showToastMessage(message):
+        state.toastMessage = message
         return .none
         
       case .resetToastMessage:
         state.toastMessage = nil
         return .none
         
+      case let .animation(animation):
+        switch animation {
+        case .success:
+          let duration = state.animationState.success.duration()
+          state.animationState.success.setSpeed(speed: duration / 1.0)
+          state.animationState.success.play()
+          return .none
+          
+        case .confetti:
+          state.isShowConfetti = true
+          state.animationState.confetti.play()
+          return .none
+          
+        case .firstVisit:
+          state.isShowFirstVisitMessage = true
+          return .none
+          
+        case .showButton:
+          state.isShowButton = true
+          return .none
+          
+        case .showToastMessage:
+          return sseudamToast(sseudam: state.sseudamPoint)
+          
+        case .showLevelBar:
+          state.showLevelBar = true
+          return .none
+          
+        case .levelBar:
+          state.startLevelAnimation = true
+          return .none
+        }
+        
+        
         default: return .none
       }
     }
   }
+}
+
+extension VisitedCompleteFeature {
+  
+  private func sseudamToast(sseudam: SseudamPoint) -> Effect<Action> {
+    let point = sseudam.sseudamText
+    var attributed: AttributedString {
+      var sseudam = AttributedString(point)
+      var text = AttributedString("이 적립됐어요!")
+      sseudam.foregroundColor = ColorSet.Text.InverseAccent
+      text.foregroundColor = ColorSet.Text.Inverse
+      sseudam.append(text)
+      return sseudam
+    }
+    return .send(.showToastMessage(attributed))
+  }
   
   private func startAnimation(isFirstVisit: Bool) -> Effect<Action> {
     return .run { send in
-      await send(.startSuccess)
-      try await Task.sleep(nanoseconds: 400_000_000)
-      await send(.startConfetti)
+      await send(.animation(.success))
+      
+      try await Task.sleep(for: .seconds(0.4))
+      await send(.animation(.confetti))
+      
       if isFirstVisit {
-        try await Task.sleep(nanoseconds: 800_000_000)
-        await send(.showFirstVisitText)
+        try await Task.sleep(for: .seconds(0.8))
+        await send(.animation(.firstVisit))
       }
-      try await Task.sleep(nanoseconds: 800_000_000)
-      await send(.showButton)
-      try await Task.sleep(nanoseconds: 400_000_000)
-      await send(.showToastMessage)
+      try await Task.sleep(for: .seconds(0.8))
+      await send(.animation(.showButton))
+      await send(.animation(.showLevelBar))
+      
+      try await Task.sleep(for: .seconds(0.4))
+      await send(.animation(.showToastMessage))
+      
+      try await Task.sleep(for: .seconds(0.4))
+      await send(.animation(.levelBar))
     }
     
   }
 }
 
 extension VisitedCompleteFeature {
+  
+  public enum VisitedAnimationAction: Equatable {
+    case success
+    case confetti
+    case firstVisit
+    case showButton
+    case showToastMessage
+    case showLevelBar
+    case levelBar
+  }
   
   public struct AnimationState: Equatable {
     var confetti = DotLottieAnimation(

@@ -13,6 +13,7 @@ import TrashDetailFeature
 import DesignKit
 import VisitedFeature
 import TrashSpotDomainInterface
+import PetDomainInterface
 
 @Reducer
 struct HomeRootFeature {
@@ -32,7 +33,7 @@ struct HomeRootFeature {
     case trashDetail(TrashDetailFeature.Action)
     
     case presentDetail(Bool, id: Int?)
-    case presentVisitedComplete(isFirst: Bool)
+    case presentVisitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
     
     case closeAlertAction(AlertType)
     case acceptAlertAction(AlertType)
@@ -64,7 +65,7 @@ struct HomeRootFeature {
     }
     Reduce { state, action in
       switch action {
-
+        
         // MARK: - Alert
         
       case .closeAlertAction:
@@ -91,8 +92,13 @@ struct HomeRootFeature {
         }
         return .none
         
-      case let .presentVisitedComplete(isFirst):
-        state.modal = .visitedComplete(VisitedCompleteFeature.State(isFirstVisit: isFirst))
+      case let .presentVisitedComplete(isFirst, petInfo):
+        state.modal = .visitedComplete(
+          VisitedCompleteFeature.State(
+            isFirstVisit: isFirst,
+            petInfo: petInfo
+          )
+        )
         return .none
         
       case .checkLoggedin:
@@ -143,8 +149,8 @@ struct HomeRootFeature {
         case let .showAlert(type):
           return .send(.presentAlert(type))
           
-        case let .visitedComplete(isFirst):
-          return .send(.presentVisitedComplete(isFirst: isFirst))
+        case let .visitedComplete(isFirst, petInfo):
+          return .send(.presentVisitedComplete(isFirst: isFirst, petInfo: petInfo))
           
         }
         

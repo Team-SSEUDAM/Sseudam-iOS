@@ -100,6 +100,7 @@ public struct LoginFeature {
         
       case let .fetchUserInfoResult(.success(data)):
         UserDefaultsKeys.userId = data.id
+        UserDefaultsKeys.userNickname = data.nickname
         return .send(.delegate(.complete))
         
       case let .fetchUserInfoResult(.failure(error)):

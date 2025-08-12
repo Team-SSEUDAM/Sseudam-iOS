@@ -9,7 +9,7 @@
 import Foundation
 
 public enum SseudamPoint {
-  case continutityAttendance
+  case continuityAttendance
   case attendance
   case firstVisit
   case visit
@@ -20,7 +20,7 @@ extension SseudamPoint {
     switch self {
     case .firstVisit:
       return 7
-    case .continutityAttendance, .visit:
+    case .continuityAttendance, .visit:
       return 5
     case .attendance:
       return 2

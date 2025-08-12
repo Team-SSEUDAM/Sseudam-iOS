@@ -41,7 +41,7 @@ public struct AttendanceFeature {
       continuityCount = data.continuity
       isContinuity = data.isContinuity
       attendanceStatus = data.status
-      sseudamPoint = data.continuity == 5 ? .continutityAttendance : .attendance
+      sseudamPoint = data.continuity == 5 ? .continuityAttendance : .attendance
       self.petInfo = petInfo
     }
   }

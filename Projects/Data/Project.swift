@@ -20,7 +20,8 @@ let project = Project.makeStaticLibraryProject(
     .Data.Pet.Implement,
     .Data.Visited.Implement,
     .Data.Attendance.Implement,
-    .Data.ImageDownload.Implement 
+    .Data.ImageDownload.Implement,
+    .Data.History.Implement,
   ]
 )
 

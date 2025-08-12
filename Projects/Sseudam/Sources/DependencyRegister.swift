@@ -46,6 +46,10 @@ import ImageDownloadDomainInterface
 import ImageDownloadDomain
 import ImageDownloadData
 
+import HistoryDomainInterface
+import HistoryDomain
+import HistoryData
+
 import NetworkKit
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
@@ -63,6 +67,7 @@ struct DependencyRegister {
     let nmGeometryRepository = NMReverseGeoCodeRepository.live
     let suggestionRepository = SpotSuggestionRepository.live
     let imageDownloadRepoaitory = ImageDownloadRepository.live
+    let historyRepository = HistoryRepository.live(networker: networker)
 
     // MARK: - Home
       
@@ -210,6 +215,11 @@ struct DependencyRegister {
     // MARK: - ImageDownload
     TrashImageDownloadUseCaseRegister {
       TrashImageDownloadUseCase.live(repository: imageDownloadRepoaitory)
+    }
+    
+    // MARK: - History
+    GetSuggestionAndHistoryUseCaseRegister {
+      GetSuggestionAndHistoryUseCase.live(repository: historyRepository)
     }
   }
 }

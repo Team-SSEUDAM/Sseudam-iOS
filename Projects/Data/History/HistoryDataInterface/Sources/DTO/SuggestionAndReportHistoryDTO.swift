@@ -24,7 +24,7 @@ public struct SuggestionAndReportHistoryDTO: DTO {
     public let address: Address
     public let trashType: String
     public let imageUrl: String
-    public let status: String? // 임시로 옵셔널처리
+    public let status: String
     public let actionType: String
     public let createdAt: String
     
@@ -46,7 +46,7 @@ public extension SuggestionAndReportHistoryDTO {
       SuggestionAndReportHistoryEntity(
         id: $0.id,
         imageUrl: $0.imageUrl,
-        status: $0.status ?? "WAITING",
+        status: $0.status,
         address: $0.address.site,
         actionType: $0.actionType,
         date: $0.createdAt

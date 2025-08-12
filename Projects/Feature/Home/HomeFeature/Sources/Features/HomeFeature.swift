@@ -48,7 +48,6 @@ public struct HomeFeature {
     case hiddenReportButton(Bool)
     
     case showReportView(detail: TrashSpotDetail?)
-    case receiveTrashDetailFromRoot(TrashSpotDetail?)
     case moveToSetting
     case suggestionButtonTapped
     case delegate(Delegate)
@@ -95,7 +94,7 @@ public struct HomeFeature {
       case let .map(.delegate(action)):
         switch action {
         case .noDataInDetailView:
-          return .send(.presentDetailView(true, id: nil))
+          return .send(.presentDetailView(true))
           
         case let .showToastMessage(message):
           return .send(.showToastMessage(message))
@@ -109,9 +108,17 @@ public struct HomeFeature {
         return .none
         
       case let .showReportView(detail):
+        print("showReportView detail: \(String(describing: detail))")
         guard let detail = detail else { return .none }
-        state.path.append(.reportView(ReportFeature.State(detail)))
-        return .none
+        state.path.append(
+          .reportView(
+            ReportFeature.State(
+              detail,
+              currentLocation: state.location.lastCameraPosition
+            )
+          )
+        )
+        return .send(.presentDetailView(false))
         
         // MARK: - Send Action to HomeRoot
         
@@ -156,12 +163,6 @@ public struct HomeFeature {
           }
         }
         
-      case let .receiveTrashDetailFromRoot(trashSpotDetail):
-        if let detail = trashSpotDetail {
-          state.path.append(.reportView(ReportFeature.State(detail, currentLocation: state.location.lastCameraPosition)))
-          return .send(.presentDetailView(false))
-        }
-        return .none
       default: return .none
       }
     }

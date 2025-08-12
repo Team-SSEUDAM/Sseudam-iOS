@@ -132,10 +132,7 @@ struct HomeRootFeature {
       case let .trashDetail(.delegate(action)):
         switch action {
         case let .reportButtonTapped(detailData):
-          return .run { @MainActor send in
-            send(.home(.showReportView(detail: detailData)))
-            send(.home(.receiveTrashDetailFromRoot(detailData)))
-          }
+          return .send(.home(.showReportView(detail: detailData)))
           
         case let .showToastMessage(message):
           return .send(.home(.showToastMessage(message)))

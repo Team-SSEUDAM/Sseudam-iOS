@@ -152,9 +152,10 @@ public struct VisitedFeature {
         guard state.visitedState == .enableVisit else {
           return .send(.disableVisit)
         }
-        
-        state.visitedState = .notDetermine
-        return .send(.fetchPetInfo)
+        return .merge([
+          .send(.changeVisitedState(.notDetermine)),
+          .send(.fetchPetInfo)
+        ])
         
       case let .requestVisitResult(.success(result)):
         return .merge([

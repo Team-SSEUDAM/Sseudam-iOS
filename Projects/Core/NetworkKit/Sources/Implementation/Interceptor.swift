@@ -14,8 +14,11 @@ import Utility
 public struct Interceptor: TokenRefresher {
   
   public static func refreshToken() async throws -> String? {
+    print(#function)
     if let refreshToken: String = KeyChainService.read(forKey: .refreshToken) {
       let accessToken = UserDefaultsKeys.accessToken
+      print(accessToken)
+      print(refreshToken)
       let refreshEndpoint = Endpoint<TokenRefreshDTO>(
         headers: .authorization(accessToken),
         method: .post,

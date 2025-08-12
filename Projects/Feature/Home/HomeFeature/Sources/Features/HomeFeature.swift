@@ -108,7 +108,6 @@ public struct HomeFeature {
         return .none
         
       case let .showReportView(detail):
-        print("showReportView detail: \(String(describing: detail))")
         guard let detail = detail else { return .none }
         state.path.append(
           .reportView(

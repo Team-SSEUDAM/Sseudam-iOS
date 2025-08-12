@@ -16,6 +16,7 @@ public typealias HTTPParameters = [String: Any]
 public enum APIHeaderType {
   case plain
   case authorization(String?)
+  case reissue(String?)
   case custom([String: String])
 }
 
@@ -92,6 +93,12 @@ public extension APIRequestable {
       return [
         "Content-Type": "application/json",
         "Authorization": "Bearer \(token)"
+      ]
+    case let .reissue(token):
+      guard let token = token else { return ["Content-Type": "application/json"] }
+      return [
+        "Content-Type": "application/json",
+        "Authorization": "\(token)"
       ]
     }
   }

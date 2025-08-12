@@ -36,7 +36,7 @@ public struct SuggestCell: View {
             .foregroundStyle(ColorSet.Text.Primary)
             .truncationMode(.tail)
             .lineLimit(1)
-          Text("{신규 제보} | \(history?.date ?? "{YY.MM.DD}")")
+          Text("\((history?.actionType == .suggestion ? "신규 제보" : "수정 제안")) | \(history?.date ?? "{YY.MM.DD}")")
             .font(FontSet.Caption.caption1)
             .foregroundStyle(ColorSet.Text.Tertiary)
         }

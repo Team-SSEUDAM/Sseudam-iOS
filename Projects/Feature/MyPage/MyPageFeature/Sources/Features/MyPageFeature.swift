@@ -35,6 +35,7 @@ public struct MyPageFeature {
     case checkLoggedIn
     
     case settingButtonTapped
+    case changeNicknameButtonTapped
     
     case checkLoginState
     
@@ -46,6 +47,7 @@ public struct MyPageFeature {
   @Reducer(state: .equatable, action: .equatable)
   public enum MyPagePath {
     case setting(SettingFeature)
+    case changeNickname(ChangeMyNicknameFeature)
   }
   
   public enum Delegate: Equatable {
@@ -77,8 +79,14 @@ public struct MyPageFeature {
         state.path.append(.setting(SettingFeature.State()))
         return .send(.hiddenTabBar(true))
         
+      case .changeNicknameButtonTapped:
+        let nickname = UserDefaultsKeys.userNickname
+        state.path.append(.changeNickname(ChangeMyNicknameFeature.State(name: nickname)))
+        return .send(.hiddenTabBar(true))
+        
       case .requestLogin:
         return .send(.delegate(.requestLogin(true)))
+        
         
       case let .hiddenTabBar(isHidden):
         return .send(.delegate(.hiddenTabBar(isHidden)))
@@ -89,6 +97,17 @@ public struct MyPageFeature {
         case .pop:
           state.path.removeLast()
           return .send(.hiddenTabBar(false))
+        }
+        
+      case let .path(.element(id: _, action: .changeNickname(.delegate(action)))):
+        switch action {
+        case let .didChangeNickname(nickname):
+          UserDefaultsKeys.userNickname = nickname
+          return .none
+        case .pop:
+          state.path.removeLast()
+          return .send(.hiddenTabBar(false))
+          
         }
         
       default: return .none

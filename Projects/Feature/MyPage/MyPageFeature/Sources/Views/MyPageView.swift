@@ -27,6 +27,8 @@ public struct MyPageView: View {
       switch store.case {
       case let .setting(store):
         SettingView(store: store)
+      case let .changeNickname(store):
+        ChangeMyNicknameView(store: store)
       }
     }
     .onAppear {
@@ -124,6 +126,7 @@ public struct MyPageView: View {
         )
         .onTapGesture {
           print("Edit Profile Tapped")
+          store.send(.changeNicknameButtonTapped)
         }
       }
     }

@@ -31,6 +31,16 @@ public struct UserEndPoint: Sendable {
     )
   }
   
+  public static func updateNickname(body: NicknameChangeBody) -> Endpoint<EmptyResponse> {
+    let accessToken = UserDefaultsKeys.accessToken
+    return Endpoint(
+      headers: .authorization(accessToken),
+      method: .put,
+      path: "/users/nickname",
+      parameters: .body(body)
+    )
+  }
+  
   public static func fetchUserInfo() -> Endpoint<UserInfoDTO> {
     let accessToken = UserDefaultsKeys.accessToken
     return Endpoint(

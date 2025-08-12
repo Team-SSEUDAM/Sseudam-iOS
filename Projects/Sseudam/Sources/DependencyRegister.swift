@@ -143,6 +143,10 @@ struct DependencyRegister {
       CheckNicknameValidateUseCase.live(repository: userReoository)
     }
     
+    ChangeNicknameUseCaseRegister {
+      ChangeNicknameUseCase.live(repository: userReoository)
+    }
+    
     LoadAreaListUseCaseRegister {
       LoadAreaListUseCase.live(repository: userReoository)
     }

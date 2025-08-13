@@ -81,12 +81,11 @@ public struct SuggestionListFeature {
         case let .success(imageData):
           print("Fetched image data: \(imageData)")
           state.suggestionsImages = imageData
-          return .send(.filterTapped(state.filterdType)) // 필터링된 타입으로 다시 필터링하여 UI 업데이트
         case let .failure(error):
           print("Error fetching image data: \(error)")
-          // 에러 처리 로직 필요
-          return .none
         }
+        /// 이미지가 있거나 없거나 에러가 발생해도 필터링된 타입으로 UI를 업데이트 하기 위해
+        return .send(.filterTapped(state.filterdType)) // 필터링된 타입으로 다시 필터링하여 UI 업데이트
       default:
         return .none
       }

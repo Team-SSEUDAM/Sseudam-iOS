@@ -237,14 +237,16 @@ public struct ReportFeature {
         return uploadReportSpotImageEffect(state, prisignedURL, uploadReportSpotImageUseCase)
         
       case .combineSpotReportModel:
-        var reportSpotDetail = TrashSpotFlattenDetailEntity(id: state.trashSpotDetail.id)
-        reportSpotDetail.spotName = state.trashSpotDetail.name
-        reportSpotDetail.latitude = state.trashSpotDetail.point.latitude
-        reportSpotDetail.longitude = state.trashSpotDetail.point.longitude
-        reportSpotDetail.trashType = state.trashSpotDetail.trashType.rawValue
-        reportSpotDetail.region = state.trashSpotRegion
-        reportSpotDetail.city = state.trashSpotCity
-        reportSpotDetail.site = state.trashSpotSite
+        let reportSpotDetail = TrashSpotFlattenDetailEntity(
+          id: state.trashSpotDetail.id,
+          latitude: state.trashSpotDetail.point.latitude,
+          longitude: state.trashSpotDetail.point.longitude,
+          spotName: state.trashSpotDetail.name,
+          region: state.trashSpotRegion,
+          city: state.trashSpotCity,
+          site: state.trashSpotSite,
+          trashType: state.trashSpotDetail.trashType.rawValue,
+        )
         state.reportSpotDetail = reportSpotDetail
         return spotReportEffect(state, reportSpotUseCase)
         

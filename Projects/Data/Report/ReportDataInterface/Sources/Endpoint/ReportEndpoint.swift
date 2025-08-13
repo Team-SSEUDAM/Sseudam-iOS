@@ -14,12 +14,13 @@ import ReportDomainInterface
 public enum ReportEndpoint: Sendable {
   
   public static func postSpotReport(
+    addPath: Int,
     body: ReportSpotBody
   ) -> Endpoint<ReportSpotDTO> {
     return Endpoint(
       headers: .authorization(UserDefaultsKeys.accessToken),
       method: .post,
-      path: "/reports/\(body.spotId)",
+      path: "/reports/\(addPath)",
       parameters: .body(body)
     )
   }

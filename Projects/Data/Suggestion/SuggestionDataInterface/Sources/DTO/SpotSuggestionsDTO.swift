@@ -32,8 +32,8 @@ public struct SpotSuggestionsDTO: DTO {
     }
     
     public struct Address: Sendable, Codable, Equatable {
-      let city: String
-      let site: String
+      public let city: String
+      public let site: String
     }
   }
 }

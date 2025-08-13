@@ -131,13 +131,14 @@ public struct ReportView: View {
   
   @ViewBuilder
   private var bottomButtonView: some View {
-    ZStack {
-      if store.nextButtonIsHidden == false {
-        nextButton
-          .padding(.horizontal, .Number16)
-          .padding(.vertical, .Number24)
+    nextButton
+      .padding(.horizontal, .Number16)
+      .padding(.vertical, .Number24)
+      .overlay {
+        if store.nextButtonIsHidden {
+          ColorSet.Background.Primary
+        }
       }
-    }
   }
   
   /// 네비게이션 바

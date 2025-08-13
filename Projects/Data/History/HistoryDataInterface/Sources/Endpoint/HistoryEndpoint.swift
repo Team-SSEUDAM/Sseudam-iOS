@@ -9,7 +9,6 @@
 import Foundation
 import NetworkKit
 import UserDefaults
-import HistoryDomainInterface
 
 public enum HistoryEndpoint: Sendable {
   public static func getSuggestionAndHistory() -> Endpoint<SuggestionAndReportHistoryDTO> {

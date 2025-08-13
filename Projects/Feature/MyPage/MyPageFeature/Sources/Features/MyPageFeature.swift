@@ -17,6 +17,9 @@ public struct MyPageFeature {
   @ObservableState
   public struct State: Equatable {
     public var path = StackState<MyPagePath.State>()
+    public var suggestionList: SuggestionListFeature.State = .init()
+    public var thrownList: ThrownListFeature.State = .init()
+    
     public var isLoggedIn: Bool = false
     public init() {}
   }
@@ -24,10 +27,15 @@ public struct MyPageFeature {
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case path(StackActionOf<MyPagePath>)
+    case suggestionList(SuggestionListFeature.Action)
+    case thrownList(ThrownListFeature.Action)
+    
     case onAppear
+    case refreshPage
     case checkLoggedIn
     
     case settingButtonTapped
+    case changeNicknameButtonTapped
     
     case checkLoginState
     
@@ -39,6 +47,7 @@ public struct MyPageFeature {
   @Reducer(state: .equatable, action: .equatable)
   public enum MyPagePath {
     case setting(SettingFeature)
+    case changeNickname(ChangeMyNicknameFeature)
   }
   
   public enum Delegate: Equatable {
@@ -48,21 +57,36 @@ public struct MyPageFeature {
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
+    Scope(state: \.suggestionList, action: \.suggestionList) {
+      SuggestionListFeature()
+    }
+    Scope(state: \.thrownList, action: \.thrownList) {
+      ThrownListFeature()
+    }
     Reduce { state, action in
       switch action {
       case .onAppear:
         return .send(.checkLoggedIn)
         
+      case .refreshPage:
+        return forceFetchInitData()
+        
       case .checkLoggedIn:
         state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
-        return .none
+        return state.isLoggedIn ? fetchInitData() : .none
         
       case .settingButtonTapped:
         state.path.append(.setting(SettingFeature.State()))
         return .send(.hiddenTabBar(true))
         
+      case .changeNicknameButtonTapped:
+        let nickname = UserDefaultsKeys.userNickname
+        state.path.append(.changeNickname(ChangeMyNicknameFeature.State(name: nickname)))
+        return .send(.hiddenTabBar(true))
+        
       case .requestLogin:
         return .send(.delegate(.requestLogin(true)))
+        
         
       case let .hiddenTabBar(isHidden):
         return .send(.delegate(.hiddenTabBar(isHidden)))
@@ -75,10 +99,37 @@ public struct MyPageFeature {
           return .send(.hiddenTabBar(false))
         }
         
+      case let .path(.element(id: _, action: .changeNickname(.delegate(action)))):
+        switch action {
+        case let .didChangeNickname(nickname):
+          UserDefaultsKeys.userNickname = nickname
+          return .none
+        case .pop:
+          state.path.removeLast()
+          return .send(.hiddenTabBar(false))
+          
+        }
+        
       default: return .none
         
       }
     }
     .forEach(\.path, action: \.path)
+  }
+}
+
+extension MyPageFeature {
+  private func fetchInitData() -> Effect<Action> {
+    return .run { send in
+      await send(.suggestionList(.fetchHistories))
+      await send(.thrownList(.fetchThrownList))
+    }
+  }
+  
+  private func forceFetchInitData() -> Effect<Action> {
+    return .run { send in
+      await send(.suggestionList(.forceRefreshHistories))
+      await send(.thrownList(.forceRefreshThrownList))
+    }
   }
 }

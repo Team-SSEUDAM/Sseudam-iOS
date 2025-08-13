@@ -20,6 +20,9 @@ public extension UserRepository {
       checkNicknameValidate: { nickname in
         let endpoint = UserEndPoint.nicknameValid(body: .init(nickname: nickname))
         return try await networker.execute(with: endpoint, timeout: 60).toEntity()
+      }, changeNickname: { nickname in
+        let endpoint = UserEndPoint.updateNickname(body: .init(nickname: nickname))
+        let _ = try await networker.execute(with: endpoint, timeout: 60)
       }, loadAreaList: {
         await cache.load()
       }, fetchAreaList: {

@@ -21,7 +21,7 @@ public struct PageLabel {
   }
 }
 
-public struct HeaderPageScrollView<Header: View, Page: View>: View {
+public struct HeaderPageScrollView<Header: View, Pages: View>: View {
   
   public var displaysSymbols: Bool = false
   /// Header에 해당하는 View
@@ -29,7 +29,7 @@ public struct HeaderPageScrollView<Header: View, Page: View>: View {
   /// Tab별로 가지게 될 Label들 (image도 가능)
   public var pageLabels: [PageLabel]
   /// 각 Tab에 해당하는 View
-  public var pages: [Page]
+  public var pages: Pages
   public var onRefresh: () async -> Void
   
   // MARK: - View 관련 Properties
@@ -47,13 +47,13 @@ public struct HeaderPageScrollView<Header: View, Page: View>: View {
     displaysSymbols: Bool,
     @ViewBuilder header: @escaping () -> Header,
     @PageLabelBuilder pageLabels: @escaping () -> [PageLabel],
-    pages: [Page],
+    @ViewBuilder pages: @escaping () -> Pages,
     onRefresh: @escaping () async -> Void = {}
   ) {
     self.displaysSymbols = displaysSymbols
     self.header = header()
     self.pageLabels = pageLabels()
-    self.pages = pages
+    self.pages = pages()
     self.onRefresh = onRefresh
     
     let count = pageLabels().count
@@ -70,13 +70,13 @@ public struct HeaderPageScrollView<Header: View, Page: View>: View {
       
       ScrollView(.horizontal) {
         HStack(spacing: 0) {
-          Group {
-            if pages.count != pageLabels.count {
+          Group(subviews: pages) { collection in
+            if collection.count != pageLabels.count {
               Text("Tabviews and labels does not match")
                 .frame(width: size.width, height: size.height)
             } else {
               ForEach(pageLabels, id: \.title){ label in
-                PageScrollView(label: label, size: size, subViews: pages)
+                PageScrollView(label: label, size: size, collections: collection)
                   .frame(width: size.width)
                   .id(label.title)
               }
@@ -112,7 +112,7 @@ public struct HeaderPageScrollView<Header: View, Page: View>: View {
   }
   
   @ViewBuilder
-  func PageScrollView(label: PageLabel, size: CGSize, subViews: [Page]) -> some View {
+  func PageScrollView(label: PageLabel, size: CGSize, collections: SubviewsCollection) -> some View {
     let index = pageLabels.firstIndex(where: { $0.title == label.title }) ?? 0
     
     ScrollView(.vertical) {
@@ -139,7 +139,7 @@ public struct HeaderPageScrollView<Header: View, Page: View>: View {
         .simultaneousGesture(horizontalScrollDisableGesture)
 
         Section {
-          subViews[index]
+          collections[index]
             .frame(minHeight: size.height - .Number48, alignment: .top)
             
         } header: {

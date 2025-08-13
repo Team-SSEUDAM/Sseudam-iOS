@@ -31,4 +31,14 @@ public struct VisitedEndPoint: Sendable {
       parameters: .query(parameter)
     )
   }
+  
+  public static func getVisitedList() -> Endpoint<VisitedListDTO> {
+    let accessToken = UserDefaultsKeys.accessToken
+    return Endpoint(
+      headers: .authorization(accessToken),
+      method: .get,
+      path: "/visited",
+      parameters: nil
+    )
+  }
 }

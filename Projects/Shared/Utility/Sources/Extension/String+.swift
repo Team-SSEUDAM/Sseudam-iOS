@@ -14,7 +14,7 @@ extension String {
   }
 
   public var isValidNicknameStrict: Bool {
-    let regex = "^[a-zA-Z0-9가-힣]{2,12}$"
+    let regex = "^[a-zA-Z0-9ㄱ-힣]{2,12}$"
     let isBasicValid = self.range(of: regex, options: .regularExpression) != nil
     return isBasicValid && !containsEmoji
   }

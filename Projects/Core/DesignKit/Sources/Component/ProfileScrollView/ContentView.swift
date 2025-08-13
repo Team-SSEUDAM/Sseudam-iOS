@@ -10,26 +10,22 @@ import SwiftUI
 
 struct ContentView: View {
   var body: some View {
-    HeaderPageScrollView(
-      displaysSymbols: false,
-      header: {
-        RoundedRectangle(cornerRadius: 30)
-          .fill(.blue.gradient)
-          .frame(height: 350)
-          .padding(15)
-      }, pageLabels: {
-        PageLabel(title: "Posts", symbolImage: "square.grid.3x3.fill")
-        PageLabel(title: "Reels", symbolImage: "photo.stack.fill")
-        PageLabel(title: "Tagged", symbolImage: "person.crop.rectangle")
-      }, pages: [
-        DummyView(.red, count: 50),
-        DummyView(.yellow, count: 10),
-        DummyView(.indigo, count: 5),
-      ],
-      onRefresh: {
-        print("Refresh triggered")
-      }
-    )
+    HeaderPageScrollView(displaysSymbols: false) {
+      RoundedRectangle(cornerRadius: 30)
+        .fill(.blue.gradient)
+        .frame(height: 350)
+        .padding(15)
+    } pageLabels: {
+      PageLabel(title: "Posts", symbolImage: "square.grid.3x3.fill")
+      PageLabel(title: "Reels", symbolImage: "photo.stack.fill")
+      PageLabel(title: "Tagged", symbolImage: "person.crop.rectangle")
+    } pages: {
+      DummyView(.red, count: 50)
+      DummyView(.yellow, count: 10)
+      DummyView(.indigo, count: 5)
+    } onRefresh: {
+      print("Refresh triggered")
+    }
   }
   
   @ViewBuilder
@@ -47,5 +43,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+  ContentView()
 }

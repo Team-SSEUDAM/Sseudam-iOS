@@ -13,35 +13,37 @@ import UserDefaults
 
 public struct MyPageView: View {
   @Bindable var store: StoreOf<MyPageFeature>
-
+  
   public init(store: StoreOf<MyPageFeature>) {
     self.store = store
   }
-
+  
   public var body: some View {
     NavigationStack(
       path: $store.scope(state: \.path, action: \.path)
     ) {
-        content
-      } destination: { store in
-        switch store.case {
-        case let .setting(store):
-          SettingView(store: store)
-        }
+      content
+    } destination: { store in
+      switch store.case {
+      case let .setting(store):
+        SettingView(store: store)
+      case let .changeNickname(store):
+        ChangeMyNicknameView(store: store)
       }
-      .onAppear {
-        store.send(.onAppear)
+    }
+    .onAppear {
+      store.send(.onAppear)
+    }
+    .onChange(of: store.path) { oldValue, newValue in
+      if newValue.count == 0 {
+        store.send(.checkLoggedIn)
+        store.send(.delegate(.hiddenTabBar(false)))
       }
-      .onChange(of: store.path) { oldValue, newValue in
-        if newValue.count == 0 {
-          store.send(.checkLoggedIn)
-          store.send(.delegate(.hiddenTabBar(false)))
-        }
-      }
-      .transaction { transaction in
-        transaction.disablesAnimations = false
-      }
-
+    }
+    .transaction { transaction in
+      transaction.disablesAnimations = false
+    }
+    
   }
   
   @ViewBuilder
@@ -54,6 +56,7 @@ public struct MyPageView: View {
           NavigationBarView
           PageScrollView
         }
+        .padding(.bottom, .Number50)
       } else {
         ZStack {
           VStack(spacing: .Number0) {
@@ -80,31 +83,40 @@ public struct MyPageView: View {
   
   @ViewBuilder
   private var PageScrollView: some View {
-    HeaderPageScrollView(
-      displaysSymbols: false,
-      header: {
-        UserInfoView
-          .frame(maxWidth: .infinity)
-          .background(ColorSet.Background.Primary)
-      }, pageLabels: {
-        PageLabel(title: "제보한 내역")
-        PageLabel(title: "버린 내역")
-      }, pages: [
-        Text("제보한 내역"),
-        Text("버린 내역")
-      ],
-      onRefresh: {
-        print("Refresh triggered")
+    HeaderPageScrollView(displaysSymbols: false) {
+      UserInfoView
+        .frame(maxWidth: .infinity)
+        .background(ColorSet.Background.Primary)
+    } pageLabels: {
+      PageLabel(title: "제보한 내역")
+      PageLabel(title: "버린 내역")
+    } pages: {
+      GeometryReader { geo in
+        let height = geo.size.height - .Number320
+        VStack(alignment: .leading, spacing: .Number0) {
+          SuggestionFilterView { type in
+            store.send(.suggestionList(.filterTapped(type)))
+          }
+          .padding(.Number16)
+          SuggestList(height: height)
+        }
       }
-    )
+      GeometryReader { geo in
+        let height = geo.size.height - .Number320
+        ThrownList(height: height)
+      }
+    } onRefresh: {
+      print("Refresh triggered")
+      store.send(.refreshPage)
+    }
   }
   
   @ViewBuilder
   private var UserInfoView: some View {
     VStack(alignment: .center, spacing: .Number12) {
-      Icon(image: .addSpot, size: .Number72)
+      Icon(image: .avartar, size: .Number72)
       HStack(alignment: .center, spacing: .Number4) {
-        Text("{store.userName}")
+        Text(UserDefaultsKeys.userNickname ?? "{userName}")
           .font(FontSet.Heading.heading3)
           .foregroundStyle(ColorSet.Text.Primary)
         Icon(
@@ -114,13 +126,14 @@ public struct MyPageView: View {
         )
         .onTapGesture {
           print("Edit Profile Tapped")
+          store.send(.changeNicknameButtonTapped)
         }
       }
     }
     .padding(.vertical, .Number28)
     .padding(.horizontal, .Number16)
   }
-
+  
   
   @ViewBuilder
   private var requireLoginView: some View {
@@ -137,12 +150,70 @@ public struct MyPageView: View {
         size: .large,
         state: .constant(.normal)
       ) {
-          store.send(.requestLogin)
-        }
-        .frame(width: 129)
+        store.send(.requestLogin)
+      }
+      .frame(width: 129)
       
       Spacer()
     }
+  }
+  
+  @ViewBuilder
+  private func SuggestList(height: CGFloat) -> some View {
+    LazyVStack(spacing: .Number0) {
+      if let histories = store.suggestionList.filterdHistories, !histories.isEmpty {
+        ForEach(histories) { history in
+          if let data = store.suggestionList.suggestionsImages[history.id] {
+            SuggestCell(history: history, imageData: data)
+          } else {
+            SuggestCell(history: history)
+          }
+        }
+      } else {
+        VStack(alignment: .center, spacing: .Number8) {
+          Spacer()
+            .frame(height: (height - .Number72) / 2)
+          Icon(
+            image: .sentimentDissatisfied,
+            size: .Number40,
+            renderingMode: .template,
+            color: ColorSet.Icon.Tertiary
+          )
+          Text("제보한 내역이 없습니다.")
+            .font(FontSet.Body.body3)
+            .foregroundStyle(ColorSet.Text.Secondary)
+        }
+      }
+    }
+    .frame(maxWidth: .infinity)
+    .background(ColorSet.Background.Primary)
+  }
+  
+  @ViewBuilder
+  private func ThrownList(height: CGFloat) -> some View {
+    LazyVStack(spacing: .Number0) {
+      if let thrownList = store.thrownList.thrownList, !thrownList.isEmpty {
+        ForEach(thrownList) { thrownList in
+          ThrownCell(thrownList: thrownList)
+        }
+      } else {
+        VStack(alignment: .center, spacing: .Number8) {
+          Spacer()
+            .frame(height: (height - .Number72) / 2)
+          Icon(
+            image: .sentimentDissatisfied,
+            size: .Number40,
+            renderingMode: .template,
+            color: ColorSet.Icon.Tertiary
+          )
+          Text("제보한 내역이 없습니다.")
+            .font(FontSet.Body.body3)
+            .foregroundStyle(ColorSet.Text.Secondary)
+        }
+      }
+    }
+    .frame(maxWidth: .infinity)
+    .background(ColorSet.Background.Primary)
   }
 }
 

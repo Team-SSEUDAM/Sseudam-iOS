@@ -32,6 +32,10 @@ public struct ReportFeature {
     
     var currentPage: Int = 0
     var trashSpotDetail: TrashSpotDetail
+    var trashSpotRegion: String?
+    var trashSpotCity: String?
+    var trashSpotSite: String?
+      
     
     /// 하위 `Feature`
     var selectedReportInfo: SelectReportInfoTypeFeature.State
@@ -238,6 +242,9 @@ public struct ReportFeature {
         reportSpotDetail.latitude = state.trashSpotDetail.point.latitude
         reportSpotDetail.longitude = state.trashSpotDetail.point.longitude
         reportSpotDetail.trashType = state.trashSpotDetail.trashType.rawValue
+        reportSpotDetail.region = state.trashSpotRegion
+        reportSpotDetail.city = state.trashSpotCity
+        reportSpotDetail.site = state.trashSpotSite
         state.reportSpotDetail = reportSpotDetail
         return spotReportEffect(state, reportSpotUseCase)
         
@@ -319,6 +326,11 @@ private extension ReportFeature {
       
     case let .centerChanged(location, entity):
       if let location = location { state.trashSpotDetail.point = location }
+      if let entity = entity {
+        state.trashSpotRegion = entity.region
+        state.trashSpotCity = entity.city
+        state.trashSpotSite = entity.site
+      }
       return .send(.nextButtonIsEnabled(location != nil && entity != nil))
     }
   }

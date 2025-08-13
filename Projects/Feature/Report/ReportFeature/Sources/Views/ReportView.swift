@@ -132,11 +132,10 @@ public struct ReportView: View {
   @ViewBuilder
   private var bottomButtonView: some View {
     ZStack {
-      nextButton
-        .padding(.horizontal, .Number16)
-        .padding(.vertical, .Number24)
-      if store.nextButtonIsHidden {
-        Rectangle().frame(height: .Number48).background(ColorSet.Background.Primary)
+      if store.nextButtonIsHidden == false {
+        nextButton
+          .padding(.horizontal, .Number16)
+          .padding(.vertical, .Number24)
       }
     }
   }

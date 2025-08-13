@@ -16,7 +16,7 @@ public extension HistoryRepository {
     return .init(
       getSuggestionAndHistory: {
         let endpoint = HistoryEndpoint.getSuggestionAndHistory()
-        return try await NetworkKit().execute(with: endpoint).toEntity()
+        return try await networker.execute(with: endpoint).toEntity()
       }
     )
   }

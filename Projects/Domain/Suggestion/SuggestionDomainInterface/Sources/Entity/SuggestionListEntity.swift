@@ -12,23 +12,9 @@ import Utility
 public struct SuggestionListEntity: Sendable, Equatable, Identifiable {
   public var id: Int
   public let imageUrl: String
-  public let status: State
+  public let status: ApprovalStatus
   public let address: String
   public let date: String
-  
-  public enum State: String, Sendable {
-    case approved = "APPROVE"
-    case rejected = "REJECT"
-    case pending = "WAITING"
-    
-    public var ko: String {
-      switch self {
-      case .approved: return "승인 완료"
-      case .rejected: return "승인 거절"
-      case .pending: return "승인 대기중"
-      }
-    }
-  }
   
   public init(
     id: Int,
@@ -39,7 +25,7 @@ public struct SuggestionListEntity: Sendable, Equatable, Identifiable {
   ) {
     self.id = id
     self.imageUrl = imageUrl
-    self.status = State(rawValue: status) ?? .pending
+    self.status = ApprovalStatus(rawValue: status) ?? .pending
     self.address = address
     self.date = date.toFormattedDateOptional() ?? date
   }

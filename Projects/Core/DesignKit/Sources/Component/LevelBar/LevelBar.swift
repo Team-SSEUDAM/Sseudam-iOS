@@ -45,7 +45,7 @@ public struct LevelBar: View {
     self.addPoint = addPoint
     self.maxLevelPoint = maxLevelPoint
     self._startAnimation = startAnimation
-    self._displayLevel = State(initialValue: .level1)
+    self._displayLevel = State(initialValue: currentLevel)
   }
   
   private var initialProgress: CGFloat {

@@ -56,6 +56,7 @@ public struct AttendanceView: View {
   @ViewBuilder
   private var attendanceStateView: some View {
     ZStack{
+      ColorSet.Background.Primary
       ConfettiView
       VStack(spacing: .Number24){
         Spacer()

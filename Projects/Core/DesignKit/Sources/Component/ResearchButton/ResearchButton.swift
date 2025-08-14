@@ -41,6 +41,7 @@ public struct ResearchButton: View {
       Icon(
         image: .replay,
         size: .Number16,
+        renderingMode: .template,
         color: ColorSet.Icon.Accent
       )
       Text("현 위치에서 재검색")

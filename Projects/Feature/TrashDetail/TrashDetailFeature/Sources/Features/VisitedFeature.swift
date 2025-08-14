@@ -25,7 +25,7 @@ public struct VisitedFeature {
     
     public var visitedButtonState: PrimaryButtonState = .disabled
     
-    public var visitedButtonText: String = "이 곳에 쓰레기 담기"
+    public var visitedButtonText: String = "이 곳에 쓰레기 버리기"
     /// 현재 쓰레기통 위치 좌표
     public var trashSpotPoint: Coordinates? = nil
     /// 쓰레기통 ID

@@ -122,7 +122,6 @@ extension UserEntryFeature {
   /// 오늘 첫 진입 여부, 첫 진입 시 출석체크
   private func isFirstAppOpenToday() -> Bool {
     let lastDate = UserDefaultsKeys.lastEntryDate
-    
     guard let lastDate = lastDate else {
       return true
     }

@@ -144,7 +144,7 @@ public struct TrashDetailView: View {
   @ViewBuilder
   private var EmptyDataView: some View {
     HStack(alignment: .center) {
-      VStack(alignment: .center, spacing: .Number20) {
+      VStack(alignment: .center, spacing: .Number10) {
         Icon(
           image: .sentimentDissatisfied,
           size: .Number32,
@@ -153,6 +153,7 @@ public struct TrashDetailView: View {
         )
         VStack(alignment: .center, spacing: .Number16) {
           Text("이 근방에는 쓰레기통이 없어요.")
+            .font(FontSet.Body.body3)
             .foregroundStyle(ColorSet.Text.Secondary)
           PrimaryButton(
             title: .constant("제보하러 가기"),
@@ -231,7 +232,7 @@ public struct TrashDetailView: View {
   @ViewBuilder
   private var ErrorView: some View {
     HStack(alignment: .center) {
-      VStack(alignment: .center, spacing: .Number20) {
+      VStack(alignment: .center, spacing: .Number10) {
         Icon(
           image: .sentimentDissatisfied,
           size: .Number32,
@@ -239,6 +240,7 @@ public struct TrashDetailView: View {
           color: ColorSet.Icon.Secondary
         )
         Text("쓰레기통 정보를 가져오는데 실패했어요.")
+          .font(FontSet.Body.body3)
           .foregroundStyle(ColorSet.Text.Secondary)
       }
     }

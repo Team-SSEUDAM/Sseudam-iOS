@@ -54,6 +54,7 @@ public struct TrashDetailFeature {
     
     /// 로그인 후 상태 변경하기 위한 action
     case checkLoggedin
+    case checkLoginBeforeReport
     
     case showToastMessage(String?)
     case showAlert(AlertType)
@@ -106,7 +107,12 @@ public struct TrashDetailFeature {
         return .none
         
       case .reportButtonTapped:
-        return .send(.delegate(.reportButtonTapped(state.trashDetail)))
+        return .send(.checkLoginBeforeReport)
+        
+      case .checkLoginBeforeReport:
+        return UserDefaultsKeys.isLoggedIn == true
+        ? .send(.delegate(.reportButtonTapped(state.trashDetail)))
+        : .send(.showAlert(.login))
         
       case let .fetchTrashDetail(id):
         return fetchTrashDetail(id: id)

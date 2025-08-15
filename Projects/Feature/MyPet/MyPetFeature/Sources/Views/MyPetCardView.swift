@@ -100,6 +100,6 @@ public struct MyPetCardView: View {
     .padding(.Number20)
     .background(ColorSet.Background.Primary)
     .cornerRadius(.Number10)
-    .elevation(level: .small, cornerRadius: .Number10)
+    .elevation(level: .elevation, cornerRadius: .Number10)
   }
 }

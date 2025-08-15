@@ -63,7 +63,7 @@ public struct BottomSheetOverlay<BottomSheetContent: View>: ViewModifier {
             .frame(maxWidth: .infinity)
             .background(.white)
             .clipCorners(.Number16, corners: [.topLeft, .topRight])
-            .elevation(level: .small, cornerRadius: .Number16)
+            .elevation(level: .elevation, cornerRadius: .Number16)
             .offset(y: offsetY)
             .allowsHitTesting(true)
         }

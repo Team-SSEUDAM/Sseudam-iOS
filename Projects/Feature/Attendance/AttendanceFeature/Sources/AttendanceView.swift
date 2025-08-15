@@ -28,6 +28,7 @@ public struct AttendanceView: View {
         bottomView
       }
     }
+    .background(ColorSet.Background.Primary.ignoresSafeArea())
     .onAppear {
       store.send(.onAppear)
     }

@@ -13,6 +13,7 @@ import TrashSpotDomainInterface
 import SuggestionFeature
 import DesignKit
 import Utility
+import UserDefaults
 import UIKit
 
 @Reducer
@@ -42,6 +43,7 @@ public struct HomeFeature {
     case path(StackActionOf<Path>)
     
     case onAppear
+    case checkIsLoggined
     case showToastMessage(String?)
     case presentDetailView(Bool, id: Int? = nil)
     case presentAlert(AlertType)
@@ -49,6 +51,7 @@ public struct HomeFeature {
     
     case showReportView(detail: TrashSpotDetail?)
     case moveToSetting
+    case moveToSuggestion
     case suggestionButtonTapped
     case delegate(Delegate)
   }
@@ -76,6 +79,14 @@ public struct HomeFeature {
           return .send(.location(.moveUserLocation))
         }
         return .none
+        
+      case .checkIsLoggined:
+        return UserDefaultsKeys.isLoggedIn == true
+        ? .send(.moveToSuggestion)
+        : .send(.presentAlert(.login))
+        
+      case .suggestionButtonTapped:
+        return .send(.checkIsLoggined)
         
       case let .showToastMessage(message):
         state.toastMessage = message
@@ -121,8 +132,12 @@ public struct HomeFeature {
         
         // MARK: - Send Action to HomeRoot
         
-      case .suggestionButtonTapped:
-        state.path.append(.suggestionView(SuggestionFeature.State(state.location.lastCameraPosition)))
+      case .moveToSuggestion:
+        state.path.append(
+          .suggestionView(
+            SuggestionFeature.State(state.location.lastCameraPosition)
+          )
+        )
         return .send(.delegate(.needToHiddenTabBar(true)))
 
       case let .presentDetailView(isPresent, id):

@@ -12,13 +12,13 @@ import Utility
 
 public struct TrashSpotFlattenDetailEntity: Equatable, Sendable {
   public var id: Int
-  public var latitude: Double?
-  public var longitude: Double?
-  public var spotName: String?
-  public var region: String?
-  public var city: String?
-  public var site: String?
-  public var trashType: String?
+  public var latitude: Double
+  public var longitude: Double
+  public var spotName: String
+  public var region: String
+  public var city: String
+  public var site: String
+  public var trashType: String
   
   public init(
     id: Int,
@@ -31,12 +31,12 @@ public struct TrashSpotFlattenDetailEntity: Equatable, Sendable {
     trashType: String? = nil
   ) {
     self.id = id
-    self.latitude = latitude
-    self.longitude = longitude
-    self.spotName = spotName
-    self.region = region
-    self.city = city
-    self.site = site
-    self.trashType = trashType
+    self.latitude = latitude ?? 0.0
+    self.longitude = longitude ?? 0.0
+    self.spotName = spotName ?? ""
+    self.region = region ?? "UNKNOWN"
+    self.city = city ?? ""
+    self.site = site ?? ""
+    self.trashType = trashType ?? ""
   }
 }

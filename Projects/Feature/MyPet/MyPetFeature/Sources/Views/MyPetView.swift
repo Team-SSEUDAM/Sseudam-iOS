@@ -57,7 +57,7 @@ public struct MyPetView: View {
       GeometryReader { proxy in
         MainView
         CustomBottomSheet(
-          minHeight: .Number72,
+          minHeight: .Number156,
           maxHeight: proxy.size.height,
           midHeight: .Number200,
           isBottomSheetDragEnabled: $bottomSheetDragEnabled,
@@ -170,7 +170,34 @@ public struct MyPetView: View {
   
   @ViewBuilder
   private var SmallBottomSheetContent: some View {
-    CommonHeaderView
+    let listStore = store.scope(state: \.petGrowthList, action: \.petGrowthList)
+    VStack {
+      CommonHeaderView
+      VStack(alignment: .center) {
+        ScrollView(.horizontal, showsIndicators: false) {
+          HStack(spacing: .Number12) {
+            ForEach(listStore.catCards) { CatCardCell(card: $0) }
+          }
+          .padding(.horizontal, .Number16)
+          .padding(.vertical, .Number12)
+        }
+        .simultaneousGesture(
+          DragGesture()
+            .onChanged { value in
+              if startBottomSheetInsideScroll {
+                let horizontalAmount = abs(value.translation.width) > 10 ? abs(value.translation.width) : 0
+                let verticalAmount = abs(value.translation.height) > 10 ? abs(value.translation.height) : 0
+                bottomSheetDragEnabled = verticalAmount > horizontalAmount
+                startBottomSheetInsideScroll = false
+              }
+            }
+            .onEnded { _ in
+              startBottomSheetInsideScroll = true
+              bottomSheetDragEnabled = true
+            }
+        )
+      }
+    }
   }
   
   @ViewBuilder

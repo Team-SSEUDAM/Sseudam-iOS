@@ -54,25 +54,32 @@ public struct MyPetView: View {
   @ViewBuilder
   private var ContentView: some View {
     if store.isLoggedIn {
-      GeometryReader { proxy in
-        MainView
-          .overlay(alignment: .bottomTrailing) {
-            IconButton(icon: .info) {
-              print("Info button tapped")
+      ZStack {
+        GeometryReader { proxy in
+          MainView
+            .overlay(alignment: .bottomTrailing) {
+              IconButton(icon: .info) {
+                store.send(.petDescriptionButtonTapped)
+              }
+              .padding(.trailing, .Number16)
+              .padding(.bottom, .Number156 + .Number16)
             }
-            .padding(.trailing, .Number16)
-            .padding(.bottom, .Number156 + .Number16)
-          }
-        CustomBottomSheet(
-          minHeight: .Number156,
-          maxHeight: proxy.size.height,
-          midHeight: .Number200,
-          isBottomSheetDragEnabled: $bottomSheetDragEnabled,
-          smallContent: { SmallBottomSheetContent },
-          largeContent: { BigBottomSheetContent }
-        )
+          CustomBottomSheet(
+            minHeight: .Number156,
+            maxHeight: proxy.size.height,
+            midHeight: .Number200,
+            isBottomSheetDragEnabled: $bottomSheetDragEnabled,
+            smallContent: { SmallBottomSheetContent },
+            largeContent: { BigBottomSheetContent }
+          )
+        }
+        .padding(.bottom, 50)
+        if store.isPresentedPetDescription {
+          PetDescriptionView(
+            onDismiss: { store.send(.dismissPetDescription) }
+          )
+        }
       }
-      .padding(.bottom, 50)
     } else {
       ZStack {
         ColorSet.Background.Primary

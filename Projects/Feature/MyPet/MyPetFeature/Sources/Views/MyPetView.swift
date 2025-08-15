@@ -56,6 +56,13 @@ public struct MyPetView: View {
     if store.isLoggedIn {
       GeometryReader { proxy in
         MainView
+          .overlay(alignment: .bottomTrailing) {
+            IconButton(icon: .info) {
+              print("Info button tapped")
+            }
+            .padding(.trailing, .Number16)
+            .padding(.bottom, .Number156 + .Number16)
+          }
         CustomBottomSheet(
           minHeight: .Number156,
           maxHeight: proxy.size.height,

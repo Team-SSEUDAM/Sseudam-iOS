@@ -245,7 +245,7 @@ public struct ReportFeature {
           region: state.trashSpotRegion,
           city: state.trashSpotCity,
           site: state.trashSpotSite,
-          trashType: state.trashSpotDetail.trashType.rawValue,
+          trashType: state.trashSpotDetail.trashType.rawValue
         )
         state.reportSpotDetail = reportSpotDetail
         return spotReportEffect(state, reportSpotUseCase)

@@ -46,7 +46,7 @@ public struct SuggestCell: View {
         text: .constant(history?.status.ko ?? "{상태}"),
         state: history?.status == .approved
         ? .accent : history?.status == .rejected
-        ? .error : .primary,
+        ? .error : .primary
       )
     }
     .padding(.vertical, .Number12)

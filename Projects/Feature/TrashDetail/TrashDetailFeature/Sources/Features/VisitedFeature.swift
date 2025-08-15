@@ -194,7 +194,7 @@ public struct VisitedFeature {
         return .none
         
       case let .changeVisitedButtonText(remainingTime):
-        let text: String = "이 곳에 쓰레기 담기"
+        let text: String = "이 곳에 쓰레기 버리기"
         if let remainingTime = remainingTime {
           state.visitedButtonText = text+"(\(remainingTime))"
         } else {

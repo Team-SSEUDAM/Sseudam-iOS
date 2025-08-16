@@ -37,8 +37,13 @@ public struct BubbleView: View {
       .animation(.easeInOut(duration: 0.3), value: text)
       .padding(.horizontal, .Number16)
       .padding(.vertical, .Number8)
-      .clipCorners(.Number20, corners: .allCorners)
-      .elevation()
+      .background {
+        GeometryReader { geometry in
+          RoundedRectangle(cornerRadius: geometry.size.height / 2)
+            .fill(backgroundColor)
+            .elevation(level: .elevation, cornerRadius: geometry.size.height / 2)
+        }
+      }
       .animation(.easeInOut(duration: 0.2), value: text)
   }
 }

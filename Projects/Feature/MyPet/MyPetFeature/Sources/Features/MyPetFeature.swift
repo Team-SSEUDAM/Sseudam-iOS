@@ -42,6 +42,9 @@ public struct MyPetFeature {
     public var catCards: [CatCard] = []
     public var growthRecords: [GrowthRecord] = []
     
+    /// 펫 설명 View 상태 관리
+    public var isPresentedPetDescription: Bool = false
+    
     public init() {
       self.petGrowthList = MyPetGrowthListFeature.State()
     }
@@ -66,6 +69,10 @@ public struct MyPetFeature {
     case showShineLottieAnimation
     case hideShineLottieAnimation
     case resetInteractionState
+    
+    case petDescriptionButtonTapped
+    case dismissPetDescription
+    
     
     case requestLogin
     case hiddenTabBar(Bool)
@@ -165,6 +172,14 @@ public struct MyPetFeature {
         state.showBubble = false
         state.bubbleOffset = .zero
         return .none
+        
+      case .petDescriptionButtonTapped:
+        state.isPresentedPetDescription = true
+        return .send(.delegate(.needToHiddenTabBar(true)))
+        
+      case .dismissPetDescription:
+        state.isPresentedPetDescription = false
+        return .send(.delegate(.needToHiddenTabBar(false)))
         
       case .requestLogin:
         return .send(.delegate(.requestLogin(true)))

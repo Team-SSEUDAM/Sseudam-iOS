@@ -54,18 +54,32 @@ public struct MyPetView: View {
   @ViewBuilder
   private var ContentView: some View {
     if store.isLoggedIn {
-      GeometryReader { proxy in
-        MainView
-        CustomBottomSheet(
-          minHeight: .Number72,
-          maxHeight: proxy.size.height,
-          midHeight: .Number200,
-          isBottomSheetDragEnabled: $bottomSheetDragEnabled,
-          smallContent: { SmallBottomSheetContent },
-          largeContent: { BigBottomSheetContent }
-        )
+      ZStack {
+        GeometryReader { proxy in
+          MainView
+            .overlay(alignment: .bottomTrailing) {
+              IconButton(icon: .info) {
+                store.send(.petDescriptionButtonTapped)
+              }
+              .padding(.trailing, .Number16)
+              .padding(.bottom, .Number156 + .Number16)
+            }
+          CustomBottomSheet(
+            minHeight: .Number156,
+            maxHeight: proxy.size.height,
+            midHeight: .Number200,
+            isBottomSheetDragEnabled: $bottomSheetDragEnabled,
+            smallContent: { SmallBottomSheetContent },
+            largeContent: { BigBottomSheetContent }
+          )
+        }
+        .padding(.bottom, 50)
+        if store.isPresentedPetDescription {
+          PetDescriptionView(
+            onDismiss: { store.send(.dismissPetDescription) }
+          )
+        }
       }
-      .padding(.bottom, 50)
     } else {
       ZStack {
         ColorSet.Background.Primary
@@ -170,7 +184,34 @@ public struct MyPetView: View {
   
   @ViewBuilder
   private var SmallBottomSheetContent: some View {
-    CommonHeaderView
+    let listStore = store.scope(state: \.petGrowthList, action: \.petGrowthList)
+    VStack {
+      CommonHeaderView
+      VStack(alignment: .center) {
+        ScrollView(.horizontal, showsIndicators: false) {
+          HStack(spacing: .Number12) {
+            ForEach(listStore.catCards) { CatCardCell(card: $0) }
+          }
+          .padding(.horizontal, .Number16)
+          .padding(.vertical, .Number12)
+        }
+        .simultaneousGesture(
+          DragGesture()
+            .onChanged { value in
+              if startBottomSheetInsideScroll {
+                let horizontalAmount = abs(value.translation.width) > 10 ? abs(value.translation.width) : 0
+                let verticalAmount = abs(value.translation.height) > 10 ? abs(value.translation.height) : 0
+                bottomSheetDragEnabled = verticalAmount > horizontalAmount
+                startBottomSheetInsideScroll = false
+              }
+            }
+            .onEnded { _ in
+              startBottomSheetInsideScroll = true
+              bottomSheetDragEnabled = true
+            }
+        )
+      }
+    }
   }
   
   @ViewBuilder

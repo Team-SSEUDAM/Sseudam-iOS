@@ -43,7 +43,7 @@ public struct LevelBar: View {
     self.currentLevel = currentLevel
     self.currentPoint = currentPoint
     self.addPoint = addPoint
-    self.maxLevelPoint = maxLevelPoint
+    self.maxLevelPoint = currentLevel.goalPoint
     self._startAnimation = startAnimation
     self._displayLevel = State(initialValue: currentLevel)
   }
@@ -162,10 +162,17 @@ public struct LevelBar: View {
       // progressbar 리셋 후 남은 포인트만큼 채우기
       animatedProgress = 0
       
-      let remainingProgress = CGFloat(remainingPointAfterLevelUp) / CGFloat(maxLevelPoint)
-      
-      withAnimation(.easeInOut(duration: 0.8)) {
-        animatedProgress = remainingProgress
+      // Level 5로 업데이트된 경우 무조건 끝까지 채우기
+      if displayLevel == .level5 {
+        withAnimation(.easeInOut(duration: 0.8)) {
+          animatedProgress = 1.0
+        }
+      } else {
+        let remainingProgress = CGFloat(remainingPointAfterLevelUp) / CGFloat(displayLevel.goalPoint)
+        
+        withAnimation(.easeInOut(duration: 0.8)) {
+          animatedProgress = remainingProgress
+        }
       }
       
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
@@ -176,4 +183,21 @@ public struct LevelBar: View {
   }
   
   
+}
+
+extension CatLevel {
+  var goalPoint: Int {
+    switch self {
+    case .level1:
+      return 20
+    case .level2:
+      return 110
+    case .level3:
+      return 220
+    case .level4:
+      return 300
+    case .level5:
+      return 300
+    }
+  }
 }

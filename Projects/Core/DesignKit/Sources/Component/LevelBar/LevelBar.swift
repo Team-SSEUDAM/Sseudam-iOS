@@ -77,7 +77,7 @@ public struct LevelBar: View {
   
   public var body: some View {
     HStack(spacing: .Number6) {
-      Text("Lv.\(displayLevel.rawInt.description)")
+      Text(displayLevel.levelText)
         .foregroundStyle(ColorSet.Text.Primary)
         .font(FontSet.Body.body3)
         .foregroundColor(.primary)

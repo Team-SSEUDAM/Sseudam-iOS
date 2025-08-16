@@ -36,6 +36,21 @@ public enum CatLevel: String, Sendable, CaseIterable {
     }
   }
   
+  public var levelText: String {
+    switch self {
+    case .level1:
+      return "Lv. 1"
+    case .level2:
+      return "Lv. 2"
+    case .level3:
+      return "Lv. 3"
+    case .level4:
+      return "Lv. 4"
+    case .level5:
+      return "Special"
+    }
+  }
+  
   public var nextLevel: CatLevel? {
     switch self {
     case .level1: return .level2

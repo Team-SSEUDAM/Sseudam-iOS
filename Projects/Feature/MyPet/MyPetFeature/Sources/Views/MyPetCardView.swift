@@ -12,6 +12,7 @@ import PetDomainInterface
 
 public struct MyPetCardView: View {
   
+  private let catLevel: CatLevel
   private let level: Int
   private let petNickName: String
   private let nextLevelText: String
@@ -27,6 +28,7 @@ public struct MyPetCardView: View {
     myPetInfo: PetInfoEntity?,
     _ action: @escaping @Sendable () -> Void
   ) {
+    self.catLevel = myPetInfo?.levelType ?? .level1
     self.level = myPetInfo?.levelType.rawInt ?? 1
     self.petNickName = myPetInfo?.nickname ?? "서버 오류 냥이"
     self.currentStamps = myPetInfo?.currentPoint ?? 0
@@ -49,7 +51,7 @@ public struct MyPetCardView: View {
     VStack(alignment: .leading, spacing: .Number4) {
       /// --------- 헤더 영역 ---------
       HStack(spacing: .Number6) {
-        Badge(text: .constant("Lv.\(level)"), state: .primary)
+        Badge(text: .constant(catLevel.levelText), state: .primary)
         Text(petNickName)
           .font(FontSet.Heading.heading3)
           .foregroundStyle(ColorSet.Text.Primary)

@@ -56,7 +56,7 @@ public struct FontInfo: Sendable {
   
   public init(font: DesignKitFontConvertible, size: CGFloat, lineHeight: CGFloat) {
     self.font = font.swiftUIFont(size: size)
-    self.lineheight = (size * lineHeight - size) / 2
+    self.lineheight = size * lineHeight - size
     self.size = size
   }
 }

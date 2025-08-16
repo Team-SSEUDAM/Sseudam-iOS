@@ -27,7 +27,7 @@ public struct FilterButton: View {
   public var body: some View {
     HStack(alignment: .center, spacing: .Number4) {
       if let icon = icon {
-        Icon(image: icon, size: .Number16, color: iconColor)
+        Icon(image: icon, size: .Number16,renderingMode: .template, color: iconColor)
       }
       Text(title)
         .font(FontSet.Body.body3)

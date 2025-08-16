@@ -28,6 +28,7 @@ public struct AttendanceView: View {
         bottomView
       }
     }
+    .background(ColorSet.Background.Primary.ignoresSafeArea())
     .onAppear {
       store.send(.onAppear)
     }
@@ -56,6 +57,7 @@ public struct AttendanceView: View {
   @ViewBuilder
   private var attendanceStateView: some View {
     ZStack{
+      ColorSet.Background.Primary
       ConfettiView
       VStack(spacing: .Number24){
         Spacer()

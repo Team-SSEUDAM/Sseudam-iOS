@@ -26,6 +26,7 @@ public struct VisitedCompleteView: View {
       mainContentView
       bottomView
     }
+    .background(ColorSet.Background.Primary.ignoresSafeArea())
     .onAppear {
       store.send(.onAppear)
     }

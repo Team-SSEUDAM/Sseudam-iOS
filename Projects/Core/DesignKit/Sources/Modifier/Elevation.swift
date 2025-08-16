@@ -11,12 +11,14 @@ import SwiftUI
 public struct ElevationModifier: ViewModifier {
   
   public enum Level {
+    case elevation
     case small
     case medium
     case large
     
     public var radius: CGFloat {
       switch self {
+      case .elevation: return 4
       case .small: return 2
       case .medium: return 4
       case .large: return 8
@@ -25,6 +27,7 @@ public struct ElevationModifier: ViewModifier {
     
     public var opacity: CGFloat {
       switch self {
+      case .elevation: return 0.2
       case .small: return 0.2
       case .medium: return 0.25
       case .large: return 0.3

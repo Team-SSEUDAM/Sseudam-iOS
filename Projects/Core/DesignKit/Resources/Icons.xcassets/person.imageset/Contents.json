@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "person.png",
+      "filename" : "Frame 2147225196.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "person@2x.png",
+      "filename" : "Frame 2147225196@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "person@3x.png",
+      "filename" : "Frame 2147225196@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

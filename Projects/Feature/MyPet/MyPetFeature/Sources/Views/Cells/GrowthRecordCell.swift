@@ -51,7 +51,7 @@ public struct GrowthRecordCell: View {
         VStack(alignment: .leading, spacing: .Number4) {
           HStack(alignment: .center, spacing: .Number6) {
             Badge(
-              text: .constant("Lv.\(record.levelType.rawInt)"),
+              text: .constant(record.levelType.levelText),
               state: .primary
             )
             

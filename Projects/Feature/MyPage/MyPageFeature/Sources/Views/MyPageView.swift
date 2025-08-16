@@ -29,6 +29,8 @@ public struct MyPageView: View {
         SettingView(store: store)
       case let .changeNickname(store):
         ChangeMyNicknameView(store: store)
+      case let .policy(store):
+        PolicyView(store: store)
       }
     }
     .onAppear {

@@ -48,6 +48,7 @@ public struct MyPageFeature {
   public enum MyPagePath {
     case setting(SettingFeature)
     case changeNickname(ChangeMyNicknameFeature)
+    case policy(PolicyFeature)
   }
   
   public enum Delegate: Equatable {
@@ -94,9 +95,19 @@ public struct MyPageFeature {
         // MARK: - Setting Delegate Action
       case let .path(.element(id: _, action: .setting(.delegate(action)))):
         switch action {
+        case let .movePolicy(type):
+          state.path.append(.policy(PolicyFeature.State(type: type)))
+          return .none
         case .pop:
           state.path.removeLast()
           return .send(.hiddenTabBar(false))
+        }
+        
+      case let .path(.element(id: _, action: .policy(.delegate(action)))):
+        switch action {
+        case .pop:
+          state.path.removeLast()
+          return .none
         }
         
       case let .path(.element(id: _, action: .changeNickname(.delegate(action)))):

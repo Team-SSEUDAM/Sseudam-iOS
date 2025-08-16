@@ -23,6 +23,7 @@ public struct SettingFeature {
   
   @ObservableState
   public struct State: Equatable {
+    var path = StackState<SettingPath.State>()
     var isLoggedIn: Bool = true
     var isNotiOn: Bool = true
     public var version: String = ""
@@ -34,6 +35,8 @@ public struct SettingFeature {
 
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    case path(StackActionOf<SettingPath>)
+    
     case onAppear
     case checkAppVersion
     case configVersionInfo(String, Bool)
@@ -61,11 +64,12 @@ public struct SettingFeature {
   }
   
   @Reducer(state: .equatable, action: .equatable)
-  public enum Path {
-    
+  public enum SettingPath {
+    case policy(PolicyFeature)
   }
   
   public enum Delegate: Equatable {
+    case movePolicy(type: PolicyType)
     case pop
   }
   
@@ -127,10 +131,10 @@ public struct SettingFeature {
         return openExternalLink(url: ExternalURL.feedBack)
         
       case .serviceTerm:
-        return openExternalLink(url: ExternalURL.serviceTerm)
+        return .send(.delegate(.movePolicy(type: .terms)))
         
       case .privacyTerm:
-        return openExternalLink(url: ExternalURL.privacyTerm)
+        return .send(.delegate(.movePolicy(type: .privacy)))
         
       case .appstore:
         if state.isNeedUpdate {
@@ -168,6 +172,7 @@ public struct SettingFeature {
       default: return .none
       }
     }
+    .forEach(\.path, action: \.path)
   }
   
 }

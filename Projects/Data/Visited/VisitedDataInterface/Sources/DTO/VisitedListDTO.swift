@@ -18,7 +18,7 @@ public struct VisitedListDTO: DTO {
   public struct VisitedSpot: Decodable, Sendable, Equatable {
     public let id: Int
     public let spotId: Int
-    public let userId: String
+    public let userId: Int
     public let site: String
     public let visitedAt: String
   }

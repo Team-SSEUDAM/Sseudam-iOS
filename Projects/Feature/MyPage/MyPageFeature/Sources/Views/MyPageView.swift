@@ -56,7 +56,9 @@ public struct MyPageView: View {
       if store.isLoggedIn {
         VStack(spacing: .Number0) {
           NavigationBarView
-          PageScrollView
+          GeometryReader { geo in
+            PageScrollView(geo.size.height)
+          }
         }
         .padding(.bottom, .Number50)
       } else {
@@ -84,7 +86,7 @@ public struct MyPageView: View {
   }
   
   @ViewBuilder
-  private var PageScrollView: some View {
+  private func PageScrollView(_ height: CGFloat) -> some View {
     HeaderPageScrollView(displaysSymbols: false) {
       UserInfoView
         .frame(maxWidth: .infinity)
@@ -93,20 +95,14 @@ public struct MyPageView: View {
       PageLabel(title: "제보한 내역")
       PageLabel(title: "버린 내역")
     } pages: {
-      GeometryReader { geo in
-        let height = geo.size.height - .Number320
-        VStack(alignment: .leading, spacing: .Number0) {
-          SuggestionFilterView { type in
-            store.send(.suggestionList(.filterTapped(type)))
-          }
-          .padding(.Number16)
-          SuggestList(height: height)
+      VStack(alignment: .leading, spacing: .Number0) {
+        SuggestionFilterView { type in
+          store.send(.suggestionList(.filterTapped(type)))
         }
+        .padding(.Number16)
+        SuggestList(height: height - .Number320)
       }
-      GeometryReader { geo in
-        let height = geo.size.height - .Number320
-        ThrownList(height: height)
-      }
+      ThrownList(height: height - .Number320)
     } onRefresh: {
       print("Refresh triggered")
       store.send(.refreshPage)
@@ -174,7 +170,7 @@ public struct MyPageView: View {
       } else {
         VStack(alignment: .center, spacing: .Number8) {
           Spacer()
-            .frame(height: (height - .Number72) / 2)
+            .frame(height: abs(height - .Number72) / 2)
           Icon(
             image: .sentimentDissatisfied,
             size: .Number40,
@@ -201,14 +197,14 @@ public struct MyPageView: View {
       } else {
         VStack(alignment: .center, spacing: .Number8) {
           Spacer()
-            .frame(height: (height - .Number72) / 2)
+            .frame(height: abs(height - .Number72) / 2)
           Icon(
             image: .sentimentDissatisfied,
             size: .Number40,
             renderingMode: .template,
             color: ColorSet.Icon.Tertiary
           )
-          Text("제보한 내역이 없습니다.")
+          Text("담은 쓰레기가 없습니다.")
             .font(FontSet.Body.body3)
             .foregroundStyle(ColorSet.Text.Secondary)
         }

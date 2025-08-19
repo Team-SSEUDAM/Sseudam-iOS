@@ -14,13 +14,27 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SplashImage.png" translatesAutoresizingMaskIntoConstraints="NO" id="JGB-QV-3E1">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                            </imageView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="Bcu-3y-fUS"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="JGB-QV-3E1" firstAttribute="leading" secondItem="Ze5-6b-2t3" secondAttribute="leading" id="5io-1W-eRP"/>
+                            <constraint firstAttribute="trailing" secondItem="JGB-QV-3E1" secondAttribute="trailing" id="LE0-6o-w8d"/>
+                            <constraint firstItem="JGB-QV-3E1" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="ad5-H1-QWf"/>
+                            <constraint firstAttribute="bottom" secondItem="JGB-QV-3E1" secondAttribute="bottom" id="uLl-a3-T1v"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="53" y="375"/>
+            <point key="canvasLocation" x="-740" y="403"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="SplashImage.png" width="376" height="761"/>
+    </resources>
 </document>

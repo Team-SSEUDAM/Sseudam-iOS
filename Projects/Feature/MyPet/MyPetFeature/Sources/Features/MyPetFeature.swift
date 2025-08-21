@@ -122,7 +122,7 @@ public struct MyPetFeature {
           return .none
         }
         
-      case .petDetailButtonTapped:
+      case .petGrowthList(.delegate(.petDetailButtonTapped)):
         state.path.append(.petDetail(MyPetDetailFeature.State()))
         return .send(.delegate(.needToHiddenTabBar(true)))
       case .petNicknameButtonTapped:

@@ -78,7 +78,13 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
       }
       
       Group {
-        if currentHeight < midHeight { smallContent() }
+        if currentHeight < midHeight {
+          ScrollView(.vertical, showsIndicators: false) {
+            smallContent()
+          }
+          .allowsHitTesting(false)
+          .frame(height: currentHeight - .Number20) // 핸들 높이 제외
+        }
         else { largeContent() }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)

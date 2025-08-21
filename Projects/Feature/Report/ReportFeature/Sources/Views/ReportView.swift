@@ -58,7 +58,7 @@ public struct ReportView: View {
   @ViewBuilder
   private func startView(width: CGFloat) -> some View {
     ReportStartView(
-      image: .addSpot,
+      image: .reportTrash,
       title: "잘못된 쓰레기통 정보를 \n발견했나요?",
       description: "수정 제안 시 5쓰담이 적립되며, \n승인되면 15쓰담을 추가 적립받아요."
     )

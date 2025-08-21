@@ -144,8 +144,10 @@ public struct HomeView: View {
   
   @ViewBuilder
   private var SuggestionButton: some View {
-    IconButton(icon: .addSpot, type: .accent) {
-      store.send(.suggestionButtonTapped)
+    if !store.isHiddenReportButton {
+      IconButton(icon: .addSpot, type: .accent) {
+        store.send(.suggestionButtonTapped)
+      }
     }
   }
   

@@ -82,7 +82,7 @@ public struct CustomBottomSheet<SmallContent: View, LargeContent: View>: View {
           ScrollView(.vertical, showsIndicators: false) {
             smallContent()
           }
-          .allowsHitTesting(false)
+          .scrollDisabled(true)
           .frame(height: currentHeight - .Number20) // 핸들 높이 제외
         }
         else { largeContent() }

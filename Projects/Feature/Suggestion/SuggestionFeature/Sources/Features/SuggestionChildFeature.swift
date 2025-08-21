@@ -27,6 +27,7 @@ public struct SuggestionChildFeature {
     var writeName: SelectSpotNameFeature.State = SelectSpotNameFeature.State()
     var selectKind: SelectSpotCategoryFeature.State = SelectSpotCategoryFeature.State()
     var selectPhoto: SelectSpotImageFeature.State = SelectSpotImageFeature.State()
+    var complete: SpotSuggestionCompleteFeature.State = SpotSuggestionCompleteFeature.State()
     
     public init(
       _ initLocation: Coordinates? = nil
@@ -40,6 +41,7 @@ public struct SuggestionChildFeature {
     case writeName(SelectSpotNameFeature.Action)
     case selectKind(SelectSpotCategoryFeature.Action)
     case selectPhoto(SelectSpotImageFeature.Action)
+    case complete(SpotSuggestionCompleteFeature.Action)
     case delegate(Delegate)
     
     @CasePathable
@@ -48,6 +50,7 @@ public struct SuggestionChildFeature {
       case writeName(SelectSpotNameFeature.Action.Delegate)
       case selectKind(SelectSpotCategoryFeature.Action.Delegate)
       case selectPhoto(SelectSpotImageFeature.Action.Delegate)
+      case complete(SpotSuggestionCompleteFeature.Action.Delegate)
     }
   }
   
@@ -63,6 +66,9 @@ public struct SuggestionChildFeature {
     }
     Scope(state: \.selectPhoto, action: \.selectPhoto) {
       SelectSpotImageFeature()
+    }
+    Scope(state: \.complete, action: \.complete) {
+      SpotSuggestionCompleteFeature()
     }
     
     Reduce { state, action in
@@ -83,6 +89,9 @@ public struct SuggestionChildFeature {
       case let .selectPhoto(.delegate(delegateAction)):
         return .send(.delegate(.selectPhoto(delegateAction)))
         
+      case let .complete(.delegate(delegateAction)):
+        return .send(.delegate(.complete(delegateAction)))
+        
         /// 일반 Action들은 각각의 Scope에서 처리되므로 여기서는 패스
       case .moveLocation:
         return .none
@@ -94,6 +103,9 @@ public struct SuggestionChildFeature {
         return .none
         
       case .selectPhoto:
+        return .none
+        
+      case .complete:
         return .none
         
       case .delegate:

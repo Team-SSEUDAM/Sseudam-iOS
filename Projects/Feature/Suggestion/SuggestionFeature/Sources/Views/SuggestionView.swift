@@ -58,7 +58,8 @@ public struct SuggestionView: View {
               SpotSuggestionCompleteView(
                 image: .addSpot,
                 title: "제보가 완료되었어요!",
-                description:"심사는 1-2일이 소요되며,\n승인되면 15쓰담을 추가 적립 받아요."
+                description:"심사는 1-2일이 소요되며,\n승인되면 15쓰담을 추가 적립 받아요.",
+                store: store.scope(state: \.child.complete, action: \.child.complete)
               )
               .frame(width: geo.size.width)
               .id(5)

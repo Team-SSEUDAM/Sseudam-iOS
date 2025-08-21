@@ -90,7 +90,6 @@ extension SettingView {
   @ViewBuilder
   private var ServiceSection: some View {
     SettingItemListView(title: "서비스") {
-      SettingItemView(item: .suggestion)
       SettingItemView(item: .feedback) {
         store.send(.feedback)
       }

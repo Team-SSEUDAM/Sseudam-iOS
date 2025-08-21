@@ -60,10 +60,11 @@ public struct IconButton: View {
   @ViewBuilder
   private var content: some View {
     Circle()
+      .fill(type.background)
       .overlay {
         Icon(
           image: icon,
-          size: .Number28,
+          size: .Number32,
           renderingMode: .template
         )
           .foregroundColor(type.icon)
@@ -79,6 +80,6 @@ public struct IconButton: View {
             .fill(ColorSet.Component.Pressed)
         }
       }
-      .frame(width: .Number40, height: .Number40)
+      .frame(width: .Number48, height: .Number48)
   }
 }

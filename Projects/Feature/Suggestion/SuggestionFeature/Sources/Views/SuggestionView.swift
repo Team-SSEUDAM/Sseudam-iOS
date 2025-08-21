@@ -26,7 +26,7 @@ public struct SuggestionView: View {
   public var body: some View {
     GeometryReader { geo in
       VStack {
-        navigationBar
+        if !store.isNavigationBarHidden { navigationBar }
         ScrollViewReader { proxy in
           ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: .Number16) {
@@ -88,10 +88,8 @@ public struct SuggestionView: View {
   private var navigationBar: some View {
     NavigationBar(
       backContent: {
-        if !store.isNavigationBarHidden {
-          TouchArea(image: .leftChevron) {
-            store.send(.backButtonTapped)
-          }
+        TouchArea(image: .leftChevron) {
+          store.send(.backButtonTapped)
         }
       }
     )

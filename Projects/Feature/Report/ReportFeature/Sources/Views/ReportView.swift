@@ -26,7 +26,7 @@ public struct ReportView: View {
   public var body: some View {
     GeometryReader { geo in
       VStack {
-        navigationBar
+        if !store.isNavigationBarHidden { navigationBar }
         mainScrollView(width: geo.size.width)
         bottomButtonView
       }
@@ -148,10 +148,8 @@ public struct ReportView: View {
   private var navigationBar: some View {
     NavigationBar(
       backContent: {
-        if !store.isNavigationBarHidden {
-          TouchArea(image: .leftChevron) {
-            store.send(.backButtonTapped)
-          }
+        TouchArea(image: .leftChevron) {
+          store.send(.backButtonTapped)
         }
       }
     )

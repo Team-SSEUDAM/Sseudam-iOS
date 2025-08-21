@@ -112,7 +112,7 @@ extension SpotSuggestionCompleteFeature {
       }
       return .send(.showToastMessage(attributed))
     } else if let errorMessage = error {
-      var attributed: AttributedString = {
+      let attributed: AttributedString = {
         var attri = AttributedString(errorMessage)
         attri.foregroundColor = ColorSet.Text.Error
         return attri

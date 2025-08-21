@@ -1,11 +1,10 @@
 //
 //  SpotSuggestionCompleteView.swift
-//  SuggestionFeature
 //
-//  Created by 조용인 on 7/6/25.
-//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
+//  SpotSuggestionComplete
 //
-
+//  Created by yongin
+//
 import SwiftUI
 import ComposableArchitecture
 import DesignKit

@@ -16,6 +16,7 @@ import SelectSpotImageFeature
 import SelectSpotCategoryFeature
 import SelectSpotNameFeature
 import SelectSpotLocationFeature
+import SpotSuggestionCompleteFeature
 
 // MARK: - Child Reducer
 @Reducer

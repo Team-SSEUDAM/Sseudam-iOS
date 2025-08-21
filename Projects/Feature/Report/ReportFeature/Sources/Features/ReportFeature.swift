@@ -16,6 +16,7 @@ import SelectSpotImageFeature
 import SelectSpotCategoryFeature
 import SelectSpotNameFeature
 import SelectSpotLocationFeature
+import SpotSuggestionCompleteFeature
 
 import DesignKit
 
@@ -193,7 +194,8 @@ public struct ReportFeature {
         state.isNavigationBarHidden = true
         return .merge([
           .send(.child(.writeName(.focusChanged(false)))),
-          .send(.nextButtonIsEnabled(true))
+          .send(.nextButtonIsEnabled(true)),
+          .send(.child(.complete(.onAppear)))
         ])
         
       case let .selectedReportInfo(.delegate(selectAction)):
@@ -211,6 +213,7 @@ public struct ReportFeature {
         case let .writeName(action): return handleWriteNameDelegate(state: &state, action: action)
         case let .selectKind(action): return handleSelectKindDelegate(state: &state, action: action)
         case let .selectPhoto(action): return handleSelectPhotoDelegate(state: &state, action: action)
+        case let .complete(action): return handleCompleteDelegate(state: &state, action: action)
         }
         
       case .checkReportInfoType:
@@ -385,6 +388,19 @@ private extension ReportFeature {
     case let .photoSelected(photo):
       state.selectedPhoto = photo
       return .send(.nextButtonIsEnabled(true))
+    }
+  }
+  
+  /// `CompleteFeature` Delegate 처리
+  func handleCompleteDelegate(
+    state: inout State,
+    action: SpotSuggestionCompleteFeature.Action.Delegate
+  ) -> Effect<Action> {
+    guard state.currentPage == 5 else { return .none }
+    
+    switch action {
+    case .done:
+      return .none
     }
   }
 }

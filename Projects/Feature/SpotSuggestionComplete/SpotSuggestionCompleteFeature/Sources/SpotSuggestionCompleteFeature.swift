@@ -1,9 +1,9 @@
 //
 //  SpotSuggestionCompleteFeature.swift
-//  SuggestionFeature
 //
-//  Created by 조용인 on 8/21/25.
-//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
+//  SpotSuggestionComplete
+//
+//  Created by yongin
 //
 
 import Foundation
@@ -28,7 +28,7 @@ public struct SpotSuggestionCompleteFeature {
     public var startLevelAnimation: Bool = false
     public init() { }
   }
-
+  
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case onAppear
@@ -47,7 +47,7 @@ public struct SpotSuggestionCompleteFeature {
   }
   
   @Dependency(\.CheckPetInfoUseCase) var checkPetInfoUseCase
-
+  
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in

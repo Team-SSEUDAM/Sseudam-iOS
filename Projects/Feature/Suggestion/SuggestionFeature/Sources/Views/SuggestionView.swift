@@ -13,6 +13,7 @@ import SelectSpotCategoryFeature
 import SelectSpotImageFeature
 import SelectSpotNameFeature
 import SelectSpotLocationFeature
+import SpotSuggestionCompleteFeature
 import DesignKit
 
 public struct SuggestionView: View {

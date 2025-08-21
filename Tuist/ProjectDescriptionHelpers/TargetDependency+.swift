@@ -32,6 +32,7 @@ public enum Feature: String, ModuleRepresentable {
   case SelectSpotName
   case SelectSpotCategory
   case SelectSpotImage
+  case SpotSuggestionComplete
   case Suggestion
   case MyPage
   case Visited
@@ -161,6 +162,7 @@ extension TargetDependency {
     public static let SelectSpotName = Self.project(.feature(.SelectSpotName))
     public static let SelectSpotCategory = Self.project(.feature(.SelectSpotCategory))
     public static let SelectSpotImage = Self.project(.feature(.SelectSpotImage))
+    public static let SpotSuggestionComplete = Self.project(.feature(.SpotSuggestionComplete))
     public static let TrashDetail = Self.project(.feature(.TrashDetail))
     public static let Auth = Self.project(.feature(.Auth))
     public static let MyPage = Self.project(.feature(.MyPage))

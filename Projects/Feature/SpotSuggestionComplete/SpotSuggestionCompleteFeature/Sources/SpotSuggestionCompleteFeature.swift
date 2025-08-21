@@ -25,6 +25,7 @@ public struct SpotSuggestionCompleteFeature {
     public var sseudamPoint: SseudamPoint = .visit
     public var toastMessage: AttributedString? = nil
     public var showLevelBar: Bool = false
+    public var showCompleteLottie: Bool = false
     public var startLevelAnimation: Bool = false
     public init() { }
   }
@@ -62,6 +63,7 @@ public struct SpotSuggestionCompleteFeature {
         state.petInfo = entity
         state.showLevelBar = true
         state.startLevelAnimation = true
+        state.showCompleteLottie = true
         return sseudamToast(sseudam: state.sseudamPoint)
         
       case let .fetchPetInfoResult(.failure(error)):

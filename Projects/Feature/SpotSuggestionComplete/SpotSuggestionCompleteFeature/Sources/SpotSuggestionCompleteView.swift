@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 import DesignKit
+import DotLottie
 
 public struct SpotSuggestionCompleteView: View {
   @Bindable var store: StoreOf<SpotSuggestionCompleteFeature>
@@ -43,7 +44,7 @@ public struct SpotSuggestionCompleteView: View {
   @ViewBuilder
   private var MainView: some View {
     VStack(alignment: .center, spacing: .Number20) {
-      Icon(image: image, size: .Number200)
+      CompleteLottie
       VStack(spacing: .Number8) {
         Text(title)
           .font(FontSet.Heading.heading1)
@@ -56,7 +57,23 @@ public struct SpotSuggestionCompleteView: View {
     }
     .padding(.Number16)
   }
-    
+  
+  @ViewBuilder
+  private var CompleteLottie: some View {
+    if store.showCompleteLottie {
+      DotLottieView(
+        dotLottie: DotLottieAnimation(
+          fileName: LottieSet.success.name,
+          config: AnimationConfig(
+            autoplay: true,
+            loop: false
+          )
+        )
+      )
+      .frame(width: .Number120, height: .Number120)
+      .clipped()
+    }
+  }
   
   @ViewBuilder
   private var PointView: some View {

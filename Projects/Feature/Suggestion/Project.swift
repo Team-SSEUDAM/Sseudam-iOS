@@ -16,6 +16,7 @@ let project = Project.makeFeature(
     .Features.SelectSpotImage,
     .Features.SelectSpotLocation,
     .Features.SelectSpotName,
+    .Features.SpotSuggestionComplete,
     .Domain.Umbrella
   ]
 )

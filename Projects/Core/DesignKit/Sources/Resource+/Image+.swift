@@ -49,5 +49,7 @@ public enum ImageSet: String {
   case sseudam = "sseudam_img"
   case avartar = "avatar"
   case petDescriptionImage = "PetDescriptionImage"
+  case suggestTrash = "suggestTrash"
+  case reportTrash = "reportTrash"
   public var swiftUIImage: DesignKitImages { DesignKitImages(name: self.rawValue) }
 }

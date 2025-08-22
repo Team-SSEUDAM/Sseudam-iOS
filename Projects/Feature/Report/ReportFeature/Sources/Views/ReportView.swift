@@ -13,6 +13,7 @@ import SelectSpotCategoryFeature
 import SelectSpotImageFeature
 import SelectSpotNameFeature
 import SelectSpotLocationFeature
+import SpotSuggestionCompleteFeature
 import DesignKit
 
 public struct ReportView: View {
@@ -24,10 +25,17 @@ public struct ReportView: View {
   
   public var body: some View {
     GeometryReader { geo in
-      VStack {
-        navigationBar
-        mainScrollView(width: geo.size.width)
-        bottomButtonView
+      ZStack {
+        VStack(spacing: .Number0) {
+          mainScrollView(width: geo.size.width)
+          bottomButtonView
+        }
+        if !store.isNavigationBarHidden {
+          VStack(spacing: .Number0) {
+            navigationBar
+            Spacer()
+          }
+        }
       }
       .navigationBarBackButtonHidden(true)
     }
@@ -57,73 +65,84 @@ public struct ReportView: View {
   
   @ViewBuilder
   private func startView(width: CGFloat) -> some View {
-    ReportStartView(
-      image: .addSpot,
-      title: "잘못된 쓰레기통 정보를 \n발견했나요?",
-      description: "수정 제안 시 5쓰담이 적립되며, \n승인되면 15쓰담을 추가 적립받아요."
-    )
-    .frame(width: width)
-    .id(0)
+    VStack(spacing: .Number0) {
+      Spacer().frame(height: .Number48)
+      ReportStartView(
+        image: .reportTrash,
+        title: "잘못된 쓰레기통 정보를 \n발견했나요?",
+        description: "수정 제안 시 5쓰담이 적립되며, \n승인되면 15쓰담을 추가 적립받아요."
+      )
+      .frame(width: width)
+      .id(0)
+    }
   }
   
   @ViewBuilder
   private func selectInfoTypeView(width: CGFloat) -> some View {
-    SelectReportInfoTypeView(
-      store: store.scope(
-        state: \.selectedReportInfo,
-        action: \.selectedReportInfo
+    VStack(spacing: .Number0) {
+      Spacer().frame(height: .Number48)
+      SelectReportInfoTypeView(
+        store: store.scope(
+          state: \.selectedReportInfo,
+          action: \.selectedReportInfo
+        )
       )
-    )
-    .frame(width: width)
-    .id(1)
+      .frame(width: width)
+      .id(1)
+      
+    }
   }
   
   @ViewBuilder
   private func selectedContentView(width: CGFloat) -> some View {
-    Group {
-      switch store.selectedReportInfoType {
-      case "POINT":
-        SelectSpotLocationView(
-          store: store.scope(
-            state: \.child.moveLocation,
-            action: \.child.moveLocation
+    VStack(spacing: .Number0) {
+      Spacer().frame(height: .Number48)
+      Group {
+        switch store.selectedReportInfoType {
+        case "POINT":
+          SelectSpotLocationView(
+            store: store.scope(
+              state: \.child.moveLocation,
+              action: \.child.moveLocation
+            )
           )
-        )
-      case "NAME":
-        SelectSpotNameView(
-          store: store.scope(
-            state: \.child.writeName,
-            action: \.child.writeName
+        case "NAME":
+          SelectSpotNameView(
+            store: store.scope(
+              state: \.child.writeName,
+              action: \.child.writeName
+            )
           )
-        )
-      case "KIND":
-        SelectSpotCategoryView(
-          store: store.scope(
-            state: \.child.selectKind,
-            action: \.child.selectKind
+        case "KIND":
+          SelectSpotCategoryView(
+            store: store.scope(
+              state: \.child.selectKind,
+              action: \.child.selectKind
+            )
           )
-        )
-      case "PHOTO":
-        SelectSpotImageView(
-          store: store.scope(
-            state: \.child.selectPhoto,
-            action: \.child.selectPhoto
+        case "PHOTO":
+          SelectSpotImageView(
+            store: store.scope(
+              state: \.child.selectPhoto,
+              action: \.child.selectPhoto
+            )
           )
-        )
-      default:
-        EmptyView()
+        default:
+          EmptyView()
+        }
       }
+      .frame(width: width)
+      .id(2)
     }
-    .frame(width: width)
-    .id(2)
   }
   
   @ViewBuilder
   private func reportCompletedView(width: CGFloat) -> some View {
-    ReportCompleteView(
+    SpotSuggestionCompleteView(
       image: .addSpot,
       title: "제보가 완료되었어요!",
-      description: "심사는 1-2일이 소요되며,\n승인되면 15쓰담을 추가 적립 받아요."
+      description:"심사는 1-2일이 소요되며,\n승인되면 15쓰담을 추가 적립 받아요.",
+      store: store.scope(state: \.child.complete, action: \.child.complete)
     )
     .frame(width: width)
     .id(3)
@@ -146,14 +165,13 @@ public struct ReportView: View {
   private var navigationBar: some View {
     NavigationBar(
       backContent: {
-        if !store.isNavigationBarHidden {
-          TouchArea(image: .leftChevron) {
-            store.send(.backButtonTapped)
-          }
+        TouchArea(image: .leftChevron) {
+          store.send(.backButtonTapped)
         }
       }
     )
     .blockBackToSwipe()
+    .frame(height: .Number48)
   }
   
   @ViewBuilder

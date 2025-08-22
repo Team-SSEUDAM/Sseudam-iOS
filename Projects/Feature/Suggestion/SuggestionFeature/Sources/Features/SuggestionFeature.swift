@@ -16,6 +16,7 @@ import SelectSpotImageFeature
 import SelectSpotCategoryFeature
 import SelectSpotNameFeature
 import SelectSpotLocationFeature
+import SpotSuggestionCompleteFeature
 
 import DesignKit
 
@@ -182,6 +183,7 @@ public struct SuggestionFeature {
         return .run { send in
           await send(.nextButtonIsEnabled(true))
           await send(.setIsLoading(false))
+          await send(.child(.complete(.onAppear)))
         }
         
         /// Child에서 오는 Delegate 처리
@@ -191,6 +193,7 @@ public struct SuggestionFeature {
         case let .writeName(action): return handleWriteNameDelegate(state: &state, action: action)
         case let .selectKind(action): return handleSelectKindDelegate(state: &state, action: action)
         case let .selectPhoto(action): return handleSelectPhotoDelegate(state: &state, action: action)
+        case let .complete(action): return handleCompleteDelegate(state: &state, action: action)
         }
         
         // Child의 일반 Action들 처리 (delegate가 아닌 경우)
@@ -204,6 +207,9 @@ public struct SuggestionFeature {
         return .none
         
       case .child(.selectPhoto):
+        return .none
+        
+      case .child(.complete):
         return .none
         
       case .validateSpotNameButtonTapped:
@@ -340,6 +346,19 @@ private extension SuggestionFeature {
     case let .photoSelected(photo):
       state.selectedPhoto = photo
       return .send(.nextButtonIsEnabled(true))
+    }
+  }
+  
+  /// `CompleteFeature` Delegate 처리
+  func handleCompleteDelegate(
+    state: inout State,
+    action: SpotSuggestionCompleteFeature.Action.Delegate
+  ) -> Effect<Action> {
+    guard state.currentPage == 5 else { return .none }
+    
+    switch action {
+    case .done:
+      return .none
     }
   }
 }

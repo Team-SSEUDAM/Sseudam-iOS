@@ -28,11 +28,16 @@ public struct MyPetGrowthListFeature {
   
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
+    case delegate(Delegate)
     case fetchPetSeasonInfo
     case fetchPetSeasonInfoResult(Result<PetSeasonInfoEntity, NetworkError>)
     
     case fetchCatCards([CatCard])
     case fetchGrowthRecords([GrowthRecord])
+    
+    public enum Delegate: Equatable {
+      case petDetailButtonTapped
+    }
   }
   
   @Dependency(\.FetchPetSeasonInfoUseCase) var fetchPetSeasonInfoUseCase

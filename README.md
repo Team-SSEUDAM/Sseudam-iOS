@@ -17,7 +17,11 @@
 # 쓰담
 <img width="130" height="130" alt="AppIcon" src="https://github.com/user-attachments/assets/c8d8d6b1-8b0c-4e53-b05e-370eacec0c31" />
 
-## Feature
+## 🐱 Feature
+|<img width="300" alt="screenshot3" src="https://github.com/user-attachments/assets/66a52426-1ecc-45e8-8a94-0adf147ab732" />|<img width="300" alt="screenshot4" src="https://github.com/user-attachments/assets/d2dd86ec-b542-4da5-b09f-a9a711ca7c18" />|<img width="300" alt="screenshot5" src="https://github.com/user-attachments/assets/bf42fe23-44a6-41cd-83ee-c96d63fba481" />|
+|:----:|:----:|:----:|
+
+<br>
 
 ## ⚙️ Tech Stack
 

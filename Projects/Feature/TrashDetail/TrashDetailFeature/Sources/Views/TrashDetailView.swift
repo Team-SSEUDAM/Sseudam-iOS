@@ -17,7 +17,6 @@ public struct TrashDetailView: View {
   @Bindable var store: StoreOf<TrashDetailFeature>
   @Environment(\.scenePhase) private var scenePhase
   @State private var downsampledImage: UIImage?
-  @State private var isNameMultiline: Bool? = nil
   
   public init(store: StoreOf<TrashDetailFeature>) {
     self.store = store
@@ -181,7 +180,7 @@ public struct TrashDetailView: View {
         .lineLimit(2)
         .foregroundStyle(ColorSet.Text.Primary)
         .background(calculateTruncation(text: name))
-        .fixedSize(horizontal: false, vertical: isNameMultiline ?? false)
+        .fixedSize(horizontal: false, vertical: store.isTitleMultiLine ?? false)
         .multilineTextAlignment(.leading)
       Text(address)
         .font(FontSet.Body.body3)
@@ -197,8 +196,7 @@ public struct TrashDetailView: View {
         .hidden()
         .onAppear {
           if store.isNeedUpdateHeight {
-            isNameMultiline = false
-            print("false")
+            store.send(.setTitleMultiLine(false))
             store.send(.updateBottomSheetHeight(.detailSheetHeight))
           }
         }
@@ -207,8 +205,7 @@ public struct TrashDetailView: View {
         .hidden()
         .onAppear {
           if store.isNeedUpdateHeight {
-            isNameMultiline = true
-            print("true")
+            store.send(.setTitleMultiLine(true))
             store.send(.updateBottomSheetHeight(.detailSheetLargeHeight))
           }
         }

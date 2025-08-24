@@ -30,6 +30,7 @@ public struct TrashDetailFeature {
     var isLoading: Bool = true
     var isFailLoadDetail: Bool = false
     var isNeedUpdateHeight: Bool = true
+    var isTitleMultiLine: Bool? = nil
     public var bottomSheetHeight: CGFloat = .detailSheetHeight
     public init() {}
   }
@@ -49,6 +50,7 @@ public struct TrashDetailFeature {
     case emptyTrashData(Bool)
     case fetchTrashDetail(id: Int)
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
+    case setTitleMultiLine(Bool?)
     
     case fetchTrashImage(imgUrl: String?, id: Int)
     case fetchTrashImageResult(Result<Data, ImageDownloadError>)
@@ -91,6 +93,7 @@ public struct TrashDetailFeature {
             await send(.showLoading(true))
             await send(.emptyTrashData(false))
             await send(.setInitVisitedState)
+            await send(.setTitleMultiLine(nil))
             await send(.fetchTrashDetail(id: id))
           }
         } else {
@@ -138,6 +141,10 @@ public struct TrashDetailFeature {
           .send(.showLoading(false)),
           .send(.visited(.initialVisitedData))
         ])
+        
+      case let .setTitleMultiLine(isMultiLine):
+        state.isTitleMultiLine = isMultiLine
+        return .none
         
       case let .fetchTrashImage(imgUrl, id):
         guard let imgUrl = imgUrl else { return .none }

@@ -91,7 +91,7 @@ public struct HomeView: View {
   private var TopButtonView: some View {
     HStack(spacing: .Number8) {
       if store.isPresentDetail {
-        IconButton(icon: .leftChevron) {
+        IconButton(icon: .leftChevron, size: .Number40) {
           store.send(.presentDetailView(false))
           store.send(.map(.deleteActiveMarker))
         }

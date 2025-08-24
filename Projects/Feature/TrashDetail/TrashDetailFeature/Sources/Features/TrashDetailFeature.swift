@@ -29,6 +29,7 @@ public struct TrashDetailFeature {
     var trashImageData: Data? = nil
     var isLoading: Bool = true
     var isFailLoadDetail: Bool = false
+    public var bottomSheetHeight: CGFloat = .detailSheetHeight
     public init() {}
   }
 
@@ -59,6 +60,7 @@ public struct TrashDetailFeature {
     case showToastMessage(String?)
     case showAlert(AlertType)
     case visitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
+    case updateBottomSheetHeight(CGFloat)
   }
   
   public enum Delegate: Equatable {
@@ -67,6 +69,7 @@ public struct TrashDetailFeature {
     case showAlert(AlertType)
     /// 방문 완료
     case visitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
+    case bottomSheetHeightChanged(CGFloat)
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -161,6 +164,10 @@ public struct TrashDetailFeature {
         
       case let .showAlert(type):
         return .send(.delegate(.showAlert(type)))
+        
+      case let .updateBottomSheetHeight(height):
+        state.bottomSheetHeight = height
+        return .send(.delegate(.bottomSheetHeightChanged(height)))
         
         // MARK: - Receive VisitedFeature Delegate Action
       case let .visited(.delegate(action)):

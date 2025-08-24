@@ -178,6 +178,7 @@ public struct TrashDetailView: View {
     VStack(alignment: .leading, spacing: .Number4) {
       Text(name)
         .font(FontSet.Heading.heading3)
+        .lineLimit(2)
         .foregroundStyle(ColorSet.Text.Primary)
         .background(calculateTruncation(text: name))
         .fixedSize(horizontal: false, vertical: isNameMultiline ?? false)
@@ -195,19 +196,21 @@ public struct TrashDetailView: View {
         .font(FontSet.Heading.heading3)
         .hidden()
         .onAppear {
-          guard isNameMultiline == nil else { return }
-          isNameMultiline = false
-          print("false")
-          store.send(.updateBottomSheetHeight(.detailSheetHeight))
+          if store.isNeedUpdateHeight {
+            isNameMultiline = false
+            print("false")
+            store.send(.updateBottomSheetHeight(.detailSheetHeight))
+          }
         }
       
       Color.clear
         .hidden()
         .onAppear {
-          guard isNameMultiline == nil else { return }
-          isNameMultiline = true
-          print("true")
-          store.send(.updateBottomSheetHeight(.detailSheetLargeHeight))
+          if store.isNeedUpdateHeight {
+            isNameMultiline = true
+            print("true")
+            store.send(.updateBottomSheetHeight(.detailSheetLargeHeight))
+          }
         }
     }
   }

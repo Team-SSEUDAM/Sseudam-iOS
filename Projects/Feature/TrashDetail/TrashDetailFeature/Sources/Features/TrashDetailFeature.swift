@@ -29,6 +29,7 @@ public struct TrashDetailFeature {
     var trashImageData: Data? = nil
     var isLoading: Bool = true
     var isFailLoadDetail: Bool = false
+    var isNeedUpdateHeight: Bool = true
     public var bottomSheetHeight: CGFloat = .detailSheetHeight
     public init() {}
   }
@@ -122,6 +123,7 @@ public struct TrashDetailFeature {
         
       case let .fetchTrashDetailResult(.success(data)):
         state.trashDetail = data
+        state.isNeedUpdateHeight = true
         return .merge([
           .send(.showLoading(false)),
           .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point))),
@@ -167,6 +169,7 @@ public struct TrashDetailFeature {
         
       case let .updateBottomSheetHeight(height):
         state.bottomSheetHeight = height
+        state.isNeedUpdateHeight = false
         return .send(.delegate(.bottomSheetHeightChanged(height)))
         
         // MARK: - Receive VisitedFeature Delegate Action

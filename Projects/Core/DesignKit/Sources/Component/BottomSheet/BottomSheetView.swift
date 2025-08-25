@@ -58,8 +58,8 @@ public struct BottomSheetOverlay<BottomSheetContent: View>: ViewModifier {
       .overlay(alignment: .bottom) {
         if showSheet {
           bottomSheetContent()
-            .padding(.bottom, .Number20)
             .frame(height: height)
+            .padding(.bottom, .Number10)
             .frame(maxWidth: .infinity)
             .background(.white)
             .clipCorners(.Number16, corners: [.topLeft, .topRight])

@@ -52,7 +52,7 @@ public struct TrashDetailView: View {
   @ViewBuilder
   private func DetailContent(data: TrashSpotDetail) -> some View {
     VStack(spacing: .Number16) {
-      HStack(spacing: .Number16) {
+      HStack(alignment: .top, spacing: .Number16) {
         VStack(alignment: .leading, spacing: .Number8) {
           TrashLocationView(name: data.name, address: data.address)
           BadgesView(
@@ -62,16 +62,20 @@ public struct TrashDetailView: View {
           )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        if data.isPublicData {
-          publicDataImageView
-        } else {
-          trashImageView
+        VStack {
+          if data.isPublicData {
+            publicDataImageView
+          } else {
+            trashImageView
+          }
+          Spacer()
         }
       }
       ButtonsView
+        .padding(.bottom, .Number20)
     }
     .padding(.horizontal, .Number16)
-    .padding(.vertical, .Number20)
+    .padding(.top, .Number20)
     .onAppear {
       LocationService.shared.startTracking()
     }
@@ -173,12 +177,39 @@ public struct TrashDetailView: View {
     VStack(alignment: .leading, spacing: .Number4) {
       Text(name)
         .font(FontSet.Heading.heading3)
+        .lineLimit(2)
         .foregroundStyle(ColorSet.Text.Primary)
+        .background(calculateTruncation(text: name))
+        .fixedSize(horizontal: false, vertical: store.isTitleMultiLine ?? false)
+        .multilineTextAlignment(.leading)
       Text(address)
         .font(FontSet.Body.body3)
         .foregroundStyle(ColorSet.Text.Primary)
     }
     .frame(maxWidth: .infinity, alignment: .leading)
+  }
+  
+  private func calculateTruncation(text: String) -> some View {
+    ViewThatFits(in: .vertical) {
+      Text(text)
+        .font(FontSet.Heading.heading3)
+        .hidden()
+        .onAppear {
+          if store.isNeedUpdateHeight {
+            store.send(.setTitleMultiLine(false))
+            store.send(.updateBottomSheetHeight(.detailSheetHeight))
+          }
+        }
+      
+      Color.clear
+        .hidden()
+        .onAppear {
+          if store.isNeedUpdateHeight {
+            store.send(.setTitleMultiLine(true))
+            store.send(.updateBottomSheetHeight(.detailSheetLargeHeight))
+          }
+        }
+    }
   }
   
   @ViewBuilder
@@ -213,7 +244,6 @@ public struct TrashDetailView: View {
           size: .medium,
           state: $store.visited.visitedButtonState
         ) {
-          print(store.visited.visitedButtonState, store.visited)
           store.send(.visited(.visitButtonTapped))
         }
         .onTapGesture {
@@ -246,5 +276,3 @@ public struct TrashDetailView: View {
     }
   }
 }
-
-

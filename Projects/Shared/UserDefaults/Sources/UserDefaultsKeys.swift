@@ -27,4 +27,8 @@ public struct UserDefaultsKeys {
   @UserDefault("lastEntryDate", default: nil)
   public static var lastEntryDate: Date?
   
+  // coachMark
+  @UserDefault("coachMark_suggestion", default: true)
+  public static var coachMark_suggestion: Bool?
+  
 }

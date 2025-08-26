@@ -115,6 +115,12 @@ public struct HomeView: View {
       if store.map.researchButtonEnable {
         ResearchButton {
           store.send((.map(.requestMapBounds(true))))
+        if let coach = UserDefaultsKeys.coachMark_suggestion, coach {
+          CoachMark(
+            text: "내 주변 가로 쓰레기통을\n등록해보세요",
+            offset: .Number100
+          ) { UserDefaultsKeys.coachMark_suggestion = false }
+          .position(.bottom)
         }
       }
       Spacer()

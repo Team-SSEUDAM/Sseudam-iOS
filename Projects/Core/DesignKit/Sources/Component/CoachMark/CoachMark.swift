@@ -12,44 +12,52 @@ import SwiftUI
 public enum CoachMarkPosition : Sendable {
   case top
   case bottom
-  case left
-  case right
 }
 
 public struct CoachMark: View {
   
+  @State private var isVisible: Bool = true
+  
   private var isSpring: Bool = false
   private var position: CoachMarkPosition = .bottom
+  private var offset: CGFloat = 0.0
   private var text: String
+  private var action: (() -> Void)? = nil
   
   public init(
-    text: String
+    text: String,
+    offset: CGFloat = 0.0,
+    action: (() -> Void)? = nil
   ) {
     self.text = text
+    self.offset = offset
+    self.action = action
   }
   
   public var body: some View {
-    
-    switch position {
-    case .top:
-      VStack(spacing: .Number0) {
-        TailingView.frame(width: .Number30, height: .Number8)
-        ContentView
-      }
-    case .bottom:
-      VStack(spacing: .Number0) {
-        ContentView
-        TailingView.frame(width: .Number30, height: .Number8)
-      }
-    case .left:
-      HStack(spacing: .Number0) {
-        TailingView.frame(width: .Number30, height: .Number8)
-        ContentView
-      }
-    case .right:
-      HStack(spacing: .Number0) {
-        ContentView
-        TailingView.frame(width: .Number30, height: .Number8)
+    if !isVisible { EmptyView() }
+    else {
+      switch position {
+      case .top:
+        VStack(spacing: .Number0) {
+          TailingView.frame(width: .Number36, height: .Number10)
+            .padding(.leading, offset)
+          ContentView
+        }
+        .onTapGesture {
+          isVisible = false
+          action?()
+        }
+      case .bottom:
+        VStack(spacing: .Number0) {
+          ContentView
+          TailingView.frame(width: .Number36, height: .Number10)
+            .padding(.leading, offset)
+        }
+        .onTapGesture {
+          isVisible = false
+          action?()
+        }
       }
     }
   }
@@ -57,7 +65,8 @@ public struct CoachMark: View {
   public var ContentView: some View {
     Group {
       Text(text)
-        .font(FontSet.Caption.caption2)
+        .multilineTextAlignment(.center)
+        .font(FontSet.Body.body3)
         .foregroundColor(ColorSet.Text.Inverse)
         .padding(.horizontal, .Number10)
         .padding(.vertical, .Number6)
@@ -81,50 +90,41 @@ public struct CoachMarkTail: Shape {
     
     switch position {
     case .top:
-      // 위쪽 꼬리 (아래로 향하는 뭉툭한 V)
-      path.move(to: CGPoint(x: rect.midX - 6, y: rect.maxY))
-      path.addLine(to: CGPoint(x: rect.midX - 1, y: rect.minY + 2))
-      path.addQuadCurve(
-        to: CGPoint(x: rect.midX + 1, y: rect.minY + 2),
-        control: CGPoint(x: rect.midX, y: rect.minY)
+      path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+      path.addCurve(
+        to: CGPoint(x: rect.midX - 4.8, y: rect.minY + 5.625),
+        control1: CGPoint(x: rect.minX + 9, y: rect.maxY),
+        control2: CGPoint(x: rect.minX + 9, y: rect.maxY + 1.25)
       )
-      path.addLine(to: CGPoint(x: rect.midX + 6, y: rect.maxY))
+      path.addQuadCurve(
+        to: CGPoint(x: rect.midX + 4.8, y: rect.minY + 5.625),
+        control: CGPoint(x: rect.midX, y: rect.minY - 3.75)
+      )
+      path.addCurve(
+        to: CGPoint(x: rect.maxX, y: rect.maxY),
+        control1: CGPoint(x: rect.maxX - 9, y: rect.maxY + 1.25),
+        control2: CGPoint(x: rect.maxX - 9, y: rect.maxY)
+      )
       path.closeSubpath()
       
     case .bottom:
-      // 아래쪽 꼬리 (위로 향하는 뭉툭한 V)
-      path.move(to: CGPoint(x: rect.midX - 6, y: rect.minY))
-      path.addLine(to: CGPoint(x: rect.midX - 1, y: rect.maxY - 2))
-      path.addQuadCurve(
-        to: CGPoint(x: rect.midX + 1, y: rect.maxY - 2),
-        control: CGPoint(x: rect.midX, y: rect.maxY)
+      path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+      path.addCurve(
+        to: CGPoint(x: rect.midX - 4.8, y: rect.maxY - 5.625),
+        control1: CGPoint(x: rect.minX + 9, y: rect.minY),
+        control2: CGPoint(x: rect.minX + 9, y: rect.minY - 1.25)
       )
-      path.addLine(to: CGPoint(x: rect.midX + 6, y: rect.minY))
-      path.closeSubpath()
-      
-    case .left:
-      // 왼쪽 꼬리 (오른쪽으로 향하는 뭉툭한 V)
-      path.move(to: CGPoint(x: rect.maxX, y: rect.midY - 6))
-      path.addLine(to: CGPoint(x: rect.minX + 2, y: rect.midY - 1))
       path.addQuadCurve(
-        to: CGPoint(x: rect.minX + 2, y: rect.midY + 1),
-        control: CGPoint(x: rect.minX, y: rect.midY)
+        to: CGPoint(x: rect.midX + 4.8, y: rect.maxY - 5.625),
+        control: CGPoint(x: rect.midX, y: rect.maxY + 3.75)
       )
-      path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY + 6))
-      path.closeSubpath()
-      
-    case .right:
-      // 오른쪽 꼬리 (왼쪽으로 향하는 뭉툭한 V)
-      path.move(to: CGPoint(x: rect.minX, y: rect.midY - 6))
-      path.addLine(to: CGPoint(x: rect.maxX - 2, y: rect.midY - 1))
-      path.addQuadCurve(
-        to: CGPoint(x: rect.maxX - 2, y: rect.midY + 1),
-        control: CGPoint(x: rect.maxX, y: rect.midY)
+      path.addCurve(
+        to: CGPoint(x: rect.maxX, y: rect.minY),
+        control1: CGPoint(x: rect.maxX - 9, y: rect.minY - 1.25),
+        control2: CGPoint(x: rect.maxX - 9, y: rect.minY)
       )
-      path.addLine(to: CGPoint(x: rect.minX, y: rect.midY + 6))
       path.closeSubpath()
     }
-    
     return path
   }
 }

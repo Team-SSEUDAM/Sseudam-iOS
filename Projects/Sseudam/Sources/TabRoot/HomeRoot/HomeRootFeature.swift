@@ -24,6 +24,7 @@ struct HomeRootFeature {
     var trashDetail: TrashDetailFeature.State? = nil
     var isPresentDetail: Bool = false
     var tempSavingDetailData: TrashSpotDetail? = nil
+    var bottomSheetHeight: CGFloat = .detailSheetHeight
     @Presents var modal: ModalDestination.State?
   }
   
@@ -148,6 +149,10 @@ struct HomeRootFeature {
           
         case let .visitedComplete(isFirst, petInfo):
           return .send(.presentVisitedComplete(isFirst: isFirst, petInfo: petInfo))
+          
+        case let .bottomSheetHeightChanged(height):
+          state.bottomSheetHeight = height
+          return .send(.home(.updateBottomSheetHeight(height)))
           
         }
         

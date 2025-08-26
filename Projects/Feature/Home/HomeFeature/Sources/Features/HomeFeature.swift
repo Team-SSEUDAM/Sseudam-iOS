@@ -34,6 +34,7 @@ public struct HomeFeature {
     public var isShowSuggestionCoachMark: Bool = UserDefaultsKeys.coachMark_suggestion ?? true
     public var toastMessage: String? = nil
     public var isInitAppear: Bool = true
+    public var bottomSheetHeight: CGFloat = .detailSheetHeight
     public init() {}
   }
 
@@ -57,6 +58,7 @@ public struct HomeFeature {
     case moveToSuggestion
     case suggestionButtonTapped
     case delegate(Delegate)
+    case updateBottomSheetHeight(CGFloat)
   }
   
   public enum Delegate: Equatable {
@@ -185,6 +187,10 @@ public struct HomeFeature {
             await openURL(url)
           }
         }
+        
+      case let .updateBottomSheetHeight(height):
+        state.bottomSheetHeight = height + .Number10
+        return .none
         
       default: return .none
       }

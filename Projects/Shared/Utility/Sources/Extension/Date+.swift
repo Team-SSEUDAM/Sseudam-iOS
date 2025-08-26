@@ -29,8 +29,16 @@ extension Date {
   
   /// 타겟 날짜가 오늘 날짜인지 여부
   public var isSameDayAsToday: Bool {
-    return Calendar.current.isDateInToday(self)
-    
+    return Calendar.kst.isDate(self, inSameDayAs: Date())
   }
   
+}
+
+extension Calendar {
+  /// KST(Asia/Seoul) 기준의 그레고리력 캘린더
+  static let kst: Calendar = {
+    var cal = Calendar(identifier: .gregorian)
+    cal.timeZone = TimeZone(identifier: "Asia/Seoul")!
+    return cal
+  }()
 }

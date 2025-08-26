@@ -23,7 +23,6 @@ public struct HomeView: View {
   }
   
   private let tabbarHeight: CGFloat = 83
-  private let bottomSheetHeight: CGFloat = .detailSheetHeight
   private let bottomPadding: CGFloat = .Number12
   
   public var body: some View {
@@ -105,7 +104,7 @@ public struct HomeView: View {
   private var TopButtonView: some View {
     HStack(spacing: .Number8) {
       if store.isPresentDetail {
-        IconButton(icon: .leftChevron) {
+        IconButton(icon: .leftChevron, size: .Number40) {
           store.send(.removeSuggestionCoachMark)
           store.send(.presentDetailView(false))
           store.send(.map(.deleteActiveMarker))
@@ -140,7 +139,7 @@ public struct HomeView: View {
     .padding(.horizontal, .Number16)
     .padding(
       .bottom,
-      (store.isPresentDetail ? bottomSheetHeight : tabbarHeight)+bottomPadding
+      (store.isPresentDetail ? store.bottomSheetHeight : tabbarHeight)+bottomPadding
     )
     .animation(
       .easeInOut(duration: store.isPresentDetail ? 0.3 : 0.13),

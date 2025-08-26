@@ -29,6 +29,9 @@ public struct TrashDetailFeature {
     var trashImageData: Data? = nil
     var isLoading: Bool = true
     var isFailLoadDetail: Bool = false
+    var isNeedUpdateHeight: Bool = true
+    var isTitleMultiLine: Bool? = nil
+    public var bottomSheetHeight: CGFloat = .detailSheetHeight
     public init() {}
   }
 
@@ -47,6 +50,7 @@ public struct TrashDetailFeature {
     case emptyTrashData(Bool)
     case fetchTrashDetail(id: Int)
     case fetchTrashDetailResult(Result<TrashSpotDetail, NetworkError>)
+    case setTitleMultiLine(Bool?)
     
     case fetchTrashImage(imgUrl: String?, id: Int)
     case fetchTrashImageResult(Result<Data, ImageDownloadError>)
@@ -59,6 +63,7 @@ public struct TrashDetailFeature {
     case showToastMessage(String?)
     case showAlert(AlertType)
     case visitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
+    case updateBottomSheetHeight(CGFloat)
   }
   
   public enum Delegate: Equatable {
@@ -67,6 +72,7 @@ public struct TrashDetailFeature {
     case showAlert(AlertType)
     /// 방문 완료
     case visitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
+    case bottomSheetHeightChanged(CGFloat)
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -87,6 +93,7 @@ public struct TrashDetailFeature {
             await send(.showLoading(true))
             await send(.emptyTrashData(false))
             await send(.setInitVisitedState)
+            await send(.setTitleMultiLine(nil))
             await send(.fetchTrashDetail(id: id))
           }
         } else {
@@ -119,6 +126,7 @@ public struct TrashDetailFeature {
         
       case let .fetchTrashDetailResult(.success(data)):
         state.trashDetail = data
+        state.isNeedUpdateHeight = true
         return .merge([
           .send(.showLoading(false)),
           .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point))),
@@ -133,6 +141,10 @@ public struct TrashDetailFeature {
           .send(.showLoading(false)),
           .send(.visited(.initialVisitedData))
         ])
+        
+      case let .setTitleMultiLine(isMultiLine):
+        state.isTitleMultiLine = isMultiLine
+        return .none
         
       case let .fetchTrashImage(imgUrl, id):
         guard let imgUrl = imgUrl else { return .none }
@@ -161,6 +173,11 @@ public struct TrashDetailFeature {
         
       case let .showAlert(type):
         return .send(.delegate(.showAlert(type)))
+        
+      case let .updateBottomSheetHeight(height):
+        state.bottomSheetHeight = height
+        state.isNeedUpdateHeight = false
+        return .send(.delegate(.bottomSheetHeightChanged(height)))
         
         // MARK: - Receive VisitedFeature Delegate Action
       case let .visited(.delegate(action)):

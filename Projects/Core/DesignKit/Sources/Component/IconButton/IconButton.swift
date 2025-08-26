@@ -31,17 +31,20 @@ public struct IconButton: View {
   public var icon: ImageSet
   public var action: () async -> Void
   private let type: ColorType
+  private let size: CGFloat
   
   @State private var isPressed: Bool = false
   
   public init(
     icon: ImageSet,
     type: ColorType = .primary,
+    size: CGFloat? = nil,
     _ action: @escaping () async -> Void
   ) {
     self.icon = icon
     self.action = action
     self.type = type
+    self.size = size ?? .Number48
   }
   
   public var body: some View {
@@ -80,6 +83,6 @@ public struct IconButton: View {
             .fill(ColorSet.Component.Pressed)
         }
       }
-      .frame(width: .Number48, height: .Number48)
+      .frame(width: size, height: size)
   }
 }

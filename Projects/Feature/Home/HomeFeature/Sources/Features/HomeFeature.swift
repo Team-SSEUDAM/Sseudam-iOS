@@ -31,6 +31,7 @@ public struct HomeFeature {
     public var isHiddenReportButton: Bool = false
     public var path = StackState<Path.State>()
     public var isPresentDetail: Bool = false
+    public var isShowSuggestionCoachMark: Bool = UserDefaultsKeys.coachMark_suggestion ?? true
     public var toastMessage: String? = nil
     public var isInitAppear: Bool = true
     public var bottomSheetHeight: CGFloat = .detailSheetHeight
@@ -49,6 +50,8 @@ public struct HomeFeature {
     case presentDetailView(Bool, id: Int? = nil)
     case presentAlert(AlertType)
     case hiddenReportButton(Bool)
+    
+    case removeSuggestionCoachMark
     
     case showReportView(detail: TrashSpotDetail?)
     case moveToSetting
@@ -120,6 +123,11 @@ public struct HomeFeature {
         state.isHiddenReportButton = isHidden
         return .none
         
+      case .removeSuggestionCoachMark:
+        UserDefaultsKeys.coachMark_suggestion = false
+        state.isShowSuggestionCoachMark = false
+        return .none
+        
       case let .showReportView(detail):
         guard let detail = detail else { return .none }
         state.path.append(
@@ -144,6 +152,7 @@ public struct HomeFeature {
 
       case let .presentDetailView(isPresent, id):
         state.isPresentDetail = isPresent
+        if isPresent { state.isShowSuggestionCoachMark = false }
         let isPathEmpty = state.path.isEmpty
         return .run { send in
           await MainActor.run {

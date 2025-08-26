@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Utility
+import UserDefaults
 import DesignKit
 import ComposableArchitecture
 
@@ -31,11 +32,23 @@ public struct HomeView: View {
       ZStack {
         MapView
         .ignoresSafeArea()
-        VStack {
-          TopButtonView
-          Spacer()
+        if store.map.researchButtonEnable {
+          VStack {
+            Spacer()
+            ResearchButton {
+              store.send((.map(.requestMapBounds(true))))
+            }
+          }
+          .padding(.bottom, (store.isPresentDetail ? store.bottomSheetHeight : tabbarHeight) + bottomPadding )
+        }
+        ZStack {
+          VStack {
+            TopButtonView
+            Spacer()
+            BottomButtonView
+          }
           SnackBarView
-          BottomButtonView
+            .padding(.bottom, (store.isPresentDetail ? store.bottomSheetHeight : tabbarHeight) + bottomPadding )
         }
       }
       .ignoresSafeArea(edges: .bottom)
@@ -92,11 +105,13 @@ public struct HomeView: View {
     HStack(spacing: .Number8) {
       if store.isPresentDetail {
         IconButton(icon: .leftChevron, size: .Number40) {
+          store.send(.removeSuggestionCoachMark)
           store.send(.presentDetailView(false))
           store.send(.map(.deleteActiveMarker))
         }
       }
       TrashFilterView { type in
+        store.send(.removeSuggestionCoachMark)
         store.send(.map(.filterTapped(type)))
       }
     }
@@ -109,15 +124,14 @@ public struct HomeView: View {
   private var BottomButtonView: some View {
     HStack(alignment: .bottom) {
       Spacer()
-        .frame(width: .Number40, height: .Number40)
-      Spacer()
-      if store.map.researchButtonEnable {
-        ResearchButton {
-          store.send((.map(.requestMapBounds(true))))
+      VStack(alignment: .trailing, spacing: .Number12) {
+        if store.isShowSuggestionCoachMark {
+          CoachMark(
+            text: "내 주변 가로 쓰레기통을\n등록해보세요",
+            offset: .Number100
+          ) { store.send(.removeSuggestionCoachMark) }
+          .position(.bottom)
         }
-      }
-      Spacer()
-      VStack(spacing: .Number12) {
         SuggestionButton
         UserLocationButton
       }
@@ -137,6 +151,7 @@ public struct HomeView: View {
   @ViewBuilder
   private var UserLocationButton: some View {
     IconButton(icon: .myLocation) {
+      store.send(.removeSuggestionCoachMark)
       store.send(.location(.fetchCurrentLocation(true)))
     }
   }
@@ -145,6 +160,7 @@ public struct HomeView: View {
   private var SuggestionButton: some View {
     if !store.isHiddenReportButton {
       IconButton(icon: .addSpot, type: .accent) {
+        store.send(.removeSuggestionCoachMark)
         store.send(.suggestionButtonTapped)
       }
     }

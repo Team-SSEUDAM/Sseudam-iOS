@@ -53,6 +53,7 @@ public enum Domain: String, ModuleRepresentable {
   case Attendance
   case ImageDownload
   case History
+  case AppVersion
   public var typePath: String { "Domain" }
 }
 
@@ -69,6 +70,7 @@ public enum Data: String, ModuleRepresentable {
   case Attendance
   case ImageDownload
   case History
+  case AppVersion
   public var typePath: String { "Data" }
 }
 
@@ -217,6 +219,10 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.History, isInterface: true))
       public static let Implement = Self.project(.domain(.History))
     }
+    public struct AppVersion: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.AppVersion, isInterface: true))
+      public static let Implement = Self.project(.domain(.AppVersion))
+    }
   }
   
   public struct Data: TargetDependencyDelegate {
@@ -264,6 +270,10 @@ extension TargetDependency {
     public struct History: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.History, isInterface: true))
       public static let Implement = Self.project(.data(.History))
+    }
+    public struct AppVersion: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.AppVersion, isInterface: true))
+      public static let Implement = Self.project(.data(.AppVersion))
     }
   }
   

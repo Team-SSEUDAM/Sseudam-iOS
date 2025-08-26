@@ -9,9 +9,11 @@
 import Foundation
 
 public struct AppVersionRepository {
-  public var fetchData: @Sendable () async throws -> Void
+  public var checkAppVersion: @Sendable () async throws -> AppVersionEntity
 
-  public init(fetchData: @Sendable @escaping () async throws -> Void) {
-    self.fetchData = fetchData
+  public init(
+    checkAppVersion: @Sendable @escaping () async throws -> AppVersionEntity
+  ) {
+    self.checkAppVersion = checkAppVersion
   }
 }

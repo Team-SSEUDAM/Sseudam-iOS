@@ -23,6 +23,8 @@ struct SseudamView: View {
     SseudamFeature()
   }
   
+  @Environment(\.scenePhase) var scenePhase
+  
   init() {
     UITabBar.appearance().isHidden = true
   }
@@ -40,6 +42,9 @@ struct SseudamView: View {
       }
       TabBar
       AlertView
+    }
+    .onChange(of: scenePhase) { _, newPhase in
+      if newPhase == .active { store.send(.onAppear) }
     }
     .onAppear {
       store.send(.onAppear)
@@ -81,6 +86,7 @@ struct SseudamView: View {
       Alert(
         type: alert,
         isErrorType: alert.isErrorType,
+        isSingleButton: alert.isSingleButton,
         closeAction: {
           Task { @MainActor in
             store.send(.closeAlertAction)

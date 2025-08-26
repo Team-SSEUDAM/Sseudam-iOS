@@ -12,11 +12,11 @@ import AppVersionDataInterface
 import NetworkKit
 
 public extension AppVersionRepository {
-  static var live: AppVersionRepository {
+  static func live(networker: NetworkKit) -> AppVersionRepository {
     AppVersionRepository(
-      fetchData: {
-        // 실제 네트워크 작업 구현
-        return
+      checkAppVersion: {
+        let endpoint = AppVersionEndPoint.checkAppVersion()
+        return try await networker.execute(with: endpoint, timeout: 30).toEntity()
       }
     )
   }

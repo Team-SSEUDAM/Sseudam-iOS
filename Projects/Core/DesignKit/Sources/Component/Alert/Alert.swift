@@ -12,17 +12,20 @@ public struct Alert: View {
   
   private let type: AlertType
   private let isErrorType: Bool
+  private let isSingleButton: Bool
   private let closeAction: @Sendable () -> Void
   private let acceptAction: @Sendable () -> Void
   
   public init(
     type: AlertType,
     isErrorType: Bool = false,
+    isSingleButton: Bool = false,
     closeAction: @escaping @Sendable () -> Void,
     acceptAction: @escaping @Sendable () -> Void
   ) {
     self.type = type
     self.isErrorType = isErrorType
+    self.isSingleButton = isSingleButton
     self.closeAction = closeAction
     self.acceptAction = acceptAction
   }
@@ -72,10 +75,12 @@ public struct Alert: View {
   @ViewBuilder
   private var buttonView: some View {
     HStack(spacing: .Number12) {
-      SecondaryButton(
-        title: type.cancel,
-        size: .large
-      ) { closeAction() }
+      if !isSingleButton {
+        SecondaryButton(
+          title: type.cancel,
+          size: .large
+        ) { closeAction() }
+      }
       
       PrimaryButton(
         title: .constant(type.accept),

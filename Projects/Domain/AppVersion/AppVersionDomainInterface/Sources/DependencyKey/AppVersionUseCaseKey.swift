@@ -9,25 +9,25 @@
 import Foundation
 import Dependencies
 
-public enum AppVersionUseCaseKey: DependencyKey {
-  public static var liveValue: AppVersionUseCase { AppVersionUseCaseProvider() }
-  public static var previewValue: AppVersionUseCase { AppVersionUseCaseProvider() }
-  public static var testValue: AppVersionUseCase { AppVersionUseCaseProvider() }
+public enum CheckAppVersionUseCaseKey: DependencyKey {
+  public static var liveValue: CheckAppVersionUseCase { CheckAppVersionUseCaseProvider() }
+  public static var previewValue: CheckAppVersionUseCase { CheckAppVersionUseCaseProvider() }
+  public static var testValue: CheckAppVersionUseCase { CheckAppVersionUseCaseProvider() }
 }
 
-private var AppVersionUseCaseProvider: () -> AppVersionUseCase = {
+private var CheckAppVersionUseCaseProvider: () -> CheckAppVersionUseCase = {
   fatalError("AppVersionUseCase Dependency not configured")
 }
 
-public func AppVersionUseCaseRegister(
-  provider: @escaping () -> AppVersionUseCase
+public func CheckAppVersionUseCaseRegister(
+  provider: @escaping () -> CheckAppVersionUseCase
 ) {
-  AppVersionUseCaseProvider = provider
+  CheckAppVersionUseCaseProvider = provider
 }
 
 extension DependencyValues {
-  public var AppVersionUseCase: AppVersionUseCase {
-    get { self[AppVersionUseCaseKey.self] }
-    set { self[AppVersionUseCaseKey.self] = newValue }
+  public var CheckAppVersionUseCase: CheckAppVersionUseCase {
+    get { self[CheckAppVersionUseCaseKey.self] }
+    set { self[CheckAppVersionUseCaseKey.self] = newValue }
   }
 }

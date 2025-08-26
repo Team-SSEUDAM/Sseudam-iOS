@@ -8,6 +8,7 @@
 
 import SwiftUI
 import Utility
+import UserDefaults
 import DesignKit
 import ComposableArchitecture
 
@@ -32,6 +33,15 @@ public struct HomeView: View {
       ZStack {
         MapView
         .ignoresSafeArea()
+        if store.map.researchButtonEnable {
+          VStack {
+            Spacer()
+            ResearchButton {
+              store.send((.map(.requestMapBounds(true))))
+            }
+          }
+          .padding(.bottom, (store.isPresentDetail ? bottomSheetHeight : tabbarHeight) + bottomPadding )
+        }
         VStack {
           TopButtonView
           Spacer()
@@ -110,11 +120,7 @@ public struct HomeView: View {
   private var BottomButtonView: some View {
     HStack(alignment: .bottom) {
       Spacer()
-        .frame(width: .Number40, height: .Number40)
-      Spacer()
-      if store.map.researchButtonEnable {
-        ResearchButton {
-          store.send((.map(.requestMapBounds(true))))
+      VStack(alignment: .trailing, spacing: .Number12) {
         if let coach = UserDefaultsKeys.coachMark_suggestion, coach {
           CoachMark(
             text: "내 주변 가로 쓰레기통을\n등록해보세요",
@@ -122,9 +128,6 @@ public struct HomeView: View {
           ) { UserDefaultsKeys.coachMark_suggestion = false }
           .position(.bottom)
         }
-      }
-      Spacer()
-      VStack(spacing: .Number12) {
         SuggestionButton
         UserLocationButton
       }

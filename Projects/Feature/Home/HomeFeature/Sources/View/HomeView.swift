@@ -42,11 +42,14 @@ public struct HomeView: View {
           }
           .padding(.bottom, (store.isPresentDetail ? bottomSheetHeight : tabbarHeight) + bottomPadding )
         }
-        VStack {
-          TopButtonView
-          Spacer()
+        ZStack {
+          VStack {
+            TopButtonView
+            Spacer()
+            BottomButtonView
+          }
           SnackBarView
-          BottomButtonView
+            .padding(.bottom, (store.isPresentDetail ? bottomSheetHeight : tabbarHeight) + bottomPadding )
         }
       }
       .ignoresSafeArea(edges: .bottom)
@@ -103,11 +106,13 @@ public struct HomeView: View {
     HStack(spacing: .Number8) {
       if store.isPresentDetail {
         IconButton(icon: .leftChevron) {
+          store.send(.removeSuggestionCoachMark)
           store.send(.presentDetailView(false))
           store.send(.map(.deleteActiveMarker))
         }
       }
       TrashFilterView { type in
+        store.send(.removeSuggestionCoachMark)
         store.send(.map(.filterTapped(type)))
       }
     }
@@ -121,11 +126,11 @@ public struct HomeView: View {
     HStack(alignment: .bottom) {
       Spacer()
       VStack(alignment: .trailing, spacing: .Number12) {
-        if let coach = UserDefaultsKeys.coachMark_suggestion, coach {
+        if store.isShowSuggestionCoachMark {
           CoachMark(
             text: "내 주변 가로 쓰레기통을\n등록해보세요",
             offset: .Number100
-          ) { UserDefaultsKeys.coachMark_suggestion = false }
+          ) { store.send(.removeSuggestionCoachMark) }
           .position(.bottom)
         }
         SuggestionButton
@@ -147,6 +152,7 @@ public struct HomeView: View {
   @ViewBuilder
   private var UserLocationButton: some View {
     IconButton(icon: .myLocation) {
+      store.send(.removeSuggestionCoachMark)
       store.send(.location(.fetchCurrentLocation(true)))
     }
   }
@@ -155,6 +161,7 @@ public struct HomeView: View {
   private var SuggestionButton: some View {
     if !store.isHiddenReportButton {
       IconButton(icon: .addSpot, type: .accent) {
+        store.send(.removeSuggestionCoachMark)
         store.send(.suggestionButtonTapped)
       }
     }

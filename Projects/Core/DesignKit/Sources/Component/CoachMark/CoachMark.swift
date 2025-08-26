@@ -48,6 +48,9 @@ public struct CoachMark: View {
           isVisible = false
           action?()
         }
+        .onDisappear {
+          action?()
+        }
       case .bottom:
         VStack(spacing: .Number0) {
           ContentView
@@ -56,6 +59,9 @@ public struct CoachMark: View {
         }
         .onTapGesture {
           isVisible = false
+          action?()
+        }
+        .onDisappear {
           action?()
         }
       }

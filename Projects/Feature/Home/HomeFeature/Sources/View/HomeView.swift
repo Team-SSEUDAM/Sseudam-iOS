@@ -39,7 +39,7 @@ public struct HomeView: View {
               store.send((.map(.requestMapBounds(true))))
             }
           }
-          .padding(.bottom, (store.isPresentDetail ? bottomSheetHeight : tabbarHeight) + bottomPadding )
+          .padding(.bottom, (store.isPresentDetail ? store.bottomSheetHeight : tabbarHeight) + bottomPadding )
         }
         ZStack {
           VStack {
@@ -48,7 +48,7 @@ public struct HomeView: View {
             BottomButtonView
           }
           SnackBarView
-            .padding(.bottom, (store.isPresentDetail ? bottomSheetHeight : tabbarHeight) + bottomPadding )
+            .padding(.bottom, (store.isPresentDetail ? store.bottomSheetHeight : tabbarHeight) + bottomPadding )
         }
       }
       .ignoresSafeArea(edges: .bottom)

@@ -37,7 +37,6 @@ struct UserEntryFeature {
     case checkAttendance
     case requestCheckAttendance
     case checkAttendanceResult(Result<AttendanceEntity, NetworkError>)
-    case saveAttendanceDate(Date)
     
     case fetchPetInfo
     case fetchPetInfoResult(Result<PetInfoEntity, NetworkError>)
@@ -67,23 +66,20 @@ struct UserEntryFeature {
         
         // MARK: - Attendance
       case .checkAttendance:
-        if isFirstAppOpenToday() {
-          return .send(.fetchPetInfo)
-        } else {
-          return .send(.checkComplete)
-        }
+        return .send(.fetchPetInfo)
         
       case .requestCheckAttendance:
         return checkAttendance(userId: state.userId)
         
       case let .checkAttendanceResult(.success(data)):
-        let attendanceState = AttendanceFeature.State(data, petInfo: state.petInfo)
-        state.modal = .attendance(attendanceState)
-        return .send(.saveAttendanceDate(data.attendanceDate ?? Date()))
+        if data.isToday {
+          return .send(.checkComplete)
+        } else {
+          let attendanceState = AttendanceFeature.State(data, petInfo: state.petInfo)
+          state.modal = .attendance(attendanceState)
+          return .none
+        }
         
-      case let .saveAttendanceDate(date):
-        UserDefaultsKeys.lastEntryDate = date
-        return .none
         
       case let .checkAttendanceResult(.failure(error)):
         print(error)
@@ -99,6 +95,7 @@ struct UserEntryFeature {
         return .send(.requestCheckAttendance)
         
       case let .fetchPetInfoResult(.failure(error)):
+        print(error.localizedDescription)
         return .send(.requestCheckAttendance)
         
         // MARK: - Attendance Delegate
@@ -119,14 +116,6 @@ struct UserEntryFeature {
 }
 
 extension UserEntryFeature {
-  /// 오늘 첫 진입 여부, 첫 진입 시 출석체크
-  private func isFirstAppOpenToday() -> Bool {
-    let lastDate = UserDefaultsKeys.lastEntryDate
-    guard let lastDate = lastDate else {
-      return true
-    }
-    return !lastDate.isSameDayAsToday
-  }
   
   private func checkAttendance(userId: Int) -> Effect<Action> {
     return .run { send in

@@ -29,6 +29,8 @@ public struct Interceptor: TokenRefresher {
         UserDefaultsKeys.accessToken = response.accessToken
         return response.accessToken
       } catch {
+        print(accessToken ?? "")
+        print(refreshToken)
         UserDefaultsKeys.isLoggedIn = false
         KeyChainService.delete(forKey: .refreshToken)
         UserDefaultsKeys.accessToken = nil

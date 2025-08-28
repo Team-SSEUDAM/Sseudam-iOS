@@ -24,7 +24,7 @@ struct SelectSpotMapViewRepresentable: UIViewRepresentable {
     let view = NMFNaverMapView()
     view.showZoomControls = false
     view.mapView.positionMode = .direction
-    view.mapView.minZoomLevel = 16
+    view.mapView.minZoomLevel = 15.5
     view.mapView.zoomLevel = 19
     view.mapView.maxZoomLevel = 20
     view.mapView.isIndoorMapEnabled = false

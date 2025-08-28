@@ -104,6 +104,7 @@ public struct MapFeature {
         if items.isEmpty {
           return .send(.emptyTrashItems)
         } else { // 데이터 있으면 바텀시트 내리기
+          state.isFirstLoad = false
           return .send(.delegate(.presentDetailView(false)))
         }
         

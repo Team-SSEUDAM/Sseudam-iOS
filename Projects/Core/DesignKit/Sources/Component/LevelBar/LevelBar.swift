@@ -46,23 +46,34 @@ public struct LevelBar: View {
     self.maxLevelPoint = currentLevel.goalPoint
     self._startAnimation = startAnimation
     
-    // 애니메이션 시작을 위해 역산된 레벨 계산
-    let startingPoint = max(0, currentPoint - addPoint)
-    let calculatedStartLevel = CatLevel.fromPoint(startingPoint)
-    self._displayLevel = State(initialValue: calculatedStartLevel)
+    if currentLevel == .level5 {
+      self._displayLevel = State(initialValue: currentLevel)
+    } else {
+      let startingPoint = max(0, currentPoint - addPoint)
+      let calculatedStartLevel = CatLevel.fromPoint(startingPoint)
+      self._displayLevel = State(initialValue: calculatedStartLevel)
+    }
   }
   
   private var initialProgress: CGFloat {
     guard displayLevel.goalPoint > 0 else { return 0 }
-    let startingPoint = max(0, currentPoint - addPoint)
-    let startingPointInCurrentLevel = startingPoint % displayLevel.goalPoint
-    return CGFloat(startingPointInCurrentLevel) / CGFloat(displayLevel.goalPoint)
+    if currentLevel == .level5 {
+      return 1.0
+    } else {
+      let startingPoint = max(0, currentPoint - addPoint)
+      let startingPointInCurrentLevel = startingPoint % displayLevel.goalPoint
+      return CGFloat(startingPointInCurrentLevel) / CGFloat(displayLevel.goalPoint)
+    }
   }
   
   private var finalProgress: CGFloat {
     guard displayLevel.goalPoint > 0 else { return 0 }
-    let currentPointInLevel = currentPoint % displayLevel.goalPoint
-    return CGFloat(currentPointInLevel) / CGFloat(displayLevel.goalPoint)
+    if currentLevel == .level5 {
+      return 1.0
+    } else {
+      let currentPointInLevel = currentPoint % displayLevel.goalPoint
+      return CGFloat(currentPointInLevel) / CGFloat(displayLevel.goalPoint)
+    }
   }
   
   /// 레벨업 가능 여부

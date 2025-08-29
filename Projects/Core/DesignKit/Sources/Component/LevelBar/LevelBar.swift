@@ -56,24 +56,30 @@ public struct LevelBar: View {
   }
   
   private var initialProgress: CGFloat {
-    guard displayLevel.goalPoint > 0 else { return 0 }
     if currentLevel == .level5 {
       return 1.0
-    } else {
-      let startingPoint = max(0, currentPoint - addPoint)
-      let startingPointInCurrentLevel = startingPoint % displayLevel.goalPoint
-      return CGFloat(startingPointInCurrentLevel) / CGFloat(displayLevel.goalPoint)
     }
+    
+    let startingPoint = max(0, currentPoint - addPoint)
+    let levelStartPoint = displayLevel.startPoint
+    let levelRange = displayLevel.goalPoint - levelStartPoint
+    guard levelRange > 0 else { return 0 }
+    
+    let startingPointInCurrentLevel = max(0, startingPoint - levelStartPoint)
+    return CGFloat(startingPointInCurrentLevel) / CGFloat(levelRange)
   }
   
   private var finalProgress: CGFloat {
-    guard displayLevel.goalPoint > 0 else { return 0 }
     if currentLevel == .level5 {
       return 1.0
-    } else {
-      let currentPointInLevel = currentPoint % displayLevel.goalPoint
-      return CGFloat(currentPointInLevel) / CGFloat(displayLevel.goalPoint)
     }
+    
+    let levelStartPoint = currentLevel.startPoint
+    let levelRange = currentLevel.goalPoint - levelStartPoint
+    guard levelRange > 0 else { return 0 }
+    
+    let currentPointInLevel = currentPoint - levelStartPoint
+    return CGFloat(currentPointInLevel) / CGFloat(levelRange)
   }
   
   /// 레벨업 가능 여부
@@ -86,7 +92,7 @@ public struct LevelBar: View {
   /// 레벨업 후 남은 올려야 할 남은 포인트
   private var remainingPointAfterLevelUp: Int {
     guard willLevelUp else { return 0 }
-    return currentPoint % currentLevel.goalPoint
+    return currentPoint - currentLevel.startPoint
   }
   
   private var isMaxLevel: Bool {
@@ -213,6 +219,21 @@ extension CatLevel {
       return 220
     case .level4:
       return 300
+    case .level5:
+      return 300
+    }
+  }
+  
+  var startPoint: Int {
+    switch self {
+    case .level1:
+      return 0
+    case .level2:
+      return 20
+    case .level3:
+      return 110
+    case .level4:
+      return 220
     case .level5:
       return 300
     }

@@ -137,8 +137,6 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     
     Task { @MainActor in
       // 받은 좌표를 저장
-      self.userLocation = coord
-      
       if manager === singleLocationManager {
         // 단발 요청 완료 처리
         singleLocationManager.stopUpdatingLocation()

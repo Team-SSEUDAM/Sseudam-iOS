@@ -27,6 +27,7 @@ let project = Project.makeApp(
     "NSPhotoLibraryUsageDescription": "앱에서 사진을 선택하기 위해 갤러리 접근 권한이 필요합니다.",
     "NMCLIENTID": "$(NM_CLIENT_ID)",
     "NMCLIENTSECRET": "$(NM_CLIENT_SECRET)",
+    "MIXPANEL_TOKEN": "$(MIXPANEL_TOKEN)",
     "BASE_URL": "$(BASE_URL)"
   ],
   dependencies: [

@@ -93,6 +93,7 @@ public enum SPM: String, ModuleRepresentable {
   case TCA = "ComposableArchitecture"
   case NMapsMap = "NMapsMap"
   case DotLottie = "DotLottie"
+  case Mixpanel = "Mixpanel"
   public var typePath: String { "SPM" }
 }
 
@@ -286,6 +287,7 @@ extension TargetDependency {
     public static let TCA = Self.project(.spm(.TCA))
     public static let NMapsMap = Self.project(.spm(.NMapsMap))
     public static let DotLottie = Self.project(.spm(.DotLottie))
+    public static let Mixpanel = Self.project(.spm(.Mixpanel))
   }
 }
 

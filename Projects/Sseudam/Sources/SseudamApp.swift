@@ -9,13 +9,17 @@
 import SwiftUI
 import Utility
 import NMapsMap
+import Mixpanel
 
 @main
 struct SseudamApp: App {
   init() {
-    if let id = Bundle.main.infoDictionary?["NMCLIENTID"] as? String {
+    if let id = Bundle.main.infoDictionary?["NMCLIENTID"] as? String,
+      let mixpanelToken = Bundle.main.infoDictionary?["MIXPANEL_TOKEN"] as? String {
       NMFAuthManager.shared().ncpKeyId = id
+      Mixpanel.initialize(token: mixpanelToken, trackAutomaticEvents: false)
     }
+    
     DependencyRegister().injection()
   }
   var body: some Scene {

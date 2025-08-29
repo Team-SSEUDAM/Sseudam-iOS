@@ -40,11 +40,13 @@ struct UserEntryFeature {
     case checkAttendance
     case requestCheckAttendance
     case checkAttendanceResult(Result<AttendanceEntity, NetworkError>)
+    case moveToAttendanceView(AttendanceEntity, PetInfoEntity)
     
     case fetchPetInfo
     case fetchPetInfoResult(Result<PetInfoEntity, NetworkError>)
     
     case checkLevelUp
+    case moveToLevelUpView(PetInfoEntity)
     
     case modal(PresentationAction<Modal.Action>)
   }
@@ -89,6 +91,11 @@ struct UserEntryFeature {
         print(error)
         return .send(.checkComplete)
         
+      case let .moveToAttendanceView(attendanceInfo, petInfo):
+        let attendanceState = AttendanceFeature.State(attendanceInfo, petInfo: petInfo)
+        state.modal = .attendance(attendanceState)
+        return .none
+        
         // MARK: - Fetch PetInfo
         
       case .fetchPetInfo:
@@ -97,9 +104,7 @@ struct UserEntryFeature {
       case let .fetchPetInfoResult(.success(entity)):
         if let attendance = state.attendanceInfo {
           state.petInfo = entity
-          let attendanceState = AttendanceFeature.State(attendance, petInfo: entity)
-          state.modal = .attendance(attendanceState)
-          return .none
+          return .send(.moveToAttendanceView(attendance, entity))
         } else {
           return .send(.checkComplete)
         }
@@ -113,14 +118,17 @@ struct UserEntryFeature {
       case .checkLevelUp:
         if UserDefaultsKeys.isNeedLevelUp ?? false {
           if let petInfo = state.petInfo {
-            let levelUpState = LevelUpFeature.State(petInfo: petInfo)
-            state.modal = .levelUp(levelUpState)
-            return .none
+            return .send(.moveToLevelUpView(petInfo))
           }
           return .send(.checkComplete)
         } else {
           return .send(.checkComplete)
         }
+        
+      case let .moveToLevelUpView(petInfo):
+        let levelUpState = LevelUpFeature.State(petInfo: petInfo)
+        state.modal = .levelUp(levelUpState)
+        return .none
         
         // MARK: - Attendance Delegate
         

@@ -41,6 +41,8 @@ struct UserEntryFeature {
     case fetchPetInfo
     case fetchPetInfoResult(Result<PetInfoEntity, NetworkError>)
     
+    case checkLevelUp
+    
     case modal(PresentationAction<Modal.Action>)
   }
   
@@ -101,13 +103,21 @@ struct UserEntryFeature {
         print(error.localizedDescription)
         return .send(.requestCheckAttendance)
         
+      case .checkLevelUp:
+        if UserDefaultsKeys.isNeedLevelUp ?? false {
+          // TODO: - modal 연결
+          return .none
+        } else {
+          return .send(.checkComplete)
+        }
+        
         // MARK: - Attendance Delegate
         
       case let .modal(.presented(.attendance(action))):
         switch action {
         case .delegate(.dismiss):
           state.modal = nil
-          return .send(.checkComplete)
+          return .send(.checkLevelUp)
         default: return .none
         }
         

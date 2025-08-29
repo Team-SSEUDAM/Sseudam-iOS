@@ -15,7 +15,7 @@ public struct Interceptor: TokenRefresher {
   
   public static func refreshToken() async throws -> String? {
     if let refreshToken: String = KeyChainService.read(forKey: .refreshToken) {
-      let accessToken = UserDefaultsKeys.accessToken
+      
       let refreshEndpoint = Endpoint<TokenRefreshDTO>(
         method: .post,
         path: "/auth/reissue",

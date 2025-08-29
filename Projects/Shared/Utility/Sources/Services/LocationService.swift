@@ -143,6 +143,7 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
         self.singleLocationContinuation?.resume(returning: coord)
         self.singleLocationContinuation = nil
       } else if manager === continuousLocationManager {
+        self.userLocation = coord
         // 연속 구독 이벤트 발행
         let now = Date()
         // 1초 throttle

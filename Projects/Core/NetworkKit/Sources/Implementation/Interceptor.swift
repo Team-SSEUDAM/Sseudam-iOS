@@ -17,7 +17,6 @@ public struct Interceptor: TokenRefresher {
     if let refreshToken: String = KeyChainService.read(forKey: .refreshToken) {
       let accessToken = UserDefaultsKeys.accessToken
       let refreshEndpoint = Endpoint<TokenRefreshDTO>(
-        headers: .reissue(accessToken),
         method: .post,
         path: "/auth/reissue",
         parameters: .body(ReissueTokenBody(refreshToken: refreshToken)),
@@ -29,8 +28,6 @@ public struct Interceptor: TokenRefresher {
         UserDefaultsKeys.accessToken = response.accessToken
         return response.accessToken
       } catch {
-        print(accessToken ?? "")
-        print(refreshToken)
         UserDefaultsKeys.isLoggedIn = false
         KeyChainService.delete(forKey: .refreshToken)
         UserDefaultsKeys.accessToken = nil

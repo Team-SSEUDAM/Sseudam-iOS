@@ -15,6 +15,7 @@ import TrashDetailFeature
 import AuthFeature
 import UserDefaults
 import AttendanceFeature
+import LevelUpFeature
 
 struct SseudamView: View {
   @Bindable var store: StoreOf<SseudamFeature> = Store(
@@ -56,6 +57,9 @@ struct SseudamView: View {
     }
     .fullScreenCover(item: $store.scope(state: \.userEntry?.modal?.attendance, action: \.userEntry.modal.attendance)) { store in
       AttendanceView(store: store)
+    }
+    .fullScreenCover(item: $store.scope(state: \.userEntry?.modal?.levelUp, action: \.userEntry.modal.levelUp)) { store in
+      LevelUpView(store: store)
     }
     .transaction { transaction in
       transaction.disablesAnimations = true

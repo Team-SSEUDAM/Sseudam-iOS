@@ -14,6 +14,8 @@ import Utility
 import AttendanceFeature
 import AttendanceDomainInterface
 
+import LevelUpFeature
+
 import PetDomainInterface
 
 @Reducer
@@ -23,6 +25,7 @@ struct UserEntryFeature {
     @Presents var modal: Modal.State?
     var attendanceInfo: AttendanceEntity? = nil
     var userId: Int
+    var petInfo: PetInfoEntity? = nil
     
     init(userId: Int) {
       self.userId = userId
@@ -53,6 +56,7 @@ struct UserEntryFeature {
   @Reducer(state: .equatable, action: .equatable)
   enum Modal {
     case attendance(AttendanceFeature)
+    case levelUp(LevelUpFeature)
   }
   
   @Dependency(\.AttendanceUseCase) var attendanceUseCase
@@ -92,6 +96,7 @@ struct UserEntryFeature {
         
       case let .fetchPetInfoResult(.success(entity)):
         if let attendance = state.attendanceInfo {
+          state.petInfo = entity
           let attendanceState = AttendanceFeature.State(attendance, petInfo: entity)
           state.modal = .attendance(attendanceState)
           return .none
@@ -103,10 +108,16 @@ struct UserEntryFeature {
         print(error.localizedDescription)
         return .send(.requestCheckAttendance)
         
+      // MARK: - LevelUp
+        
       case .checkLevelUp:
         if UserDefaultsKeys.isNeedLevelUp ?? false {
-          // TODO: - modal 연결
-          return .none
+          if let petInfo = state.petInfo {
+            let levelUpState = LevelUpFeature.State(petInfo: petInfo)
+            state.modal = .levelUp(levelUpState)
+            return .none
+          }
+          return .send(.checkComplete)
         } else {
           return .send(.checkComplete)
         }
@@ -118,6 +129,14 @@ struct UserEntryFeature {
         case .delegate(.dismiss):
           state.modal = nil
           return .send(.checkLevelUp)
+        default: return .none
+        }
+        
+      case let .modal(.presented(.levelUp(action))):
+        switch action {
+        case .delegate(.dismiss):
+          state.modal = nil
+          return .send(.checkComplete)
         default: return .none
         }
         

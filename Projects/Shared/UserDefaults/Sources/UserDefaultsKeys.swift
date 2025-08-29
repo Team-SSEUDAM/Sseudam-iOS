@@ -24,9 +24,6 @@ public struct UserDefaultsKeys {
   @UserDefault("userNickname", default: nil)
   public static var userNickname: String?
   
-  @UserDefault("lastEntryDate", default: nil)
-  public static var lastEntryDate: Date?
-  
   // coachMark
   @UserDefault("coachMark_suggestion", default: nil)
   public static var coachMark_suggestion: Bool?

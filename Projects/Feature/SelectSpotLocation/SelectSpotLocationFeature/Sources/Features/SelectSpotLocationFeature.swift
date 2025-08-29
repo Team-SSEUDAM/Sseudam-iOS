@@ -46,6 +46,7 @@ public struct SelectSpotLocationFeature {
     /// 움직이기 시작 한 순가 -> 이 떄 부터, 로딩 시작
     case onMapMovingStarted
     case initUserLocation(Coordinates)
+    case moveUserLocation
     
     case reverseGeoCode(Coordinates)
     case reverseGeoCodeResult(Result<NMGeoCodeReverseEntity, NetworkError>)
@@ -99,6 +100,10 @@ public struct SelectSpotLocationFeature {
       case let .initUserLocation(location):
         state.userLocation = location
         return .none
+        
+      case .moveUserLocation:
+        return moveUserLocation()
+        
       default: return .none
       }
     }
@@ -140,5 +145,6 @@ extension SelectSpotLocationFeature {
       }
     }
   }
+  
   
 }

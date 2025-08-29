@@ -16,13 +16,15 @@ public struct AttendanceDTO: DTO {
   let continuity: Int
   let isContinuity: Bool
   let createdAt: String
+  let isToday: Bool
   
   public func toEntity() throws -> AttendanceEntity {
     return  .init(
       userId: userId,
       continuity: continuity,
       isContinuity: isContinuity,
-      attendanceDate: createdAt.toUTCDate
+      attendanceDate: createdAt.toUTCDate,
+      isToday: isToday
     )
   }
 }

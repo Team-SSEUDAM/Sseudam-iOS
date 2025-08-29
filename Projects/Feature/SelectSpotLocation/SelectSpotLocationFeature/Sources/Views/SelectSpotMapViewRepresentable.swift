@@ -24,7 +24,7 @@ struct SelectSpotMapViewRepresentable: UIViewRepresentable {
     let view = NMFNaverMapView()
     view.showZoomControls = false
     view.mapView.positionMode = .direction
-    view.mapView.minZoomLevel = 18
+    view.mapView.minZoomLevel = 15.5
     view.mapView.zoomLevel = 19
     view.mapView.maxZoomLevel = 20
     view.mapView.isIndoorMapEnabled = false
@@ -54,7 +54,7 @@ struct SelectSpotMapViewRepresentable: UIViewRepresentable {
   private func moveCamera(
     _ view: NMFNaverMapView,
     to point: Coordinates,
-    zoomLevel: Double = 16
+    zoomLevel: Double = 17
   ) {
     let coord = NMGLatLng(lat: point.latitude, lng: point.longitude)
     let update = NMFCameraUpdate(scrollTo: coord, zoomTo: zoomLevel)

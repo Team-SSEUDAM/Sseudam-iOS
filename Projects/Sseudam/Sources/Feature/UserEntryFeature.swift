@@ -21,7 +21,7 @@ struct UserEntryFeature {
   @ObservableState
   struct State {
     @Presents var modal: Modal.State?
-    var petInfo: PetInfoEntity? = nil
+    var attendanceInfo: AttendanceEntity? = nil
     var userId: Int
     
     init(userId: Int) {
@@ -66,7 +66,7 @@ struct UserEntryFeature {
         
         // MARK: - Attendance
       case .checkAttendance:
-        return .send(.fetchPetInfo)
+        return .send(.requestCheckAttendance)
         
       case .requestCheckAttendance:
         return checkAttendance(userId: state.userId)
@@ -75,11 +75,9 @@ struct UserEntryFeature {
         if data.isToday {
           return .send(.checkComplete)
         } else {
-          let attendanceState = AttendanceFeature.State(data, petInfo: state.petInfo)
-          state.modal = .attendance(attendanceState)
-          return .none
+          state.attendanceInfo = data
+          return .send(.fetchPetInfo)
         }
-        
         
       case let .checkAttendanceResult(.failure(error)):
         print(error)
@@ -91,8 +89,13 @@ struct UserEntryFeature {
         return fetchPetInfo()
         
       case let .fetchPetInfoResult(.success(entity)):
-        state.petInfo = entity
-        return .send(.requestCheckAttendance)
+        if let attendance = state.attendanceInfo {
+          let attendanceState = AttendanceFeature.State(attendance, petInfo: entity)
+          state.modal = .attendance(attendanceState)
+          return .none
+        } else {
+          return .send(.checkComplete)
+        }
         
       case let .fetchPetInfoResult(.failure(error)):
         print(error.localizedDescription)

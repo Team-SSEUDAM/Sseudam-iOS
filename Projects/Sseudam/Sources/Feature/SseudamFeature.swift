@@ -201,6 +201,8 @@ extension SseudamFeature {
 
       case (.optionalAppUpdate(let url), .accept):
         await send(.open(url))
+      case (.optionalAppUpdate, .close):
+        await send(.homeRoot(.closeAlertAction(type)))
         
       default: return
       }

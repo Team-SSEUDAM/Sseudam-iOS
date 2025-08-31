@@ -46,6 +46,7 @@ struct ForceUpdateFeature {
         return .send(.checkForUpdate)
         
       case .checkForUpdate:
+        guard !state.hasCheckedUpdate else { return .none } // optional이면 재확인 X
         return checkAppVersion()
         
       case let .versionInfoResult(.success(versionInfo)):

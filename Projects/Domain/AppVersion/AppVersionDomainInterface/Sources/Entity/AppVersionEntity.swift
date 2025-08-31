@@ -10,9 +10,7 @@ import Foundation
 
 public struct AppVersionEntity: Codable, Equatable {
   public let newVersion: String
-  public var userVersion: String {
-    Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0"
-  }
+  public let userVersion: String
   public let criticalVersion: String
 
   public init(
@@ -21,6 +19,7 @@ public struct AppVersionEntity: Codable, Equatable {
   ) {
     self.newVersion = version
     self.criticalVersion = criticalVersion
+    self.userVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
   }
   
   public var updateStatus: UpdateStatus {

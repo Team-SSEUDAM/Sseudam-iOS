@@ -39,6 +39,7 @@ public struct CatCardCell: View {
             CatImageSet.image(name: card.imageURL)
               .resizable()
               .scaledToFit()
+              .frame(width: .Number50, height: .Number50)
           }
         }
       )

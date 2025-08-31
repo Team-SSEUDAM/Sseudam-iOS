@@ -79,7 +79,3 @@ public struct SuggestCell: View {
   }
   
 }
-
-#Preview {
-    SuggestCell()
-}

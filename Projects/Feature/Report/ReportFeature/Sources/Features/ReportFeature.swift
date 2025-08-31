@@ -396,7 +396,7 @@ private extension ReportFeature {
     state: inout State,
     action: SpotSuggestionCompleteFeature.Action.Delegate
   ) -> Effect<Action> {
-    guard state.currentPage == 5 else { return .none }
+    guard state.currentPage == 3 else { return .none }
     
     switch action {
     case .done:

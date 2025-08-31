@@ -24,6 +24,7 @@ struct SseudamFeature {
   struct State {
     var selectedTab: TabBarItem = .home
     var isTabbarHidden: Bool = false
+    var isFirstEntry: Bool = true
     
     var homeRoot: HomeRootFeature.State = .init()
     var myPetRoot: MyPetRootFeature.State = .init()
@@ -81,6 +82,7 @@ struct SseudamFeature {
         return .none
         
       case .onAppear:
+        state.isFirstEntry = false
         return .merge(
           .send(.forceUpdateCheck(.onAppear)),
           checkIsLoggedIn()

@@ -21,6 +21,7 @@ public struct Interceptor: TokenRefresher {
         parameters: .body(ReissueTokenBody(refreshToken: refreshToken)),
         isRefreshToken: true
       )
+      print(refreshToken)
       do {
         let response = try await NetworkKit().execute(with: refreshEndpoint)
         KeyChainService.save(response.refreshToken, forKey: .refreshToken)

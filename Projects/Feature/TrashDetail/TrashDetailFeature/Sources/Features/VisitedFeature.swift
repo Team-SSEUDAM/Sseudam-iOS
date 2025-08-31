@@ -407,7 +407,7 @@ extension VisitedFeature {
       if let user = user,
          let target = target {
         let distance = user.distance(to: target)
-        let isWithin5m = distance <= 10
+        let isWithin5m = distance <= 30
         await send(.storedWithinDistance(isWithin5m))
       } else {
         await send(.showToastMessage("위치 정보를 확인할 수 없어요"))

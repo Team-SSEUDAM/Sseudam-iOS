@@ -47,9 +47,6 @@ struct SseudamView: View {
     .onChange(of: scenePhase) { _, newPhase in
       if newPhase == .active { store.send(.onAppear) }
     }
-    .onAppear {
-      store.send(.onAppear)
-    }
     .ignoresSafeArea(edges: .bottom)
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in
       LoginView(store: store)

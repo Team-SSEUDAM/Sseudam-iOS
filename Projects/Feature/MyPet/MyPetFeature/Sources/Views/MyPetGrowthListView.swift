@@ -41,7 +41,7 @@ public struct BigBottomSheetContentView: View {
   private var SavedCatsView: some View {
     VStack(alignment: .leading, spacing: .Number8) {
       HStack(alignment: .center) {
-        Text("내가 살린 고양이")
+        Text("내가 돌본 고양이")
           .font(FontSet.Body.body3)
           .foregroundStyle(ColorSet.Text.Secondary)
           .padding(.horizontal, .Number16)

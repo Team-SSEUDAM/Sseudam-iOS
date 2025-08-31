@@ -42,8 +42,10 @@ public struct GrowthRecordCell: View {
                 CatImageSet.image(name: record.catCard.imageURL)
                   .resizable()
                   .scaledToFit()
+                  .frame(width: .Number50, height: .Number50)
               }
             }
+            .frame(width: .Number64, height: .Number64)
           )
           .clipCorners(.Number8, corners: .allCorners)
         

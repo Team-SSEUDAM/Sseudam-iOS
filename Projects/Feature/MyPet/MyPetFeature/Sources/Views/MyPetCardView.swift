@@ -99,7 +99,7 @@ public struct MyPetCardView: View {
           .foregroundStyle(ColorSet.Text.Primary)
       }
     }
-    .padding(.Number20)
+    .padding(.Number16)
     .background(ColorSet.Background.Primary)
     .cornerRadius(.Number10)
     .elevation(level: .elevation, cornerRadius: .Number10)

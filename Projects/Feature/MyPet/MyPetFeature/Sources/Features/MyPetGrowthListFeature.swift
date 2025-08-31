@@ -82,10 +82,17 @@ extension MyPetGrowthListFeature {
   }
   
   fileprivate func fetchCatCardsAction(with seasonData: PetSeasonInfoEntity) -> Action {
-    let catCards = seasonData.seasonPetInfo.map { item -> CatCard in
-      let imageURL = CatImageSet.imageURL(level: item.levelType, type: item.season)
-      return .init(isLocked: item.isLocked, imageURL: imageURL)
-    }
+    print("seasonData: \(seasonData)")
+    
+    let catCards = Dictionary(grouping: seasonData.seasonPetInfo) { $0.season }
+      .compactMap { _, pets in
+        pets.max { $0.createdAt < $1.createdAt }
+      }
+      .map { pet in
+        let imageURL = CatImageSet.imageURL(level: pet.levelType, type: pet.season)
+        return CatCard(isLocked: pet.isLocked, imageURL: imageURL)
+      }
+    
     return .fetchCatCards(catCards)
   }
   

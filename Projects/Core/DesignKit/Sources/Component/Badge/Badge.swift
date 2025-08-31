@@ -14,17 +14,20 @@ public struct Badge: View {
   private let state: BadgeState
   private let icon: ImageSet?
   private let suffix: String?
+  private let iconColor: Color?
   
   public init(
     text: Binding<String>,
     state: BadgeState,
     icon: ImageSet? = nil,
+    iconColor: Color? = nil,
     suffix: String? = nil
   ) {
     self._text = text
     self.state = state
     self.icon = icon
     self.suffix = suffix
+    self.iconColor = iconColor
   }
   
   public var body: some View {
@@ -32,9 +35,10 @@ public struct Badge: View {
       if let icon {
         Icon(
           image: icon,
-          size: .Number16
+          size: .Number16,
+          renderingMode: .template,
+          color: iconColor ?? ColorSet.Icon.Secondary
         )
-        .foregroundColor(state.textColor)
       }
       if let suffix {
         HStack(spacing: 0) {

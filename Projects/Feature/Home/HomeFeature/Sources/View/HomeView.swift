@@ -23,7 +23,7 @@ public struct HomeView: View {
   }
   
   private let tabbarHeight: CGFloat = 83
-  private let bottomPadding: CGFloat = .Number12
+  private let bottomPadding: CGFloat = 13
   
   public var body: some View {
     NavigationStack(
@@ -32,15 +32,6 @@ public struct HomeView: View {
       ZStack {
         MapView
         .ignoresSafeArea()
-        if store.map.researchButtonEnable {
-          VStack {
-            Spacer()
-            ResearchButton {
-              store.send((.map(.requestMapBounds(true))))
-            }
-          }
-          .padding(.bottom, (store.isPresentDetail ? store.bottomSheetHeight : tabbarHeight) + bottomPadding )
-        }
         ZStack {
           VStack {
             TopButtonView
@@ -133,7 +124,17 @@ public struct HomeView: View {
           .position(.bottom)
         }
         SuggestionButton
-        UserLocationButton
+        HStack(alignment: .center) {
+          Spacer().frame(width: .Number48, height: .Number48)
+          Spacer()
+          if store.map.researchButtonEnable {
+            ResearchButton {
+              store.send((.map(.requestMapBounds(true))))
+            }
+          }
+          Spacer()
+          UserLocationButton
+        }
       }
     }
     .padding(.horizontal, .Number16)

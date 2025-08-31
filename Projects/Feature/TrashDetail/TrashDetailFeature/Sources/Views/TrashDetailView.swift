@@ -239,14 +239,12 @@ public struct TrashDetailView: View {
   private var ButtonsView: some View {
     GeometryReader { geo in
       HStack(spacing: .Number8) {
-        SecondaryButton(title: "수정 제안하기", size: .medium) {
+        SecondaryButton(title: "수정 제안하기", size: .large) {
           store.send(.reportButtonTapped)
         }
-        .frame(width: (geo.size.width - .Number8) / 3)
-        
         PrimaryButton(
           title: $store.visited.visitedButtonText,
-          size: .medium,
+          size: .large,
           state: $store.visited.visitedButtonState
         ) {
           store.send(.visited(.visitButtonTapped))
@@ -256,7 +254,7 @@ public struct TrashDetailView: View {
             store.send(.visited(.visitButtonTapped))
           }
         }
-        .frame(width: (geo.size.width - .Number8) * 2 / 3)
+        .frame(width: 192)
         
       }
     }

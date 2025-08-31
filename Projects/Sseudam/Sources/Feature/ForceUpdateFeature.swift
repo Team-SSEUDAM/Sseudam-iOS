@@ -17,7 +17,7 @@ struct ForceUpdateFeature {
   @ObservableState
   struct State: Equatable {
     var hasCheckedUpdate = false
-    let appStoreURL = URL(string: "https://apps.apple.com/kr/app/sseudam/id6748684080") ?? URL(string: "https://www.apple.com/ios/app-store/")!
+    let appStoreURL = URL(string: Constants.APP_STORE_URL)!
   }
   
   enum Action: Equatable {

@@ -45,29 +45,54 @@ public struct LevelBar: View {
     self.addPoint = addPoint
     self.maxLevelPoint = currentLevel.goalPoint
     self._startAnimation = startAnimation
-    self._displayLevel = State(initialValue: currentLevel)
+    
+    if currentLevel == .level5 {
+      self._displayLevel = State(initialValue: currentLevel)
+    } else {
+      let startingPoint = max(0, currentPoint - addPoint)
+      let calculatedStartLevel = CatLevel.fromPoint(startingPoint)
+      self._displayLevel = State(initialValue: calculatedStartLevel)
+    }
   }
   
   private var initialProgress: CGFloat {
-    guard maxLevelPoint > 0 else { return 0 }
-    return CGFloat(currentPoint) / CGFloat(maxLevelPoint)
+    if currentLevel == .level5 {
+      return 1.0
+    }
+    
+    let startingPoint = max(0, currentPoint - addPoint)
+    let levelStartPoint = displayLevel.startPoint
+    let levelRange = displayLevel.goalPoint - levelStartPoint
+    guard levelRange > 0 else { return 0 }
+    
+    let startingPointInCurrentLevel = max(0, startingPoint - levelStartPoint)
+    return CGFloat(startingPointInCurrentLevel) / CGFloat(levelRange)
   }
   
   private var finalProgress: CGFloat {
-    guard maxLevelPoint > 0 else { return 0 }
-    return CGFloat(currentPoint + addPoint) / CGFloat(maxLevelPoint)
+    if currentLevel == .level5 {
+      return 1.0
+    }
+    
+    let levelStartPoint = currentLevel.startPoint
+    let levelRange = currentLevel.goalPoint - levelStartPoint
+    guard levelRange > 0 else { return 0 }
+    
+    let currentPointInLevel = currentPoint - levelStartPoint
+    return CGFloat(currentPointInLevel) / CGFloat(levelRange)
   }
   
   /// 레벨업 가능 여부
   private var willLevelUp: Bool {
-    guard currentLevel != .level5 else { return false }
-    return currentPoint + addPoint >= maxLevelPoint
+    guard displayLevel != .level5 else { return false }
+    let startingPoint = max(0, currentPoint - addPoint)
+    return CatLevel.fromPoint(startingPoint) != currentLevel
   }
   
   /// 레벨업 후 남은 올려야 할 남은 포인트
   private var remainingPointAfterLevelUp: Int {
     guard willLevelUp else { return 0 }
-    return (currentPoint + addPoint) - maxLevelPoint
+    return currentPoint - currentLevel.startPoint
   }
   
   private var isMaxLevel: Bool {
@@ -153,11 +178,9 @@ public struct LevelBar: View {
     
     // 레벨업 후 남은 포인트로 새로운 progressbar 시작
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-      // 레벨업
-      if let newLevel = currentLevel.nextLevel {
-        displayLevel = newLevel
-        isLevelingUp = true
-      }
+      // 레벨 텍스트 변경과 함께 레벨업
+      displayLevel = currentLevel
+      isLevelingUp = true
       
       // progressbar 리셋 후 남은 포인트만큼 채우기
       animatedProgress = 0
@@ -198,6 +221,35 @@ extension CatLevel {
       return 300
     case .level5:
       return 300
+    }
+  }
+  
+  var startPoint: Int {
+    switch self {
+    case .level1:
+      return 0
+    case .level2:
+      return 20
+    case .level3:
+      return 110
+    case .level4:
+      return 220
+    case .level5:
+      return 300
+    }
+  }
+  
+  static func fromPoint(_ point: Int) -> CatLevel {
+    if point >= 300 {
+      return .level5
+    } else if point >= 220 {
+      return .level4
+    } else if point >= 110 {
+      return .level3
+    } else if point >= 20 {
+      return .level2
+    } else {
+      return .level1
     }
   }
 }

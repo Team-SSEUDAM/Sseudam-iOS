@@ -14,6 +14,8 @@ import Utility
 import AttendanceFeature
 import AttendanceDomainInterface
 
+import LevelUpFeature
+
 import PetDomainInterface
 
 @Reducer
@@ -21,8 +23,9 @@ struct UserEntryFeature {
   @ObservableState
   struct State {
     @Presents var modal: Modal.State?
-    var petInfo: PetInfoEntity? = nil
+    var attendanceInfo: AttendanceEntity? = nil
     var userId: Int
+    var petInfo: PetInfoEntity? = nil
     
     init(userId: Int) {
       self.userId = userId
@@ -37,9 +40,13 @@ struct UserEntryFeature {
     case checkAttendance
     case requestCheckAttendance
     case checkAttendanceResult(Result<AttendanceEntity, NetworkError>)
+    case moveToAttendanceView(AttendanceEntity, PetInfoEntity)
     
     case fetchPetInfo
     case fetchPetInfoResult(Result<PetInfoEntity, NetworkError>)
+    
+    case checkLevelUp
+    case moveToLevelUpView(PetInfoEntity)
     
     case modal(PresentationAction<Modal.Action>)
   }
@@ -51,6 +58,7 @@ struct UserEntryFeature {
   @Reducer(state: .equatable, action: .equatable)
   enum Modal {
     case attendance(AttendanceFeature)
+    case levelUp(LevelUpFeature)
   }
   
   @Dependency(\.AttendanceUseCase) var attendanceUseCase
@@ -66,7 +74,7 @@ struct UserEntryFeature {
         
         // MARK: - Attendance
       case .checkAttendance:
-        return .send(.fetchPetInfo)
+        return .send(.requestCheckAttendance)
         
       case .requestCheckAttendance:
         return checkAttendance(userId: state.userId)
@@ -75,15 +83,18 @@ struct UserEntryFeature {
         if data.isToday {
           return .send(.checkComplete)
         } else {
-          let attendanceState = AttendanceFeature.State(data, petInfo: state.petInfo)
-          state.modal = .attendance(attendanceState)
-          return .none
+          state.attendanceInfo = data
+          return .send(.fetchPetInfo)
         }
-        
         
       case let .checkAttendanceResult(.failure(error)):
         print(error)
         return .send(.checkComplete)
+        
+      case let .moveToAttendanceView(attendanceInfo, petInfo):
+        let attendanceState = AttendanceFeature.State(attendanceInfo, petInfo: petInfo)
+        state.modal = .attendance(attendanceState)
+        return .none
         
         // MARK: - Fetch PetInfo
         
@@ -91,16 +102,45 @@ struct UserEntryFeature {
         return fetchPetInfo()
         
       case let .fetchPetInfoResult(.success(entity)):
-        state.petInfo = entity
-        return .send(.requestCheckAttendance)
+        if let attendance = state.attendanceInfo {
+          state.petInfo = entity
+          return .send(.moveToAttendanceView(attendance, entity))
+        } else {
+          return .send(.checkComplete)
+        }
         
       case let .fetchPetInfoResult(.failure(error)):
         print(error.localizedDescription)
         return .send(.requestCheckAttendance)
         
+      // MARK: - LevelUp
+        
+      case .checkLevelUp:
+        if UserDefaultsKeys.isNeedLevelUp ?? false {
+          if let petInfo = state.petInfo {
+            return .send(.moveToLevelUpView(petInfo))
+          }
+          return .send(.checkComplete)
+        } else {
+          return .send(.checkComplete)
+        }
+        
+      case let .moveToLevelUpView(petInfo):
+        let levelUpState = LevelUpFeature.State(petInfo: petInfo)
+        state.modal = .levelUp(levelUpState)
+        return .none
+        
         // MARK: - Attendance Delegate
         
       case let .modal(.presented(.attendance(action))):
+        switch action {
+        case .delegate(.dismiss):
+          state.modal = nil
+          return .send(.checkLevelUp)
+        default: return .none
+        }
+        
+      case let .modal(.presented(.levelUp(action))):
         switch action {
         case .delegate(.dismiss):
           state.modal = nil

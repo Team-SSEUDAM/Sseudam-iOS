@@ -25,14 +25,17 @@ public struct MyPetView: View {
     NavigationStack(
       path: $store.scope(state: \.path, action: \.path)
     ) {
-      ContentView
-        .onAppear() {
-          store.send(.onAppear)
-        }
-        .background(
-          ColorSet.Background.Primary
-            .ignoresSafeArea()
-        )
+      GeometryReader { proxy in
+        let _ = print("MyPetView - proxy.safebottom: \(proxy.safeAreaInsets.bottom)")
+        ContentView(safeAreaBottomInset: proxy.safeAreaInsets.bottom)
+          .onAppear() {
+            store.send(.onAppear)
+          }
+          .background(
+            ColorSet.Background.Primary
+              .ignoresSafeArea()
+          )
+      }
     } destination: { store in
       switch store.case {
       case let .petDetail(store):
@@ -52,11 +55,11 @@ public struct MyPetView: View {
   }
   
   @ViewBuilder
-  private var ContentView: some View {
+  private func ContentView(safeAreaBottomInset: CGFloat) -> some View {
     if store.isLoggedIn {
       ZStack {
         GeometryReader { proxy in
-          MainView
+          MainView(safeAreaBottomInset: safeAreaBottomInset)
             .overlay(alignment: .bottomTrailing) {
               IconButton(icon: .info) {
                 store.send(.petDescriptionButtonTapped)
@@ -90,84 +93,111 @@ public struct MyPetView: View {
   }
   
   @ViewBuilder
-  private var MainView: some View {
+  private func MainView(safeAreaBottomInset: CGFloat) -> some View {
     ZStack {
       VStack {
         Spacer()
-        ColorSet.Mint._100
-          .frame(height: .Number230)
-          .offset(y: -.Number50)
+        LinearGradient(
+          gradient: Gradient(
+            colors: [
+              ColorSet.HexColor._9Fd5Fb,
+              ColorSet.HexColor._A3D9FF
+            ]
+          ),
+          startPoint: .top,
+          endPoint: .bottom
+        )
+        .frame(height: 330 * UIScreen.main.bounds.height / 812 - safeAreaBottomInset)
       }
       
-      VStack {
+      VStack(spacing: .Number0) {
         CardView
           .padding(.Number16)
-        Group {
-          ZStack {
-            Ellipse()
-              .fill(
-                RadialGradient(
-                  gradient: Gradient(stops: [
-                    .init(color: ColorSet.HexColor._006F9D.opacity(0.3), location: 0),
-                    .init(color: ColorSet.HexColor._006F9D.opacity(0), location: 1)
-                  ]),
-                  center: .center,
-                  startRadius: 0,
-                  endRadius: 77
-                )
-              )
-              .frame(width: 153, height: 52)
-              .blur(radius: 6)
-              .offset(y: 90)
-            
-            // 고양이 이미지
-            Image(
-              asset: CatImageSet.imgae(
-                level: store.myPetInfo?.levelType,
-                interaction: store.isMyPetInteracted,
-                type: ._2025_07
-              )
-            )
-            .resizable()
-            .aspectRatio(1, contentMode: .fit)
-            .frame(height: .Number220)
-            .overlay(
-              Color.clear
-                .contentShape(Rectangle())
-                .allowsHitTesting(true)
-                .onTapGesture(coordinateSpace: .global) { location in
-                  let impactFeedback = UIImpactFeedbackGenerator(style: .soft)
-                  impactFeedback.impactOccurred()
-                  
-                  var newLocation = location
-                  newLocation.y -= .Number220
-                  store.send(.catImageTapped(newLocation))
-                }
-            )
-            
-            if store.showBubble {
-              BubbleView(text: store.bubbleText)
-                .offset(x: store.bubbleOffset.x, y: store.bubbleOffset.y)
-                .transition(.scale.combined(with: .opacity))
-                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: store.showBubble)
-                .zIndex(2)
-                .allowsHitTesting(false)
-            }
-            
-            if store.showShineLottieAnimation {
-              TapCatImageWithShine
-                .frame(width: .Number220, height: .Number220)
-                .position(store.tapMyPetLocation)
-                .allowsHitTesting(false)
-                .transition(.opacity)
-                .zIndex(1)
-            }
+        ZStack {
+          CatShadowView
+            .offset(y: 135)
+          CatImageView
+            .padding(.bottom, -(74 * UIScreen.main.bounds.height / 812))
+          
+          if store.showBubble {
+            BubbleView(text: store.bubbleText)
+              .offset(x: store.bubbleOffset.x, y: store.bubbleOffset.y)
+              .transition(.scale.combined(with: .opacity))
+              .animation(.spring(response: 0.3, dampingFraction: 0.8), value: store.showBubble)
+              .zIndex(2)
+              .allowsHitTesting(false)
+          }
+          
+          if store.showShineLottieAnimation {
+            TapCatImageWithShine
+              .frame(width: .Number220, height: .Number220)
+              .position(store.tapMyPetLocation)
+              .allowsHitTesting(false)
+              .transition(.opacity)
+              .zIndex(1)
           }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.bottom, .Number156 + .Number50)
       }
     }
-    .background(ColorSet.Background.Accent)
+    .background(
+      LinearGradient(
+        gradient: Gradient(
+          colors: [
+            ColorSet.HexColor._E0F2Ff,
+            ColorSet.HexColor._D7E4F8
+          ]
+        ),
+        startPoint: .top,
+        endPoint: .bottom
+      )
+    )
+  }
+  
+  @ViewBuilder
+  private var CatShadowView: some View {
+    Ellipse()
+      .fill(
+        RadialGradient(
+          gradient: Gradient(stops: [
+            .init(color: ColorSet.HexColor._006F9D.opacity(0.3), location: 0),
+            .init(color: ColorSet.HexColor._006F9D.opacity(0), location: 1)
+          ]),
+          center: .center,
+          startRadius: 0,
+          endRadius: 77
+        )
+      )
+      .frame(width: 153, height: 52)
+      .blur(radius: 6)
+  }
+  
+  @ViewBuilder
+  private var CatImageView: some View {
+    Image(
+      asset: CatImageSet.imgae(
+        level: store.myPetInfo?.levelType,
+        interaction: store.isMyPetInteracted,
+        type: ._2025_07
+      )
+    )
+    .resizable()
+    .aspectRatio(1, contentMode: .fit)
+    .frame(height: .Number220)
+    .overlay(
+      Color.clear
+        .contentShape(Rectangle())
+        .allowsHitTesting(true)
+        .onTapGesture(coordinateSpace: .global) { location in
+          let impactFeedback = UIImpactFeedbackGenerator(style: .soft)
+          impactFeedback.impactOccurred()
+          
+          var newLocation = location
+          newLocation.y -= .Number220
+          store.send(.catImageTapped(newLocation))
+        }
+    )
   }
   
   @ViewBuilder

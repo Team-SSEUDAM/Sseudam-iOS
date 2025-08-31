@@ -223,7 +223,12 @@ public struct TrashDetailView: View {
       if let name = suggestionName {
         Badge(text: .constant(name), state: .primary, icon: .verified, suffix: " 제보")
       } else {
-        Badge(text: .constant("공공데이터포털"), state: .primary, icon: .verified)
+        Badge(
+          text: .constant("공공데이터포털"),
+          state: .primary,
+          icon: .verified,
+          iconColor: ColorSet.Icon.Secondary
+        )
       }
       Badge(text: .constant("인증 \(visitedCount)회"), state: .primary)
     }

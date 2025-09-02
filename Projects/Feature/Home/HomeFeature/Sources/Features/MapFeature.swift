@@ -27,13 +27,12 @@ public struct MapFeature {
     public var trashType: TrashType? = nil
     /// 활성화 되어있는 마커를 지우기 위한 플래그
     public var isNeedDeleteMarker: Bool = false
-    /// 첫 로드 여부
-    public var isFirstLoad: Bool = true
     /// 확장 검색 여부
     public var isExpandedRetry: Bool = false
     /// 확장 검색 시도 시 필요한 이전 탐색 범위
     public var lastSearchedBounds: [Coordinates]? = nil
     
+    public var isTrashDataFirstLoad: Bool = true
     public init() {}
   }
   
@@ -95,6 +94,7 @@ public struct MapFeature {
         case let .success(items):
           return .send(.storeTrashItems(items))
         case let .failure(error):
+          state.isTrashDataFirstLoad = false
           return .send(.delegate(.showToastMessage(error.localizedDescription)))
         }
         
@@ -104,12 +104,12 @@ public struct MapFeature {
         if items.isEmpty {
           return .send(.emptyTrashItems)
         } else { // 데이터 있으면 바텀시트 내리기
-          state.isFirstLoad = false
+          state.isTrashDataFirstLoad = false
           return .send(.delegate(.presentDetailView(false)))
         }
         
       case .emptyTrashItems:
-        if state.isFirstLoad {
+        if state.isTrashDataFirstLoad {
           return .send(.firstLoadSearch)
         } else { // 바텀시트 띄우기
           return .send(.delegate(.presentDetailView(true, id: nil)))
@@ -120,8 +120,8 @@ public struct MapFeature {
           state.isExpandedRetry = true
           return .send(.expandSearch)
         } else { // 확장 검색 후에도 없음
-          state.isFirstLoad = false
           state.isExpandedRetry = false
+          state.isTrashDataFirstLoad = false
           return .send(
             .delegate(.showToastMessage("이 근방에는 쓰레기통이 없어요.\n지도를 움직여 다른 위치를 확인해보세요!"))
           )

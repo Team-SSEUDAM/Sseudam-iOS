@@ -19,8 +19,6 @@ extension MapViewRepresentable {
     
     var isInitialBounds: Bool = true
     
-    var isFirstLoadData: Bool = true
-    
     var trashItems: [TrashSpot] = []
     
     var markers: [NMFMarker] = []

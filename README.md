@@ -1,4 +1,5 @@
-<img width="3117" height="1351" alt="the front cover" src="https://github.com/user-attachments/assets/6503429f-03dc-4800-a9c0-9efa72280a66" />
+<img width="3117" height="1351" alt="the front cover" src="https://github.com/user-attachments/assets/57772baa-8714-4af5-ad2c-c35bbddce842" />
+
 
 <p align="center">
   <!--

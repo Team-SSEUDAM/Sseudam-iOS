@@ -15,6 +15,7 @@ import TrashDetailFeature
 import AuthFeature
 import UserDefaults
 import AttendanceFeature
+import LevelUpFeature
 
 struct SseudamView: View {
   @Bindable var store: StoreOf<SseudamFeature> = Store(
@@ -22,6 +23,8 @@ struct SseudamView: View {
   ) {
     SseudamFeature()
   }
+  
+  @Environment(\.scenePhase) var scenePhase
   
   init() {
     UITabBar.appearance().isHidden = true
@@ -41,8 +44,8 @@ struct SseudamView: View {
       TabBar
       AlertView
     }
-    .onAppear {
-      store.send(.onAppear)
+    .onChange(of: scenePhase) { _, newPhase in
+      if newPhase == .active { store.send(.onAppear) }
     }
     .ignoresSafeArea(edges: .bottom)
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in
@@ -56,6 +59,9 @@ struct SseudamView: View {
     }
     .fullScreenCover(item: $store.scope(state: \.userEntry?.modal?.attendance, action: \.userEntry.modal.attendance)) { store in
       AttendanceView(store: store)
+    }
+    .fullScreenCover(item: $store.scope(state: \.userEntry?.modal?.levelUp, action: \.userEntry.modal.levelUp)) { store in
+      LevelUpView(store: store)
     }
     .transaction { transaction in
       transaction.disablesAnimations = true
@@ -81,6 +87,7 @@ struct SseudamView: View {
       Alert(
         type: alert,
         isErrorType: alert.isErrorType,
+        isSingleButton: alert.isSingleButton,
         closeAction: {
           Task { @MainActor in
             store.send(.closeAlertAction)

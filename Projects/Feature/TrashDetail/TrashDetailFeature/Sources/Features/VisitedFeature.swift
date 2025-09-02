@@ -37,7 +37,7 @@ public struct VisitedFeature {
     
     public var checkComplete: Bool = false
     
-    var petInfo: PetInfoEntity? = nil
+    var isTodayFirst: Bool = false
     
     public var timer: TimerFeature.State = .init()
   }
@@ -152,14 +152,18 @@ public struct VisitedFeature {
         guard state.visitedState == .enableVisit else {
           return .send(.disableVisit)
         }
+        guard let spotId = state.trashSpotId else {
+          return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
+        }
         return .merge([
           .send(.changeVisitedState(.notDetermine)),
-          .send(.fetchPetInfo)
+          requestVisited(spotId: spotId)
         ])
         
       case let .requestVisitResult(.success(result)):
+        state.isTodayFirst = result.isTodayFirst
         return .merge([
-          .send(.visitedComplete(isFirst: result.isTodayFirst, petInfo: state.petInfo)),
+          .send(.fetchPetInfo),
           .send(.successVisit(date: result.visitedAt))
         ])
         
@@ -214,13 +218,10 @@ public struct VisitedFeature {
         return fetchPetInfo()
         
       case let .fetchPetInfoResult(.success(entity)):
-        state.petInfo = entity
-        guard let spotId = state.trashSpotId else {
-          return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
-        }
-        return requestVisited(spotId: spotId)
+        return .send(.visitedComplete(isFirst: state.isTodayFirst, petInfo: entity))
         
       case let .fetchPetInfoResult(.failure(error)):
+        print(error.localizedDescription)
         guard let spotId = state.trashSpotId else {
           return .send(.showToastMessage("쓰레기통 정보를 불러오지 못했어요"))
         }
@@ -406,7 +407,7 @@ extension VisitedFeature {
       if let user = user,
          let target = target {
         let distance = user.distance(to: target)
-        let isWithin5m = distance <= 10
+        let isWithin5m = distance <= 30
         await send(.storedWithinDistance(isWithin5m))
       } else {
         await send(.showToastMessage("위치 정보를 확인할 수 없어요"))

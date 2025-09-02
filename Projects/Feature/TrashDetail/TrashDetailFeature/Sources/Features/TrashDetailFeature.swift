@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 import ComposableArchitecture
 import TrashSpotDomainInterface
 import ImageDownloadDomainInterface
@@ -26,12 +27,12 @@ public struct TrashDetailFeature {
     public var visited: VisitedFeature.State = .init()
     var isEmptyList: Bool = false
     var trashDetail: TrashSpotDetail? = nil
-    var trashImageData: Data? = nil
     var isLoading: Bool = true
     var isFailLoadDetail: Bool = false
     var isNeedUpdateHeight: Bool = true
     var isTitleMultiLine: Bool? = nil
     public var bottomSheetHeight: CGFloat = .detailSheetHeight
+    var downsampledImage: UIImage? = nil
     public init() {}
   }
 
@@ -54,7 +55,7 @@ public struct TrashDetailFeature {
     
     case fetchTrashImage(imgUrl: String?, id: Int)
     case fetchTrashImageResult(Result<Data, ImageDownloadError>)
-    case storeImageData(data: Data?)
+    case storeImageData(data: UIImage?)
     
     /// 로그인 후 상태 변경하기 위한 action
     case checkLoggedin
@@ -151,14 +152,21 @@ public struct TrashDetailFeature {
         return fetchTrashImage(imgUrl: imgUrl, id: id)
         
       case let .fetchTrashImageResult(.success(data)):
-        return .send(.storeImageData(data: data))
+        return .run { send in
+            let image = await UIImage.downsampledAsync(
+            from: data,
+            to: CGSize(width: .Number80, height: .Number80)
+          )
+          await send(.storeImageData(data: image))
+        }
         
       case let .fetchTrashImageResult(.failure(error)):
+        state.downsampledImage = nil
         print(error)
         return .none
         
       case let .storeImageData(data):
-        state.trashImageData = data
+        state.downsampledImage = data
         return .none
         
       case .checkLoggedin:

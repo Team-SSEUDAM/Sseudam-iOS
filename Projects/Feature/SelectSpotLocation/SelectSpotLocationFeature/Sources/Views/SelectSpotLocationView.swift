@@ -34,24 +34,37 @@ public struct SelectSpotLocationView: View {
         }
         
         Group {
-          SelectSpotMapViewRepresentable(
-            userLocation: $store.userLocation
-          )
-          .onReceive {
-            store.send(.centerChanged($0))
-          }
-          .onMapMovingStarted {
-            store.send(.onMapMovingStarted)
-          }
-          .overlay(
-            Icon(
-              image: .normalTrashPin,
-              size: .Number56
+          ZStack {
+            SelectSpotMapViewRepresentable(
+              userLocation: $store.userLocation
             )
-            .offset(y: -16)
-            .allowsHitTesting(false),
-            alignment: .center
-          )
+            .onReceive {
+              store.send(.centerChanged($0))
+            }
+            .onMapMovingStarted {
+              store.send(.onMapMovingStarted)
+            }
+            .overlay(
+              Icon(
+                image: .normalTrashPin,
+                size: .Number56
+              )
+              .offset(y: -16)
+              .allowsHitTesting(false),
+              alignment: .center
+            )
+            VStack {
+              Spacer()
+              HStack {
+                Spacer()
+                IconButton(icon: .myLocation) {
+                  store.send(.moveUserLocation)
+                }
+                  .padding(.vertical, .Number12)
+                  .padding(.horizontal, .Number16)
+              }
+            }
+          }
         }
         .aspectRatio(1, contentMode: .fit)
         .clipCorners(.Number10, corners: .allCorners)

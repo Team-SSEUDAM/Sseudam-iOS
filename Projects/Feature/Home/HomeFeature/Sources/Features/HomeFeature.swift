@@ -34,7 +34,7 @@ public struct HomeFeature {
     public var isShowSuggestionCoachMark: Bool = UserDefaultsKeys.coachMark_suggestion ?? true
     public var toastMessage: String? = nil
     public var isInitAppear: Bool = true
-    public var bottomSheetHeight: CGFloat = .detailSheetHeight
+    public var bottomSheetHeight: CGFloat = .detailSheetHeight + .Number10
     public init() {}
   }
 

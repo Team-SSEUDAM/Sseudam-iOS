@@ -115,6 +115,8 @@ extension DesignKitAsset {
       public static let _006F9D = DesignKitAsset.Colors._006F9D.swiftUIColor
       public static let _9Fd5Fb = DesignKitAsset.Colors._9Fd5Fb.swiftUIColor
       public static let _E0F2Ff = DesignKitAsset.Colors.e0F2Ff.swiftUIColor
+      public static let _D7E4F8 = DesignKitAsset.Colors.d7E4F8.swiftUIColor
+      public static let _A3D9FF = DesignKitAsset.Colors.a3D9Ff.swiftUIColor
     }
   }
 }

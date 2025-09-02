@@ -9,6 +9,9 @@
 import Foundation
 
 public struct UserDefaultsKeys {
+  
+  // MARK: - User
+  
   @UserDefault("accessToken", default: nil)
   public static var accessToken: String?
   
@@ -24,11 +27,17 @@ public struct UserDefaultsKeys {
   @UserDefault("userNickname", default: nil)
   public static var userNickname: String?
   
-  @UserDefault("lastEntryDate", default: nil)
-  public static var lastEntryDate: Date?
+  // MARK: - CoachMark
   
-  // coachMark
   @UserDefault("coachMark_suggestion", default: nil)
   public static var coachMark_suggestion: Bool?
+  
+  // MARK: - Level
+  
+  @UserDefault("current_catlevel", default: 1)
+  public static var current_catlevel: Int?
+  
+  @UserDefault("isNeedLevelUp", default: false)
+  public static var isNeedLevelUp: Bool? // true일 경우 레벨업 화면 등장
   
 }

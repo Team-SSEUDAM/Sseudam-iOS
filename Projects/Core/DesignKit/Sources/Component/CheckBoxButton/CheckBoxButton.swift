@@ -45,7 +45,9 @@ public struct CheckBoxButton: View {
       if let icon = icon {
         Icon(
           image: icon,
-          size: .Number24
+          size: .Number24,
+          renderingMode: .template,
+          color: state.textColor
         )
         .foregroundColor(state.iconColor)
       }

@@ -16,7 +16,6 @@ import DotLottie
 public struct TrashDetailView: View {
   @Bindable var store: StoreOf<TrashDetailFeature>
   @Environment(\.scenePhase) private var scenePhase
-  @State private var downsampledImage: UIImage?
   
   public init(store: StoreOf<TrashDetailFeature>) {
     self.store = store
@@ -101,7 +100,7 @@ public struct TrashDetailView: View {
   
   @ViewBuilder
   private var trashImageView: some View {
-    if let image = downsampledImage {
+    if let image = store.downsampledImage {
       Image(uiImage: image)
         .resizable()
         .clipShape(RoundedRectangle(cornerRadius: .Number8))
@@ -112,14 +111,6 @@ public struct TrashDetailView: View {
         .fill(ColorSet.Background.Secondary)
         .clipShape(RoundedRectangle(cornerRadius: .Number8))
         .frame(width: .Number80, height: .Number80)
-        .task(id: store.trashImageData) { 
-          if let data = store.trashImageData {
-            downsampledImage = await UIImage.downsampledAsync(
-              from: data,
-              to: CGSize(width: .Number80, height: .Number80)
-            )
-          }
-        }
     }
   }
   
@@ -223,7 +214,12 @@ public struct TrashDetailView: View {
       if let name = suggestionName {
         Badge(text: .constant(name), state: .primary, icon: .verified, suffix: " 제보")
       } else {
-        Badge(text: .constant("공공데이터포털"), state: .primary, icon: .verified)
+        Badge(
+          text: .constant("공공데이터포털"),
+          state: .primary,
+          icon: .verified,
+          iconColor: ColorSet.Icon.Secondary
+        )
       }
       Badge(text: .constant("인증 \(visitedCount)회"), state: .primary)
     }
@@ -234,14 +230,12 @@ public struct TrashDetailView: View {
   private var ButtonsView: some View {
     GeometryReader { geo in
       HStack(spacing: .Number8) {
-        SecondaryButton(title: "수정 제안하기", size: .medium) {
+        SecondaryButton(title: "수정 제안하기", size: .large) {
           store.send(.reportButtonTapped)
         }
-        .frame(width: (geo.size.width - .Number8) / 3)
-        
         PrimaryButton(
           title: $store.visited.visitedButtonText,
-          size: .medium,
+          size: .large,
           state: $store.visited.visitedButtonState
         ) {
           store.send(.visited(.visitButtonTapped))
@@ -251,7 +245,7 @@ public struct TrashDetailView: View {
             store.send(.visited(.visitButtonTapped))
           }
         }
-        .frame(width: (geo.size.width - .Number8) * 2 / 3)
+        .frame(width: 192)
         
       }
     }

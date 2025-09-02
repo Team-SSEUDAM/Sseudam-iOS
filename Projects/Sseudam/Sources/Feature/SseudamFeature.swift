@@ -24,12 +24,16 @@ struct SseudamFeature {
   struct State {
     var selectedTab: TabBarItem = .home
     var isTabbarHidden: Bool = false
+    var isFirstEntry: Bool = true
     
     var homeRoot: HomeRootFeature.State = .init()
     var myPetRoot: MyPetRootFeature.State = .init()
     var mypageRoot: MyPageRootFeature.State = .init()
+    
+    var forceUpdateCheck: ForceUpdateFeature.State = .init()
     var authFlow: AuthFlowFeature.State? = nil
     var userEntry: UserEntryFeature.State? = nil
+    
     var presentAlert: AlertType? = nil
   }
   
@@ -44,14 +48,18 @@ struct SseudamFeature {
     case mypageRoot(MyPageRootFeature.Action)
     case authFlow(AuthFlowFeature.Action)
     case userEntry(UserEntryFeature.Action)
+    case forceUpdateCheck(ForceUpdateFeature.Action)
     
     case requestLogin(isPresent: Bool)
+    case open(URL)
     
     case closeAlertAction
     case acceptAlertAction
     case dismissAlert(Bool)
     
   }
+  
+  @Dependency(\.openURL) var openURL
   
   var body: some ReducerOf<Self> {
     BindingReducer()
@@ -64,6 +72,9 @@ struct SseudamFeature {
     Scope(state: \.mypageRoot, action: \.mypageRoot) {
       MyPageRootFeature()
     }
+    Scope(state: \.forceUpdateCheck, action: \.forceUpdateCheck) {
+      ForceUpdateFeature()
+    }
     Reduce { state, action in
       switch action {
       case let .selectTab(tab):
@@ -71,7 +82,16 @@ struct SseudamFeature {
         return .none
         
       case .onAppear:
-        return checkIsLoggedIn()
+        state.isFirstEntry = false
+        return .merge(
+          .send(.forceUpdateCheck(.onAppear)),
+          checkIsLoggedIn()
+        )
+        
+      case let .open(url):
+        return .run { send in
+          await openURL(url)
+        }
         
       case let .checkUserEntryState(userId):
         state.userEntry = .init(userId: userId)
@@ -99,6 +119,10 @@ struct SseudamFeature {
         
       case let .myPetRoot(.delegate(.hiddenTabBar(isHidden))):
         state.isTabbarHidden = (isHidden)
+        return .none
+        
+      case let .forceUpdateCheck(.delegate(.presentAlert(type))):
+        state.presentAlert = type
         return .none
         
       case .authFlow(.delegate(.changeLoginState)):
@@ -173,7 +197,15 @@ extension SseudamFeature {
         await send(.homeRoot(.closeAlertAction(type)))
       case (.login, .accept):
         await send(.requestLogin(isPresent: true))
+        
+      case (.forceAppUpdate(let url), .accept):
+        await send(.open(url))
 
+      case (.optionalAppUpdate(let url), .accept):
+        await send(.open(url))
+      case (.optionalAppUpdate, .close):
+        await send(.homeRoot(.closeAlertAction(type)))
+        
       default: return
       }
 

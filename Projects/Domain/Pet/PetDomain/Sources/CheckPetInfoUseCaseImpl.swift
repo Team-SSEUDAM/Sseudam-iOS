@@ -9,6 +9,7 @@
 import Foundation
 import Utility
 import PetDomainInterface
+import UserDefaults
 
 extension CheckPetInfoUseCase {
   public static func live(repository: PetRepository) -> CheckPetInfoUseCase {
@@ -20,6 +21,9 @@ extension CheckPetInfoUseCase {
         switch error {
         case .fileNotFound:
           let newEntity = try await repository.getPetInfo()
+          if UserDefaultsKeys.current_catlevel ?? 1 < newEntity.levelType.rawInt {
+            UserDefaultsKeys.isNeedLevelUp = true
+          }
           return newEntity
         default : throw error
         }

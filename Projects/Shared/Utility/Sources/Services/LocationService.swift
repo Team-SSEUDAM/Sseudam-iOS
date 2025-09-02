@@ -137,14 +137,13 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     
     Task { @MainActor in
       // 받은 좌표를 저장
-      self.userLocation = coord
-      
       if manager === singleLocationManager {
         // 단발 요청 완료 처리
         singleLocationManager.stopUpdatingLocation()
         self.singleLocationContinuation?.resume(returning: coord)
         self.singleLocationContinuation = nil
       } else if manager === continuousLocationManager {
+        self.userLocation = coord
         // 연속 구독 이벤트 발행
         let now = Date()
         // 1초 throttle

@@ -15,14 +15,13 @@ public struct Interceptor: TokenRefresher {
   
   public static func refreshToken() async throws -> String? {
     if let refreshToken: String = KeyChainService.read(forKey: .refreshToken) {
-      let accessToken = UserDefaultsKeys.accessToken
       let refreshEndpoint = Endpoint<TokenRefreshDTO>(
-        headers: .reissue(accessToken),
         method: .post,
         path: "/auth/reissue",
         parameters: .body(ReissueTokenBody(refreshToken: refreshToken)),
         isRefreshToken: true
       )
+      print(refreshToken)
       do {
         let response = try await NetworkKit().execute(with: refreshEndpoint)
         KeyChainService.save(response.refreshToken, forKey: .refreshToken)

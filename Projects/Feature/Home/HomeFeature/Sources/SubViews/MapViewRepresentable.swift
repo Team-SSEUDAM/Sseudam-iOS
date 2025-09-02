@@ -27,6 +27,8 @@ struct MapViewRepresentable: UIViewRepresentable {
   
   @Binding var isNeedDeleteMarker: Bool
   
+  @Binding var isTrashDataFirstLoad: Bool
+  
   /// 지도 범위 전달 클로저
   var mapBounds: (([Coordinates]) -> Void)? = nil
   /// 마커 탭 시 id값을 전달하기 위한 클로저
@@ -154,7 +156,6 @@ extension MapViewRepresentable {
   
   /// 지도에 마커 보여주기
   private func presentMarkers(_ view: NMFNaverMapView, items: [TrashSpot], context: Context) {
-    print(#function, items.count)
     if context.coordinator.trashItems != items {
       deleteDrawMarker(context: context)
     }
@@ -230,7 +231,7 @@ extension MapViewRepresentable {
   ) {
     // 카메라 이동
     if !items.isEmpty  {
-      if context.coordinator.isFirstLoadData {
+      if isTrashDataFirstLoad {
         if items.count >= 20 {
           let currentPosition = view.mapView.cameraPosition.target
           let mapPoint: Coordinates = .init(
@@ -241,7 +242,7 @@ extension MapViewRepresentable {
         } else {
           fitMarkersZoomOnly(view: view, items: items)
         }
-        context.coordinator.isFirstLoadData = false
+        isTrashDataFirstLoad = false
       } else {
         fitMarkersInCenter(view: view, items: items)
       }

@@ -26,7 +26,7 @@ public enum 앱_기본_플로우: String, Sendable {
 }
 
 public enum 출석_관련: String, Sendable {
-  case 첫_출석_완료 = "Attendance_Complete_First"
+  case 일반_출석_완료 = "Attendance_Complete_Nth"
   case 연속_출석_달성 = "Attendance_Achieve_Streak"
 }
 
@@ -63,4 +63,64 @@ extension MixPanelEvent: MixPanelType {
     case let .신고_관련_이벤트(e):      return e.rawValue
     }
   }
+}
+
+// MARK: - 공통 컨텍스트 & 보조 타입 (snake_case 키를 유지)
+public struct UserCtx: Equatable, Sendable, Encodable {
+  public var user_id: String?        // 게스트면 nil
+  public var user_location: String?  // 서울특별시
+  public var user_level: Int?        // 레벨
+  public var user_login: Bool        // 로그인 유무
+  public init(
+    user_id: String?,
+    user_location: String?,
+    user_level: Int?,
+    user_login: Bool
+  ) {
+    self.user_id = user_id
+    self.user_location = user_location
+    self.user_level = user_level
+    self.user_login = user_login
+  }
+}
+
+public enum CategoryType: String, Sendable, Codable { case all, general, recycle } // category_type
+public enum TrashType: String, Sendable, Codable { case general, recycle }         // trash_type
+public enum PhotoType: String, Sendable, Codable { case camera, gallery }          // photo_type
+public enum ReportInfoField: String, Sendable, CaseIterable, Codable {
+  case location, name, category, photo
+}
+
+public enum AppEvent: Equatable, Sendable {
+  // 1) 앱 기본 플로우
+  case appViewedSplash(session_id: String, timestamp: Date, ctx: UserCtx)
+  case sessionStarted(session_duration: TimeInterval?, previous_session_gap: TimeInterval?, ctx: UserCtx)
+
+  // 2) 출석
+  case attendanceCompletedNth(streak_count: Int, ctx: UserCtx)
+  case attendanceAchieveStreak(streak_count: Int, ctx: UserCtx)
+
+  // 3) 지도/방문 인증
+  case mapCategoryTapped(category_type: CategoryType, ctx: UserCtx)
+  case mapPinTapped(trash_id: String, trash_type: TrashType, distance_from_user: Double?, ctx: UserCtx)
+  case visitAuthStarted(gps_accuracy: Double?, trash_id: String, trash_type: TrashType, distance_from_user: Double?, ctx: UserCtx)
+  case visitAuthCompleted(trash_id: String, trash_type: TrashType, distance_from_user: Double?, ctx: UserCtx)
+
+  // 4) 제보
+  case suggestionStartNew(ctx: UserCtx)
+  case suggestionClickLocation(ctx: UserCtx)
+  case suggestionSetLocation(ctx: UserCtx)
+  case suggestionInputName(description_length: Int, ctx: UserCtx)
+  case suggestionSelectCategory(trash_type: TrashType, ctx: UserCtx)
+  case suggestionUploadPhoto(file_size: Int?, photo_type: PhotoType, ctx: UserCtx)
+  case suggestionCompleteSubmission(submission_id: String, ctx: UserCtx)
+
+  // 5) 신고
+  case reportStartNew(ctx: UserCtx)
+  case reportSetLocation(selected_info_types: Set<ReportInfoField>, ctx: UserCtx)
+  case reportCompleteSubmission(ctx: UserCtx)
+
+  // 식별(선택)
+  case identify(userId: String)
+  case alias(userId: String)
 }

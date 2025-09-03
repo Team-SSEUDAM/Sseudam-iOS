@@ -10,7 +10,7 @@ import Foundation
 
 extension Date {
   /// ISO8601 형식 문자열로 변환
-  func toISOString() -> String {
+  public func toISOString() -> String {
     ISO8601DateFormatter().string(from: self)
   }
   

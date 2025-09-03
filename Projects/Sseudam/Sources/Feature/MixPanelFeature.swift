@@ -11,46 +11,19 @@ import ComposableArchitecture
 import AnalyticsKit
 import Utility
 
-public enum AppEvent: Equatable, Sendable {
-  // App lifecycle
-  case appViewedSplash
-  case sessionStarted(sessionId: String)
-  
-  // Map / Visit
-  case mapPinTapped(placeId: String, category: String)
-  case mapCategoryTapped(String)
-  case visitAuthStarted
-  case visitAuthCompleted
-  
-  // Attendance
-  case attendanceFirstCompleted
-  case attendanceStreakAchieved(days: Int)
-  
-  // Suggestion
-  case suggestionSubmitted(id: String)
-  case suggestionPhotoUploaded(count: Int)
-  
-  // Report
-  case reportSubmitted(id: String)
-  
-  // Auth (원하면 식별/병합까지 여기서 다룸)
-  case identify(userId: String)
-  case alias(userId: String)
-}
-
-
 @Reducer
 public struct MixPanelFeature {
-  @ObservableState
-  public struct State: Equatable {
-    public init() {}
+  @ObservableState public struct State: Equatable {
+    public init() {
+      
+    }
   }
   
   public enum Action {
     case track(AppEvent)
-    case setOptIn(Bool)            // 설정 화면 등에서 추적 토글
-    case registerSuper([String: Any], once: Bool = false) // 필요시 상위에서 공통 속성 주입
-    case setUserProps([String: Any]) // People 속성 업데이트
+    case setOptIn(Bool)
+    case registerSuper([String: Any], once: Bool = false)
+    case setUserProps([String: Any])
   }
   
   @Dependency(\.analytics) var analytics
@@ -60,71 +33,146 @@ public struct MixPanelFeature {
   public var body: some ReducerOf<Self> {
     Reduce { state, action in
       switch action {
-        
-      case .track(let event):
-        switch event {
-          // App lifecycle
-        case .appViewedSplash:
-          analytics.track(.앱_기본_플로우_이벤트(.앱_시작_화면_진입), [:])
+      case .track(let ev):
+        switch ev {
           
-        case let .sessionStarted(sessionId):
-          analytics.track(.앱_기본_플로우_이벤트(.세션_시작), ["session_id": sessionId])
+          // 1) 앱 기본 플로우
+        case let .appViewedSplash(session_id, ts, ctx):
+          analytics.track(.앱_기본_플로우_이벤트(.앱_시작_화면_진입),
+                          base(ctx).merging([
+                            "session_id": session_id,
+                            "timestamp": ts.toISOString()
+                          ]))
           
-          // Map / Visit
-        case let .mapPinTapped(placeId, category):
-          analytics.track(.지도_및_방문_인증_이벤트(.지도_핀_클릭),
-                          ["place_id": placeId, "category": category])
+        case let .sessionStarted(duration, gap, ctx):
+          analytics.track(.앱_기본_플로우_이벤트(.세션_시작),
+                          base(ctx).merging([
+                            "session_duration": duration as Any,
+                            "previous_session_gap": gap as Any
+                          ]))
           
-        case let .mapCategoryTapped(category):
+          // 2) 출석
+        case let .attendanceCompletedNth(streak, ctx):
+          analytics.track(.출석_관련_이벤트(.일반_출석_완료),
+                          base(ctx).merging(["streak_count": streak]))
+          
+        case let .attendanceAchieveStreak(streak, ctx):
+          analytics.track(.출석_관련_이벤트(.연속_출석_달성),
+                          base(ctx).merging(["streak_count": streak]))
+          
+          // 3) 지도/방문 인증
+        case let .mapCategoryTapped(category, ctx):
           analytics.track(.지도_및_방문_인증_이벤트(.카테고리_클릭),
-                          ["category": category])
+                          base(ctx).merging(["category_type": category.rawValue]))
           
-        case .visitAuthStarted:
-          analytics.track(.지도_및_방문_인증_이벤트(.방문_인증_시작), [:])
+        case let .mapPinTapped(trashId, trashType, distance, ctx):
+          analytics.track(.지도_및_방문_인증_이벤트(.지도_핀_클릭),
+                          base(ctx).merging([
+                            "trash_id": trashId,
+                            "trash_type": trashType.rawValue,
+                            "distance_from_user": distance as Any
+                          ]))
           
-        case .visitAuthCompleted:
-          analytics.track(.지도_및_방문_인증_이벤트(.방문_인증_완료), [:])
+        case let .visitAuthStarted(acc, trashId, trashType, distance, ctx):
+          analytics.track(.지도_및_방문_인증_이벤트(.방문_인증_시작),
+                          base(ctx).merging([
+                            "gps_accuracy": acc as Any,
+                            "trash_id": trashId,
+                            "trash_type": trashType.rawValue,
+                            "distance_from_user": distance as Any
+                          ]))
           
-          // Attendance
-        case .attendanceFirstCompleted:
-          analytics.track(.출석_관련_이벤트(.첫_출석_완료), [:])
+        case let .visitAuthCompleted(trashId, trashType, distance, ctx):
+          analytics.track(.지도_및_방문_인증_이벤트(.방문_인증_완료),
+                          base(ctx).merging([
+                            "trash_id": trashId,
+                            "trash_type": trashType.rawValue,
+                            "distance_from_user": distance as Any
+                          ]))
           
-        case let .attendanceStreakAchieved(days):
-          analytics.track(.출석_관련_이벤트(.연속_출석_달성), ["days": days])
+          // 4) 제보
+        case let .suggestionStartNew(ctx):
+          analytics.track(.제보_관련_이벤트(.새_제보_시작), base(ctx))
           
-          // Suggestion
-        case let .suggestionSubmitted(id):
-          analytics.track(.제보_관련_이벤트(.제보_제출_완료), ["suggestion_id": id])
+        case let .suggestionClickLocation(ctx):
+          analytics.track(.제보_관련_이벤트(.제보_위치_지도_영역_클릭), base(ctx))
           
-        case let .suggestionPhotoUploaded(count):
-          analytics.track(.제보_관련_이벤트(.사진_업로드_완료), ["count": count])
+        case let .suggestionSetLocation(ctx):
+          analytics.track(.제보_관련_이벤트(.제보_위치_설정_완료), base(ctx))
           
-          // Report
-        case let .reportSubmitted(id):
-          analytics.track(.신고_관련_이벤트(.신고_제출_완료), ["report_id": id])
+        case let .suggestionInputName(len, ctx):
+          analytics.track(.제보_관련_이벤트(.제보_정보_입력_완료),
+                          base(ctx).merging(["description_length": len]))
           
-          // Auth
-        case let .identify(userId):
-          analytics.identify(userId)
+        case let .suggestionSelectCategory(trashType, ctx):
+          analytics.track(.제보_관련_이벤트(.쓰레기통_유형_선택_완료),
+                          base(ctx).merging(["trash_type": trashType.rawValue]))
           
-        case let .alias(userId):
-          analytics.alias(userId)
+        case let .suggestionUploadPhoto(fileSize, photoType, ctx):
+          analytics.track(.제보_관련_이벤트(.사진_업로드_완료),
+                          base(ctx).merging([
+                            "file_size": fileSize as Any,
+                            "photo_type": photoType.rawValue
+                          ]))
+          
+        case let .suggestionCompleteSubmission(submissionId, ctx):
+          analytics.track(.제보_관련_이벤트(.제보_제출_완료),
+                          base(ctx).merging(["submission_id": submissionId]))
+          
+          // 5) 신고
+        case let .reportStartNew(ctx):
+          analytics.track(.신고_관련_이벤트(.새_신고_시작), base(ctx))
+          
+        case let .reportSetLocation(selected, ctx):
+          analytics.track(.신고_관련_이벤트(.정보_유형_선택),
+                          base(ctx).merging(["report_info_types": selected.map(\.rawValue)]))
+          
+        case let .reportCompleteSubmission(ctx):
+          analytics.track(.신고_관련_이벤트(.신고_제출_완료), base(ctx))
+          
+          // 식별
+        case let .identify(userId): analytics.identify(userId)
+        case let .alias(userId):    analytics.alias(userId)
         }
         return .none
         
       case let .setOptIn(enabled):
-        analytics.setTracking(enabled)
-        return .none
+        analytics.setTracking(enabled); return .none
         
       case let .registerSuper(props, once):
-        analytics.registerSuperProperties(props, once)
-        return .none
+        analytics.registerSuperProperties(props, once); return .none
         
       case let .setUserProps(props):
-        analytics.setUserProperties(props)
-        return .none
+        analytics.setUserProperties(props); return .none
       }
     }
   }
 }
 
+// MARK: - Prop 헬퍼
+private func base(_ ctx: UserCtx) -> [String: Any] {
+  [
+    "user_id": ctx.user_id as Any,
+    "user_location": ctx.user_location as Any,
+    "user_level": ctx.user_level as Any,
+    "user_login": ctx.user_login
+  ].compact()
+}
+
+private extension Dictionary where Key == String, Value == Any {
+  func merging(_ more: [String: Any]) -> [String: Any] {
+    self.merging(more, uniquingKeysWith: { _, new in new }).compact()
+  }
+  func compact() -> [String: Any] {
+    filter { !($0.value is OptionalProtocol && ( $0.value as? OptionalProtocol )!.isNil ) }
+  }
+}
+
+// Optional 제거용 얇은 프로토콜
+private protocol OptionalProtocol { var isNil: Bool { get } }
+extension Optional: OptionalProtocol { var isNil: Bool { self == nil } }
+
+// Date → ISO8601
+private extension Date {
+  var iso8601String: String { ISO8601DateFormatter().string(from: self) }
+}

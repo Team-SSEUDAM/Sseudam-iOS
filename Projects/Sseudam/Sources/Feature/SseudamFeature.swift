@@ -63,6 +63,7 @@ struct SseudamFeature {
   }
   
   @Dependency(\.openURL) var openURL
+  @Dependency(\.date.now) var now
   
   var body: some ReducerOf<Self> {
     BindingReducer()
@@ -91,12 +92,20 @@ struct SseudamFeature {
       case .onAppear:
         state.isFirstEntry = false
         let sessionId = UUID().uuidString
+        let ctx = currentUserCtx()
         return .merge(
           .send(.forceUpdateCheck(.onAppear)),
           checkIsLoggedIn(),
-          // ✅ 앱 공통 트래킹은 SubFeature에 포워딩
-          .send(.mixpanel(.track(.appViewedSplash))),
-          .send(.mixpanel(.track(.sessionStarted(sessionId: sessionId))))
+          .send(.mixpanel(.track(.appViewedSplash(
+            session_id: sessionId,
+            timestamp: now,
+            ctx: ctx
+          )))),
+          .send(.mixpanel(.track(.sessionStarted(
+            session_duration: nil,           // TODO: scenePhase로 계산해 채우기
+            previous_session_gap: nil,       // TODO: 이전 종료시각 기반
+            ctx: ctx
+          ))))
         )
         
       case let .open(url):
@@ -223,5 +232,24 @@ extension SseudamFeature {
       // 공통적으로 알림 닫기
       await send(.dismissAlert(true))
     }
+  }
+  
+  fileprivate func currentUserCtx() -> UserCtx {
+    let isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
+    let uid: String? = {
+      guard isLoggedIn, let id = UserDefaultsKeys.userId else { return nil }
+      return String(id)
+    }()
+    
+    // TODO: 실제 값 연결 (지역/레벨)
+    let userLocation: String? = nil
+    let userLevel: Int? = nil
+    
+    return UserCtx(
+      user_id: uid,
+      user_location: userLocation,
+      user_level: userLevel,
+      user_login: isLoggedIn
+    )
   }
 }

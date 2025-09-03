@@ -80,6 +80,7 @@ public enum Core: String, ModuleRepresentable {
   case DesignKit
   case NetworkKit
   case Cache
+  case AnalyticsKit
   public var typePath: String { "Core" }
 }
 
@@ -285,6 +286,7 @@ extension TargetDependency {
     public static let DesignKit = Self.project(.core(.DesignKit))
     public static let NetworkKit = Self.project(.core(.NetworkKit))
     public static let Cache = Self.project(.core(.Cache))
+    public static let AnalyticsKit = Self.project(.core(.AnalyticsKit))
   }
   
   public struct Shared: TargetDependencyDelegate {

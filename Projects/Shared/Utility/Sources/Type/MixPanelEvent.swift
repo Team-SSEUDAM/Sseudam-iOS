@@ -84,10 +84,10 @@ public struct UserCtx: Equatable, Sendable, Encodable {
   }
 }
 
-public enum CategoryType: String, Sendable, Codable { case all, general, recycle } // category_type
-public enum TrashType: String, Sendable, Codable { case general, recycle }         // trash_type
-public enum PhotoType: String, Sendable, Codable { case camera, gallery }          // photo_type
-public enum ReportInfoField: String, Sendable, CaseIterable, Codable {
+public enum MPCategoryType: String, Sendable, Codable { case all, general, recycle } // category_type
+public enum MPTrashType: String, Sendable, Codable { case general, recycle }         // trash_type
+public enum MPPhotoType: String, Sendable, Codable { case camera, gallery }          // photo_type
+public enum MPReportInfoField: String, Sendable, CaseIterable, Codable {
   case location, name, category, photo
 }
 
@@ -101,23 +101,23 @@ public enum AppEvent: Equatable, Sendable {
   case attendanceAchieveStreak(streak_count: Int, ctx: UserCtx)
 
   // 3) 지도/방문 인증
-  case mapCategoryTapped(category_type: CategoryType, ctx: UserCtx)
-  case mapPinTapped(trash_id: String, trash_type: TrashType, distance_from_user: Double?, ctx: UserCtx)
-  case visitAuthStarted(gps_accuracy: Double?, trash_id: String, trash_type: TrashType, distance_from_user: Double?, ctx: UserCtx)
-  case visitAuthCompleted(trash_id: String, trash_type: TrashType, distance_from_user: Double?, ctx: UserCtx)
+  case mapCategoryTapped(category_type: MPCategoryType, ctx: UserCtx)
+  case mapPinTapped(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx)
+  case visitAuthStarted(gps_accuracy: Double?, trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx)
+  case visitAuthCompleted(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx)
 
   // 4) 제보
   case suggestionStartNew(ctx: UserCtx)
   case suggestionClickLocation(ctx: UserCtx)
   case suggestionSetLocation(ctx: UserCtx)
   case suggestionInputName(description_length: Int, ctx: UserCtx)
-  case suggestionSelectCategory(trash_type: TrashType, ctx: UserCtx)
-  case suggestionUploadPhoto(file_size: Int?, photo_type: PhotoType, ctx: UserCtx)
+  case suggestionSelectCategory(trash_type: MPTrashType, ctx: UserCtx)
+  case suggestionUploadPhoto(file_size: Int?, photo_type: MPPhotoType, ctx: UserCtx)
   case suggestionCompleteSubmission(submission_id: String, ctx: UserCtx)
 
   // 5) 신고
   case reportStartNew(ctx: UserCtx)
-  case reportSetLocation(selected_info_types: Set<ReportInfoField>, ctx: UserCtx)
+  case reportSetLocation(selected_info_types: Set<MPReportInfoField>, ctx: UserCtx)
   case reportCompleteSubmission(ctx: UserCtx)
 
   // 식별(선택)

@@ -42,7 +42,13 @@ struct SseudamView: View {
       AlertView
     }
     .onChange(of: scenePhase) { _, newPhase in
-      if newPhase == .active { store.send(.onAppear) }
+      switch newPhase {
+      case .active:
+        store.send(.onAppear)
+      case .background:
+        store.send(.scenePhaseChanged(.background))
+      default: break
+      }
     }
     .ignoresSafeArea(edges: .bottom)
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in

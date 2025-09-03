@@ -171,8 +171,3 @@ private extension Dictionary where Key == String, Value == Any {
 // Optional 제거용 얇은 프로토콜
 private protocol OptionalProtocol { var isNil: Bool { get } }
 extension Optional: OptionalProtocol { var isNil: Bool { self == nil } }
-
-// Date → ISO8601
-private extension Date {
-  var iso8601String: String { ISO8601DateFormatter().string(from: self) }
-}

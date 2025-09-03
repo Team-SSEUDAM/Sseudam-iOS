@@ -11,6 +11,7 @@ import Utility
 import DesignKit
 import ComposableArchitecture
 import UserDefaults
+import AnalyticsKit
 
 import HomeFeature
 import MyPetFeature
@@ -41,6 +42,7 @@ struct SseudamFeature {
   
   enum Action: BindableAction {
     case binding(BindingAction<State>)
+    case scenePhaseChanged(ScenePhase)
     case selectTab(TabBarItem)
     case onAppear
     case checkUserEntryState(userId: Int)
@@ -63,7 +65,7 @@ struct SseudamFeature {
   }
   
   @Dependency(\.openURL) var openURL
-  @Dependency(\.date.now) var now
+  @Dependency(\.sessionTracker) var sessionTracker
   
   var body: some ReducerOf<Self> {
     BindingReducer()
@@ -91,22 +93,30 @@ struct SseudamFeature {
         
       case .onAppear:
         state.isFirstEntry = false
-        let sessionId = UUID().uuidString
         let ctx = currentUserCtx()
         return .merge(
           .send(.forceUpdateCheck(.onAppear)),
           checkIsLoggedIn(),
-          .send(.mixpanel(.track(.appViewedSplash(
-            session_id: sessionId,
-            timestamp: now,
-            ctx: ctx
-          )))),
-          .send(.mixpanel(.track(.sessionStarted(
-            session_duration: nil,           // TODO: scenePhase로 계산해 채우기
-            previous_session_gap: nil,       // TODO: 이전 종료시각 기반
-            ctx: ctx
-          ))))
+          .run { send in
+            let info = await sessionTracker.start(Date())
+            await send(.mixpanel(.track(.appViewedSplash(
+              session_id: info.session_id,
+              timestamp: Date(),
+              ctx: ctx
+            ))))
+            
+            await send(.mixpanel(.track(.sessionStarted(
+              session_duration: info.previous_session_duration,
+              previous_session_gap: info.previous_session_gap,
+              ctx: ctx
+            ))))
+          }
         )
+        
+      case .scenePhaseChanged(.background):
+        return .run { _ in
+          await sessionTracker.end(Date())
+        }
         
       case let .open(url):
         return .run { send in

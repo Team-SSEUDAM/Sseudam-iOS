@@ -26,7 +26,6 @@ struct SseudamFeature {
   struct State {
     var selectedTab: TabBarItem = .home
     var isTabbarHidden: Bool = false
-    var isFirstEntry: Bool = true
     
     var homeRoot: HomeRootFeature.State = .init()
     var myPetRoot: MyPetRootFeature.State = .init()
@@ -92,22 +91,27 @@ struct SseudamFeature {
         return .none
         
       case .onAppear:
-        state.isFirstEntry = false
-        let ctx = currentUserCtx()
+        
+        return .run { send in
+          let ctx = currentUserCtx()
+          let info = await sessionTracker.start(Date())
+          await send(.mixpanel(.track(.sessionStarted(
+            session_duration: info.previous_session_duration,
+            previous_session_gap: info.previous_session_gap,
+            ctx: ctx
+          ))))
+        }
+        
+      case .scenePhaseChanged(.active):
         return .merge(
           .send(.forceUpdateCheck(.onAppear)),
           checkIsLoggedIn(),
           .run { send in
+            let ctx = currentUserCtx()
             let info = await sessionTracker.start(Date())
             await send(.mixpanel(.track(.appViewedSplash(
               session_id: info.session_id,
               timestamp: Date(),
-              ctx: ctx
-            ))))
-            
-            await send(.mixpanel(.track(.sessionStarted(
-              session_duration: info.previous_session_duration,
-              previous_session_gap: info.previous_session_gap,
               ctx: ctx
             ))))
           }

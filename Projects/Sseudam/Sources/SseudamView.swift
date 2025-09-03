@@ -44,11 +44,14 @@ struct SseudamView: View {
     .onChange(of: scenePhase) { _, newPhase in
       switch newPhase {
       case .active:
-        store.send(.onAppear)
+        store.send(.scenePhaseChanged(.active))
       case .background:
         store.send(.scenePhaseChanged(.background))
       default: break
       }
+    }
+    .onAppear {
+      store.send(.onAppear)
     }
     .ignoresSafeArea(edges: .bottom)
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in

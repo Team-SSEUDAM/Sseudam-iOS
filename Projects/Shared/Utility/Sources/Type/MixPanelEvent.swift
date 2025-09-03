@@ -52,3 +52,15 @@ public enum 신고_관련: String, Sendable {
   case 정보_유형_선택 = "Report_Set_Location"
   case 신고_제출_완료 = "Report_Complete_Submission"
 }
+
+extension MixPanelEvent: MixPanelType {
+  public var eventName: String {
+    switch self {
+    case let .앱_기본_플로우_이벤트(e): return e.rawValue
+    case let .출석_관련_이벤트(e):      return e.rawValue
+    case let .지도_및_방문_인증_이벤트(e): return e.rawValue
+    case let .제보_관련_이벤트(e):      return e.rawValue
+    case let .신고_관련_이벤트(e):      return e.rawValue
+    }
+  }
+}

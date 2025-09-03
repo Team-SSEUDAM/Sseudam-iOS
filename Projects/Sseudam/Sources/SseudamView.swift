@@ -18,15 +18,12 @@ import AttendanceFeature
 import LevelUpFeature
 
 struct SseudamView: View {
-  @Bindable var store: StoreOf<SseudamFeature> = Store(
-    initialState: SseudamFeature.State()
-  ) {
-    SseudamFeature()
-  }
+  @Bindable var store: StoreOf<SseudamFeature>
   
   @Environment(\.scenePhase) var scenePhase
   
-  init() {
+  public init(store: StoreOf<SseudamFeature>) {
+    self.store = store
     UITabBar.appearance().isHidden = true
   }
   
@@ -103,8 +100,3 @@ struct SseudamView: View {
   }
   
 }
-
-#Preview {
-  SseudamView()
-}
-

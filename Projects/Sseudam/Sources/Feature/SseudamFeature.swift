@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Utility
 import DesignKit
 import ComposableArchitecture
 import UserDefaults
@@ -31,13 +32,14 @@ struct SseudamFeature {
     var mypageRoot: MyPageRootFeature.State = .init()
     
     var forceUpdateCheck: ForceUpdateFeature.State = .init()
+    var mixpanel: MixPanelFeature.State = .init()
     var authFlow: AuthFlowFeature.State? = nil
     var userEntry: UserEntryFeature.State? = nil
     
     var presentAlert: AlertType? = nil
   }
   
-  enum Action: BindableAction, Equatable {
+  enum Action: BindableAction {
     case binding(BindingAction<State>)
     case selectTab(TabBarItem)
     case onAppear
@@ -49,6 +51,7 @@ struct SseudamFeature {
     case authFlow(AuthFlowFeature.Action)
     case userEntry(UserEntryFeature.Action)
     case forceUpdateCheck(ForceUpdateFeature.Action)
+    case mixpanel(MixPanelFeature.Action)
     
     case requestLogin(isPresent: Bool)
     case open(URL)
@@ -75,6 +78,10 @@ struct SseudamFeature {
     Scope(state: \.forceUpdateCheck, action: \.forceUpdateCheck) {
       ForceUpdateFeature()
     }
+    Scope(state: \.mixpanel, action: \.mixpanel) {
+      MixPanelFeature()
+    }
+
     Reduce { state, action in
       switch action {
       case let .selectTab(tab):
@@ -83,9 +90,13 @@ struct SseudamFeature {
         
       case .onAppear:
         state.isFirstEntry = false
+        let sessionId = UUID().uuidString
         return .merge(
           .send(.forceUpdateCheck(.onAppear)),
-          checkIsLoggedIn()
+          checkIsLoggedIn(),
+          // ✅ 앱 공통 트래킹은 SubFeature에 포워딩
+          .send(.mixpanel(.track(.appViewedSplash))),
+          .send(.mixpanel(.track(.sessionStarted(sessionId: sessionId))))
         )
         
       case let .open(url):

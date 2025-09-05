@@ -51,7 +51,7 @@ public struct MixPanelFeature {
                             "previous_session_gap": gap as Any
                           ]))
           
-          ///
+          /// - 일반 출석 완료(매 출석 시)
         case let .attendanceCompletedNth(streak, ctx):
           analytics.track(.출석_관련_이벤트(.일반_출석_완료),
                           base(ctx).merging(["streak_count": streak]))
@@ -60,7 +60,6 @@ public struct MixPanelFeature {
           analytics.track(.출석_관련_이벤트(.연속_출석_달성),
                           base(ctx).merging(["streak_count": streak]))
           
-          /// - 일반 출석 완료(매 출석 시)
         case let .mapCategoryTapped(category, ctx):
           analytics.track(.지도_및_방문_인증_이벤트(.카테고리_클릭),
                           base(ctx).merging(["category_type": category.rawValue]))

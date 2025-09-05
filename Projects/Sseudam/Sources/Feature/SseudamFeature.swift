@@ -139,6 +139,22 @@ struct SseudamFeature {
         state.isTabbarHidden = (isHidden)
         return .none
         
+      case let .homeRoot(.mixPanel(action)):
+        switch action {
+        case .suggestionStart:
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .suggestionStartNew(
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
+        }
+        
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):
         state.authFlow = isPresent ? .init() : nil
         return .send(.authFlow(.presentLogin(isPresent)))

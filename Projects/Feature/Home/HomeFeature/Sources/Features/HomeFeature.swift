@@ -44,6 +44,8 @@ public struct HomeFeature {
     case map(MapFeature.Action)
     case path(StackActionOf<Path>)
     
+    case delegate(Delegate)
+    case mixPanel(MixPanel)
     case onAppear
     case checkIsLoggined
     case showToastMessage(String?)
@@ -57,7 +59,6 @@ public struct HomeFeature {
     case moveToSetting
     case moveToSuggestion
     case suggestionButtonTapped
-    case delegate(Delegate)
     case updateBottomSheetHeight(CGFloat)
   }
   
@@ -65,6 +66,10 @@ public struct HomeFeature {
     case needToHiddenTabBar(Bool)
     case presentDetailView(Bool, id: Int?)
     case presentAlert(AlertType)
+  }
+  
+  public enum MixPanel: Equatable {
+    case suggestionStart
   }
   
   public var body: some ReducerOf<Self> {
@@ -148,7 +153,10 @@ public struct HomeFeature {
             SuggestionFeature.State(state.location.lastCameraPosition)
           )
         )
-        return .send(.delegate(.needToHiddenTabBar(true)))
+        return .merge(
+          .send(.delegate(.needToHiddenTabBar(true))),
+          .send(.mixPanel(.suggestionStart))
+        )
 
       case let .presentDetailView(isPresent, id):
         state.isPresentDetail = isPresent

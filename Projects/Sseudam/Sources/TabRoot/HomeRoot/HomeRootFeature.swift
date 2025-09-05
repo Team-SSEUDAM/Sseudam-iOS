@@ -46,11 +46,16 @@ struct HomeRootFeature {
     case checkLoggedin
     case modal(PresentationAction<ModalDestination.Action>)
     case delegate(Delegate)
+    case mixPanel(MixPanel)
   }
   
   enum Delegate: Equatable {
     case hiddenTabBar(Bool)
     case presentAlert(AlertType)
+  }
+  
+  enum MixPanel: Equatable {
+    case suggestionStart
   }
   
   @Reducer(state: .equatable, action: .equatable)
@@ -134,6 +139,11 @@ struct HomeRootFeature {
             return .send(.hiddenTabBar(isHidden))
         }
         
+      case let .home(.mixPanel(action)):
+        switch action {
+        case .suggestionStart:
+          return .send(.mixPanel(.suggestionStart))
+        }
         // MARK: - Receive TrashDetail Delegate Action
         
       case let .trashDetail(.delegate(action)):

@@ -140,16 +140,17 @@ public struct HomeFeature {
         )
         return .send(.presentDetailView(false))
         
-        // MARK: - Send Action to HomeRoot
-        
       case .moveToSuggestion:
         state.path.append(
           .suggestionView(
             SuggestionFeature.State(state.location.lastCameraPosition)
           )
         )
-        return .send(.delegate(.needToHiddenTabBar(true)))
+        return .send(.presentDetailView(false))
 
+        
+        // MARK: - Send Action to HomeRoot
+      
       case let .presentDetailView(isPresent, id):
         state.isPresentDetail = isPresent
         if isPresent { state.isShowSuggestionCoachMark = false }

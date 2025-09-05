@@ -67,11 +67,11 @@ extension MixPanelEvent: MixPanelType {
 
 // MARK: - 공통 컨텍스트 & 보조 타입 (snake_case 키를 유지)
 public struct UserCtx: Equatable, Sendable, Encodable {
-  public var user_id: String?        // 게스트면 nil
+  public var user_id: Int?        // 게스트면 nil
   public var user_location: String?  // 서울특별시
   public var user_level: Int?        // 레벨
   public init(
-    user_id: String?,
+    user_id: Int?,
     user_location: String?,
     user_level: Int?
   ) {

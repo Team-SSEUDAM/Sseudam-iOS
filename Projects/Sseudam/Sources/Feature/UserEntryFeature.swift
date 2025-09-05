@@ -102,6 +102,7 @@ struct UserEntryFeature {
         return fetchPetInfo()
         
       case let .fetchPetInfoResult(.success(entity)):
+        UserDefaultsKeys.current_catlevel = entity.levelType.rawInt
         if let attendance = state.attendanceInfo {
           state.petInfo = entity
           return .send(.moveToAttendanceView(attendance, entity))

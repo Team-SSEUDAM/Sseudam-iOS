@@ -82,8 +82,6 @@ extension MyPetGrowthListFeature {
   }
   
   fileprivate func fetchCatCardsAction(with seasonData: PetSeasonInfoEntity) -> Action {
-    print("seasonData: \(seasonData)")
-    
     let catCards = Dictionary(grouping: seasonData.seasonPetInfo) { $0.season }
       .compactMap { _, pets in
         pets.max { $0.createdAt < $1.createdAt }

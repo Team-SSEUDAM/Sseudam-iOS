@@ -9,6 +9,7 @@
 import SwiftUI
 import DesignKit
 import ComposableArchitecture
+import Utility
 import HomeFeature
 import MyPetFeature
 import TrashDetailFeature
@@ -52,6 +53,12 @@ struct SseudamView: View {
     }
     .onAppear {
       store.send(.onAppear)
+    }
+    .task {
+      for await city in LocationService.shared.cityUpdateStream {
+        guard let city else { continue }
+        store.send(.userLocationChanged(city))
+      }
     }
     .ignoresSafeArea(edges: .bottom)
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in

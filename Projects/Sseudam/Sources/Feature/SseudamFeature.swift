@@ -61,6 +61,7 @@ struct SseudamFeature {
     case acceptAlertAction
     case dismissAlert(Bool)
     
+    case userLocationChanged(String)
   }
   
   @Dependency(\.openURL) var openURL
@@ -92,7 +93,6 @@ struct SseudamFeature {
         
       case .onAppear:
         return .none
-        
         
       case .scenePhaseChanged(.active):
         return .merge(
@@ -185,6 +185,11 @@ struct SseudamFeature {
           return .none
         }
         
+        // MARK: - User Location
+      case let .userLocationChanged(location):
+        UserDefaultsKeys.userLocation = location
+        return .none
+        
       default: return .none
       }
     }
@@ -241,18 +246,13 @@ extension SseudamFeature {
   }
   
   fileprivate func currentUserCtx() -> UserCtx? {
-    guard let isLoggedIn = UserDefaultsKeys.isLoggedIn else { return nil} /// 로그인 상태 모름 -> nil
-    let uid: String? = {
-      guard isLoggedIn, let id = UserDefaultsKeys.userId else { return nil }
-      return String(id)
-    }()
-    
-    // TODO: 실제 값 연결 (지역/레벨)
-    let userLocation: String? = nil
-    let userLevel: Int? = nil
+    guard let isLoggedIn = UserDefaultsKeys.isLoggedIn, isLoggedIn else { return nil} /// 로그인 상태 모름 -> nil
+    let userId = UserDefaultsKeys.userId
+    let userLevel = UserDefaultsKeys.current_catlevel
+    let userLocation = UserDefaultsKeys.userLocation
     
     return UserCtx(
-      user_id: uid,
+      user_id: userId,
       user_location: userLocation,
       user_level: userLevel
     )

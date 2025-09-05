@@ -20,10 +20,13 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
   
   public static let shared = LocationService()
   public private(set) var userLocation: Coordinates? = nil
+  public private(set) var currentCity: String? = nil
   private let throttleInterval: TimeInterval = 1 // 1초 간격
   private var lastUpdateTime: Date? = nil
+  private var lastGeocodedLocation: Coordinates? = nil
+  private let geocodingDistanceThreshold: Double = 500 // 500미터 이상 이동시에만 재지오코딩
   private var mode: LocationUpdateMode = .single
-
+  
   private lazy var locationManager: CLLocationManager = {
     let manager = CLLocationManager()
     manager.delegate = self
@@ -45,6 +48,7 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     return manager
   }()
   
+  private lazy var geocoder = CLGeocoder()
   
   /// 단발 위치 요청 시 응답을 위한 continuation
   private var singleLocationContinuation: CheckedContinuation<Coordinates?, Never>?
@@ -63,6 +67,20 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     }
   }
   
+  /// 도시 업데이트 발생 시 외부로 전달할 continuation
+  private var cityUpdateContinuation: AsyncStream<String?>.Continuation?
+  
+  /// 외부에 노출되는 도시 업데이트 스트림 (읽기 전용)
+  public var cityUpdateStream: AsyncStream<String?> {
+    AsyncStream { continuation in
+      self.cityUpdateContinuation = continuation
+      // 현재 도시가 있다면 즉시 전달
+      if let city = self.currentCity {
+        continuation.yield(city)
+      }
+    }
+  }
+  
   // MARK: - Initialize
   
   private override init() {
@@ -75,7 +93,6 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
   }
   
   // MARK: - Location Method
-  
   
   /// 단발 위치 요청 (버튼 눌렀을 때 사용)
   public func requestSingleLocation() async -> Coordinates? {
@@ -120,6 +137,59 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
     continuousLocationManager.stopUpdatingLocation()
   }
   
+  // MARK: - Geocoding
+  
+  /// 좌표를 도시명으로 변환
+  private func reverseGeocode(coordinates: Coordinates) async {
+    // 이전 지오코딩 위치와 비교하여 충분히 이동했는지 확인
+    if let lastLocation = lastGeocodedLocation {
+      let distance = calculateDistance(from: lastLocation, to: coordinates)
+      if distance < geocodingDistanceThreshold {
+        return // 거리가 threshold 미만이면 지오코딩 스킵
+      }
+    }
+    
+    let location = CLLocation(latitude: coordinates.latitude, longitude: coordinates.longitude)
+    
+    do {
+      let placemarks = try await geocoder.reverseGeocodeLocation(location, preferredLocale: Locale(identifier: "ko_KR"))
+      
+      if let placemark = placemarks.first {
+        // locality: 도시명 (예: 서울특별시)
+        // administrativeArea: 행정구역 (예: 서울특별시)
+        // subAdministrativeArea: 하위 행정구역 (예: 강남구)
+        
+        let city = placemark.locality ?? placemark.administrativeArea
+        
+        // 도시명이 변경된 경우에만 업데이트
+        if city != currentCity {
+          self.currentCity = city
+          self.cityUpdateContinuation?.yield(city)
+        }
+        
+        self.lastGeocodedLocation = coordinates
+      }
+    } catch {
+      if currentCity != nil {
+        self.currentCity = nil
+        self.cityUpdateContinuation?.yield(nil)
+      }
+    }
+  }
+  
+  /// 두 좌표 간 거리 계산 (미터 단위)
+  private func calculateDistance(from: Coordinates, to: Coordinates) -> Double {
+    let fromLocation = CLLocation(latitude: from.latitude, longitude: from.longitude)
+    let toLocation = CLLocation(latitude: to.latitude, longitude: to.longitude)
+    return fromLocation.distance(from: toLocation)
+  }
+  
+  /// 수동으로 현재 위치의 도시명 업데이트
+  public func updateCurrentCity() async {
+    guard let location = userLocation else { return }
+    await reverseGeocode(coordinates: location)
+  }
+  
   // MARK: - Delegate
   
   nonisolated public func locationManager(
@@ -142,6 +212,10 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
         singleLocationManager.stopUpdatingLocation()
         self.singleLocationContinuation?.resume(returning: coord)
         self.singleLocationContinuation = nil
+        
+        // 단발 요청에서도 도시명 업데이트
+        await reverseGeocode(coordinates: coord)
+        
       } else if manager === continuousLocationManager {
         self.userLocation = coord
         // 연속 구독 이벤트 발행
@@ -152,6 +226,9 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
         }
         lastUpdateTime = now
         self.userLocationContinuation?.yield(())
+        
+        // 연속 업데이트에서 도시명 업데이트 (비동기로 처리)
+        Task { await reverseGeocode(coordinates: coord) }
       }
     }
   }

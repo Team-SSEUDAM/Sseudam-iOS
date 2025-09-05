@@ -91,16 +91,8 @@ struct SseudamFeature {
         return .none
         
       case .onAppear:
+        return .none
         
-        return .run { send in
-          let ctx = currentUserCtx()
-          let info = await sessionTracker.start(Date())
-          await send(.mixpanel(.track(.sessionStarted(
-            session_duration: info.previous_session_duration,
-            previous_session_gap: info.previous_session_gap,
-            ctx: ctx
-          ))))
-        }
         
       case .scenePhaseChanged(.active):
         return .merge(
@@ -109,9 +101,9 @@ struct SseudamFeature {
           .run { send in
             let ctx = currentUserCtx()
             let info = await sessionTracker.start(Date())
-            await send(.mixpanel(.track(.appViewedSplash(
-              session_id: info.session_id,
-              timestamp: Date(),
+            await send(.mixpanel(.track(.sessionStarted(
+              session_duration: info.previous_session_duration,
+              previous_session_gap: info.previous_session_gap,
               ctx: ctx
             ))))
           }
@@ -248,8 +240,8 @@ extension SseudamFeature {
     }
   }
   
-  fileprivate func currentUserCtx() -> UserCtx {
-    let isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
+  fileprivate func currentUserCtx() -> UserCtx? {
+    guard let isLoggedIn = UserDefaultsKeys.isLoggedIn else { return nil} /// 로그인 상태 모름 -> nil
     let uid: String? = {
       guard isLoggedIn, let id = UserDefaultsKeys.userId else { return nil }
       return String(id)
@@ -262,8 +254,7 @@ extension SseudamFeature {
     return UserCtx(
       user_id: uid,
       user_location: userLocation,
-      user_level: userLevel,
-      user_login: isLoggedIn
+      user_level: userLevel
     )
   }
 }

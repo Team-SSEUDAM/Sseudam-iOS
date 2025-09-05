@@ -70,17 +70,14 @@ public struct UserCtx: Equatable, Sendable, Encodable {
   public var user_id: String?        // 게스트면 nil
   public var user_location: String?  // 서울특별시
   public var user_level: Int?        // 레벨
-  public var user_login: Bool        // 로그인 유무
   public init(
     user_id: String?,
     user_location: String?,
-    user_level: Int?,
-    user_login: Bool
+    user_level: Int?
   ) {
     self.user_id = user_id
     self.user_location = user_location
     self.user_level = user_level
-    self.user_login = user_login
   }
 }
 
@@ -94,31 +91,31 @@ public enum MPReportInfoField: String, Sendable, CaseIterable, Codable {
 public enum AppEvent: Equatable, Sendable {
   // 1) 앱 기본 플로우
   case appViewedSplash(session_id: String, timestamp: Date, ctx: UserCtx)
-  case sessionStarted(session_duration: TimeInterval?, previous_session_gap: TimeInterval?, ctx: UserCtx)
+  case sessionStarted(session_duration: TimeInterval?, previous_session_gap: TimeInterval?, ctx: UserCtx?)
 
   // 2) 출석
-  case attendanceCompletedNth(streak_count: Int, ctx: UserCtx)
-  case attendanceAchieveStreak(streak_count: Int, ctx: UserCtx)
+  case attendanceCompletedNth(streak_count: Int, ctx: UserCtx?)
+  case attendanceAchieveStreak(streak_count: Int, ctx: UserCtx?)
 
   // 3) 지도/방문 인증
-  case mapCategoryTapped(category_type: MPCategoryType, ctx: UserCtx)
-  case mapPinTapped(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx)
-  case visitAuthStarted(gps_accuracy: Double?, trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx)
-  case visitAuthCompleted(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx)
+  case mapCategoryTapped(category_type: MPCategoryType, ctx: UserCtx?)
+  case mapPinTapped(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx?)
+  case visitAuthStarted(gps_accuracy: Double?, trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx?)
+  case visitAuthCompleted(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx?)
 
   // 4) 제보
-  case suggestionStartNew(ctx: UserCtx)
-  case suggestionClickLocation(ctx: UserCtx)
-  case suggestionSetLocation(ctx: UserCtx)
-  case suggestionInputName(description_length: Int, ctx: UserCtx)
-  case suggestionSelectCategory(trash_type: MPTrashType, ctx: UserCtx)
-  case suggestionUploadPhoto(file_size: Int?, photo_type: MPPhotoType, ctx: UserCtx)
-  case suggestionCompleteSubmission(submission_id: String, ctx: UserCtx)
+  case suggestionStartNew(ctx: UserCtx?)
+  case suggestionClickLocation(ctx: UserCtx?)
+  case suggestionSetLocation(ctx: UserCtx?)
+  case suggestionInputName(description_length: Int, ctx: UserCtx?)
+  case suggestionSelectCategory(trash_type: MPTrashType, ctx: UserCtx?)
+  case suggestionUploadPhoto(file_size: Int?, photo_type: MPPhotoType, ctx: UserCtx?)
+  case suggestionCompleteSubmission(submission_id: String, ctx: UserCtx?)
 
   // 5) 신고
-  case reportStartNew(ctx: UserCtx)
-  case reportSetLocation(selected_info_types: Set<MPReportInfoField>, ctx: UserCtx)
-  case reportCompleteSubmission(ctx: UserCtx)
+  case reportStartNew(ctx: UserCtx?)
+  case reportSetLocation(selected_info_types: Set<MPReportInfoField>, ctx: UserCtx?)
+  case reportCompleteSubmission(ctx: UserCtx?)
 
   // 식별(선택)
   case identify(userId: String)

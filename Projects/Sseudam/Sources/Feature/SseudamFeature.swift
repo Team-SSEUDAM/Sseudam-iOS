@@ -85,7 +85,9 @@ struct SseudamFeature {
       MixPanelFeature()
     }
 
-    Reduce { state, action in
+    Reduce {
+      state,
+      action in
       switch action {
       case let .selectTab(tab):
         state.selectedTab = tab
@@ -101,11 +103,17 @@ struct SseudamFeature {
           .run { send in
             let ctx = currentUserCtx()
             let info = await sessionTracker.start(Date())
-            await send(.mixpanel(.track(.sessionStarted(
-              session_duration: info.previous_session_duration,
-              previous_session_gap: info.previous_session_gap,
-              ctx: ctx
-            ))))
+            await send(
+              .mixpanel(
+                .track(
+                  .sessionStarted(
+                    session_duration: info.previous_session_duration,
+                    previous_session_gap: info.previous_session_gap,
+                    ctx: ctx
+                  )
+                )
+              )
+            )
           }
         )
         
@@ -183,6 +191,23 @@ struct SseudamFeature {
         case .checkComplete:
           state.userEntry = nil
           return .none
+        }
+        
+      case let .userEntry(.mixPanel(action)):
+        switch action {
+        case let .attendanceComplete(count):
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .attendanceCompletedNth(
+                    streak_count: count,
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
         }
         
         // MARK: - User Location

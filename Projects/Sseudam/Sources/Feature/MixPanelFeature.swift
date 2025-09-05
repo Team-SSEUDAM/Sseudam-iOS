@@ -60,7 +60,7 @@ public struct MixPanelFeature {
           analytics.track(.출석_관련_이벤트(.연속_출석_달성),
                           base(ctx).merging(["streak_count": streak]))
           
-          // 3) 지도/방문 인증
+          /// - 일반 출석 완료(매 출석 시)
         case let .mapCategoryTapped(category, ctx):
           analytics.track(.지도_및_방문_인증_이벤트(.카테고리_클릭),
                           base(ctx).merging(["category_type": category.rawValue]))

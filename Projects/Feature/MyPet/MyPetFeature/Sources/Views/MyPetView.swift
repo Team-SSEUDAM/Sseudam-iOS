@@ -26,7 +26,6 @@ public struct MyPetView: View {
       path: $store.scope(state: \.path, action: \.path)
     ) {
       GeometryReader { proxy in
-        let _ = print("MyPetView - proxy.safebottom: \(proxy.safeAreaInsets.bottom)")
         ContentView(safeAreaBottomInset: proxy.safeAreaInsets.bottom)
           .onAppear() {
             store.send(.onAppear)

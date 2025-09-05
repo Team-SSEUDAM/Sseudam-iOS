@@ -24,9 +24,6 @@ public struct UserDefaultsKeys {
   @UserDefault("userId", default: nil)
   public static var userId: Int?
   
-  @UserDefault("userNickname", default: nil)
-  public static var userNickname: String?
-  
   @UserDefault("userLocation", default: nil)
   public static var userLocation: String?
   
@@ -37,7 +34,7 @@ public struct UserDefaultsKeys {
   
   // MARK: - Level
   
-  @UserDefault("current_catlevel", default: nil)
+  @UserDefault("current_catlevel", default: 1)
   public static var current_catlevel: Int?
   
   @UserDefault("isNeedLevelUp", default: false)

@@ -81,7 +81,7 @@ public struct MyPageFeature {
         return .send(.hiddenTabBar(true))
         
       case .changeNicknameButtonTapped:
-        let nickname = UserDefaultsKeys.userNickname
+        let nickname = UserDefaultsKeys.username
         state.path.append(.changeNickname(ChangeMyNicknameFeature.State(name: nickname)))
         return .send(.hiddenTabBar(true))
         
@@ -113,7 +113,7 @@ public struct MyPageFeature {
       case let .path(.element(id: _, action: .changeNickname(.delegate(action)))):
         switch action {
         case let .didChangeNickname(nickname):
-          UserDefaultsKeys.userNickname = nickname
+          UserDefaultsKeys.username = nickname
           return .none
         case .pop:
           state.path.removeLast()

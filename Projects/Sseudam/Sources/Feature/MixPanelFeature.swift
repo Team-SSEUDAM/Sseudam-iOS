@@ -60,9 +60,13 @@ public struct MixPanelFeature {
           analytics.track(.출석_관련_이벤트(.연속_출석_달성),
                           base(ctx).merging(["streak_count": streak]))
           
-        case let .mapCategoryTapped(category, ctx):
+          /// - 일반 출석 완료(매 출석 시)
+        case let .mapCategoryTapped(category, userLogin, ctx):
           analytics.track(.지도_및_방문_인증_이벤트(.카테고리_클릭),
-                          base(ctx).merging(["category_type": category.rawValue]))
+                          base(ctx).merging([
+                            "category_type": category.rawValue,
+                            "user_login": userLogin.description
+                          ]))
           
         case let .mapPinTapped(trashId, trashType, distance, ctx):
           analytics.track(.지도_및_방문_인증_이벤트(.지도_핀_클릭),
@@ -128,6 +132,8 @@ public struct MixPanelFeature {
           
         case let .reportCompleteSubmission(ctx):
           analytics.track(.신고_관련_이벤트(.신고_제출_완료), base(ctx))
+          
+          
           
           // 식별
         case let .identify(userId): analytics.identify(userId)

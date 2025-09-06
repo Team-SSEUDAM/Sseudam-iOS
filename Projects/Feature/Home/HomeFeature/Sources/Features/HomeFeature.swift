@@ -44,8 +44,6 @@ public struct HomeFeature {
     case map(MapFeature.Action)
     case path(StackActionOf<Path>)
     
-    case delegate(Delegate)
-    case mixPanel(MixPanel)
     case onAppear
     case checkIsLoggined
     case showToastMessage(String?)
@@ -59,6 +57,8 @@ public struct HomeFeature {
     case moveToSetting
     case moveToSuggestion
     case suggestionButtonTapped
+    case delegate(Delegate)
+    case mixPanel(MixPanel)
     case updateBottomSheetHeight(CGFloat)
   }
   
@@ -80,6 +80,7 @@ public struct HomeFeature {
     case reportStart
     case reportSelectCategory(repoty_type: String)
     case reportCompleteSubmission
+    case category(categoryType: MPCategoryType, userLogin: Bool)
   }
   
   public var body: some ReducerOf<Self> {
@@ -132,6 +133,12 @@ public struct HomeFeature {
           
         case let .presentDetailView(isShow, id):
           return .send(.presentDetailView(isShow, id: id))
+        }
+        
+      case let .map(.mixPanel(event)):
+        switch event {
+        case let .category(category, userLogin):
+          return .send(.mixPanel(.category(categoryType: category, userLogin: userLogin)))
         }
         
       case let .hiddenReportButton(isHidden):

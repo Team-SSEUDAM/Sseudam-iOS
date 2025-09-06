@@ -276,6 +276,17 @@ struct SseudamFeature {
               )
             )
           }
+          
+        case let .category(categoryType, userLogin):
+          return .run { send in
+            await send(.mixpanel(.track(
+              .mapCategoryTapped(
+                category_type: categoryType,
+                user_login: userLogin,
+                ctx: currentUserCtx()
+              )
+            )))
+          }
         }
         
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):
@@ -348,6 +359,7 @@ struct SseudamFeature {
             )
           }
         }
+        
         
         // MARK: - User Location
       case let .userLocationChanged(location):

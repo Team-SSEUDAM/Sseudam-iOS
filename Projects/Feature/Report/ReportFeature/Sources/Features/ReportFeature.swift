@@ -74,6 +74,7 @@ public struct ReportFeature {
     case selectedReportInfo(SelectReportInfoTypeFeature.Action)
     case child(ReportChildFeature.Action)
     case binding(BindingAction<State>)
+    case mixPanel(MixPanel)
     
     case combineSpotReportModel
     case spotReportResult(Result<String?, NetworkError>)
@@ -109,6 +110,12 @@ public struct ReportFeature {
     case backButtonTapped
     case pop(TrashSpotDetail)
     case backPageTapped
+    
+    
+    public enum MixPanel: Equatable {
+      case reportSelectCategory(repoty_type: String)
+      case reportCompleteSubmission
+    }
   }
   
   @Dependency(\.ReportSpotUseCase) var reportSpotUseCase
@@ -149,7 +156,12 @@ public struct ReportFeature {
         case 0: return .send(.didAppearStartReport)
         case 1: return .send(.didAppearSelectReportInfo)
         case 2: return .send(.checkReportInfoType)
-        case 3: return .send(.didAppearComplete)
+        case 3:
+          return .merge(
+            .send(.mixPanel(.reportCompleteSubmission)),
+            .send(.didAppearComplete)
+          )
+            
         default: return .none
         }
         
@@ -217,15 +229,18 @@ public struct ReportFeature {
         }
         
       case .checkReportInfoType:
-        let selectedType = state.selectedReportInfoType
-        switch selectedType {
-        case "POINT": return .send(.didAppearMoveLocation) /// 위치 선택 페이지로 이동
-        case "NAME": return .send(.didAppearWriteName) /// 이름 작성 페이지로 이동
-        case "KIND": return .send(.didAppearSelectKind) /// 종류 선택 페이지로 이동
-        case "PHOTO": return .send(.didAppearSelectPhoto) /// 사진 선택 페이지로 이동
+        var action: Action
+        switch state.selectedReportInfoType {
+        case "POINT": action = .didAppearMoveLocation /// 위치 선택 페이지로 이동
+        case "NAME": action = .didAppearWriteName /// 이름 작성 페이지로 이동
+        case "KIND": action = .didAppearSelectKind /// 종류 선택 페이지로 이동
+        case "PHOTO": action = .didAppearSelectPhoto /// 사진 선택 페이지로 이동
         default: return .none
         }
-        
+        return .merge(
+          .send(.mixPanel(.reportSelectCategory(repoty_type: "위치"))),
+          .send(action)
+        )
       case .validateSpotNameButtonTapped:
         return .run { send in
           await send(.setIsLoading(true))
@@ -303,6 +318,9 @@ public struct ReportFeature {
         return .none
         
       case .binding:
+        return .none
+        
+      case .mixPanel:
         return .none
         
       case .pop:

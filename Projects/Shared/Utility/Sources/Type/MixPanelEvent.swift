@@ -49,7 +49,7 @@ public enum 제보_관련: String, Sendable {
 
 public enum 신고_관련: String, Sendable {
   case 새_신고_시작 = "Report_Start_New"
-  case 정보_유형_선택 = "Report_Set_Location"
+  case 정보_유형_선택 = "Report_Select_Category"
   case 신고_제출_완료 = "Report_Complete_Submission"
 }
 
@@ -114,7 +114,7 @@ public enum AppEvent: Equatable, Sendable {
 
   // 5) 신고
   case reportStartNew(ctx: UserCtx?)
-  case reportSetLocation(selected_info_types: Set<MPReportInfoField>, ctx: UserCtx?)
+  case reportSelectCategory(selected_info_types: String, ctx: UserCtx?)
   case reportCompleteSubmission(ctx: UserCtx?)
 
   // 식별(선택)

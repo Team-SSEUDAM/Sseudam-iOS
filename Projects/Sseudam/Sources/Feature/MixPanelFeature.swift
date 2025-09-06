@@ -122,9 +122,9 @@ public struct MixPanelFeature {
         case let .reportStartNew(ctx):
           analytics.track(.신고_관련_이벤트(.새_신고_시작), base(ctx))
           
-        case let .reportSetLocation(selected, ctx):
+        case let .reportSelectCategory(selected, ctx):
           analytics.track(.신고_관련_이벤트(.정보_유형_선택),
-                          base(ctx).merging(["report_info_types": selected.map(\.rawValue)]))
+                          base(ctx).merging(["report_info_types": selected]))
           
         case let .reportCompleteSubmission(ctx):
           analytics.track(.신고_관련_이벤트(.신고_제출_완료), base(ctx))

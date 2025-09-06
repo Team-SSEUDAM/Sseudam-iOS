@@ -62,6 +62,10 @@ struct HomeRootFeature {
     case suggestionSelectCategory(trash_type: String)
     case suggestionUploadPhoto(file_size: Int, photo_type: String)
     case suggestionCompleteSubmission(submission_id: Int)
+    
+    case reportStart
+    case reportSelectCategory(repoty_type: String)
+    case reportCompleteSubmission
   }
   
   @Reducer(state: .equatable, action: .equatable)
@@ -161,6 +165,14 @@ struct HomeRootFeature {
           return .send(.mixPanel(.suggestionUploadPhoto(file_size: file_size, photo_type: photo_type)))
         case let .suggestionCompleteSubmission(submission_id):
           return .send(.mixPanel(.suggestionCompleteSubmission(submission_id: submission_id)))
+          
+          
+        case .reportStart:
+          return .send(.mixPanel(.reportStart))
+        case let .reportSelectCategory(repoty_type):
+          return .send(.mixPanel(.reportSelectCategory(repoty_type: repoty_type)))
+        case .reportCompleteSubmission:
+          return .send(.mixPanel(.reportCompleteSubmission))
         }
         // MARK: - Receive TrashDetail Delegate Action
         

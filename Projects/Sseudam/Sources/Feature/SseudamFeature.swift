@@ -236,6 +236,46 @@ struct SseudamFeature {
               )
             )
           }
+          
+        case .reportStart:
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .reportStartNew(
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
+          
+        case let .reportSelectCategory(repoty_type):
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .reportSelectCategory(
+                    selected_info_types: repoty_type,
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
+          
+        case .reportCompleteSubmission:
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .reportCompleteSubmission(
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
         }
         
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):

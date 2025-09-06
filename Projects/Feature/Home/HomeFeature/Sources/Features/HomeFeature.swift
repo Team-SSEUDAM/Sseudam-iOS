@@ -27,7 +27,6 @@ public struct HomeFeature {
   public struct State: Equatable {
     public var location: LocationFeature.State = .init()
     public var map: MapFeature.State = .init()
-    public var suggestion: SuggestionFeature.State? = nil
     
     public var isHiddenReportButton: Bool = false
     public var path = StackState<Path.State>()
@@ -77,6 +76,10 @@ public struct HomeFeature {
     case suggestionSelectCategory(trash_type: String)
     case suggestionUploadPhoto(file_size: Int, photo_type: String)
     case suggestionCompleteSubmission(submission_id: Int)
+    
+    case reportStart
+    case reportSelectCategory(repoty_type: String)
+    case reportCompleteSubmission
   }
   
   public var body: some ReducerOf<Self> {
@@ -150,13 +153,14 @@ public struct HomeFeature {
             )
           )
         )
-        return .send(.presentDetailView(false))
-        
+        return .merge(
+          .send(.presentDetailView(false)),
+          .send(.mixPanel(.suggestionStart))
+        )
         // MARK: - Send Action to HomeRoot
         
       case .moveToSuggestion:
         let suggestionState = SuggestionFeature.State(state.location.lastCameraPosition)
-        state.suggestion = suggestionState
         state.path.append(.suggestionView(suggestionState))
         return .merge(
           .send(.delegate(.needToHiddenTabBar(true))),
@@ -184,7 +188,6 @@ public struct HomeFeature {
           // MARK: - Suggestion Action
         case .element(id: _, action: .suggestionView(.pop)):
           state.path.removeLast()
-          state.suggestion = nil
           return .none
           
         case let .element(id: _, action: .suggestionView(.mixPanel(ev))):
@@ -203,10 +206,19 @@ public struct HomeFeature {
             return .send(.mixPanel(.suggestionCompleteSubmission(submission_id: submission_id)))
           }
           
-          // MARK: - Suggestion Action
+          // MARK: - Report Action
         case let .element(id: _, action: .reportView(.pop(detail))):
           state.path.removeLast()
           return .send(.presentDetailView(true, id: detail.id))
+          
+        case let .element(id: _, action: .reportView(.mixPanel(ev))):
+          switch ev {
+          case let .reportSelectCategory(repoty_type):
+            return .send(.mixPanel(.reportSelectCategory(repoty_type: repoty_type)))
+          case .reportCompleteSubmission:
+            return .send(.mixPanel(.reportCompleteSubmission))
+          }
+          
         default: return .none
         }
         

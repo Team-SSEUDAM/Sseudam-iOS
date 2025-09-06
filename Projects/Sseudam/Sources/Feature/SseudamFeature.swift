@@ -153,6 +153,89 @@ struct SseudamFeature {
               )
             )
           }
+          
+        case .suggestionClickLocation:
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .suggestionClickLocation(
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
+          
+        case .suggestionSetLocation:
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .suggestionSetLocation(
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
+          
+        case let .suggestionInputName(length):
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .suggestionInputName(
+                    description_length: length,
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
+          
+        case let .suggestionSelectCategory(type):
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .suggestionSelectCategory(
+                    trash_type: type,
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
+          
+        case let .suggestionUploadPhoto(file_size, photo_type):
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .suggestionUploadPhoto(
+                    file_size: file_size,
+                    photo_type: photo_type,
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
+          
+        case let .suggestionCompleteSubmission(submission_id):
+          return .run { send in
+            await send(
+              .mixpanel(
+                .track(
+                  .suggestionCompleteSubmission(
+                    submission_id: submission_id,
+                    ctx: currentUserCtx()
+                  )
+                )
+              )
+            )
+          }
         }
         
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):

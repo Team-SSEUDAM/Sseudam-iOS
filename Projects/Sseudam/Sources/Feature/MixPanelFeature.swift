@@ -105,13 +105,13 @@ public struct MixPanelFeature {
           
         case let .suggestionSelectCategory(trashType, ctx):
           analytics.track(.제보_관련_이벤트(.쓰레기통_유형_선택_완료),
-                          base(ctx).merging(["trash_type": trashType.rawValue]))
+                          base(ctx).merging(["trash_type": trashType]))
           
         case let .suggestionUploadPhoto(fileSize, photoType, ctx):
           analytics.track(.제보_관련_이벤트(.사진_업로드_완료),
                           base(ctx).merging([
                             "file_size": fileSize as Any,
-                            "photo_type": photoType.rawValue
+                            "photo_type": photoType
                           ]))
           
         case let .suggestionCompleteSubmission(submissionId, ctx):

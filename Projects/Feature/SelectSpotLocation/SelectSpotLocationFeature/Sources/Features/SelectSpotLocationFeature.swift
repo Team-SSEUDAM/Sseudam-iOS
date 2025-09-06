@@ -40,6 +40,7 @@ public struct SelectSpotLocationFeature {
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case delegate(Delegate)
+    case mixPanel(MixPanel)
     case onAppear
     /// 카메라가 Idle(멈춤) 상태일 때 델리게이트로부터 전달된 좌표
     case centerChanged(Coordinates)
@@ -54,6 +55,10 @@ public struct SelectSpotLocationFeature {
     public enum Delegate: Equatable {
       case nowCalculateReverseGeoCode(Bool)
       case centerChanged(_ point: Coordinates?, _ entity: NMGeoCodeReverseEntity?)
+    }
+    
+    public enum MixPanel: Equatable {
+      case suggestionClickLocation
     }
   }
   
@@ -75,7 +80,10 @@ public struct SelectSpotLocationFeature {
         
       case let .centerChanged(point):
         state.centerLocation = point
-        return .send(.reverseGeoCode(point))
+        return .merge(
+          .send(.mixPanel(.suggestionClickLocation)),
+          .send(.reverseGeoCode(point))
+        )
         
       case let .reverseGeoCode(point):
         return reverseGeoCodeEffect(point)

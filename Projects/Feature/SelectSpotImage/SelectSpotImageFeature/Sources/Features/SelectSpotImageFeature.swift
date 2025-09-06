@@ -25,6 +25,8 @@ public struct SelectSpotImageFeature {
     public var selectedPhoto: UIImage? = nil /// 최종 선택된 사진 (크롭 완료)
     public var originalPhoto: UIImage? = nil /// 원본 사진 (크롭 전)
     public var isEnabled: Bool = false
+    public var photoType: String = ""
+        
     public init() { }
   }
   
@@ -39,6 +41,7 @@ public struct SelectSpotImageFeature {
     
     case binding(BindingAction<State>)
     case delegate(Delegate)
+    case mixPanel(MixPanel)
     
     case centerButtonTapped /// 1. 사진이 없을 떄, 2. 사진이 있을 떄
     case photoTaken(UIImage) /// 사진이 선택되었을 때
@@ -49,11 +52,17 @@ public struct SelectSpotImageFeature {
     public enum Delegate: Equatable {
       case photoSelected(UIImage) /// 사진이 선택되었을 때
     }
+    
+    public enum MixPanel: Equatable {
+      case suggestionUploadPhoto(file_size: Int, photo_type: String)
+    }
   }
   
   public var body: some ReducerOf<Self> {
     BindingReducer()
-    Reduce { state, action in
+    Reduce {
+      state,
+      action in
       switch action {
       case .centerButtonTapped:
         return .send(.willAppearPhotoConfirmationDialog)
@@ -67,17 +76,24 @@ public struct SelectSpotImageFeature {
         state.selectedPhoto = croppedImage
         state.isEnabled = true
         state.destination = nil
-        return .send(.delegate(.photoSelected(croppedImage)))
+        let photoSize = croppedImage.pngData()?.count ?? 0
+        return .merge(
+          .send(.mixPanel(.suggestionUploadPhoto(file_size: photoSize, photo_type: state.photoType))
+          ),
+          .send(.delegate(.photoSelected(croppedImage)))
+        )
         
       case .willAppearPhotoConfirmationDialog:
         state.destination = .confirmationDialog(.makePhotoConfirmationDialog)
         return .none
         
       case .destination(.presented(.confirmationDialog(.takePhotoButtonTapped))):
+        state.photoType = "camera"
         state.destination = .camera(CameraPickerFeature.State())
         return .none
         
       case .destination(.presented(.confirmationDialog(.selectPhotoButtonTapped))):
+        state.photoType = "photo_library"
         state.destination = .photoLibraryPicker(PhotoLibraryPickerFeature.State())
         return .none
         

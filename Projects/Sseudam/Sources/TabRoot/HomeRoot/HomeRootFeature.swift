@@ -56,6 +56,12 @@ struct HomeRootFeature {
   
   enum MixPanel: Equatable {
     case suggestionStart
+    case suggestionClickLocation
+    case suggestionSetLocation
+    case suggestionInputName(description_length: Int)
+    case suggestionSelectCategory(trash_type: String)
+    case suggestionUploadPhoto(file_size: Int, photo_type: String)
+    case suggestionCompleteSubmission(submission_id: Int)
   }
   
   @Reducer(state: .equatable, action: .equatable)
@@ -143,6 +149,18 @@ struct HomeRootFeature {
         switch action {
         case .suggestionStart:
           return .send(.mixPanel(.suggestionStart))
+        case .suggestionClickLocation:
+          return .send(.mixPanel(.suggestionClickLocation))
+        case .suggestionSetLocation:
+          return .send(.mixPanel(.suggestionSetLocation))
+        case let .suggestionInputName(description_length):
+          return .send(.mixPanel(.suggestionInputName(description_length: description_length)))
+        case let .suggestionSelectCategory(trash_type):
+          return .send(.mixPanel(.suggestionSelectCategory(trash_type: trash_type)))
+        case let .suggestionUploadPhoto(file_size, photo_type):
+          return .send(.mixPanel(.suggestionUploadPhoto(file_size: file_size, photo_type: photo_type)))
+        case let .suggestionCompleteSubmission(submission_id):
+          return .send(.mixPanel(.suggestionCompleteSubmission(submission_id: submission_id)))
         }
         // MARK: - Receive TrashDetail Delegate Action
         

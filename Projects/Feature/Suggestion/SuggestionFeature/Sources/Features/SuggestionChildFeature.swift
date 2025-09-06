@@ -44,6 +44,7 @@ public struct SuggestionChildFeature {
     case selectPhoto(SelectSpotImageFeature.Action)
     case complete(SpotSuggestionCompleteFeature.Action)
     case delegate(Delegate)
+    case mixPanel(MixPanel)
     
     @CasePathable
     public enum Delegate: Equatable {
@@ -52,6 +53,11 @@ public struct SuggestionChildFeature {
       case selectKind(SelectSpotCategoryFeature.Action.Delegate)
       case selectPhoto(SelectSpotImageFeature.Action.Delegate)
       case complete(SpotSuggestionCompleteFeature.Action.Delegate)
+    }
+    
+    public enum MixPanel: Equatable {
+      case moveLocation(SelectSpotLocationFeature.Action.MixPanel)
+      case selectPhoto(SelectSpotImageFeature.Action.MixPanel)
     }
   }
   
@@ -78,6 +84,9 @@ public struct SuggestionChildFeature {
       case let .moveLocation(.delegate(delegateAction)):
         return .send(.delegate(.moveLocation(delegateAction)))
         
+      case let .moveLocation(.mixPanel(mixPanelAction)):
+        return .send(.mixPanel(.moveLocation(mixPanelAction)))
+        
         /// WriteNameFeature의 delegate를 부모로 전달
       case let .writeName(.delegate(delegateAction)):
         return .send(.delegate(.writeName(delegateAction)))
@@ -89,6 +98,9 @@ public struct SuggestionChildFeature {
         /// SelectPhotoFeature의 delegate를 부모로 전달
       case let .selectPhoto(.delegate(delegateAction)):
         return .send(.delegate(.selectPhoto(delegateAction)))
+        
+      case let .selectPhoto(.mixPanel(mixPanelAction)):
+        return .send(.mixPanel(.selectPhoto(mixPanelAction)))
         
       case let .complete(.delegate(delegateAction)):
         return .send(.delegate(.complete(delegateAction)))
@@ -110,6 +122,9 @@ public struct SuggestionChildFeature {
         return .none
         
       case .delegate:
+        return .none
+        
+      case .mixPanel:
         return .none
       }
     }

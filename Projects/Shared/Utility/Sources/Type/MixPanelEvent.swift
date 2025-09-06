@@ -108,9 +108,9 @@ public enum AppEvent: Equatable, Sendable {
   case suggestionClickLocation(ctx: UserCtx?)
   case suggestionSetLocation(ctx: UserCtx?)
   case suggestionInputName(description_length: Int, ctx: UserCtx?)
-  case suggestionSelectCategory(trash_type: MPTrashType, ctx: UserCtx?)
-  case suggestionUploadPhoto(file_size: Int?, photo_type: MPPhotoType, ctx: UserCtx?)
-  case suggestionCompleteSubmission(submission_id: String, ctx: UserCtx?)
+  case suggestionSelectCategory(trash_type: String, ctx: UserCtx?)
+  case suggestionUploadPhoto(file_size: Int?, photo_type: String, ctx: UserCtx?)
+  case suggestionCompleteSubmission(submission_id: Int, ctx: UserCtx?)
 
   // 5) 신고
   case reportStartNew(ctx: UserCtx?)

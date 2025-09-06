@@ -77,10 +77,9 @@ public struct MixPanelFeature {
                             "distance_from_user": distance as Any
                           ]))
           
-        case let .visitAuthStarted(acc, trashId, trashType, distance, ctx):
+        case let .visitAuthStarted(trashId, trashType, distance, ctx):
           analytics.track(.지도_및_방문_인증_이벤트(.방문_인증_시작),
                           base(ctx).merging([
-                            "gps_accuracy": acc as Any,
                             "trash_id": trashId,
                             "trash_type": trashType.rawValue,
                             "distance_from_user": distance as Any

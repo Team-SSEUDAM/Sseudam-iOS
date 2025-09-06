@@ -70,6 +70,7 @@ struct HomeRootFeature {
     
     case category(categoryType: MPCategoryType, userLogin: Bool)
     case mapPinTapped(id: String, trashType: MPTrashType, distance: Double?)
+    case visitCompleted(id: String, trashType: MPTrashType, distance: Double?)
   }
   
   @Reducer(state: .equatable, action: .equatable)
@@ -209,6 +210,9 @@ struct HomeRootFeature {
         switch event {
         case let .mapPinTapped(id, trashType, distance):
           return .send(.mixPanel(.mapPinTapped(id: id, trashType: trashType, distance: distance)))
+          
+        case let .visitCompleted(id, trashType, distance):
+          return .send(.mixPanel(.visitCompleted(id: id, trashType: trashType, distance: distance)))
         }
         
       default: return .none

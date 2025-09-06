@@ -300,6 +300,18 @@ struct SseudamFeature {
               )
             )))
           }
+          
+        case let .visitCompleted(id, trashType, distance):
+          return .run { send in
+            await send(.mixpanel(.track(
+              .visitAuthCompleted(
+                trash_id: id,
+                trash_type: trashType,
+                distance_from_user: distance,
+                ctx: currentUserCtx()
+              )
+            )))
+          }
         }
         
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):

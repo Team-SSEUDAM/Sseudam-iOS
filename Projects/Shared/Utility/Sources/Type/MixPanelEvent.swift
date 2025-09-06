@@ -100,7 +100,7 @@ public enum AppEvent: Equatable, Sendable {
   // 3) 지도/방문 인증
   case mapCategoryTapped(category_type: MPCategoryType, user_login: Bool, ctx: UserCtx?)
   case mapPinTapped(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, user_login: Bool, ctx: UserCtx?)
-  case visitAuthStarted(gps_accuracy: Double?, trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx?)
+  case visitAuthStarted(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx?)
   case visitAuthCompleted(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx?)
 
   // 4) 제보

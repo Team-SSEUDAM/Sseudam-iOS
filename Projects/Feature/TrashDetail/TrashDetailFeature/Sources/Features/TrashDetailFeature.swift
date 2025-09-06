@@ -79,6 +79,7 @@ public struct TrashDetailFeature {
   
   public enum MixPanel: Equatable {
     case mapPinTapped(id: String, trashType: MPTrashType, distance: Double?)
+    case visitCompleted(id: String, trashType: MPTrashType, distance: Double?)
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -204,6 +205,16 @@ public struct TrashDetailFeature {
           
         case let .showAlert(type):
           return .send(.showAlert(type))
+          
+        case let .sendVisitCompleteEvent(distance):
+          guard let detail = state.trashDetail else { return .none }
+          return .send(.mixPanel(
+            .visitCompleted(
+              id: detail.id.description,
+              trashType: detail.trashType.mpTrashType,
+              distance: distance
+            )
+          ))
         }
         
         default: return .none

@@ -67,7 +67,9 @@ struct HomeRootFeature {
     case reportStart
     case reportSelectCategory(repoty_type: String)
     case reportCompleteSubmission
+    
     case category(categoryType: MPCategoryType, userLogin: Bool)
+    case mapPinTapped(id: String, trashType: MPTrashType, distance: Double?)
   }
   
   @Reducer(state: .equatable, action: .equatable)
@@ -201,7 +203,12 @@ struct HomeRootFeature {
         case let .bottomSheetHeightChanged(height):
           state.bottomSheetHeight = height
           return .send(.home(.updateBottomSheetHeight(height)))
-          
+        }
+        
+      case let .trashDetail(.mixPanel(event)):
+        switch event {
+        case let .mapPinTapped(id, trashType, distance):
+          return .send(.mixPanel(.mapPinTapped(id: id, trashType: trashType, distance: distance)))
         }
         
       default: return .none

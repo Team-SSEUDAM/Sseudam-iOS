@@ -287,6 +287,19 @@ struct SseudamFeature {
               )
             )))
           }
+          
+        case let .mapPinTapped(id, trashType, distance):
+          return .run { send in
+            await send(.mixpanel(.track(
+              .mapPinTapped(
+                trash_id: id,
+                trash_type: trashType,
+                distance_from_user: distance,
+                user_login: UserDefaultsKeys.isLoggedIn ?? false,
+                ctx: currentUserCtx()
+              )
+            )))
+          }
         }
         
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):

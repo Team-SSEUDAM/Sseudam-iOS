@@ -65,14 +65,15 @@ public struct MixPanelFeature {
           analytics.track(.지도_및_방문_인증_이벤트(.카테고리_클릭),
                           base(ctx).merging([
                             "category_type": category.rawValue,
-                            "user_login": userLogin.description
+                            "user_login": userLogin
                           ]))
           
-        case let .mapPinTapped(trashId, trashType, distance, ctx):
+        case let .mapPinTapped(trashId, trashType, distance, userLogin, ctx):
           analytics.track(.지도_및_방문_인증_이벤트(.지도_핀_클릭),
                           base(ctx).merging([
                             "trash_id": trashId,
                             "trash_type": trashType.rawValue,
+                            "user_login": userLogin,
                             "distance_from_user": distance as Any
                           ]))
           

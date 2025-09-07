@@ -122,7 +122,7 @@ extension SelectSpotLocationFeature {
   
   private func moveUserLocation() -> Effect<Action> {
     return .run { send in
-      if let userLocation = await LocationService.shared.userLocation {
+      if let userLocation = await LocationService.shared.requestSingleLocation() {
         await send(.initUserLocation(userLocation))
       }
     }

@@ -155,7 +155,7 @@ public struct TrashDetailView: View {
             size: .medium,
             state: .constant(.normal)
           ) {
-            print("제보하러 가기")
+            store.send(.suggestionButtonTapped)
           }
           .frame(width: 116)
         }

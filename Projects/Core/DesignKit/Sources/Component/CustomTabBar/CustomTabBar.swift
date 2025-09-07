@@ -51,6 +51,7 @@ public struct CustomTabBar: View {
     }
     .padding(.vertical, .Number8)
     .frame(maxWidth: .infinity, maxHeight: 62)
+    .contentShape(Rectangle())
     .onTapGesture { onTabSelected(tab) }
   }
 }

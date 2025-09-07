@@ -162,7 +162,7 @@ public struct HomeFeature {
         )
         return .merge(
           .send(.presentDetailView(false)),
-          .send(.mixPanel(.suggestionStart))
+          .send(.mixPanel(.reportStart))
         )
         // MARK: - Send Action to HomeRoot
         
@@ -173,7 +173,9 @@ public struct HomeFeature {
           .send(.delegate(.needToHiddenTabBar(true))),
           .send(.mixPanel(.suggestionStart))
         )
-
+        
+        // MARK: - Send Action to HomeRoot
+      
       case let .presentDetailView(isPresent, id):
         state.isPresentDetail = isPresent
         if isPresent { state.isShowSuggestionCoachMark = false }

@@ -113,6 +113,7 @@ public struct RegisterFavoriteAreaFeature {
       case let .signUpResult(result):
         switch result {
         case let .success(nickname):
+          UserDefaultsKeys.isLoggedIn = true
           return .send(.successSignUp(nickname: nickname))
         case .failure:
           return .send(.errorToastMessage("회원가입에 실패했어요."))

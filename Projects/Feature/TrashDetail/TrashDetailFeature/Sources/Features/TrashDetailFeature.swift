@@ -46,6 +46,7 @@ public struct TrashDetailFeature {
     case showLoading(Bool)
     case noTrashData
     case reportButtonTapped
+    case suggestionButtonTapped
     
     case setInitVisitedState
     case emptyTrashData(Bool)
@@ -60,6 +61,7 @@ public struct TrashDetailFeature {
     /// 로그인 후 상태 변경하기 위한 action
     case checkLoggedin
     case checkLoginBeforeReport
+    case checkLoginBeforeSuggestion
     
     case showToastMessage(String?)
     case showAlert(AlertType)
@@ -69,6 +71,7 @@ public struct TrashDetailFeature {
   
   public enum Delegate: Equatable {
     case reportButtonTapped(TrashSpotDetail?)
+    case suggestionButtonTapped
     case showToastMessage(String?)
     case showAlert(AlertType)
     /// 방문 완료
@@ -117,9 +120,17 @@ public struct TrashDetailFeature {
       case .reportButtonTapped:
         return .send(.checkLoginBeforeReport)
         
+      case .suggestionButtonTapped:
+        return .send(.checkLoginBeforeSuggestion)
+        
       case .checkLoginBeforeReport:
         return UserDefaultsKeys.isLoggedIn == true
         ? .send(.delegate(.reportButtonTapped(state.trashDetail)))
+        : .send(.showAlert(.login))
+        
+      case .checkLoginBeforeSuggestion:
+        return UserDefaultsKeys.isLoggedIn == true
+        ? .send(.delegate(.suggestionButtonTapped))
         : .send(.showAlert(.login))
         
       case let .fetchTrashDetail(id):

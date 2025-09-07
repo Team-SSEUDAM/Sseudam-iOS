@@ -141,6 +141,9 @@ struct HomeRootFeature {
         case let .reportButtonTapped(detailData):
           return .send(.home(.showReportView(detail: detailData)))
           
+        case .suggestionButtonTapped:
+          return .send(.home(.moveToSuggestion))
+          
         case let .showToastMessage(message):
           return .send(.home(.showToastMessage(message)))
           

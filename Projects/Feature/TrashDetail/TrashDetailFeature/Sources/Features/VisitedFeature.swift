@@ -33,7 +33,9 @@ public struct VisitedFeature {
     
     public var isDenyPermission: Bool = true
     
-    public var isWithinDistance: Bool = false // 5m 범위 내에 있는지
+    public var isWithinDistance: Bool = false // 30m
+    
+    public var distanceWithUser: Double? = nil
     
     public var checkComplete: Bool = false
     
@@ -55,6 +57,8 @@ public struct VisitedFeature {
     case checkDistance(userLocation: Coordinates?)
     /// 5m 내에 있는지 여부 저장
     case storedWithinDistance(Bool)
+    /// 유저와 쓰레기통 간의 거리 저장
+    case storeDistanceWithUser(Double)
     /// 방문 인증 가능 여부 확인
     case checkEnableVisit
     /// 방문하기 버튼 탭
@@ -95,6 +99,7 @@ public struct VisitedFeature {
     case visitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
     case showToastMessage(String?)
     case showAlert(AlertType)
+    case sendVisitCompleteEvent(distance: Double?)
   }
   
   @Dependency(\.VisitedUseCase) var visitedUseCase
@@ -140,6 +145,10 @@ public struct VisitedFeature {
         state.isWithinDistance = isWithin
         return .none
         
+      case let .storeDistanceWithUser(distance):
+        state.distanceWithUser = (distance * 100).rounded() / 100
+        return .none
+        
       case .checkEnableVisit:
         if !state.checkComplete { return .none }
         return checkEnableVisit(
@@ -163,6 +172,7 @@ public struct VisitedFeature {
       case let .requestVisitResult(.success(result)):
         state.isTodayFirst = result.isTodayFirst
         return .merge([
+          .send(.delegate(.sendVisitCompleteEvent(distance: state.distanceWithUser))),
           .send(.fetchPetInfo),
           .send(.successVisit(date: result.visitedAt))
         ])
@@ -409,6 +419,7 @@ extension VisitedFeature {
         let distance = user.distance(to: target)
         let isWithin5m = distance <= 30
         await send(.storedWithinDistance(isWithin5m))
+        await send(.storeDistanceWithUser(distance))
       } else {
         await send(.showToastMessage("위치 정보를 확인할 수 없어요"))
       }

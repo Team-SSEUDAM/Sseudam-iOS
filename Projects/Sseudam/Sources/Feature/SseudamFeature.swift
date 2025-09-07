@@ -276,6 +276,42 @@ struct SseudamFeature {
               )
             )
           }
+          
+        case let .category(categoryType, userLogin):
+          return .run { send in
+            await send(.mixpanel(.track(
+              .mapCategoryTapped(
+                category_type: categoryType,
+                user_login: userLogin,
+                ctx: currentUserCtx()
+              )
+            )))
+          }
+          
+        case let .mapPinTapped(id, trashType, distance):
+          return .run { send in
+            await send(.mixpanel(.track(
+              .mapPinTapped(
+                trash_id: id,
+                trash_type: trashType,
+                distance_from_user: distance,
+                user_login: UserDefaultsKeys.isLoggedIn ?? false,
+                ctx: currentUserCtx()
+              )
+            )))
+          }
+          
+        case let .visitCompleted(id, trashType, distance):
+          return .run { send in
+            await send(.mixpanel(.track(
+              .visitAuthCompleted(
+                trash_id: id,
+                trash_type: trashType,
+                distance_from_user: distance,
+                ctx: currentUserCtx()
+              )
+            )))
+          }
         }
         
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):
@@ -348,6 +384,7 @@ struct SseudamFeature {
             )
           }
         }
+        
         
         // MARK: - User Location
       case let .userLocationChanged(location):

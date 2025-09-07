@@ -81,8 +81,8 @@ public struct UserCtx: Equatable, Sendable, Encodable {
   }
 }
 
-public enum MPCategoryType: String, Sendable, Codable { case all, general, recycle } // category_type
-public enum MPTrashType: String, Sendable, Codable { case general, recycle }         // trash_type
+public enum MPCategoryType: String, Sendable, Codable, Equatable { case all, general, recycle } // category_type
+public enum MPTrashType: String, Sendable, Codable, Equatable { case general, recycle }         // trash_type
 public enum MPPhotoType: String, Sendable, Codable { case camera, gallery }          // photo_type
 public enum MPReportInfoField: String, Sendable, CaseIterable, Codable {
   case location, name, category, photo
@@ -98,9 +98,9 @@ public enum AppEvent: Equatable, Sendable {
   case attendanceAchieveStreak(streak_count: Int, ctx: UserCtx?)
 
   // 3) 지도/방문 인증
-  case mapCategoryTapped(category_type: MPCategoryType, ctx: UserCtx?)
-  case mapPinTapped(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx?)
-  case visitAuthStarted(gps_accuracy: Double?, trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx?)
+  case mapCategoryTapped(category_type: MPCategoryType, user_login: Bool, ctx: UserCtx?)
+  case mapPinTapped(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, user_login: Bool, ctx: UserCtx?)
+  case visitAuthStarted(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx?)
   case visitAuthCompleted(trash_id: String, trash_type: MPTrashType, distance_from_user: Double?, ctx: UserCtx?)
 
   // 4) 제보

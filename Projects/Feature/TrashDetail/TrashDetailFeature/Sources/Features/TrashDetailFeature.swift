@@ -39,6 +39,7 @@ public struct TrashDetailFeature {
   public enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case delegate(Delegate)
+    case mixPanel(MixPanel)
     case visited(VisitedFeature.Action)
     
     case onDisappaer
@@ -74,6 +75,11 @@ public struct TrashDetailFeature {
     /// 방문 완료
     case visitedComplete(isFirst: Bool, petInfo: PetInfoEntity?)
     case bottomSheetHeightChanged(CGFloat)
+  }
+  
+  public enum MixPanel: Equatable {
+    case mapPinTapped(id: String, trashType: MPTrashType, distance: Double?)
+    case visitCompleted(id: String, trashType: MPTrashType, distance: Double?)
   }
   
   @Dependency(\.FetchTrashSpotDetailUseCase) var fetchTrashSpotDetailUseCase
@@ -129,6 +135,7 @@ public struct TrashDetailFeature {
         state.trashDetail = data
         state.isNeedUpdateHeight = true
         return .merge([
+          checkTapPinEvent(trashDetail: data),
           .send(.showLoading(false)),
           .send(.visited(.setTrashSpotInfo(spotId: data.id, point: data.point))),
           .send(.fetchTrashImage(imgUrl: data.imageUrl, id: data.id))
@@ -198,6 +205,16 @@ public struct TrashDetailFeature {
           
         case let .showAlert(type):
           return .send(.showAlert(type))
+          
+        case let .sendVisitCompleteEvent(distance):
+          guard let detail = state.trashDetail else { return .none }
+          return .send(.mixPanel(
+            .visitCompleted(
+              id: detail.id.description,
+              trashType: detail.trashType.mpTrashType,
+              distance: distance
+            )
+          ))
         }
         
         default: return .none
@@ -240,6 +257,33 @@ public struct TrashDetailFeature {
       } catch {
         await send(.fetchTrashImageResult(.failure(.customImageError(error.localizedDescription))))
       }
+    }
+  }
+  
+  private func checkTapPinEvent(trashDetail: TrashSpotDetail) -> Effect<Action> {
+    return .run { send in
+      var distance: Double? = nil
+      if let user = await LocationService.shared.userLocation {
+        distance = (user.distance(to: trashDetail.point) * 100).rounded() / 100
+      }
+      await send(.mixPanel(
+        .mapPinTapped(
+          id: trashDetail.id.description,
+          trashType: trashDetail.trashType.mpTrashType,
+          distance: distance
+        )
+      ))
+    }
+  }
+}
+
+fileprivate extension TrashType {
+  var mpTrashType: MPTrashType {
+    switch self {
+    case .general:
+      return .general
+    case .recycle:
+      return .recycle
     }
   }
 }

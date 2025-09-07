@@ -80,6 +80,7 @@ public enum Core: String, ModuleRepresentable {
   case DesignKit
   case NetworkKit
   case Cache
+  case AnalyticsKit
   public var typePath: String { "Core" }
 }
 
@@ -96,6 +97,7 @@ public enum SPM: String, ModuleRepresentable {
   case TCA = "ComposableArchitecture"
   case NMapsMap = "NMapsMap"
   case DotLottie = "DotLottie"
+  case Mixpanel = "Mixpanel"
   public var typePath: String { "SPM" }
 }
 
@@ -284,6 +286,7 @@ extension TargetDependency {
     public static let DesignKit = Self.project(.core(.DesignKit))
     public static let NetworkKit = Self.project(.core(.NetworkKit))
     public static let Cache = Self.project(.core(.Cache))
+    public static let AnalyticsKit = Self.project(.core(.AnalyticsKit))
   }
   
   public struct Shared: TargetDependencyDelegate {
@@ -298,6 +301,7 @@ extension TargetDependency {
     public static let TCA = Self.project(.spm(.TCA))
     public static let NMapsMap = Self.project(.spm(.NMapsMap))
     public static let DotLottie = Self.project(.spm(.DotLottie))
+    public static let Mixpanel = Self.project(.spm(.Mixpanel))
   }
 }
 

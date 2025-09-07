@@ -16,7 +16,7 @@ public struct SpotSuggestionUseCase {
     _ centerPoint: Coordinates?,
     _ nmReverseGeoCode: NMGeoCodeReverseEntity?,
     _ trashType: String
-  ) async throws -> String
+  ) async throws -> SpotSuggestionEntity
   
   public init(
     execute: @Sendable @escaping (
@@ -24,7 +24,7 @@ public struct SpotSuggestionUseCase {
       _ centerPoint: Coordinates?,
       _ nmReverseGeoCode: NMGeoCodeReverseEntity?,
       _ trashType: String
-    ) async throws -> String
+    ) async throws -> SpotSuggestionEntity
   ) {
     self.execute = execute
   }

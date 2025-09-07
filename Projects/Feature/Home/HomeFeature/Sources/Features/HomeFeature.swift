@@ -58,6 +58,7 @@ public struct HomeFeature {
     case moveToSuggestion
     case suggestionButtonTapped
     case delegate(Delegate)
+    case mixPanel(MixPanel)
     case updateBottomSheetHeight(CGFloat)
   }
   
@@ -65,6 +66,21 @@ public struct HomeFeature {
     case needToHiddenTabBar(Bool)
     case presentDetailView(Bool, id: Int?)
     case presentAlert(AlertType)
+  }
+  
+  public enum MixPanel: Equatable {
+    case suggestionStart
+    case suggestionClickLocation
+    case suggestionSetLocation
+    case suggestionInputName(description_length: Int)
+    case suggestionSelectCategory(trash_type: String)
+    case suggestionUploadPhoto(file_size: Int, photo_type: String)
+    case suggestionCompleteSubmission(submission_id: Int)
+    
+    case reportStart
+    case reportSelectCategory(repoty_type: String)
+    case reportCompleteSubmission
+    case category(categoryType: MPCategoryType, userLogin: Bool)
   }
   
   public var body: some ReducerOf<Self> {
@@ -119,6 +135,12 @@ public struct HomeFeature {
           return .send(.presentDetailView(isShow, id: id))
         }
         
+      case let .map(.mixPanel(event)):
+        switch event {
+        case let .category(category, userLogin):
+          return .send(.mixPanel(.category(categoryType: category, userLogin: userLogin)))
+        }
+        
       case let .hiddenReportButton(isHidden):
         state.isHiddenReportButton = isHidden
         return .none
@@ -138,16 +160,19 @@ public struct HomeFeature {
             )
           )
         )
-        return .send(.presentDetailView(false))
+        return .merge(
+          .send(.presentDetailView(false)),
+          .send(.mixPanel(.reportStart))
+        )
+        // MARK: - Send Action to HomeRoot
         
       case .moveToSuggestion:
-        state.path.append(
-          .suggestionView(
-            SuggestionFeature.State(state.location.lastCameraPosition)
-          )
+        let suggestionState = SuggestionFeature.State(state.location.lastCameraPosition)
+        state.path.append(.suggestionView(suggestionState))
+        return .merge(
+          .send(.delegate(.needToHiddenTabBar(true))),
+          .send(.mixPanel(.suggestionStart))
         )
-        return .send(.presentDetailView(false))
-
         
         // MARK: - Send Action to HomeRoot
       
@@ -169,13 +194,40 @@ public struct HomeFeature {
         
       case let .path(action):
         switch action {
+          // MARK: - Suggestion Action
         case .element(id: _, action: .suggestionView(.pop)):
           state.path.removeLast()
           return .none
           
+        case let .element(id: _, action: .suggestionView(.mixPanel(ev))):
+          switch ev {
+          case .suggestionClickLocation:
+            return .send(.mixPanel(.suggestionClickLocation))
+          case .suggestionSetLocation:
+            return .send(.mixPanel(.suggestionSetLocation))
+          case let .suggestionInputName(description_length):
+            return .send(.mixPanel(.suggestionInputName(description_length: description_length)))
+          case let .suggestionSelectCategory(trash_type):
+            return .send(.mixPanel(.suggestionSelectCategory(trash_type: trash_type)))
+          case let .suggestionUploadPhoto(file_size, photo_type):
+            return .send(.mixPanel(.suggestionUploadPhoto(file_size: file_size, photo_type: photo_type)))
+          case let .suggestionCompleteSubmission(submission_id):
+            return .send(.mixPanel(.suggestionCompleteSubmission(submission_id: submission_id)))
+          }
+          
+          // MARK: - Report Action
         case let .element(id: _, action: .reportView(.pop(detail))):
           state.path.removeLast()
           return .send(.presentDetailView(true, id: detail.id))
+          
+        case let .element(id: _, action: .reportView(.mixPanel(ev))):
+          switch ev {
+          case let .reportSelectCategory(repoty_type):
+            return .send(.mixPanel(.reportSelectCategory(repoty_type: repoty_type)))
+          case .reportCompleteSubmission:
+            return .send(.mixPanel(.reportCompleteSubmission))
+          }
+          
         default: return .none
         }
         

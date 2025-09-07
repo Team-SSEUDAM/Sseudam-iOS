@@ -14,6 +14,7 @@ import DesignKit
 import VisitedFeature
 import TrashSpotDomainInterface
 import PetDomainInterface
+import Utility
 
 @Reducer
 struct HomeRootFeature {
@@ -46,11 +47,30 @@ struct HomeRootFeature {
     case checkLoggedin
     case modal(PresentationAction<ModalDestination.Action>)
     case delegate(Delegate)
+    case mixPanel(MixPanel)
   }
   
   enum Delegate: Equatable {
     case hiddenTabBar(Bool)
     case presentAlert(AlertType)
+  }
+  
+  enum MixPanel: Equatable {
+    case suggestionStart
+    case suggestionClickLocation
+    case suggestionSetLocation
+    case suggestionInputName(description_length: Int)
+    case suggestionSelectCategory(trash_type: String)
+    case suggestionUploadPhoto(file_size: Int, photo_type: String)
+    case suggestionCompleteSubmission(submission_id: Int)
+    
+    case reportStart
+    case reportSelectCategory(repoty_type: String)
+    case reportCompleteSubmission
+    
+    case category(categoryType: MPCategoryType, userLogin: Bool)
+    case mapPinTapped(id: String, trashType: MPTrashType, distance: Double?)
+    case visitCompleted(id: String, trashType: MPTrashType, distance: Double?)
   }
   
   @Reducer(state: .equatable, action: .equatable)
@@ -134,6 +154,37 @@ struct HomeRootFeature {
             return .send(.hiddenTabBar(isHidden))
         }
         
+      case let .home(.mixPanel(action)):
+        switch action {
+        case .suggestionStart:
+          return .send(.mixPanel(.suggestionStart))
+        case .suggestionClickLocation:
+          return .send(.mixPanel(.suggestionClickLocation))
+        case .suggestionSetLocation:
+          return .send(.mixPanel(.suggestionSetLocation))
+        case let .suggestionInputName(description_length):
+          return .send(.mixPanel(.suggestionInputName(description_length: description_length)))
+        case let .suggestionSelectCategory(trash_type):
+          return .send(.mixPanel(.suggestionSelectCategory(trash_type: trash_type)))
+        case let .suggestionUploadPhoto(file_size, photo_type):
+          return .send(.mixPanel(.suggestionUploadPhoto(file_size: file_size, photo_type: photo_type)))
+        case let .suggestionCompleteSubmission(submission_id):
+          return .send(.mixPanel(.suggestionCompleteSubmission(submission_id: submission_id)))
+          
+          
+        case .reportStart:
+          return .send(.mixPanel(.reportStart))
+
+        case let .reportSelectCategory(repoty_type):
+          return .send(.mixPanel(.reportSelectCategory(repoty_type: repoty_type)))
+
+        case .reportCompleteSubmission:
+          return .send(.mixPanel(.reportCompleteSubmission))
+          
+        case let .category(categoryType, userLogin):
+          return .send(.mixPanel(.category(categoryType: categoryType, userLogin: userLogin)))
+        }
+        
         // MARK: - Receive TrashDetail Delegate Action
         
       case let .trashDetail(.delegate(action)):
@@ -156,7 +207,15 @@ struct HomeRootFeature {
         case let .bottomSheetHeightChanged(height):
           state.bottomSheetHeight = height
           return .send(.home(.updateBottomSheetHeight(height)))
+        }
+        
+      case let .trashDetail(.mixPanel(event)):
+        switch event {
+        case let .mapPinTapped(id, trashType, distance):
+          return .send(.mixPanel(.mapPinTapped(id: id, trashType: trashType, distance: distance)))
           
+        case let .visitCompleted(id, trashType, distance):
+          return .send(.mixPanel(.visitCompleted(id: id, trashType: trashType, distance: distance)))
         }
         
       default: return .none

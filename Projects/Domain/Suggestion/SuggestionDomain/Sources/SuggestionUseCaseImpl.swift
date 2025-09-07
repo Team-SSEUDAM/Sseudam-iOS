@@ -19,8 +19,7 @@ extension SpotSuggestionUseCase {
         nmReverseGeoCode: nmReverseGeoCode,
         trashType: trashType
       )
-      let entity = try await repository.postSpotSuggestion(input)
-      return entity.imageUploadURL
+      return try await repository.postSpotSuggestion(input)
     }
   }
 }

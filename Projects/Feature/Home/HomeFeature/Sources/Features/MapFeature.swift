@@ -10,6 +10,7 @@ import ComposableArchitecture
 import TrashSpotDomainInterface
 import DesignKit
 import Utility
+import UserDefaults
 
 @Reducer
 public struct MapFeature {
@@ -65,6 +66,7 @@ public struct MapFeature {
     case deleteActiveMarker
     
     case delegate(Delegate)
+    case mixPanel(MixPanel)
   }
   
   public enum Delegate: Equatable {
@@ -72,6 +74,10 @@ public struct MapFeature {
     case noDataInDetailView
     case showToastMessage(String?)
     case presentDetailView(Bool, id: Int? = nil)
+  }
+  
+  public enum MixPanel: Equatable {
+    case category(categoryType: MPCategoryType, userLogin: Bool)
   }
   
   @Dependency(\.FetchTrashSpotUseCase) var fetchTrashSpotUseCase
@@ -140,7 +146,12 @@ public struct MapFeature {
           return .none
         }
         state.trashType = type
-        return .send(.requestMapBounds(true))
+        let mpTrashType: MPCategoryType? = type?.mpCategoryType
+        let userLogin: Bool = UserDefaultsKeys.isLoggedIn ?? false
+        return .merge([
+          .send(.mixPanel(.category(categoryType: mpTrashType ?? .all, userLogin: userLogin))),
+          .send(.requestMapBounds(true))
+        ])
         
       case let .requestExpandedMapBounds(bounds):
         let expandedBounds = expandBounds(bounds, ratio: 1.5) // 확장비율 조정
@@ -201,5 +212,16 @@ extension MapFeature {
           longitude: ne.longitude + lngDelta * ratio
       )
       return [newSW, newNE]
+  }
+}
+
+fileprivate extension TrashType {
+  var mpCategoryType: MPCategoryType {
+    switch self {
+    case .general:
+        .general
+    case .recycle:
+        .recycle
+    }
   }
 }

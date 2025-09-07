@@ -9,6 +9,7 @@
 import SwiftUI
 import DesignKit
 import ComposableArchitecture
+import Utility
 import HomeFeature
 import MyPetFeature
 import TrashDetailFeature
@@ -18,15 +19,12 @@ import AttendanceFeature
 import LevelUpFeature
 
 struct SseudamView: View {
-  @Bindable var store: StoreOf<SseudamFeature> = Store(
-    initialState: SseudamFeature.State()
-  ) {
-    SseudamFeature()
-  }
+  @Bindable var store: StoreOf<SseudamFeature>
   
   @Environment(\.scenePhase) var scenePhase
   
-  init() {
+  public init(store: StoreOf<SseudamFeature>) {
+    self.store = store
     UITabBar.appearance().isHidden = true
   }
   
@@ -45,7 +43,22 @@ struct SseudamView: View {
       AlertView
     }
     .onChange(of: scenePhase) { _, newPhase in
-      if newPhase == .active { store.send(.onAppear) }
+      switch newPhase {
+      case .active:
+        store.send(.scenePhaseChanged(.active))
+      case .background:
+        store.send(.scenePhaseChanged(.background))
+      default: break
+      }
+    }
+    .onAppear {
+      store.send(.onAppear)
+    }
+    .task {
+      for await city in LocationService.shared.cityUpdateStream {
+        guard let city else { continue }
+        store.send(.userLocationChanged(city))
+      }
     }
     .ignoresSafeArea(edges: .bottom)
     .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in
@@ -103,8 +116,3 @@ struct SseudamView: View {
   }
   
 }
-
-#Preview {
-  SseudamView()
-}
-

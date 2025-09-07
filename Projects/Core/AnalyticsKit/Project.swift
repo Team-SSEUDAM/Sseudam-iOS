@@ -1,34 +1,30 @@
 //
 //  Project.swift
-//  Manifests
+//  AppVersionDataInterfaceManifests
 //
-//  Created by 조용인 on 6/16/25.
+//  Created by 조용인 on 9/3/25.
 //
 
 import ProjectDescription
 import ProjectDescriptionHelpers
 
 let project = Project(
-  name: "ThirdParty",
+  name: "AnalyticsKit",
   organizationName: "Sseudam.a2bo.ios",
   options: .default,
   settings: .default,
   targets: [
     .target(
-      name: "ThirdParty",
+      name: "AnalyticsKit",
       destinations: .iOS,
       product: .staticLibrary,
-      bundleId: "Sseudam.a2bo.ios.ThirdParty",
+      bundleId: "Sseudam.a2bo.ios.core.analyticsKit",
       deploymentTargets: .iOS("18.0"),
       infoPlist: .extendingDefault(with: [:]),
       sources: ["Sources/**"],
       dependencies: [
-        .SPM.TCA,
-        .SPM.NMapsMap,
-        .SPM.DotLottie,
-        .SPM.Mixpanel
+        .Shared.Umbrella
       ]
     )
   ]
 )
-

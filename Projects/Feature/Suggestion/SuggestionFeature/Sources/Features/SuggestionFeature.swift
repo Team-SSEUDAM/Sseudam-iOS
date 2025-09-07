@@ -63,9 +63,9 @@ public struct SuggestionFeature {
     case destination(PresentationAction<Destination.Action>)
     case child(SuggestionChildFeature.Action)
     case binding(BindingAction<State>)
+    case mixPanel(MixPanel)
     
-    
-    case spotSuggestionResult(Result<String, NetworkError>)
+    case spotSuggestionResult(Result<SpotSuggestionEntity, NetworkError>)
     case uploadSpotImageResult(Result<String, NetworkError>)
     case postSpotImage(String)
     
@@ -94,6 +94,16 @@ public struct SuggestionFeature {
     case backButtonTapped
     case pop
     case backPageTapped
+    
+    public enum MixPanel: Equatable {
+      case suggestionClickLocation
+      case suggestionSetLocation
+      case suggestionInputName(description_length: Int)
+      case suggestionSelectCategory(trash_type: String)
+      case suggestionUploadPhoto(file_size: Int, photo_type: String)
+      case suggestionCompleteSubmission(submission_id: Int)
+    }
+    
   }
   
   @Dependency(\.SpotSuggestionUseCase) var spotSuggestionUseCase
@@ -135,9 +145,17 @@ public struct SuggestionFeature {
         switch state.currentPage {
         case 0: return .send(.didAppearStartReport)
         case 1: return .send(.didAppearMoveLocation)
-        case 2: return .send(.didAppearWriteName)
+        case 2:
+          return .merge(
+            .send(.mixPanel(.suggestionSetLocation)),
+            .send(.didAppearWriteName)
+          )
         case 3: return .send(.didAppearSelectKind)
-        case 4: return .send(.didAppearSelectPhoto)
+        case 4:
+          return .merge(
+            .send(.mixPanel(.suggestionSelectCategory(trash_type: state.trashType))),
+            .send(.didAppearSelectPhoto)
+          )
         case 5: return .send(.didAppearComplete)
         default: return .none
         }
@@ -196,6 +214,13 @@ public struct SuggestionFeature {
         case let .complete(action): return handleCompleteDelegate(state: &state, action: action)
         }
         
+        /// Child에서 오는 MixPanel 처리
+      case let .child(.mixPanel(mixpanelAction)):
+        switch mixpanelAction {
+        case let .moveLocation(action): return handleMoveLocationMixPanel(state: &state, action: action)
+        case let .selectPhoto(action): return handleSelectPhotoMixPanel(state: &state, action: action)
+        }
+        
         // Child의 일반 Action들 처리 (delegate가 아닌 경우)
       case .child(.moveLocation):
         return .none
@@ -226,8 +251,11 @@ public struct SuggestionFeature {
         
       case let .spotSuggestionResult(result):
         switch result {
-        case let .success(prisignedURL):
-          return .send(.postSpotImage(prisignedURL))
+        case let .success(entity):
+          return .merge(
+            .send(.mixPanel(.suggestionCompleteSubmission(submission_id: entity.suggestionID))),
+            .send(.postSpotImage(entity.imageUploadURL))
+          )
           
         case let .failure(error):
           return .send(.errorOccured(message: error.localizedDescription))
@@ -261,12 +289,45 @@ public struct SuggestionFeature {
       case .binding:
         return .none
         
+      case .mixPanel:
+        return .none
+        
       case .pop:
         return .none
       }
     }
     .ifLet(\.$destination, action: \.destination) {
       Destination.body
+    }
+  }
+}
+
+// MARK: - MixPanel Handlers
+private extension SuggestionFeature {
+  
+  /// `MoveLocationFeature` MixPanel 처리
+  func handleMoveLocationMixPanel(
+    state: inout State,
+    action: SelectSpotLocationFeature.Action.MixPanel
+  ) -> Effect<Action> {
+    guard state.currentPage == 1 else { return .none }
+    
+    switch action {
+    case .suggestionClickLocation:
+      return .send(.mixPanel(.suggestionClickLocation))
+    }
+  }
+  
+  /// `SelectPhotoFeature(사진 선택)` MixPanel 처리
+  func handleSelectPhotoMixPanel(
+    state: inout State,
+    action: SelectSpotImageFeature.Action.MixPanel
+  ) -> Effect<Action> {
+    guard state.currentPage == 4 else { return .none }
+    
+    switch action {
+    case let .suggestionUploadPhoto(file_size, photo_type):
+      return .send(.mixPanel(.suggestionUploadPhoto(file_size: file_size, photo_type: photo_type)) )
     }
   }
 }
@@ -306,10 +367,12 @@ private extension SuggestionFeature {
       
     case let .serverValidationCompleted(isValid, name):
       state.spotName = name
+      let description_length = state.spotName.count
       if isValid {
         state.currentPage = 3
         return .run { send in
           await send(.setIsLoading(false))
+          await send(.mixPanel(.suggestionInputName(description_length: description_length)))
           await send(.didAppearSelectKind)
         }
       } else {

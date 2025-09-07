@@ -28,7 +28,8 @@ let project = Project.makeApp(
     "NMCLIENTID": "$(NM_CLIENT_ID)",
     "NMCLIENTSECRET": "$(NM_CLIENT_SECRET)",
     "BASE_URL": "$(BASE_URL)",
-    "APP_STORE_URL": "$(APP_STORE_URL)"
+    "APP_STORE_URL": "$(APP_STORE_URL)",
+    "MIXPANEL_TOKEN": "$(MIXPANEL_TOKEN)"
   ],
   dependencies: [
     .Features.Umbrella,

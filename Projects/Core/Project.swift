@@ -13,7 +13,8 @@ let project = Project.makeStaticLibraryProject(
   dependencies: [
     .Core.DesignKit,
     .Core.NetworkKit,
-    .Core.Cache
+    .Core.Cache,
+    .Core.AnalyticsKit,
   ]
 )
 

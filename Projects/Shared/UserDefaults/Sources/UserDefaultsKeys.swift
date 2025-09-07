@@ -24,8 +24,8 @@ public struct UserDefaultsKeys {
   @UserDefault("userId", default: nil)
   public static var userId: Int?
   
-  @UserDefault("userNickname", default: nil)
-  public static var userNickname: String?
+  @UserDefault("userLocation", default: nil)
+  public static var userLocation: String?
   
   // MARK: - CoachMark
   

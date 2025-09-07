@@ -35,6 +35,7 @@ struct UserEntryFeature {
   enum Action: BindableAction, Equatable {
     case binding(BindingAction<State>)
     case delegate(Delegate)
+    case mixPanel(MixPanel)
     case checkComplete
     
     case checkAttendance
@@ -53,6 +54,10 @@ struct UserEntryFeature {
   
   enum Delegate: Equatable {
     case checkComplete
+  }
+  
+  enum MixPanel: Equatable {
+    case attendanceComplete(streakCount: Int)
   }
   
   @Reducer(state: .equatable, action: .equatable)
@@ -84,7 +89,10 @@ struct UserEntryFeature {
           return .send(.checkComplete)
         } else {
           state.attendanceInfo = data
-          return .send(.fetchPetInfo)
+          return .merge(
+            .send(.mixPanel(.attendanceComplete(streakCount: data.continuity))),
+            .send(.fetchPetInfo)
+          )
         }
         
       case let .checkAttendanceResult(.failure(error)):
@@ -102,6 +110,7 @@ struct UserEntryFeature {
         return fetchPetInfo()
         
       case let .fetchPetInfoResult(.success(entity)):
+        UserDefaultsKeys.current_catlevel = entity.levelType.rawInt
         if let attendance = state.attendanceInfo {
           state.petInfo = entity
           return .send(.moveToAttendanceView(attendance, entity))

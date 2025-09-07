@@ -114,7 +114,7 @@ public struct MyPageView: View {
     VStack(alignment: .center, spacing: .Number12) {
       Icon(image: .avartar, size: .Number72)
       HStack(alignment: .center, spacing: .Number4) {
-        Text(UserDefaultsKeys.userNickname ?? "{userName}")
+        Text(UserDefaultsKeys.username ?? "{userName}")
           .font(FontSet.Heading.heading3)
           .foregroundStyle(ColorSet.Text.Primary)
         Icon(

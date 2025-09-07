@@ -19,6 +19,9 @@ public struct SpotSuggestionDTO: DTO {
 
 public extension SpotSuggestionDTO {
   func toEntity() -> SpotSuggestionEntity {
-    return SpotSuggestionEntity(imageUploadURL: presignedUrl)
+    return SpotSuggestionEntity(
+      imageUploadURL: presignedUrl,
+      suggestionID: Int(suggestionId)
+    )
   }
 }

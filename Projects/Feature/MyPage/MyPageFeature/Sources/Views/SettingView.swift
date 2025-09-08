@@ -78,8 +78,8 @@ extension SettingView {
   private var settingListView: some View {
     ServiceSection
     BorderView(size: .xlarge)
-    NotiSection
-    BorderView(size: .xlarge)
+//    NotiSection
+//    BorderView(size: .xlarge)
     EtcSection
     if store.isLoggedIn {
       BorderView(size: .xlarge)

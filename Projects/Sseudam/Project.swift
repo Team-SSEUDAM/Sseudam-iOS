@@ -13,6 +13,7 @@ let project = Project.makeApp(
     "CFBundleDevelopmentRegion": "ko_KR",
     "CFBundleShortVersionString": "1.0.0",
     "CFBundleVersion": "1",
+    "CFBundleDisplayName": "쓰담",
     "CFBundleIconName": "AppIcon",
     "UILaunchStoryboardName": "LaunchScreen",
     "UIApplicationSceneManifest": [

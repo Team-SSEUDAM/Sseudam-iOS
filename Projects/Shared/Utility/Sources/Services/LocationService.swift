@@ -241,6 +241,8 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
         switch status {
         case .authorizedAlways, .authorizedWhenInUse:
           singleLocationManager.startUpdatingLocation()
+        case .notDetermined:
+          break
         default:
           singleLocationContinuation?.resume(returning: nil)
           singleLocationContinuation = nil
@@ -250,6 +252,8 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
         switch status {
         case .authorizedAlways, .authorizedWhenInUse:
           continuousLocationManager.startUpdatingLocation()
+        case .notDetermined:
+          break
         default:
           self.userLocation = nil
           userLocationContinuation?.yield(())

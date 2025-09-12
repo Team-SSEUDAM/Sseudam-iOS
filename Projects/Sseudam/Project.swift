@@ -11,7 +11,7 @@ import ProjectDescriptionHelpers
 let project = Project.makeApp(
   infoPlist: [
     "CFBundleDevelopmentRegion": "ko_KR",
-    "CFBundleShortVersionString": "1.0.0",
+    "CFBundleShortVersionString": "1.0.1",
     "CFBundleVersion": "1",
     "CFBundleDisplayName": "쓰담",
     "CFBundleIconName": "AppIcon",

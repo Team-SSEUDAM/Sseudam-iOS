@@ -207,6 +207,7 @@ public struct HeaderPageScrollView<Header: View, Pages: View>: View {
           }
           .frame(maxWidth: .infinity)
           .foregroundStyle(activeTab == label.title ? ColorSet.Text.Primary : ColorSet.Text.Tertiary)
+          .contentShape(Rectangle())
           .onTapGesture {
             withAnimation(.easeInOut(duration: 0.25)) {
               activeTab = label.title

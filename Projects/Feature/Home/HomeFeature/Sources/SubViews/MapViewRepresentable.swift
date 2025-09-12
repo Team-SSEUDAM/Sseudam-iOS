@@ -98,6 +98,7 @@ extension MapViewRepresentable {
     let point = Coordinates(latitude: cameraPosition.lat, longitude: cameraPosition.lng)
     
     if point != context.coordinator.lastCameraPoint {
+      view.mapView.positionMode = .direction
       moveCamera(view, to: location)
       context.coordinator.lastCameraPoint = location
     }

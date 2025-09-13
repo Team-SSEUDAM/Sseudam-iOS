@@ -93,6 +93,7 @@ public struct SuggestionFeature {
     
     case backButtonTapped
     case pop
+    case complete
     case backPageTapped
     
     public enum MixPanel: Equatable {
@@ -139,7 +140,7 @@ public struct SuggestionFeature {
       case .nextButtonTapped:
         /// 다음 페이지로 넘어가기 전에 현재 페이지에서 검증 action
         if state.currentPage == 2 { return .send(.validateSpotNameButtonTapped) }
-        if state.currentPage == 5 { return .send(.pop) }
+        if state.currentPage == 5 { return .send(.complete) }
         state.currentPage = min(state.currentPage + 1, 5)
         /// 다음 페이지에 따라 적절한 action을 보냄
         switch state.currentPage {
@@ -293,6 +294,9 @@ public struct SuggestionFeature {
         return .none
         
       case .pop:
+        return .none
+        
+      case .complete:
         return .none
       }
     }

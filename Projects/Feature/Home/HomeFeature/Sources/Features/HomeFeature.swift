@@ -207,13 +207,14 @@ public struct HomeFeature {
         switch action {
           // MARK: - Suggestion Action
         case .element(id: _, action: .suggestionView(.pop)):
+          state.isShowSuggestionFromDetail = false
           state.path.removeLast()
-          if state.isShowSuggestionFromDetail {
-            state.isShowSuggestionFromDetail = false
-            return .send(.presentDetailView(true, id: nil))
-          } else {
-            return .none
-          }
+          return .send(.presentDetailView(true, id: nil))
+          
+        case .element(id: _, action: .suggestionView(.complete)):
+          state.path.removeLast()
+          state.isShowSuggestionFromDetail = false
+          return .none
           
         case let .element(id: _, action: .suggestionView(.mixPanel(ev))):
           switch ev {

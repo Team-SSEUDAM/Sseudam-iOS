@@ -35,6 +35,8 @@ public struct HomeFeature {
     public var toastMessage: String? = nil
     public var isInitAppear: Bool = true
     public var bottomSheetHeight: CGFloat = .detailSheetHeight + .Number10
+    
+    public var isShowSuggestionFromDetail: Bool = false
     public init() {}
   }
 
@@ -55,6 +57,7 @@ public struct HomeFeature {
     
     case showReportView(detail: TrashSpotDetail?)
     case moveToSetting
+    case moveToSuggestionFromDetail
     case moveToSuggestion
     case suggestionButtonTapped
     case delegate(Delegate)
@@ -166,6 +169,14 @@ public struct HomeFeature {
         )
         // MARK: - Send Action to HomeRoot
         
+      case .moveToSuggestionFromDetail:
+        state.isPresentDetail = false
+        state.isShowSuggestionFromDetail = true
+        return .run { send in
+          await send(.delegate(.presentDetailView(false, id: nil)))
+          await send(.moveToSuggestion)
+        }
+        
       case .moveToSuggestion:
         let suggestionState = SuggestionFeature.State(state.location.lastCameraPosition)
         state.path.append(.suggestionView(suggestionState))
@@ -196,6 +207,18 @@ public struct HomeFeature {
         switch action {
           // MARK: - Suggestion Action
         case .element(id: _, action: .suggestionView(.pop)):
+          state.path.removeLast()
+          if state.isShowSuggestionFromDetail {
+            state.isShowSuggestionFromDetail = false
+            return .send(.presentDetailView(true, id: nil))
+          } else {
+            return .none
+          }
+          
+        case .element(id: _, action: .suggestionView(.complete)):
+          if state.isShowSuggestionFromDetail {
+            state.isShowSuggestionFromDetail = false
+          }
           state.path.removeLast()
           return .none
           

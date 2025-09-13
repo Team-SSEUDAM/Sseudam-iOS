@@ -63,8 +63,7 @@ public struct SecondaryButton<Icon: View>: View {
       .gesture(
         DragGesture(minimumDistance: .Number0)
           .onChanged { _ in isPressed = true }
-          .onEnded {
-            _ in
+          .onEnded { _ in
             isPressed = false
             Task { action() }
           }
@@ -83,6 +82,7 @@ public struct SecondaryButton<Icon: View>: View {
     .frame(maxWidth: .infinity)
     .padding(.vertical, size.padding.vertical)
     .padding(.horizontal, size.padding.horizontal)
+    .contentShape(Rectangle()) // 버튼의 패딩 영역도 터치 가능하게 설정
     .overlay(
       RoundedRectangle(cornerRadius: size.cornerRadius)
         .inset(by: 0.5)

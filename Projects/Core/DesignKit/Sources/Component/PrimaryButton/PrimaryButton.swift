@@ -103,6 +103,7 @@ public struct PrimaryButton<Icon: View, LoadingView: View>: View {
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, isLoading ? .Number4 : size.padding.vertical)
+    .contentShape(Rectangle())
     .background(
       RoundedRectangle(cornerRadius: size.cornerRadius)
         .fill(state.backgroundColor)

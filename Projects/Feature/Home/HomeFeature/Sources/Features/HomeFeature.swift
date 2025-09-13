@@ -55,6 +55,7 @@ public struct HomeFeature {
     
     case showReportView(detail: TrashSpotDetail?)
     case moveToSetting
+    case moveToSuggestionFromDetail
     case moveToSuggestion
     case suggestionButtonTapped
     case delegate(Delegate)
@@ -165,6 +166,14 @@ public struct HomeFeature {
           .send(.mixPanel(.reportStart))
         )
         // MARK: - Send Action to HomeRoot
+        
+      case .moveToSuggestionFromDetail:
+        state.isPresentDetail = false
+        
+        return .run { send in
+          await send(.delegate(.presentDetailView(false, id: nil)))
+          await send(.moveToSuggestion)
+        }
         
       case .moveToSuggestion:
         let suggestionState = SuggestionFeature.State(state.location.lastCameraPosition)

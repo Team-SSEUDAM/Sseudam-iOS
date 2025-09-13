@@ -35,6 +35,8 @@ public struct HomeFeature {
     public var toastMessage: String? = nil
     public var isInitAppear: Bool = true
     public var bottomSheetHeight: CGFloat = .detailSheetHeight + .Number10
+    
+    public var isShowSuggestionFromDetail: Bool = false
     public init() {}
   }
 
@@ -169,7 +171,7 @@ public struct HomeFeature {
         
       case .moveToSuggestionFromDetail:
         state.isPresentDetail = false
-        
+        state.isShowSuggestionFromDetail = true
         return .run { send in
           await send(.delegate(.presentDetailView(false, id: nil)))
           await send(.moveToSuggestion)
@@ -206,7 +208,12 @@ public struct HomeFeature {
           // MARK: - Suggestion Action
         case .element(id: _, action: .suggestionView(.pop)):
           state.path.removeLast()
-          return .none
+          if state.isShowSuggestionFromDetail {
+            state.isShowSuggestionFromDetail = false
+            return .send(.presentDetailView(true, id: nil))
+          } else {
+            return .none
+          }
           
         case let .element(id: _, action: .suggestionView(.mixPanel(ev))):
           switch ev {

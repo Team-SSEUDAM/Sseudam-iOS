@@ -7,12 +7,18 @@
     <img src="https://img.shields.io/badge/소개페이지-blue?style=for-the-badge&logo=notion&logoColor=white" alt="소개페이지" />
   </a>
   -->
+  
+  <a href="https://apps.apple.com/app/id6744023330">
+    <img src ="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg">
+  </a>
   <a href="https://www.instagram.com/sseu.dami/">
     <img src="https://img.shields.io/badge/@_sseu.dami-13BAFF?style=for-the-badge&logo=instagram&logoColor=white" alt="@_sseu.dami" />
   </a>
   <a href="https://github.com/Team-SSEUDAM/Sseudam-Server">
     <img src="https://img.shields.io/badge/Sseudam--Server-000000?style=for-the-badge&logo=github&logoColor=white" alt="Sseudam-Server" />
-  </a>
+  </a> 
+<br>
+
 </p>
 
 # 쓰담

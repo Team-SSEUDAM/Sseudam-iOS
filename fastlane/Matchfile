@@ -1,5 +1,6 @@
+
 git_url("https://github.com/usa4060/Sseudam-iOS_private.git")
 storage_mode("git")
-type("development", "appstore")
-app_identifier(["Sseudam.a2bo.ios.Debug", "Sseudam.a2bo.ios.Release"])
 username("cocoa9805@naver.com")
+app_identifier(["Sseudam.a2bo.ios.Debug", "Sseudam.a2bo.ios.Release"])
+type("development", "appstore")

@@ -7,10 +7,12 @@
 //
 
 import SwiftUI
+import Dependencies
 
 final class SceneDelegate: NSObject, UIWindowSceneDelegate {
   
   var window: UIWindow?
+  @Dependency(\.deepLinkClient) var deepLinkClient
   
   // MARK: - 앱이 실행될 때(Cold Launch) 호출되는 메서드
   /// 이 메서드는 앱이 처음 실행될 때 호출되며, 앱의 초기 설정이나 화면을 구성하는 데 사용됩니다.
@@ -70,6 +72,7 @@ extension SceneDelegate {
       print("🧊 Universal Link Cold Launch → 전달: \(path)")
     } else {
       //TODO: Live 상태 → 앱 SseudamFeature에 DeepLink Path 관련 action 전달
+      deepLinkClient.handle(path)
       print("🔥 Universal Link Live → 전달: \(path)")
     }
   }
@@ -84,6 +87,7 @@ extension SceneDelegate {
       print("🧊 Universal Link Cold Launch → 전달: \(path)")
     } else {
       //TODO: Live 상태 → 앱 SseudamFeature에 DeepLink Path 관련 action 전달
+      deepLinkClient.handle(path)
       print("🔥 Universal Link Live → 전달: \(path)")
     }
   }

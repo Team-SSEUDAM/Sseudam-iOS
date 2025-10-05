@@ -24,8 +24,6 @@ final class SceneDelegate: NSObject, UIWindowSceneDelegate {
     willConnectTo session: UISceneSession,
     options connectionOptions: UIScene.ConnectionOptions
   ) {
-    guard let scene = (scene as? UIWindowScene) else { return }
-    
     /// `푸시 알림`으로 앱 시작
     if let notiResponse = connectionOptions.notificationResponse {
       handlePushNotification(

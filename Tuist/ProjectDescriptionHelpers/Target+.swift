@@ -37,7 +37,12 @@ public extension Target {
       deploymentTargets: .iOS("18.0"),
       infoPlist: .extendingDefault(with: infoPlist),
       sources: ["Sources/**"],
-      resources: ["Resources/**"],
+      resources: [
+        .glob(
+            pattern: "Resources/**",
+            excluding: [env == .develop ? "Resources/Release/**" : "Resources/Dev/**"]
+        )
+      ],
       entitlements: .file(path: .relativeToRoot(env.entitlements)),
       scripts: script,
       dependencies: dependencies,

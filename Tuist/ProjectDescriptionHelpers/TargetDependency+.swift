@@ -98,6 +98,8 @@ public enum SPM: String, ModuleRepresentable {
   case NMapsMap = "NMapsMap"
   case DotLottie = "DotLottie"
   case Mixpanel = "Mixpanel"
+  case FirebaseCrashlytics = "FirebaseCrashlytics"
+  case FirebaseMessaging = "FirebaseMessaging"
   public var typePath: String { "SPM" }
 }
 
@@ -302,6 +304,8 @@ extension TargetDependency {
     public static let NMapsMap = Self.project(.spm(.NMapsMap))
     public static let DotLottie = Self.project(.spm(.DotLottie))
     public static let Mixpanel = Self.project(.spm(.Mixpanel))
+    public static let FirebaseCrashlytics = Self.project(.spm(.FirebaseCrashlytics))
+    public static let FirebaseMessaging = Self.project(.spm(.FirebaseMessaging))
   }
 }
 

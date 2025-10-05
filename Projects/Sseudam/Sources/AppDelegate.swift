@@ -94,6 +94,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate, MessagingDelegate {
     /// (optional) 나중에는, 이동해야하는 `경로에 따라 id 값들을 추가로 받아야 할 수` 있기 때문에 `DeepLink관련 Struct를 만들어 처리`하는 것을 고려
     if let path = userInfo["path"] as? String {
       deepLinkClient.handle(path)
+      print("🔔 Push Banner 탭: \(path)")
     }
   }
   

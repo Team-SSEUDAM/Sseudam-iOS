@@ -66,30 +66,16 @@ extension SceneDelegate {
   private func handleUniversalLink(url: URL, isColdLaunch: Bool) {
     guard let components = URLComponents(url: url, resolvingAgainstBaseURL: true) else { return }
     let path = components.path
-    
-    if isColdLaunch {
-      //TODO: Cold Launch → 앱 SseudamFeature에 DeepLink Path 관련 action 전달
-      print("🧊 Universal Link Cold Launch → 전달: \(path)")
-    } else {
-      //TODO: Live 상태 → 앱 SseudamFeature에 DeepLink Path 관련 action 전달
-      deepLinkClient.handle(path)
-      print("🔥 Universal Link Live → 전달: \(path)")
-    }
+    deepLinkClient.handle(path)
+    print("🔥 Universal Link 전달: \(path)")
   }
   
   // 🔔 푸시 알림 처리
   private func handlePushNotification(userInfo: [AnyHashable: Any], isColdLaunch: Bool) {
     // 푸시 페이로드에서 action 추출
     guard let path = userInfo["action"] as? String else { return }
-    
-    if isColdLaunch {
-      //TODO: Cold Launch → 앱 SseudamFeature에 DeepLink Path 관련 action 전달
-      print("🧊 Universal Link Cold Launch → 전달: \(path)")
-    } else {
-      //TODO: Live 상태 → 앱 SseudamFeature에 DeepLink Path 관련 action 전달
-      deepLinkClient.handle(path)
-      print("🔥 Universal Link Live → 전달: \(path)")
-    }
+    deepLinkClient.handle(path)
+    print("🔥 Push Notification 전달: \(path)")
   }
 }
 

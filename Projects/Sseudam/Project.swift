@@ -30,6 +30,7 @@ let project = Project.makeApp(
     "NMCLIENTSECRET": "$(NM_CLIENT_SECRET)",
     "BASE_URL": "$(BASE_URL)",
     "APP_STORE_URL": "$(APP_STORE_URL)",
+    "FirebaseAppDelegateProxyEnabled": false,
     "MIXPANEL_TOKEN": "$(MIXPANEL_TOKEN)"
   ],
   dependencies: [

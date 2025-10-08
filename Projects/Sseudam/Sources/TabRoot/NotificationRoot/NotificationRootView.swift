@@ -9,6 +9,8 @@
 import SwiftUI
 import ComposableArchitecture
 
+import NotificationFeature
+
 struct NotificationRootView: View {
   
   @Bindable var store: StoreOf<NotificationRootFeature>
@@ -18,7 +20,7 @@ struct NotificationRootView: View {
   }
   
   var body: some View {
-    Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+    NotificationView(store: store.scope(state: \.notification, action: \.notification))
   }
 }
 

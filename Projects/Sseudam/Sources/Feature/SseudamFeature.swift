@@ -145,6 +145,10 @@ struct SseudamFeature {
         state.authFlow = isPresent ? .init() : nil
         return .send(.authFlow(.presentLogin(isPresent)))
         
+      case let .notificationRoot(.delegate(.requestLogin(isPresent, _))):
+        state.authFlow = isPresent ? .init() : nil
+        return .send(.authFlow(.presentLogin(isPresent)))
+        
       case let .myPetRoot(.delegate(.hiddenTabBar(isHidden))):
         state.isTabbarHidden = (isHidden)
         return .none
@@ -158,7 +162,8 @@ struct SseudamFeature {
           checkIsLoggedIn(),
           .send(.mypageRoot(.checkLoggedin)),
           .send(.myPetRoot(.checkLoggedin)),
-          .send(.homeRoot(.checkLoggedin))
+          .send(.homeRoot(.checkLoggedin)),
+          .send(.notificationRoot(.checkLoggedin))
         )
         
       case let .requestLogin(isPresent):

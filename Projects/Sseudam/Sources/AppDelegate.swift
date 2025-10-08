@@ -20,15 +20,8 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     FirebaseConfiguration.shared.setLoggerLevel(.min) /// Firebase 로그 최소화
     FirebaseApp.configure()
     Messaging.messaging().delegate = self
-    
     UNUserNotificationCenter.current().delegate = self
-    
-    let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
-    UNUserNotificationCenter.current().requestAuthorization(
-      options: authOptions,
-      completionHandler: { _, _ in }
-    )
-    application.registerForRemoteNotifications()
+    UIApplication.shared.registerForRemoteNotifications()
     return true
   }
   
@@ -64,14 +57,18 @@ extension AppDelegate: UNUserNotificationCenterDelegate, MessagingDelegate {
   
   //MARK: - APNs 토큰이 갱신되었을 때 호출
   func application(
-    application: UIApplication,
+    _ application: UIApplication,
     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
   ) {
     Messaging.messaging().apnsToken = deviceToken
+    let tokenString = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+    print("✅ APNs token: \(tokenString)")
   }
   
   //MARK: - FCM 토큰이 갱신되었을 때 호출
-  func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) { }
+  func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+    print("🔔 Firebase registration token: \(String(describing: fcmToken))")
+  }
   
   //MARK: - 포그라운드에서 알림 수신 시 처리
   func userNotificationCenter(

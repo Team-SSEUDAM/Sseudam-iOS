@@ -29,6 +29,7 @@ struct SseudamFeature {
     
     var homeRoot: HomeRootFeature.State = .init()
     var myPetRoot: MyPetRootFeature.State = .init()
+    var notificationRoot: NotificationRootFeature.State = .init()
     var mypageRoot: MyPageRootFeature.State = .init()
     
     var forceUpdateCheck: ForceUpdateFeature.State = .init()
@@ -48,6 +49,7 @@ struct SseudamFeature {
     
     case homeRoot(HomeRootFeature.Action)
     case myPetRoot(MyPetRootFeature.Action)
+    case notificationRoot(NotificationRootFeature.Action)
     case mypageRoot(MyPageRootFeature.Action)
     case authFlow(AuthFlowFeature.Action)
     case userEntry(UserEntryFeature.Action)
@@ -74,6 +76,9 @@ struct SseudamFeature {
     }
     Scope(state: \.myPetRoot, action: \.myPetRoot) {
       MyPetRootFeature()
+    }
+    Scope(state: \.notificationRoot, action: \.notificationRoot) {
+      NotificationRootFeature()
     }
     Scope(state: \.mypageRoot, action: \.mypageRoot) {
       MyPageRootFeature()

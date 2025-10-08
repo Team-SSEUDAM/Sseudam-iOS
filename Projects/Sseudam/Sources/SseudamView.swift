@@ -30,52 +30,62 @@ struct SseudamView: View {
   
   var body: some View {
     
+    contents
+      .onChange(of: scenePhase) { _, newPhase in
+        switch newPhase {
+        case .active:
+          store.send(.scenePhaseChanged(.active))
+        case .background:
+          store.send(.scenePhaseChanged(.background))
+        default: break
+        }
+      }
+      .onAppear {
+        store.send(.onAppear)
+      }
+      .task {
+        for await city in LocationService.shared.cityUpdateStream {
+          guard let city else { continue }
+          store.send(.userLocationChanged(city))
+        }
+      }
+      .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in
+        LoginView(store: store)
+      }
+      .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.signUp, action: \.authFlow.modal.signUp)) { store in
+        NickNameInputView(store: store)
+      }
+      .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.complete, action: \.authFlow.modal.complete)) { store in
+        SignUpCompleteView(store: store)
+      }
+      .fullScreenCover(item: $store.scope(state: \.userEntry?.modal?.attendance, action: \.userEntry.modal.attendance)) { store in
+        AttendanceView(store: store)
+      }
+      .fullScreenCover(item: $store.scope(state: \.userEntry?.modal?.levelUp, action: \.userEntry.modal.levelUp)) { store in
+        LevelUpView(store: store)
+      }
+      
+  }
+  
+  @ViewBuilder
+  var contents: some View {
     ZStack(alignment: .bottom) {
       TabView(selection: $store.selectedTab) {
         HomeRootView(store: store.scope(state: \.homeRoot, action: \.homeRoot))
           .tag(TabBarItem.home)
         MyPetRootView(store: store.scope(state: \.myPetRoot, action: \.myPetRoot))
           .tag(TabBarItem.myPet)
+        NotificationRootView(store: store.scope(state: \.notificationRoot, action: \.notificationRoot))
+          .tag(TabBarItem.notification)
         MyPageRootView(store: store.scope(state: \.mypageRoot, action: \.mypageRoot))
-          .tag(TabBarItem.myPage)
+          .tag(TabBarItem.myPage).transaction { transaction in
+            transaction.disablesAnimations = true
+          }
       }
       TabBar
       AlertView
     }
-    .onChange(of: scenePhase) { _, newPhase in
-      switch newPhase {
-      case .active:
-        store.send(.scenePhaseChanged(.active))
-      case .background:
-        store.send(.scenePhaseChanged(.background))
-      default: break
-      }
-    }
-    .onAppear {
-      store.send(.onAppear)
-    }
-    .task {
-      for await city in LocationService.shared.cityUpdateStream {
-        guard let city else { continue }
-        store.send(.userLocationChanged(city))
-      }
-    }
     .ignoresSafeArea(edges: .bottom)
-    .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.login, action: \.authFlow.modal.login)) { store in
-      LoginView(store: store)
-    }
-    .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.signUp, action: \.authFlow.modal.signUp)) { store in
-      NickNameInputView(store: store)
-    }
-    .fullScreenCover(item: $store.scope(state: \.authFlow?.modal?.complete, action: \.authFlow.modal.complete)) { store in
-      SignUpCompleteView(store: store)
-    }
-    .fullScreenCover(item: $store.scope(state: \.userEntry?.modal?.attendance, action: \.userEntry.modal.attendance)) { store in
-      AttendanceView(store: store)
-    }
-    .fullScreenCover(item: $store.scope(state: \.userEntry?.modal?.levelUp, action: \.userEntry.modal.levelUp)) { store in
-      LevelUpView(store: store)
-    }
     .transaction { transaction in
       transaction.disablesAnimations = true
     }

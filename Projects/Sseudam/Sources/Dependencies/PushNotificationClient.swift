@@ -17,6 +17,7 @@ struct PushNotificationClient {
   var requestAuthorization: @Sendable () async -> Bool = { false }
   var getFCMToken: @Sendable () async -> String? = { nil }
   var registerForRemoteNotifications: @Sendable () -> Void = {}
+  var openSettings: @Sendable () async -> Void = {}
 }
 
 extension PushNotificationClient: DependencyKey {
@@ -54,6 +55,16 @@ extension PushNotificationClient: DependencyKey {
       Task { @MainActor in
         UIApplication.shared.registerForRemoteNotifications()
       }
+    },
+    openSettings: {
+      await UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
     }
   )
+}
+
+extension DependencyValues {
+  var pushNotificationClient: PushNotificationClient {
+    get { self[PushNotificationClient.self] }
+    set { self[PushNotificationClient.self] = newValue }
+  }
 }

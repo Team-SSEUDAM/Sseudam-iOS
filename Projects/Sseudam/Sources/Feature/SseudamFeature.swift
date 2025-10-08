@@ -19,6 +19,8 @@ import TrashDetailFeature
 import AuthFeature
 import AttendanceFeature
 
+import UserDomainInterface
+
 @Reducer
 struct SseudamFeature {
   
@@ -54,6 +56,11 @@ struct SseudamFeature {
     case forceUpdateCheck(ForceUpdateFeature.Action)
     case mixpanel(MixPanelFeature.Action)
     
+    case checkAndRequestPushPermissionIfNeeded
+    case subscribeFCMTokenUpdates
+    case dynamicUpdateFCMToken
+    case fcmTokenReceived(String)
+    
     case requestLogin(isPresent: Bool)
     case open(URL)
     
@@ -66,6 +73,8 @@ struct SseudamFeature {
   
   @Dependency(\.openURL) var openURL
   @Dependency(\.sessionTracker) var sessionTracker
+  @Dependency(\.pushNotificationClient) var pushNotificationClient
+  @Dependency(\.UpdateFCMTokenUseCase) var updateFCMTokenUseCase
   
   var body: some ReducerOf<Self> {
     BindingReducer()
@@ -94,8 +103,39 @@ struct SseudamFeature {
         return .none
         
       case .onAppear:
-        return .none
+        return .merge(
+          .send(.checkAndRequestPushPermissionIfNeeded),
+          .send(.subscribeFCMTokenUpdates)
+        )
         
+      case .subscribeFCMTokenUpdates:
+        return .run { send in
+          for await notification in NotificationCenter.default.notifications(named: .didReceiveFCMToken) {
+            if let token = notification.userInfo?["token"] as? String {
+              await send(.fcmTokenReceived(token))
+            }
+          }
+        }
+        
+      case .dynamicUpdateFCMToken:
+        return .run { _ in
+          if let token = await pushNotificationClient.getFCMToken() {
+            try? await updateFCMTokenUseCase.execute(token)
+          }
+        }
+        
+      case let .fcmTokenReceived(token):
+        return .run { _ in try? await updateFCMTokenUseCase.execute(token) }
+        
+      case .checkAndRequestPushPermissionIfNeeded:
+        return .run { send in
+          let status = await pushNotificationClient.checkAuthorizationStatus()
+          switch status {
+          case .notDetermined: let _ = await pushNotificationClient.requestAuthorization()
+          default: break
+          }
+        }
+
       case .scenePhaseChanged(.active):
         return .merge(
           .send(.forceUpdateCheck(.onAppear)),
@@ -409,7 +449,10 @@ extension SseudamFeature {
   private func checkIsLoggedIn() -> Effect<Action> {
     if UserDefaultsKeys.isLoggedIn ?? false ,
        let userId = UserDefaultsKeys.userId {
-      return .send(.checkUserEntryState(userId: userId))
+      return .run { send in
+        await send(.dynamicUpdateFCMToken)
+        await send(.checkUserEntryState(userId: userId))
+      }
     }
     return .none
   }

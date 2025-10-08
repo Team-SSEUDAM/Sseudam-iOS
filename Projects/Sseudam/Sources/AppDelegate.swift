@@ -10,6 +10,7 @@ import SwiftUI
 import Dependencies
 import FirebaseCore
 import FirebaseMessaging
+import Utility
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
   func application(
@@ -67,7 +68,13 @@ extension AppDelegate: UNUserNotificationCenterDelegate, MessagingDelegate {
   
   //MARK: - FCM 토큰이 갱신되었을 때 호출
   func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-    print("🔔 Firebase registration token: \(String(describing: fcmToken))")
+    guard let token = fcmToken else { return }
+    print("🔔 Firebase registration token: \(String(describing: token))")
+    NotificationCenter.default.post(
+      name: .didReceiveFCMToken,
+      object: nil,
+      userInfo: ["token": token]
+    )
   }
   
   //MARK: - 포그라운드에서 알림 수신 시 처리

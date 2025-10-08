@@ -172,6 +172,10 @@ struct DependencyRegister {
       FetchUserInfoUseCase.live(repository: userReoository)
     }
     
+    UpdateFCMTokenUseCaseRegister {
+      UpdateFCMTokenUseCase.live(repository: userReoository)
+    }
+    
     // MARK: - Trash Spot
     
     FetchTrashSpotUseCaseRegister {

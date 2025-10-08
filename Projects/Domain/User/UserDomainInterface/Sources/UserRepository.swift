@@ -16,6 +16,7 @@ public struct UserRepository {
   public var deleteAreaList: @Sendable () async throws -> Void
   public var withdrawal: @Sendable () async throws -> Void
   public var fetchUserInfo: @Sendable () async throws -> UserInfoEntity
+  public var putFCMToken: @Sendable (String) async throws -> Void
 
   public init(
     checkNicknameValidate: @Sendable @escaping (String) async throws -> NicknameValidEntity,
@@ -24,7 +25,8 @@ public struct UserRepository {
     fetchAreaList: @Sendable @escaping () async throws -> [String],
     deleteAreaList: @Sendable @escaping () async throws -> Void,
     withdrawal: @Sendable @escaping () async throws -> Void,
-    fetchUserInfo: @Sendable @escaping () async throws -> UserInfoEntity
+    fetchUserInfo: @Sendable @escaping () async throws -> UserInfoEntity,
+    putFCMToken: @Sendable @escaping (String) async throws -> Void
   ) {
     self.checkNicknameValidate = checkNicknameValidate
     self.changeNickname = changeNickname
@@ -33,5 +35,6 @@ public struct UserRepository {
     self.deleteAreaList = deleteAreaList
     self.withdrawal = withdrawal
     self.fetchUserInfo = fetchUserInfo
+    self.putFCMToken = putFCMToken
   }
 }

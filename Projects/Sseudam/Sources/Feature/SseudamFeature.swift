@@ -105,21 +105,7 @@ struct SseudamFeature {
         return .merge(
           .send(.forceUpdateCheck(.onAppear)),
           checkIsLoggedIn(),
-          .run { send in
-            let ctx = currentUserCtx()
-            let info = await sessionTracker.start(Date())
-            await send(
-              .mixpanel(
-                .track(
-                  .sessionStarted(
-                    session_duration: info.previous_session_duration,
-                    previous_session_gap: info.previous_session_gap,
-                    ctx: ctx
-                  )
-                )
-              )
-            )
-          }
+          sendSceneActiveAction()
         )
         
       case .scenePhaseChanged(.background):
@@ -145,180 +131,8 @@ struct SseudamFeature {
         return .none
         
       case let .homeRoot(.mixPanel(action)):
-        switch action {
-        case .suggestionStart:
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .suggestionStartNew(
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-          
-        case .suggestionClickLocation:
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .suggestionClickLocation(
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-          
-        case .suggestionSetLocation:
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .suggestionSetLocation(
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-          
-        case let .suggestionInputName(length):
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .suggestionInputName(
-                    description_length: length,
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-          
-        case let .suggestionSelectCategory(type):
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .suggestionSelectCategory(
-                    trash_type: type,
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-          
-        case let .suggestionUploadPhoto(file_size, photo_type):
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .suggestionUploadPhoto(
-                    file_size: file_size,
-                    photo_type: photo_type,
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-          
-        case let .suggestionCompleteSubmission(submission_id):
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .suggestionCompleteSubmission(
-                    submission_id: submission_id,
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-          
-        case .reportStart:
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .reportStartNew(
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-          
-        case let .reportSelectCategory(repoty_type):
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .reportSelectCategory(
-                    selected_info_types: repoty_type,
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-          
-        case .reportCompleteSubmission:
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .reportCompleteSubmission(
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-          
-        case let .category(categoryType, userLogin):
-          return .run { send in
-            await send(.mixpanel(.track(
-              .mapCategoryTapped(
-                category_type: categoryType,
-                user_login: userLogin,
-                ctx: currentUserCtx()
-              )
-            )))
-          }
-          
-        case let .mapPinTapped(id, trashType, distance):
-          return .run { send in
-            await send(.mixpanel(.track(
-              .mapPinTapped(
-                trash_id: id,
-                trash_type: trashType,
-                distance_from_user: distance,
-                user_login: UserDefaultsKeys.isLoggedIn ?? false,
-                ctx: currentUserCtx()
-              )
-            )))
-          }
-          
-        case let .visitCompleted(id, trashType, distance):
-          return .run { send in
-            await send(.mixpanel(.track(
-              .visitAuthCompleted(
-                trash_id: id,
-                trash_type: trashType,
-                distance_from_user: distance,
-                ctx: currentUserCtx()
-              )
-            )))
-          }
-        }
-        
+        return manageHomeMixpanel(action)
+      
       case let .mypageRoot(.delegate(.requestLogin(isPresent, _))):
         state.authFlow = isPresent ? .init() : nil
         return .send(.authFlow(.presentLogin(isPresent)))
@@ -374,22 +188,7 @@ struct SseudamFeature {
         }
         
       case let .userEntry(.mixPanel(action)):
-        switch action {
-        case let .attendanceComplete(count):
-          return .run { send in
-            await send(
-              .mixpanel(
-                .track(
-                  .attendanceCompletedNth(
-                    streak_count: count,
-                    ctx: currentUserCtx()
-                  )
-                )
-              )
-            )
-          }
-        }
-        
+        return manageUserEntryMixpanel(action)
         
         // MARK: - User Location
       case let .userLocationChanged(location):
@@ -448,6 +247,224 @@ extension SseudamFeature {
 
       // 공통적으로 알림 닫기
       await send(.dismissAlert(true))
+    }
+  }
+  
+  
+}
+
+// MARK: - Mixpanel Action
+extension SseudamFeature {
+  
+  fileprivate func manageUserEntryMixpanel(_ action: UserEntryFeature.MixPanel) -> Effect<Action> {
+    switch action {
+    case let .attendanceComplete(count):
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .attendanceCompletedNth(
+                streak_count: count,
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+    }
+  }
+  
+  fileprivate func manageHomeMixpanel(_ action: HomeRootFeature.MixPanel) -> Effect<Action> {
+    switch action {
+    case .suggestionStart:
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .suggestionStartNew(
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+      
+    case .suggestionClickLocation:
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .suggestionClickLocation(
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+      
+    case .suggestionSetLocation:
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .suggestionSetLocation(
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+      
+    case let .suggestionInputName(length):
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .suggestionInputName(
+                description_length: length,
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+      
+    case let .suggestionSelectCategory(type):
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .suggestionSelectCategory(
+                trash_type: type,
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+      
+    case let .suggestionUploadPhoto(file_size, photo_type):
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .suggestionUploadPhoto(
+                file_size: file_size,
+                photo_type: photo_type,
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+      
+    case let .suggestionCompleteSubmission(submission_id):
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .suggestionCompleteSubmission(
+                submission_id: submission_id,
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+      
+    case .reportStart:
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .reportStartNew(
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+      
+    case let .reportSelectCategory(repoty_type):
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .reportSelectCategory(
+                selected_info_types: repoty_type,
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+      
+    case .reportCompleteSubmission:
+      return .run { send in
+        await send(
+          .mixpanel(
+            .track(
+              .reportCompleteSubmission(
+                ctx: currentUserCtx()
+              )
+            )
+          )
+        )
+      }
+      
+    case let .category(categoryType, userLogin):
+      return .run { send in
+        await send(.mixpanel(.track(
+          .mapCategoryTapped(
+            category_type: categoryType,
+            user_login: userLogin,
+            ctx: currentUserCtx()
+          )
+        )))
+      }
+      
+    case let .mapPinTapped(id, trashType, distance):
+      return .run { send in
+        await send(.mixpanel(.track(
+          .mapPinTapped(
+            trash_id: id,
+            trash_type: trashType,
+            distance_from_user: distance,
+            user_login: UserDefaultsKeys.isLoggedIn ?? false,
+            ctx: currentUserCtx()
+          )
+        )))
+      }
+      
+    case let .visitCompleted(id, trashType, distance):
+      return .run { send in
+        await send(.mixpanel(.track(
+          .visitAuthCompleted(
+            trash_id: id,
+            trash_type: trashType,
+            distance_from_user: distance,
+            ctx: currentUserCtx()
+          )
+        )))
+      }
+    }
+  }
+  
+  fileprivate func sendSceneActiveAction() -> Effect<Action> {
+    return .run { send in
+      let ctx = currentUserCtx()
+      let info = await sessionTracker.start(Date())
+      await send(
+        .mixpanel(
+          .track(
+            .sessionStarted(
+              session_duration: info.previous_session_duration,
+              previous_session_gap: info.previous_session_gap,
+              ctx: ctx
+            )
+          )
+        )
+      )
     }
   }
   

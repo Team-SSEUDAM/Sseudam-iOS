@@ -34,6 +34,9 @@ public struct NotificationFeature {
   
   public enum Delegate: Equatable {
     case requestLogin(Bool)
+    case showThrowTrash(id: Int)
+    case moveAcceptList
+    case showRefuseAlert
   }
 
   public var body: some ReducerOf<Self> {
@@ -56,8 +59,15 @@ public struct NotificationFeature {
         return .send(.delegate(.requestLogin(true)))
         
       case let .itemTapped(type):
-        print(type)
-        return .none
+        switch type {
+        case .trashThrow:
+          return .send(.delegate(.showThrowTrash(id: 30)))
+        case .accept:
+          return .send(.delegate(.moveAcceptList))
+        case .refuse:
+          return .send(.delegate(.showRefuseAlert))
+        }
+        
         
         default: return .none
       }

@@ -32,6 +32,9 @@ struct NotificationRootFeature {
   
   enum Delegate: Equatable {
     case requestLogin(Bool, AuthEntryPoint)
+    case showThrowTrash(id: Int)
+    case moveAcceptList
+    case showRefuseAlert
   }
   
   @Reducer(state: .equatable, action: .equatable)
@@ -53,6 +56,16 @@ struct NotificationRootFeature {
         switch action {
         case let .requestLogin(isPresent):
           return .send(.delegate(.requestLogin(isPresent, .notification)))
+          
+        case let .showThrowTrash(id):
+          return .send(.delegate(.showThrowTrash(id: id)))
+          
+        case .moveAcceptList:
+          return .send(.delegate(.moveAcceptList))
+          
+        case .showRefuseAlert:
+          return .send(.delegate(.showRefuseAlert))
+          
         }
       default: return .none
       }

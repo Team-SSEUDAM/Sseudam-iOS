@@ -59,6 +59,8 @@ struct SseudamFeature {
     case requestLogin(isPresent: Bool)
     case open(URL)
     
+    case showThrowTrash(id: Int)
+    
     case closeAlertAction
     case acceptAlertAction
     case dismissAlert(Bool)
@@ -145,9 +147,9 @@ struct SseudamFeature {
         state.authFlow = isPresent ? .init() : nil
         return .send(.authFlow(.presentLogin(isPresent)))
         
-      case let .notificationRoot(.delegate(.requestLogin(isPresent, _))):
-        state.authFlow = isPresent ? .init() : nil
-        return .send(.authFlow(.presentLogin(isPresent)))
+        // Handle notification delegate
+      case let .notificationRoot(.delegate(action)):
+        return delegateNotification(action)
         
       case let .myPetRoot(.delegate(.hiddenTabBar(isHidden))):
         state.isTabbarHidden = (isHidden)
@@ -169,6 +171,10 @@ struct SseudamFeature {
       case let .requestLogin(isPresent):
         state.authFlow = isPresent ? .init() : nil
         return .send(.authFlow(.presentLogin(isPresent)))
+        
+        
+      case .showThrowTrash:
+        return .send(.selectTab(.home))
         
         // MARK: - Alert
         
@@ -193,7 +199,7 @@ struct SseudamFeature {
         }
         
       case let .userEntry(.mixPanel(action)):
-        return manageUserEntryMixpanel(action)
+        return handleUserEntryMixpanel(action)
         
         // MARK: - User Location
       case let .userLocationChanged(location):
@@ -258,10 +264,29 @@ extension SseudamFeature {
   
 }
 
+// MARK: - Notification Delegate Action
+extension SseudamFeature {
+  fileprivate func delegateNotification(_ action: NotificationRootFeature.Delegate) -> Effect<Action> {
+    switch action {
+    case let .requestLogin(isPresent, _):
+      return .send(.requestLogin(isPresent: isPresent))
+      
+    case let .showThrowTrash(id):
+      return .send(.showThrowTrash(id: id))
+      
+    case .moveAcceptList:
+      return .send(.selectTab(.myPage))
+      
+    case .showRefuseAlert:
+      return .none
+    }
+  }
+}
+
 // MARK: - Mixpanel Action
 extension SseudamFeature {
   
-  fileprivate func manageUserEntryMixpanel(_ action: UserEntryFeature.MixPanel) -> Effect<Action> {
+  fileprivate func handleUserEntryMixpanel(_ action: UserEntryFeature.MixPanel) -> Effect<Action> {
     switch action {
     case let .attendanceComplete(count):
       return .run { send in

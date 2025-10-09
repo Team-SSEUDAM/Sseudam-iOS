@@ -7,6 +7,7 @@
 //
 
 import ComposableArchitecture
+import NotificationDomainInterface
 import UserDefaults
 
 @Reducer
@@ -17,6 +18,7 @@ public struct NotificationFeature {
   @ObservableState
   public struct State: Equatable {
     public var isLoggedIn: Bool = false
+    public var data: [NotificationEntity] = []
     public init() {}
   }
 
@@ -25,6 +27,7 @@ public struct NotificationFeature {
     case onAppear
     case checkLoggedIn
     case requestLogin
+    case itemTapped(NotificationType)
     
     case delegate(Delegate)
   }
@@ -38,6 +41,11 @@ public struct NotificationFeature {
     Reduce { state, action in
       switch action {
       case .onAppear:
+        state.data = [
+          .init(contents: "{{닉네임}}님이 제보한 쓰레기통에 쓰레기가 버려졌어요.", date: "2025-10-09T00:01:09.800", type: .trashThrow),
+          .init(contents: "ㅇㅇ쓰레기통 제보가 승인되었어요.", date: "2025-10-09T00:01:09.800", type: .accept),
+          .init(contents: "ㅇㅇ쓰레기통 제보가 반려되었어요.", date: "2025-10-09T00:01:09.800", type: .refuse)
+        ]
         return .send(.checkLoggedIn)
         
       case .checkLoggedIn:
@@ -46,6 +54,10 @@ public struct NotificationFeature {
         
       case .requestLogin:
         return .send(.delegate(.requestLogin(true)))
+        
+      case let .itemTapped(type):
+        print(type)
+        return .none
         
         default: return .none
       }

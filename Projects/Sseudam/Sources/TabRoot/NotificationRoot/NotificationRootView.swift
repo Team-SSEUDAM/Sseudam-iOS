@@ -20,7 +20,7 @@ struct NotificationRootView: View {
   }
   
   var body: some View {
-    NotificationView(store: store.scope(state: \.notification, action: \.notification))
+    NotificationView(store: store.scope(state: \.notifications, action: \.notification))
   }
 }
 

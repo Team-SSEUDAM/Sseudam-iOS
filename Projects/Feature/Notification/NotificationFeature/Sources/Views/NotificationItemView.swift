@@ -7,10 +7,20 @@
 //
 
 import SwiftUI
+import NotificationDomainInterface
 import DesignKit
+import Utility
 
 public struct NotificationItemView: View {
-    public var body: some View {
+  private var data: NotificationEntity
+  private var onTap: ((NotificationType) -> Void)?
+  
+  init(data: NotificationEntity, onTap: ((NotificationType) -> Void)?) {
+    self.data = data
+    self.onTap = onTap
+  }
+  
+  public var body: some View {
     ZStack {
       ColorSet.Background.Primary
       contentView
@@ -27,10 +37,10 @@ public struct NotificationItemView: View {
   private var contentView: some View {
     HStack(alignment: .center) {
       VStack(alignment: .leading, spacing: .Number0) {
-        Text("ㅇㅇ님이 제보한\n쓰레기통에 쓰레기가 버려졌어요.")
+        Text(data.contents)
           .font(FontSet.Body.body2)
           .foregroundStyle(ColorSet.Text.Primary)
-        Text("25.01.01")
+        Text(data.date.toFormattedDate("yy.MM.dd"))
           .font(FontSet.Caption.caption1)
           .foregroundStyle(ColorSet.Text.Tertiary)
       }
@@ -44,6 +54,12 @@ public struct NotificationItemView: View {
     }
     .padding(.vertical, .Number14)
     .padding(.horizontal, .Number16)
+    .contentShape(Rectangle())
+    .onTapGesture {
+      if let onTap = onTap {
+        onTap(data.type)
+      }
+    }
   }
   
 }

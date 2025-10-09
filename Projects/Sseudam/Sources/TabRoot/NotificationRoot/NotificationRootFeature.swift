@@ -17,7 +17,7 @@ import Utility
 struct NotificationRootFeature {
   @ObservableState
   struct State: Equatable {
-    var notification: NotificationFeature.State = .init()
+    var notifications: NotificationFeature.State = .init()
     @Presents var modal: ModalDestination.State?
   }
   
@@ -41,10 +41,10 @@ struct NotificationRootFeature {
   
   var body: some ReducerOf<Self> {
     BindingReducer()
-    Scope(state: \.notification, action: \.notification) {
+    Scope(state: \.notifications, action: \.notification) {
       NotificationFeature()
     }
-    Reduce { stata, action in
+    Reduce { state, action in
       switch action {
       case .checkLoggedin:
         return .send(.notification(.checkLoggedIn))

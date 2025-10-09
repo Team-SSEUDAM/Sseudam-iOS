@@ -13,7 +13,7 @@ import DesignKit
 
 public struct NotificationView: View {
   @Bindable var store: StoreOf<NotificationFeature>
-
+  
   public init(store: StoreOf<NotificationFeature>) {
     self.store = store
   }
@@ -48,8 +48,10 @@ public struct NotificationView: View {
   private var NotificationItems: some View {
     ScrollView {
       LazyVStack(spacing: .Number0) {
-        ForEach(0..<10) { _ in
-          NotificationItemView()
+        ForEach(store.data, id: \.contents) { item in
+          NotificationItemView(data: item) { type in
+            store.send(.itemTapped(type))
+          }
         }
       }
     }

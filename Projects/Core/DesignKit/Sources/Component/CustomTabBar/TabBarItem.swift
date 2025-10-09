@@ -20,8 +20,8 @@ public enum TabBarItem: String, CaseIterable, Identifiable {
   public var tabBarIcons: (selected: ImageSet, unselected: ImageSet) {
     switch self {
     case .home: return (.homeFilled, .home)
-    case .myPet: return (.interests, .interests)
-    case .notification: return (.notification, .notification)
+    case .myPet: return (.interestsFilled, .interests)
+    case .notification: return (.notificationFilled, .notification)
     case .myPage: return (.personFilled, .person)
     }
   }

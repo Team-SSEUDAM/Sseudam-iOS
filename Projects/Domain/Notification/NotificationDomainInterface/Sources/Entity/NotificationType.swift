@@ -19,4 +19,10 @@ public struct NotificationEntity: Hashable {
   public var date: String
   public var type: NotificationType
   
+  public init(contents: String, date: String, type: NotificationType) {
+    self.contents = contents
+    self.date = date
+    self.type = type
+  }
+  
 }

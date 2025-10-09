@@ -26,8 +26,7 @@ public struct NotificationView: View {
       if store.isLoggedIn {
         VStack(spacing: .Number0) {
           NavigationBarView
-          Spacer()
-          Text("hello")
+          NotificationItems
           Spacer()
         }
       } else {
@@ -43,6 +42,18 @@ public struct NotificationView: View {
     .onAppear {
       store.send(.onAppear)
     }
+  }
+  
+  @ViewBuilder
+  private var NotificationItems: some View {
+    ScrollView {
+      LazyVStack(spacing: .Number0) {
+        ForEach(0..<10) { _ in
+          NotificationItemView()
+        }
+      }
+    }
+    .padding(.bottom, .Number50)
   }
   
   @ViewBuilder

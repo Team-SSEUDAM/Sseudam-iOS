@@ -38,6 +38,7 @@ struct SseudamFeature {
     var userEntry: UserEntryFeature.State? = nil
     
     var presentAlert: AlertType? = nil
+    var presentDetailMessageAlert: AlertType? = nil
   }
   
   enum Action: BindableAction {
@@ -64,6 +65,9 @@ struct SseudamFeature {
     case closeAlertAction
     case acceptAlertAction
     case dismissAlert(Bool)
+    
+    case closeDetailAlert
+    case showDetailAlert(AlertType)
     
     case userLocationChanged(String)
   }
@@ -190,6 +194,14 @@ struct SseudamFeature {
         state.presentAlert = nil
         return .none
         
+      case .closeDetailAlert:
+        state.presentDetailMessageAlert = nil
+        return .none
+        
+      case let .showDetailAlert(type):
+        state.presentDetailMessageAlert = type
+        return .none
+        
         // MARK: - UserEntry
       case let .userEntry(.delegate(action)):
         switch action {
@@ -278,7 +290,7 @@ extension SseudamFeature {
       return .send(.selectTab(.myPage))
       
     case .showRefuseAlert:
-      return .none
+      return .send(.showDetailAlert(.refuseSuggestion("해당 위치에 쓰레기통이 없어요")))
     }
   }
 }

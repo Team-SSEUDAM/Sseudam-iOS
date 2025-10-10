@@ -84,6 +84,7 @@ struct SseudamView: View {
       }
       TabBar
       AlertView
+      DetailMessageAlertView
     }
     .ignoresSafeArea(edges: .bottom)
     .transaction { transaction in
@@ -106,7 +107,7 @@ struct SseudamView: View {
   
   @ViewBuilder
   var AlertView: some View {
-    if let alert =  store.presentAlert {
+    if let alert = store.presentAlert {
       Alert(
         type: alert,
         isErrorType: alert.isErrorType,
@@ -122,6 +123,17 @@ struct SseudamView: View {
           }
         }
       )
+    }
+  }
+  
+  @ViewBuilder
+  var DetailMessageAlertView: some View {
+    if let alert = store.presentDetailMessageAlert {
+      DetailMessageAlert(type: alert) {
+        Task { @MainActor in
+          store.send(.closeDetailAlert)
+        }
+      }
     }
   }
   

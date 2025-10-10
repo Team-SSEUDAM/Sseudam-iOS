@@ -26,8 +26,12 @@ public struct NotificationView: View {
       if store.isLoggedIn {
         VStack(spacing: .Number0) {
           NavigationBarView
-          NotificationItems
-          Spacer()
+          if store.data.isEmpty {
+            EmptyView
+          } else {
+            NotificationItems
+            Spacer()
+          }
         }
       } else {
         ZStack {
@@ -41,6 +45,17 @@ public struct NotificationView: View {
     }
     .onAppear {
       store.send(.onAppear)
+    }
+  }
+  
+  @ViewBuilder
+  private var EmptyView: some View {
+    VStack {
+      Spacer()
+      Text("아직 알림이 없어요!")
+        .font(FontSet.Body.body3)
+        .foregroundStyle(ColorSet.Text.Disabled)
+      Spacer()
     }
   }
   

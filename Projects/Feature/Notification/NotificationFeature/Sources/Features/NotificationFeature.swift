@@ -46,9 +46,9 @@ public struct NotificationFeature {
       switch action {
       case .onAppear:
         state.data = [
-          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{닉네임}}님이 제보한 쓰레기통에 쓰레기가 버려졌어요.", readStatus: true, createdAt: "2025-10-08T17:15:28.001012"),
-          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{쓰레기통 이름}}쓰레기통 제보가 승인되었어요.", readStatus: false, createdAt: "2025-10-08T17:15:28.001012"),
-          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{쓰레기통 이름}}쓰레기통 제보가 반려되었어요.", readStatus: true, createdAt: "2025-10-08T17:15:28.001012")
+//          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{닉네임}}님이 제보한 쓰레기통에 쓰레기가 버려졌어요.", readStatus: true, createdAt: "2025-10-08T17:15:28.001012"),
+//          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{쓰레기통 이름}}쓰레기통 제보가 승인되었어요.", readStatus: false, createdAt: "2025-10-08T17:15:28.001012"),
+//          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{쓰레기통 이름}}쓰레기통 제보가 반려되었어요.", readStatus: true, createdAt: "2025-10-08T17:15:28.001012")
         ]
         return .send(.checkLoggedIn)
         

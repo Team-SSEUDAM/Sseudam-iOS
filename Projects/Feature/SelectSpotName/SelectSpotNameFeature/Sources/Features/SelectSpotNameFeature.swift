@@ -192,7 +192,7 @@ extension SelectSpotNameFeature {
     /// error1: 0~1자 (우선순위 1)
     if name.count < 2 { return .tooShort }
     /// error2: 13자 이상 (우선순위 2)
-    if name.count > 12 { return .tooLong }
+    if name.count > 30 { return .tooLong }
     /// error3: 특수문자 + 이모지 포함 (우선순위 3)
     if containsInvalidCharacters(name) { return .containsSpecialChar }
     /// 모든 검사 통과

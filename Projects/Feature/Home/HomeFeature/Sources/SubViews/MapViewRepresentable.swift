@@ -12,6 +12,7 @@ import TrashSpotDomainInterface
 import Utility
 import NMapsMap
 import CoreGraphics
+import DesignKit
 
 struct MapViewRepresentable: UIViewRepresentable {
   
@@ -126,13 +127,29 @@ extension MapViewRepresentable {
     }
   }
   
-  private func markerTapEvent(to marker: NMFMarker, data: TrashSpot, context: Context) {
+  private func markerTapEvent(_ view: NMFNaverMapView, to marker: NMFMarker, data: TrashSpot, context: Context) {
     if marker == context.coordinator.activeMarker { return }
+    marker.zIndex = 100
     marker.iconImage = data.trashType.activePinImage
     context.coordinator.markerTapEvent(marker: marker, data: data)
     if let onMarkerTapped = onMarkerTapped {
       onMarkerTapped(data.id)
     }
+  }
+  
+  private func activeRadiusCircle(_ view: NMFNaverMapView, to location: Coordinates, radius: CGFloat, context: Context) {
+    let circle = NMFCircleOverlay(
+      NMGLatLng(
+        lat: location.latitude,
+        lng: location.longitude
+      ),
+      radius: radius,
+      fill: UIColor(ColorSet.Background.Primary.opacity(0.6))
+    )
+    circle.outlineColor = UIColor(ColorSet.Border.Inverse)
+    circle.outlineWidth = 1
+    circle.mapView = view.mapView
+    context.coordinator.activeRadiusOverlay = circle
   }
   
   /// 여러 마커의 중간지점 찾는 메서드
@@ -173,8 +190,9 @@ extension MapViewRepresentable {
       
       marker.touchHandler = { (overlay: NMFOverlay) -> Bool in
         guard let marker = overlay as? NMFMarker else { return true }
-        markerTapEvent(to: marker, data: item, context: context)
+        markerTapEvent(view, to: marker, data: item, context: context)
         moveCamera(view, to: item.location)
+        activeRadiusCircle(view, to: item.location, radius: .visitPossibleRadius, context: context)
         return true
       }
       return marker

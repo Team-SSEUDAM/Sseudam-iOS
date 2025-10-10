@@ -34,7 +34,7 @@ struct NotificationRootFeature {
     case requestLogin(Bool, AuthEntryPoint)
     case showThrowTrash(id: Int)
     case moveAcceptList
-    case showRefuseAlert
+    case showRefuseAlert(reason: String)
   }
   
   @Reducer(state: .equatable, action: .equatable)
@@ -63,8 +63,8 @@ struct NotificationRootFeature {
         case .moveAcceptList:
           return .send(.delegate(.moveAcceptList))
           
-        case .showRefuseAlert:
-          return .send(.delegate(.showRefuseAlert))
+        case let .showRefuseAlert(reason):
+          return .send(.delegate(.showRefuseAlert(reason: reason)))
           
         }
       default: return .none

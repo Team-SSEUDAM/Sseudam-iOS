@@ -6,6 +6,7 @@
 //  Created by Jiyeon
 //
 
+import Foundation
 import ComposableArchitecture
 import NotificationDomainInterface
 import UserDefaults
@@ -36,7 +37,7 @@ public struct NotificationFeature {
     case requestLogin(Bool)
     case showThrowTrash(id: Int)
     case moveAcceptList
-    case showRefuseAlert
+    case showRefuseAlert(reason: String)
   }
 
   public var body: some ReducerOf<Self> {
@@ -45,9 +46,9 @@ public struct NotificationFeature {
       switch action {
       case .onAppear:
         state.data = [
-          .init(contents: "{{닉네임}}님이 제보한 쓰레기통에 쓰레기가 버려졌어요.", date: "2025-10-09T00:01:09.800", type: .trashThrow),
-          .init(contents: "ㅇㅇ쓰레기통 제보가 승인되었어요.", date: "2025-10-09T00:01:09.800", type: .accept),
-          .init(contents: "ㅇㅇ쓰레기통 제보가 반려되었어요.", date: "2025-10-09T00:01:09.800", type: .refuse)
+          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{닉네임}}님이 제보한 쓰레기통에 쓰레기가 버려졌어요.", readStatus: true, createdAt: Date()),
+          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{쓰레기통 이름}}쓰레기통 제보가 승인되었어요.", readStatus: true, createdAt: Date()),
+          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{쓰레기통 이름}}쓰레기통 제보가 반려되었어요.", readStatus: true, createdAt: Date())
         ]
         return .send(.checkLoggedIn)
         
@@ -60,12 +61,14 @@ public struct NotificationFeature {
         
       case let .itemTapped(type):
         switch type {
-        case .trashThrow:
+        case .visitedSpot:
           return .send(.delegate(.showThrowTrash(id: 30)))
-        case .accept:
+        case .approveSuggestion, .approveReport:
           return .send(.delegate(.moveAcceptList))
-        case .refuse:
-          return .send(.delegate(.showRefuseAlert))
+        case .rejectSuggestion, .rejectReport:
+          return .send(.delegate(.showRefuseAlert(reason: "쓰레기통이 없어요")))
+        default:
+          return .none
         }
         
         

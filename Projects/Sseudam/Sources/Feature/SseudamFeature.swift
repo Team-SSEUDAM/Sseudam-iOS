@@ -289,8 +289,8 @@ extension SseudamFeature {
     case .moveAcceptList:
       return .send(.selectTab(.myPage))
       
-    case .showRefuseAlert:
-      return .send(.showDetailAlert(.refuseSuggestion("해당 위치에 쓰레기통이 없어요")))
+    case let .showRefuseAlert(reason):
+      return .send(.showDetailAlert(.refuseSuggestion(reason)))
     }
   }
 }

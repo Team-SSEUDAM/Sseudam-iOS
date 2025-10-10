@@ -8,21 +8,13 @@
 
 import Foundation
 
-public enum NotificationType {
-  case trashThrow
-  case accept
-  case refuse
-}
-
-public struct NotificationEntity: Hashable {
-  public var contents: String
-  public var date: String
-  public var type: NotificationType
-  
-  public init(contents: String, date: String, type: NotificationType) {
-    self.contents = contents
-    self.date = date
-    self.type = type
-  }
-  
+public enum NotificationType: Sendable, Equatable {
+  case approveSuggestion
+  case rejectSuggestion
+  case approveReport
+  case rejectReport
+  case newPetSeason
+  case visitedSpot
+  case adminPush
+  case regular
 }

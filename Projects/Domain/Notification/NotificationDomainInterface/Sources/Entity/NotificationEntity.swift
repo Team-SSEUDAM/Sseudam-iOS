@@ -16,7 +16,7 @@ public struct NotificationEntity: Sendable, Equatable, Identifiable {
   public var topic: String
   public var contents: String
   public var readStatus: Bool
-  public var createdAt: Date
+  public var createdAt: String
   
   public init(
     id: Int,
@@ -26,7 +26,7 @@ public struct NotificationEntity: Sendable, Equatable, Identifiable {
     topic: String,
     contents: String,
     readStatus: Bool,
-    createdAt: Date
+    createdAt: String
   ) {
     self.id = id
     self.userId = userId

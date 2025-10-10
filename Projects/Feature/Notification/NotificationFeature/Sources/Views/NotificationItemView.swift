@@ -15,14 +15,21 @@ public struct NotificationItemView: View {
   private var data: NotificationEntity
   private var onTap: ((NotificationType) -> Void)?
   
+  private var backgroundColor: Color
+  private var textColor: Color
+  private var iconColor: Color
+  
   init(data: NotificationEntity, onTap: ((NotificationType) -> Void)?) {
     self.data = data
     self.onTap = onTap
+    backgroundColor = data.readStatus ? ColorSet.Background.Secondary : ColorSet.Background.Primary
+    textColor = data.readStatus ? ColorSet.Text.Secondary : ColorSet.Text.Primary
+    iconColor = data.readStatus ? ColorSet.Icon.Secondary : ColorSet.Icon.Primary
   }
   
   public var body: some View {
     ZStack {
-      ColorSet.Background.Primary
+      backgroundColor
       contentView
       VStack{
         Spacer()
@@ -39,8 +46,8 @@ public struct NotificationItemView: View {
       VStack(alignment: .leading, spacing: .Number0) {
         Text(data.contents)
           .font(FontSet.Body.body2)
-          .foregroundStyle(ColorSet.Text.Primary)
-        Text(data.date.toFormattedDate("yy.MM.dd"))
+          .foregroundStyle(textColor)
+        Text(data.createdAt.toFormattedDate("yy.MM.dd"))
           .font(FontSet.Caption.caption1)
           .foregroundStyle(ColorSet.Text.Tertiary)
       }
@@ -49,7 +56,7 @@ public struct NotificationItemView: View {
         image: .rightChevron,
         size: .Number24,
         renderingMode: .template,
-        color: ColorSet.Icon.Secondary
+        color: iconColor
       )
     }
     .padding(.vertical, .Number14)

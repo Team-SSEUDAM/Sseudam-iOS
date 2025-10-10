@@ -9,9 +9,11 @@
 import Foundation
 
 public struct NotificationRepository {
-  public var fetchData: @Sendable () async throws -> Void
+  public var fetchNotification: @Sendable (FetchNotificationParameter) async throws -> NotificationListEntity?
 
-  public init(fetchData: @Sendable @escaping () async throws -> Void) {
-    self.fetchData = fetchData
+  public init(
+    fetchNotification: @Sendable @escaping (FetchNotificationParameter) async throws -> NotificationListEntity?
+  ) {
+    self.fetchNotification = fetchNotification
   }
 }

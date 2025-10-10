@@ -12,12 +12,10 @@ import NotificationDataInterface
 import NetworkKit
 
 public extension NotificationRepository {
-  static var live: NotificationRepository {
-    NotificationRepository(
-      fetchData: {
-        // 실제 네트워크 작업 구현
-        return
-      }
-    )
+  static func live(networker: NetworkKit) -> NotificationRepository {
+    NotificationRepository { parameter in
+      let endPoint = NotificationEndpoint.fetchNotification(parameter: parameter)
+      return try await networker.execute(with: endPoint).toEntity()
+    }
   }
 }

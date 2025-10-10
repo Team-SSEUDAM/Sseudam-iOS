@@ -8,13 +8,13 @@
 
 import Foundation
 
-public enum NotificationType: Sendable, Equatable {
-  case approveSuggestion
-  case rejectSuggestion
-  case approveReport
-  case rejectReport
-  case newPetSeason
-  case visitedSpot
-  case adminPush
-  case regular
+public enum NotificationType: String, Sendable, Equatable {
+  case approveSuggestion = "APPROVE_SUGGESTION"
+  case rejectSuggestion = "REJECT_SUGGESTION"
+  case approveReport = "APPROVE_REPORT"
+  case rejectReport = "REJECT_REPORT"
+  case newPetSeason = "NEW_PET_SEASON"
+  case visitedSpot = "ANONYMOUS_VISITED_SPOT"
+  case adminPush = "ADMIN_PUSH"
+  case regular = "REGULAR"
 }

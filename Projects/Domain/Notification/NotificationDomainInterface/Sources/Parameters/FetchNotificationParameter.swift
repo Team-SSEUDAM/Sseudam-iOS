@@ -12,4 +12,10 @@ public struct FetchNotificationParameter: Encodable {
   public var userId: Int
   public var size: Int
   public var lastId: Int?
+  
+  public init(userId: Int, size: Int, lastId: Int? = nil) {
+    self.userId = userId
+    self.size = size
+    self.lastId = lastId
+  }
 }

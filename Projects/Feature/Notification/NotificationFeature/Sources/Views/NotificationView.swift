@@ -14,6 +14,8 @@ import DesignKit
 public struct NotificationView: View {
   @Bindable var store: StoreOf<NotificationFeature>
   
+  private let bottomPadding: CGFloat = 13
+  
   public init(store: StoreOf<NotificationFeature>) {
     self.store = store
   }
@@ -24,15 +26,7 @@ public struct NotificationView: View {
         .ignoresSafeArea()
       
       if store.isLoggedIn {
-        VStack(spacing: .Number0) {
-          NavigationBarView
-          if store.data.isEmpty {
-            EmptyView
-          } else {
-            NotificationItems
-            Spacer()
-          }
-        }
+        contents
       } else {
         ZStack {
           VStack(spacing: .Number0) {
@@ -42,9 +36,24 @@ public struct NotificationView: View {
           requireLoginView
         }
       }
+      SnackBarView
+        .padding(.bottom, .tabbarHeight+bottomPadding)
     }
     .onAppear {
       store.send(.onAppear)
+    }
+  }
+  
+  @ViewBuilder
+  private var contents: some View {
+    VStack(spacing: .Number0) {
+      NavigationBarView
+      if store.data.isEmpty {
+        EmptyView
+      } else {
+        NotificationItems
+        Spacer()
+      }
     }
   }
   
@@ -78,6 +87,14 @@ public struct NotificationView: View {
     NavigationBar(
       title: "알림"
     )
+  }
+  
+  @ViewBuilder
+  private var SnackBarView: some View {
+    SnackBar(message: $store.toastMessage) {
+      store.send(.showToastMessage(nil))
+    }
+    .padding(.horizontal, .Number16)
   }
   
   

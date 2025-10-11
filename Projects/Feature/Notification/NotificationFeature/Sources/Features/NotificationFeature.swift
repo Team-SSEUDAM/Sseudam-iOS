@@ -10,6 +10,7 @@ import Foundation
 import ComposableArchitecture
 import NotificationDomainInterface
 import UserDefaults
+import Utility
 
 @Reducer
 public struct NotificationFeature {
@@ -20,6 +21,8 @@ public struct NotificationFeature {
   public struct State: Equatable {
     public var isLoggedIn: Bool = false
     public var data: [NotificationEntity] = []
+    public var lastId: Int? = nil
+    public var toastMessage: String? = nil
     public init() {}
   }
 
@@ -30,6 +33,11 @@ public struct NotificationFeature {
     case requestLogin
     case itemTapped(NotificationType)
     
+    case fetchNotificationItems
+    case fetchNotificationResult(Result<NotificationListEntity, NetworkError>)
+    
+    case showToastMessage(String?)
+    
     case delegate(Delegate)
   }
   
@@ -39,22 +47,23 @@ public struct NotificationFeature {
     case moveAcceptList
     case showRefuseAlert(reason: String)
   }
+  
+  @Dependency(\.FetchNotificationUseCase) private var fetchNotificationUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
     Reduce { state, action in
       switch action {
       case .onAppear:
-        state.data = [
-//          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{닉네임}}님이 제보한 쓰레기통에 쓰레기가 버려졌어요.", readStatus: true, createdAt: "2025-10-08T17:15:28.001012"),
-//          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{쓰레기통 이름}}쓰레기통 제보가 승인되었어요.", readStatus: false, createdAt: "2025-10-08T17:15:28.001012"),
-//          .init(id: 1, userId: 1, type: .visitedSpot, parameterValue: 1, topic: "", contents: "{{쓰레기통 이름}}쓰레기통 제보가 반려되었어요.", readStatus: true, createdAt: "2025-10-08T17:15:28.001012")
-        ]
         return .send(.checkLoggedIn)
         
       case .checkLoggedIn:
         state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
-        return .none
+        if state.isLoggedIn {
+          return .send(.fetchNotificationItems)
+        } else {
+          return .none
+        }
         
       case .requestLogin:
         return .send(.delegate(.requestLogin(true)))
@@ -71,8 +80,40 @@ public struct NotificationFeature {
           return .none
         }
         
+      case .fetchNotificationItems:
+        return fetchNotificationItems(lastId: state.lastId)
+        
+      case let .fetchNotificationResult(.success(data)):
+        state.data.append(contentsOf: data.items)
+        state.lastId = data.nextCursor
+        return .none
+        
+      case let .fetchNotificationResult(.failure(error)):
+        print(error)
+        return .send(.showToastMessage(error.localizedDescription))
+        
+      case let .showToastMessage(message):
+        state.toastMessage = message
+        return .none
         
         default: return .none
+      }
+    }
+  }
+  
+  private func fetchNotificationItems(lastId: Int?) -> Effect<Action> {
+    guard let userId = UserDefaultsKeys.userId else { return .none }
+    return .run { send in
+      let parameter: FetchNotificationParameter = .init(userId: userId, size: 20, lastId: lastId)
+      do {
+        if let data = try await fetchNotificationUseCase.execute(parameter) {
+          await send(.fetchNotificationResult(.success(data)))
+        }
+        
+      } catch let error as NetworkError {
+        await send(.fetchNotificationResult(.failure(error)))
+      } catch {
+        await send(.fetchNotificationResult(.failure(.customError(message: error.localizedDescription))))
       }
     }
   }

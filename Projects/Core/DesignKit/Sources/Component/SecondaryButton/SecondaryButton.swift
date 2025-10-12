@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-public struct SecondaryButton<Icon: View>: View {
+public struct SecondaryButton<Icon: View, LoadingView: View>: View {
   
   public enum SecondaryButtonSize {
     case large, medium
@@ -27,6 +27,13 @@ public struct SecondaryButton<Icon: View>: View {
       }
     }
     
+    public var lottie: CGFloat {
+      switch self {
+      case .large: return .Number40
+      case .medium: return .Number32
+      }
+    }
+    
     public var font: FontInfo {
       switch self {
       case .large: return FontSet.Label.label1
@@ -35,26 +42,33 @@ public struct SecondaryButton<Icon: View>: View {
     }
   }
   
-  private var title: String
   private var size: SecondaryButtonSize
   private var icon: () -> Icon
-  private var state: SecondaryButtonState
+  private var loadingView: () -> LoadingView
+  
   
   private var action: @Sendable () -> Void
   
+  @Binding private var state: SecondaryButtonState
+  @Binding public var title: String
+  @Binding public var isLoading: Bool
   @State private var isPressed: Bool = false
   
   public init(
     icon: @escaping () -> Icon = { EmptyView() },
-    title: String,
+    loadingView: @escaping () -> LoadingView = { EmptyView() },
+    isLoading: Binding<Bool> = .constant(false),
+    title: Binding<String>,
     size: SecondaryButtonSize = .large,
-    state: SecondaryButtonState = .normal,
+    state: Binding<SecondaryButtonState>,
     _ action: @escaping @Sendable () -> Void
   ) {
-    self.title = title
+    self._title = title
     self.size = size
     self.icon = icon
-    self.state = state
+    self.loadingView = loadingView
+    self._isLoading = isLoading
+    self._state = state
     self.action = action
   }
   
@@ -65,7 +79,7 @@ public struct SecondaryButton<Icon: View>: View {
           .onChanged { _ in isPressed = true }
           .onEnded { _ in
             isPressed = false
-            Task { action() }
+            action()
           }
       )
       .disabled(state == .disabled)
@@ -75,9 +89,14 @@ public struct SecondaryButton<Icon: View>: View {
   private var content: some View {
     HStack(spacing: .Number6) {
       icon()
-      Text(title)
-        .foregroundColor(state.textColor)
-        .font(size.font)
+      if isLoading {
+        loadingView()
+          .frame(width: size.lottie, height: size.lottie)
+      } else {
+        Text(title)
+          .foregroundColor(state.textColor)
+          .font(size.font)
+      }
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, size.padding.vertical)

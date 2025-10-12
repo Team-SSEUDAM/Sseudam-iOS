@@ -39,6 +39,7 @@ public struct SuggestionFeature {
     var nextButtonState: PrimaryButtonState = .normal
     var nextButtonText: String = "시작하기"
     var isLoading: Bool = false /// 다음 버튼의 로딩 상태
+    var isPhotoPage: Bool = false /// 현재 페이지가 선택 페이지면, PrimaryButton의 상태를 커스텀 상태로 변경해야함,,,
     
     /// 제보하기에 담길 데이터
     var spotName: String = ""
@@ -185,19 +186,20 @@ public struct SuggestionFeature {
         
       case .didAppearSelectKind:
         state.nextButtonText = "다음"
+        state.isPhotoPage = false
         return .merge([
           .send(.child(.writeName(.focusChanged(false)))),
           .send(.nextButtonIsEnabled(state.child.selectKind.isEnabled))
         ])
         
       case .didAppearSelectPhoto:
-        state.nextButtonText = "완료"
-        return .merge([
-          .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
-        ])
+        state.nextButtonText = "사진이 없어요"
+        state.isPhotoPage = true
+        return .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
         
       case .didAppearComplete:
         state.isNavigationBarHidden = true
+        state.isPhotoPage = false
         state.nextButtonText = "확인"
         return .run { send in
           await send(.nextButtonIsEnabled(true))

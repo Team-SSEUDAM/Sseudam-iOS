@@ -21,8 +21,7 @@ public struct SelectSpotNameFeature {
   public enum NameValidationResult: Equatable {
     case valid
     case tooShort           // error1: 0~1자 일때
-    case tooLong            // error2: 13자 이상일때
-    case containsSpecialChar // error3: 특수문자 + 이모지 포함
+    case tooLong            // error2: 30자 이상일때
     case startsWithSpace    // error4: 공백으로 시작
     case serverError(String?)        // 서버 통신 과정에서 오류
     case checking           // 서버 검증 중
@@ -36,9 +35,7 @@ public struct SelectSpotNameFeature {
       case .tooShort:
         return "쓰레기통 이름은 2자 이상 입력해주세요."
       case .tooLong:
-        return "쓰레기통 이름은 12자 이하로 입력해주세요."
-      case .containsSpecialChar:
-        return "쓰레기통 이름은 특수문자나 이모지 사용이 불가능해요."
+        return "쓰레기통 이름은 30자 이하로 입력해주세요."
       case .startsWithSpace:
         return "쓰레기통 이름은 공백으로 시작할 수 없어요."
       case let .serverError(errorMessage):
@@ -46,7 +43,7 @@ public struct SelectSpotNameFeature {
       case .checking:
         return "쓰레기통 이름을 확인하고 있어요..."
       case .empty:
-        return "2~12자까지 입력할 수 있어요."
+        return "2~30자까지 입력할 수 있어요."
       }
     }
     
@@ -57,7 +54,7 @@ public struct SelectSpotNameFeature {
       switch self {
       case .valid:
         return .accent
-      case .tooShort, .tooLong, .containsSpecialChar, .startsWithSpace, .serverError:
+      case .tooShort, .tooLong, .startsWithSpace, .serverError:
         return .error
       case .checking:
         return .accent
@@ -191,24 +188,9 @@ extension SelectSpotNameFeature {
     if name.hasPrefix(" ") { return .startsWithSpace }
     /// error1: 0~1자 (우선순위 1)
     if name.count < 2 { return .tooShort }
-    /// error2: 13자 이상 (우선순위 2)
-    if name.count > 12 { return .tooLong }
-    /// error3: 특수문자 + 이모지 포함 (우선순위 3)
-    if containsInvalidCharacters(name) { return .containsSpecialChar }
+    /// error2: 30자 초과 (우선순위 2)
+    if name.count > 30 { return .tooLong }
     /// 모든 검사 통과
     return .valid
-  }
-  
-  /// 특수문자 및 이모지 포함 여부 검사
-  private func containsInvalidCharacters(_ text: String) -> Bool {
-    // 허용되는 문자: 한글, 영문, 숫자, 공백
-    let allowedCharacterSet = CharacterSet.alphanumerics
-      .union(.whitespacesAndNewlines)
-      .union(CharacterSet(charactersIn: "가-힣ㄱ-ㅎㅏ-ㅣ"))
-    
-    // 입력된 텍스트에서 허용되지 않는 문자가 있는지 확인
-    return text.unicodeScalars.contains { scalar in
-      !allowedCharacterSet.contains(scalar)
-    }
   }
 }

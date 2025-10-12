@@ -80,6 +80,9 @@ public struct NotificationView: View {
         }
       }
     }
+    .refreshable {
+      store.send(.refreshNotificationItems)
+    }
     .onScrollGeometryChange(for: CGFloat.self, of: { geo in
       let offsetY = geo.contentOffset.y
       let contentHeight = geo.contentSize.height

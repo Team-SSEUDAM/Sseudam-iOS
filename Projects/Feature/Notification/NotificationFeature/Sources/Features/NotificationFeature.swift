@@ -38,6 +38,7 @@ public struct NotificationFeature {
     case fetchNotificationItems
     case fetchNotificationResult(Result<NotificationListEntity, NetworkError>)
     case fetchNextNotificationItems
+    case refreshNotificationItems
     
     case readNotification(id: Int)
     case readNotificationResult(Result<Int, NetworkError>)
@@ -84,7 +85,6 @@ public struct NotificationFeature {
         }
         
       case .fetchNotificationItems:
-        guard !state.isLoading else { return .none }
         return fetchNotificationItems(lastId: state.lastId)
         
       case let .fetchNotificationResult(.success(data)):
@@ -102,6 +102,13 @@ public struct NotificationFeature {
         guard !state.isLoading,
               let _ = state.lastId else { return .none }
         state.isLoading = true
+        return .send(.fetchNotificationItems)
+        
+      case .refreshNotificationItems:
+        guard !state.isLoading else { return .none }
+        state.isLoading = true
+        state.lastId = nil
+        state.data = []
         return .send(.fetchNotificationItems)
         
       case let .readNotification(id):

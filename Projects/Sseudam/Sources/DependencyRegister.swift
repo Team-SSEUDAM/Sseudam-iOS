@@ -245,5 +245,9 @@ struct DependencyRegister {
     FetchNotificationUseCaseRegister {
       FetchNotificationUseCase.live(repository: notificaionRepository)
     }
+    
+    ReadNotificationUseCaseRegister {
+      ReadNotificationUseCase.live(repository: notificaionRepository)
+    }
   }
 }

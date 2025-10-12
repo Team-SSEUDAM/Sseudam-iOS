@@ -20,4 +20,13 @@ public enum NotificationEndpoint: Sendable {
       parameters: .query(parameter)
     )
   }
+  
+  public static func readNotification(userId: Int, notiId: Int) -> Endpoint<ReadNotificationDTO> {
+    return Endpoint(
+      headers: .authorization(UserDefaultsKeys.accessToken),
+      method: .put,
+      path: "/notifications/\(notiId)/read",
+      parameters: .query(ReadNotificationParameter(user: userId))
+    )
+  }
 }

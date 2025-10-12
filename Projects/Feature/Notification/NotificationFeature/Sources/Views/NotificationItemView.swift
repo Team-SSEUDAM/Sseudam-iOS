@@ -13,13 +13,13 @@ import Utility
 
 public struct NotificationItemView: View {
   private var data: NotificationEntity
-  private var onTap: ((NotificationType) -> Void)?
+  private var onTap: ((NotificationEntity) -> Void)?
   
   private var backgroundColor: Color
   private var textColor: Color
   private var iconColor: Color
   
-  init(data: NotificationEntity, onTap: ((NotificationType) -> Void)?) {
+  init(data: NotificationEntity, onTap: ((NotificationEntity) -> Void)?) {
     self.data = data
     self.onTap = onTap
     backgroundColor = data.readStatus ? ColorSet.Background.Secondary : ColorSet.Background.Primary
@@ -64,7 +64,7 @@ public struct NotificationItemView: View {
     .contentShape(Rectangle())
     .onTapGesture {
       if let onTap = onTap {
-        onTap(data.type)
+        onTap(data)
       }
     }
   }

@@ -16,6 +16,11 @@ public extension NotificationRepository {
     NotificationRepository { parameter in
       let endPoint = NotificationEndpoint.fetchNotification(parameter: parameter)
       return try await networker.execute(with: endPoint).toEntity()
+    } readNotification: { userId, notiId in
+      let endPoint = NotificationEndpoint.readNotification(userId: userId, notiId: notiId)
+      let data = try await networker.execute(with: endPoint)
+      return try data.toEntity()
+      
     }
   }
 }

@@ -72,10 +72,11 @@ public struct NotificationView: View {
   private var NotificationItems: some View {
     ScrollView {
       LazyVStack(spacing: .Number0) {
-        ForEach(store.data, id: \.contents) { item in
+        ForEach(store.data, id: \.id) { item in
           NotificationItemView(data: item) { type in
             store.send(.itemTapped(type))
           }
+          
         }
       }
     }

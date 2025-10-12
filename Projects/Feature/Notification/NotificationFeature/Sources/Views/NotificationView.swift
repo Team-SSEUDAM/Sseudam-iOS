@@ -80,6 +80,16 @@ public struct NotificationView: View {
         }
       }
     }
+    .onScrollGeometryChange(for: CGFloat.self, of: { geo in
+      let offsetY = geo.contentOffset.y
+      let contentHeight = geo.contentSize.height
+      let containerHeight = geo.containerSize.height
+      return contentHeight - containerHeight - offsetY
+    }, action: { oldValue, newValue in
+      if newValue < 200 {
+        store.send(.fetchNextNotificationItems)
+      }
+    })
     .padding(.bottom, .Number50)
   }
   

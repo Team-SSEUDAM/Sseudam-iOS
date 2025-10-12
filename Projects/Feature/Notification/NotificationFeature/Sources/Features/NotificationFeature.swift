@@ -23,6 +23,8 @@ public struct NotificationFeature {
     public var data: [NotificationEntity] = []
     public var lastId: Int? = nil
     public var toastMessage: String? = nil
+    public var isFirstLoad: Bool = true
+    public var isLoading: Bool = false
     public init() {}
   }
 
@@ -35,6 +37,7 @@ public struct NotificationFeature {
     
     case fetchNotificationItems
     case fetchNotificationResult(Result<NotificationListEntity, NetworkError>)
+    case fetchNextNotificationItems
     
     case readNotification(id: Int)
     case readNotificationResult(Result<Int, NetworkError>)
@@ -63,17 +66,14 @@ public struct NotificationFeature {
         
       case .checkLoggedIn:
         state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
-        if state.isLoggedIn {
-          return .send(.fetchNotificationItems)
-        } else {
-          return .none
-        }
+        guard state.isLoggedIn,
+              state.isFirstLoad else { return .none }
+        return .send(.fetchNotificationItems)
         
       case .requestLogin:
         return .send(.delegate(.requestLogin(true)))
         
       case let .itemTapped(data):
-        print(data.readStatus)
         if data.readStatus {
           return handleTappedItem(type: data.type)
         } else {
@@ -84,16 +84,25 @@ public struct NotificationFeature {
         }
         
       case .fetchNotificationItems:
+        guard !state.isLoading else { return .none }
         return fetchNotificationItems(lastId: state.lastId)
         
       case let .fetchNotificationResult(.success(data)):
+        state.isLoading = false
         state.data.append(contentsOf: data.items)
         state.lastId = data.nextCursor
         return .none
         
       case let .fetchNotificationResult(.failure(error)):
         print(error)
+        state.isLoading = false
         return .send(.showToastMessage(error.localizedDescription))
+        
+      case .fetchNextNotificationItems:
+        guard !state.isLoading,
+              let _ = state.lastId else { return .none }
+        state.isLoading = true
+        return .send(.fetchNotificationItems)
         
       case let .readNotification(id):
         return readNotificationItems(notiId: id)

@@ -8,8 +8,8 @@
 
 import SwiftUI
 import ComposableArchitecture
-
 import DesignKit
+import DotLottie
 
 public struct NotificationView: View {
   @Bindable var store: StoreOf<NotificationFeature>
@@ -46,13 +46,20 @@ public struct NotificationView: View {
   
   @ViewBuilder
   private var contents: some View {
-    VStack(spacing: .Number0) {
-      NavigationBarView
-      if store.data.isEmpty {
-        EmptyView
-      } else {
-        NotificationItems
-        Spacer()
+    ZStack {
+      VStack(spacing: .Number0) {
+        NavigationBarView
+        if store.data.isEmpty {
+          if !store.isLoading {
+            EmptyView
+          }
+        } else {
+          NotificationItems
+          Spacer()
+        }
+      }
+      if store.isLoading {
+        loadingView
       }
     }
   }
@@ -90,7 +97,7 @@ public struct NotificationView: View {
       return contentHeight - containerHeight - offsetY
     }, action: { oldValue, newValue in
       if newValue < 200 {
-        store.send(.fetchNextNotificationItems)
+        store.send(.fetchNotificationItems(isFirst: false))
       }
     })
     .padding(.bottom, .Number50)
@@ -132,6 +139,20 @@ public struct NotificationView: View {
       .frame(width: 129)
       
       Spacer()
+    }
+  }
+  
+  @ViewBuilder
+  private var loadingView: some View {
+    ZStack {
+      Color.black.opacity(0.001)
+        .ignoresSafeArea()
+      DotLottieAnimation(
+        fileName: LottieSet.dot_loading.name,
+        config: AnimationConfig(autoplay: true, loop: true)
+      )
+      .view()
+      .frame(width: .Number100, height: .Number100)
     }
   }
   

@@ -35,9 +35,8 @@ public struct NotificationFeature {
     case requestLogin
     case itemTapped(NotificationEntity)
     
-    case fetchNotificationItems
+    case fetchNotificationItems(isFirst: Bool)
     case fetchNotificationResult(Result<NotificationListEntity, NetworkError>)
-    case fetchNextNotificationItems
     case refreshNotificationItems
     
     case readNotification(id: Int)
@@ -69,7 +68,7 @@ public struct NotificationFeature {
         state.isLoggedIn = UserDefaultsKeys.isLoggedIn ?? false
         guard state.isLoggedIn,
               state.isFirstLoad else { return .none }
-        return .send(.fetchNotificationItems)
+        return .send(.fetchNotificationItems(isFirst: true))
         
       case .requestLogin:
         return .send(.delegate(.requestLogin(true)))
@@ -84,8 +83,16 @@ public struct NotificationFeature {
           ])
         }
         
-      case .fetchNotificationItems:
-        return fetchNotificationItems(lastId: state.lastId)
+      case let .fetchNotificationItems(isFirst):
+        guard !state.isLoading else { return .none }
+        if isFirst {
+          state.isLoading = true
+          return fetchNotificationItems(lastId: state.lastId)
+        } else {
+          guard let id = state.lastId else { return .none }
+          state.isLoading = true
+          return fetchNotificationItems(lastId: id)
+        }
         
       case let .fetchNotificationResult(.success(data)):
         state.isLoading = false
@@ -98,18 +105,12 @@ public struct NotificationFeature {
         state.isLoading = false
         return .send(.showToastMessage(error.localizedDescription))
         
-      case .fetchNextNotificationItems:
-        guard !state.isLoading,
-              let _ = state.lastId else { return .none }
-        state.isLoading = true
-        return .send(.fetchNotificationItems)
         
       case .refreshNotificationItems:
         guard !state.isLoading else { return .none }
-        state.isLoading = true
         state.lastId = nil
         state.data = []
-        return .send(.fetchNotificationItems)
+        return .send(.fetchNotificationItems(isFirst: true))
         
       case let .readNotification(id):
         return readNotificationItems(notiId: id)

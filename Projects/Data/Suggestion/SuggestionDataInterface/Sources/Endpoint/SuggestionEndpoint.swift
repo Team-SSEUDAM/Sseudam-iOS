@@ -43,4 +43,6 @@ public enum SuggestionEndpoint: Sendable {
       parameters: nil
     )
   }
+  
+  
 }

@@ -136,7 +136,7 @@ public struct NotificationView: View {
       ) {
         store.send(.requestLogin)
       }
-      .frame(width: 129)
+      .frame(width: .loginButtonWidth)
       
       Spacer()
     }

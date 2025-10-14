@@ -36,10 +36,10 @@ public struct HomeView: View {
           VStack {
             TopButtonView
             Spacer()
+            SnackBarView
+              .padding(.bottom, bottomPadding)
             BottomButtonView
           }
-          SnackBarView
-            .padding(.bottom, (store.isPresentDetail ? store.bottomSheetHeight : tabbarHeight) + bottomPadding )
         }
       }
       .ignoresSafeArea(edges: .bottom)

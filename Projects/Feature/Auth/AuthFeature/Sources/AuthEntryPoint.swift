@@ -13,4 +13,5 @@ public enum AuthEntryPoint {
   case map
   case mypet
   case mypage
+  case notification
 }

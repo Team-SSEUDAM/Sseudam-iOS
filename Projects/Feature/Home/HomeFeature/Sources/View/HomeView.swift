@@ -22,7 +22,6 @@ public struct HomeView: View {
     self.store = store
   }
   
-  private let tabbarHeight: CGFloat = 83
   private let bottomPadding: CGFloat = 13
   
   public var body: some View {
@@ -141,7 +140,7 @@ public struct HomeView: View {
     .padding(.horizontal, .Number16)
     .padding(
       .bottom,
-      (store.isPresentDetail ? store.bottomSheetHeight : tabbarHeight)+bottomPadding
+      (store.isPresentDetail ? store.bottomSheetHeight : .tabbarHeight)+bottomPadding
     )
     .animation(
       .easeInOut(duration: store.isPresentDetail ? 0.3 : 0.13),

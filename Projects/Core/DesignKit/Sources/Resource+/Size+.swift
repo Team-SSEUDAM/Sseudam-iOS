@@ -52,4 +52,6 @@ public extension CGFloat {
   
   static let detailSheetHeight: CGFloat = 197
   static let detailSheetLargeHeight: CGFloat = 222
+  static let tabbarHeight: CGFloat = 83
+  static let loginButtonWidth: CGFloat = 129
 }

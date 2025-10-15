@@ -38,6 +38,7 @@ public enum Feature: String, ModuleRepresentable {
   case Visited
   case Attendance
   case LevelUp
+  case Notification
   public var typePath: String { "Feature" }
 }
 
@@ -55,6 +56,7 @@ public enum Domain: String, ModuleRepresentable {
   case ImageDownload
   case History
   case AppVersion
+  case Notification
   public var typePath: String { "Domain" }
 }
 
@@ -72,6 +74,7 @@ public enum Data: String, ModuleRepresentable {
   case ImageDownload
   case History
   case AppVersion
+  case Notification
   public var typePath: String { "Data" }
 }
 
@@ -176,6 +179,7 @@ extension TargetDependency {
     public static let Visited = Self.project(.feature(.Visited))
     public static let Attendance = Self.project(.feature(.Attendance))
     public static let LevelUp = Self.project(.feature(.LevelUp))
+    public static let Notification = Self.project(.feature(.Notification))
   }
   
   public struct Domain: TargetDependencyDelegate {
@@ -229,6 +233,10 @@ extension TargetDependency {
       public static let Interface = Self.project(.domain(.AppVersion, isInterface: true))
       public static let Implement = Self.project(.domain(.AppVersion))
     }
+    public struct Notification: TargetDependencyDelegate {
+      public static let Interface = Self.project(.domain(.Notification, isInterface: true))
+      public static let Implement = Self.project(.domain(.Notification))
+    }
   }
   
   public struct Data: TargetDependencyDelegate {
@@ -280,6 +288,10 @@ extension TargetDependency {
     public struct AppVersion: TargetDependencyDelegate {
       public static let Interface = Self.project(.data(.AppVersion, isInterface: true))
       public static let Implement = Self.project(.data(.AppVersion))
+    }
+    public struct Notification: TargetDependencyDelegate {
+      public static let Interface = Self.project(.data(.Notification, isInterface: true))
+      public static let Implement = Self.project(.data(.Notification))
     }
   }
   

@@ -11,6 +11,7 @@ import SwiftUI
 public enum TabBarItem: String, CaseIterable, Identifiable {
   case home
   case myPet
+  case notification
   case myPage
   
   public var id: String { rawValue }
@@ -19,7 +20,8 @@ public enum TabBarItem: String, CaseIterable, Identifiable {
   public var tabBarIcons: (selected: ImageSet, unselected: ImageSet) {
     switch self {
     case .home: return (.homeFilled, .home)
-    case .myPet: return (.interests, .interests)
+    case .myPet: return (.interestsFilled, .interests)
+    case .notification: return (.notificationFilled, .notification)
     case .myPage: return (.personFilled, .person)
     }
   }
@@ -29,6 +31,7 @@ public enum TabBarItem: String, CaseIterable, Identifiable {
     switch self {
     case .home: return "홈"
     case .myPet: return "마이펫"
+    case .notification: return "알림"
     case .myPage: return "마이페이지"
     }
   }

@@ -22,6 +22,7 @@ let project = Project.makeStaticLibraryProject(
     .Domain.Attendance.Implement,
     .Domain.ImageDownload.Implement,
     .Domain.History.Implement,
-    .Domain.AppVersion.Implement
+    .Domain.AppVersion.Implement,
+    .Domain.Notification.Implement
   ]
 )

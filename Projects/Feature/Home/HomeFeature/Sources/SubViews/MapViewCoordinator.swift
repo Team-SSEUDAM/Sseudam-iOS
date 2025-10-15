@@ -29,6 +29,9 @@ extension MapViewRepresentable {
     
     var activeRadiusOverlay: NMFCircleOverlay?
     
+    var activeRadiusGroundOverlay: NMFGroundOverlay?
+    
+    
     init(_ parent: MapViewRepresentable) {
       self.parent = parent
     }
@@ -93,6 +96,10 @@ extension MapViewRepresentable {
       if let circle = self.activeRadiusOverlay {
         circle.mapView = nil
         self.activeRadiusOverlay = nil
+      }
+      if let radius = self.activeRadiusGroundOverlay {
+        radius.mapView = nil
+        self.activeRadiusGroundOverlay = nil
       }
     }
     

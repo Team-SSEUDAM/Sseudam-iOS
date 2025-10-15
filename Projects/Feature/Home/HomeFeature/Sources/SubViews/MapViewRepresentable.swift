@@ -137,21 +137,6 @@ extension MapViewRepresentable {
     }
   }
   
-  private func activeRadiusCircle(_ view: NMFNaverMapView, to location: Coordinates, radius: CGFloat, context: Context) {
-    let circle = NMFCircleOverlay(
-      NMGLatLng(
-        lat: location.latitude,
-        lng: location.longitude
-      ),
-      radius: radius,
-      fill: UIColor(ColorSet.Background.Primary.opacity(0.6))
-    )
-    circle.outlineColor = UIColor(ColorSet.Border.Inverse)
-    circle.outlineWidth = 1
-    circle.mapView = view.mapView
-    context.coordinator.activeRadiusOverlay = circle
-  }
-  
   /// 여러 마커의 중간지점 찾는 메서드
   private func averageCenter(of points: [Coordinates]) -> Coordinates? {
     guard !points.isEmpty else { return nil }
@@ -223,6 +208,41 @@ extension MapViewRepresentable {
       context.coordinator.deleteAllMarkers()
       
     }
+  }
+  
+  private func activeRadiusCircle(_ view: NMFNaverMapView, to location: Coordinates, radius: CGFloat, context: Context) {
+    
+    // GroundOverlay 생성
+    let b = bounds(center: location, radiusMeters: Double(radius))
+    let overlay = NMFGroundOverlay(bounds: b, image: MapRadiusImage.overlayImage)
+    overlay.zIndex = 99
+    overlay.alpha = 1.0
+    overlay.mapView = view.mapView
+    
+    context.coordinator.activeRadiusGroundOverlay = overlay
+    
+    // 테두리
+    let circle = NMFCircleOverlay(NMGLatLng(lat: location.latitude, lng: location.longitude), radius: radius)
+    circle.fillColor = .clear
+    circle.outlineColor = UIColor(ColorSet.Border.Inverse)
+    circle.outlineWidth = 1
+    circle.zIndex = 100
+    circle.mapView = view.mapView
+    
+    context.coordinator.activeRadiusOverlay = circle
+  }
+  
+  private func bounds(
+    center: Coordinates,
+    radiusMeters: Double
+  ) -> NMGLatLngBounds {
+    let lat = center.latitude * .pi / 180
+    let dLat = (radiusMeters / 6_378_137.0) * (180 / .pi)
+    let dLng = dLat / cos(lat)
+    
+    let sw = NMGLatLng(lat: center.latitude - dLat, lng: center.longitude - dLng)
+    let ne = NMGLatLng(lat: center.latitude + dLat, lng: center.longitude + dLng)
+    return NMGLatLngBounds(southWest: sw, northEast: ne)
   }
 }
 

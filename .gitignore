@@ -73,6 +73,7 @@ Config/
 
 *.xcconfig
 *.p8
+*/fastlane
 
 # Claude Code documentation
 CLAUDE.md

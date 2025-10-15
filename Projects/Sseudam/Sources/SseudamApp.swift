@@ -15,7 +15,7 @@ import AnalyticsKit
 
 @main
 struct SseudamApp: App {
-  
+  @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
   let store: StoreOf<SseudamFeature>
   
   init() {

@@ -129,6 +129,10 @@ struct DependencyRegister {
       ReportSpotNameValidateUseCase.live(repository: reportRepository)
     }
     
+    ReportDetailUseCaseRegister {
+      ReportDetailUseCase.live(repository: reportRepository)
+    }
+    
     // MARK: - Auth
     
     AppleLoginUseCaseRegister {

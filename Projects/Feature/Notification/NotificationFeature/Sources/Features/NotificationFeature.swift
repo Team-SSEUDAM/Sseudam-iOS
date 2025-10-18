@@ -10,6 +10,7 @@ import Foundation
 import ComposableArchitecture
 import NotificationDomainInterface
 import SuggestionDomainInterface
+import ReportDomainInterface
 import UserDefaults
 import Utility
 
@@ -43,6 +44,9 @@ public struct NotificationFeature {
     case fetchSuggestionRejectReason(id: Int)
     case fetchSuggestionRejectReasonResult(Result<String, NetworkError>)
     
+    case fetchReportRejectReason(id: Int)
+    case fetchReportRejectReasonResult(Result<String, NetworkError>)
+    
     case readNotification(id: Int)
     case readNotificationResult(Result<Int, NetworkError>)
     
@@ -61,6 +65,7 @@ public struct NotificationFeature {
   @Dependency(\.FetchNotificationUseCase) private var fetchNotificationUseCase
   @Dependency(\.ReadNotificationUseCase) private var readNotificationUseCase
   @Dependency(\.SuggestionDetailUseCase) private var suggestionDetailUseCase
+  @Dependency(\.ReportDetailUseCase) private var reportdetailUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -95,7 +100,16 @@ public struct NotificationFeature {
         return .send(.delegate(.showRefuseAlert(reason: reason)))
       
       case let .fetchSuggestionRejectReasonResult(.failure(error)):
-        return .none
+        return .send(.showToastMessage(error.localizedDescription))
+        
+      case let .fetchReportRejectReason(reportId):
+        return fetchReportRejectReason(reportId: reportId)
+        
+      case let .fetchReportRejectReasonResult(.success(reason)):
+        return .send(.delegate(.showRefuseAlert(reason: reason)))
+        
+      case let .fetchReportRejectReasonResult(.failure(error)):
+        return .send(.showToastMessage(error.localizedDescription))
         
       case let .fetchNotificationItems(isFirst):
         guard !state.isLoading else { return .none }
@@ -157,7 +171,7 @@ public struct NotificationFeature {
     case .rejectSuggestion:
       return .send(.fetchSuggestionRejectReason(id: entity.parameterValue))
     case .rejectReport:
-      return .send(.delegate(.showRefuseAlert(reason: "쓰레기통이 없어요")))
+      return .send(.fetchReportRejectReason(id: entity.parameterValue))
     default:
       return .none
     }
@@ -204,6 +218,20 @@ public struct NotificationFeature {
         await send(.fetchSuggestionRejectReasonResult(.failure(error)))
       } catch {
         await send(.fetchSuggestionRejectReasonResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
+  
+  private func fetchReportRejectReason(reportId: Int) -> Effect<Action> {
+    guard let userId = UserDefaultsKeys.userId else { return .none }
+    return .run { send in
+      do {
+        let data = try await reportdetailUseCase.execute(userId, reportId)
+        await send(.fetchReportRejectReasonResult(.success(data.rejectReason)))
+      } catch let error as NetworkError {
+        await send(.fetchReportRejectReasonResult(.failure(error)))
+      } catch {
+        await send(.fetchReportRejectReasonResult(.failure(.customError(message: error.localizedDescription))))
       }
     }
   }

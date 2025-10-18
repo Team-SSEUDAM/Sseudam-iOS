@@ -33,6 +33,8 @@ public struct MapFeature {
     /// 확장 검색 시도 시 필요한 이전 탐색 범위
     public var lastSearchedBounds: [Coordinates]? = nil
     
+    
+    
     public var isTrashDataFirstLoad: Bool = true
     public init() {}
   }

@@ -32,7 +32,7 @@ struct NotificationRootFeature {
   
   enum Delegate: Equatable {
     case requestLogin(Bool, AuthEntryPoint)
-    case showThrowTrash(id: Int)
+    case showThrowTrash(id: Int, point: Coordinates)
     case moveAcceptList
     case showRefuseAlert(reason: String)
   }
@@ -57,8 +57,8 @@ struct NotificationRootFeature {
         case let .requestLogin(isPresent):
           return .send(.delegate(.requestLogin(isPresent, .notification)))
           
-        case let .showThrowTrash(id):
-          return .send(.delegate(.showThrowTrash(id: id)))
+        case let .showThrowTrash(id, point):
+          return .send(.delegate(.showThrowTrash(id: id, point: point)))
           
         case .moveAcceptList:
           return .send(.delegate(.moveAcceptList))

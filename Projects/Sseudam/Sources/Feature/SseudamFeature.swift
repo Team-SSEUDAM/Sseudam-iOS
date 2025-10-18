@@ -67,7 +67,7 @@ struct SseudamFeature {
     case requestLogin(isPresent: Bool)
     case open(URL)
     
-    case showThrowTrash(id: Int)
+    case showThrowTrash(id: Int, point: Coordinates)
     
     case closeAlertAction
     case acceptAlertAction
@@ -217,8 +217,11 @@ struct SseudamFeature {
         return .send(.authFlow(.presentLogin(isPresent)))
         
         
-      case .showThrowTrash:
-        return .send(.selectTab(.home))
+      case let .showThrowTrash(spotId, point):
+        return .concatenate([
+          .send(.selectTab(.home)),
+          .send(.homeRoot(.moveTrashSpot(spotId: spotId, point: point)))
+        ])
         
         // MARK: - Alert
         
@@ -326,8 +329,8 @@ extension SseudamFeature {
     case let .requestLogin(isPresent, _):
       return .send(.requestLogin(isPresent: isPresent))
       
-    case let .showThrowTrash(id):
-      return .send(.showThrowTrash(id: id))
+    case let .showThrowTrash(id, point):
+      return .send(.showThrowTrash(id: id, point: point))
       
     case .moveAcceptList:
       return .send(.selectTab(.myPage))

@@ -43,6 +43,9 @@ struct HomeRootFeature {
     case hiddenTabBar(Bool)
     case presentAlert(AlertType)
     
+    /// 특정 위치로 이동
+    case moveTrashSpot(spotId: Int, point: Coordinates)
+    
     /// 로그인 후 상태 변경하기 위한 action
     case checkLoggedin
     case modal(PresentationAction<ModalDestination.Action>)
@@ -129,6 +132,10 @@ struct HomeRootFeature {
             await send(.trashDetail(.checkLoggedin))
           }
         }
+        
+      case let .moveTrashSpot(spotId, point):
+        print(spotId, point)
+        return .none
         
         // MARK: - Receive VisitComplete Delegate Action
       case let .modal(.presented(.visitedComplete(action))):

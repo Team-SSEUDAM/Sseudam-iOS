@@ -57,7 +57,7 @@ public struct NotificationFeature {
   
   public enum Delegate: Equatable {
     case requestLogin(Bool)
-    case showThrowTrash(id: Int)
+    case showThrowTrash(id: Int, point: Coordinates)
     case moveAcceptList
     case showRefuseAlert(reason: String)
   }
@@ -165,7 +165,8 @@ public struct NotificationFeature {
   private func handleTappedItem(_ entity: NotificationEntity) -> Effect<Action> {
     switch entity.type {
     case .visitedSpot:
-      return .send(.delegate(.showThrowTrash(id: 30)))
+      let point: Coordinates = .init(latitude: 126.9206861, longitude: 37.6407397)
+      return .send(.delegate(.showThrowTrash(id: 12261, point: point)))
     case .approveSuggestion, .approveReport:
       return .send(.delegate(.moveAcceptList))
     case .rejectSuggestion:

@@ -29,8 +29,6 @@ extension MapViewRepresentable {
     
     var activeRadiusOverlay: NMFCircleOverlay?
     
-    var activeRadiusGroundOverlay: NMFGroundOverlay?
-    
     
     init(_ parent: MapViewRepresentable) {
       self.parent = parent
@@ -97,10 +95,7 @@ extension MapViewRepresentable {
         circle.mapView = nil
         self.activeRadiusOverlay = nil
       }
-      if let radius = self.activeRadiusGroundOverlay {
-        radius.mapView = nil
-        self.activeRadiusGroundOverlay = nil
-      }
+      
     }
     
     /// 지도에 나타나는 마커 리스트 저장

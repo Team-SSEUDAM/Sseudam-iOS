@@ -132,6 +132,8 @@ extension MapViewRepresentable {
     marker.zIndex = 100
     marker.iconImage = data.trashType.activePinImage
     context.coordinator.markerTapEvent(marker: marker, data: data)
+    
+    activeRadiusCircle(view, to: data.location, radius: .visitPossibleRadius, context: context)
     if let onMarkerTapped = onMarkerTapped {
       onMarkerTapped(data.id)
     }
@@ -177,7 +179,6 @@ extension MapViewRepresentable {
         guard let marker = overlay as? NMFMarker else { return true }
         markerTapEvent(view, to: marker, data: item, context: context)
         moveCamera(view, to: item.location)
-        activeRadiusCircle(view, to: item.location, radius: .visitPossibleRadius, context: context)
         return true
       }
       return marker
@@ -211,20 +212,12 @@ extension MapViewRepresentable {
   }
   
   private func activeRadiusCircle(_ view: NMFNaverMapView, to location: Coordinates, radius: CGFloat, context: Context) {
-    
-    // GroundOverlay 생성
-    let b = bounds(center: location, radiusMeters: Double(radius))
-    let overlay = NMFGroundOverlay(bounds: b, image: MapRadiusImage.overlayImage)
-    overlay.zIndex = 99
-    overlay.alpha = 1.0
-    overlay.mapView = view.mapView
-    
-    context.coordinator.activeRadiusGroundOverlay = overlay
+    guard context.coordinator.activeRadiusOverlay == nil else { return }
     
     // 테두리
     let circle = NMFCircleOverlay(NMGLatLng(lat: location.latitude, lng: location.longitude), radius: radius)
-    circle.fillColor = .clear
-    circle.outlineColor = UIColor(ColorSet.Border.Inverse)
+    circle.fillColor = UIColor(ColorSet.Mint._100.opacity(0.1))
+    circle.outlineColor = UIColor(ColorSet.Border.Accent.opacity(0.5))
     circle.outlineWidth = 1
     circle.zIndex = 100
     circle.mapView = view.mapView
@@ -232,6 +225,7 @@ extension MapViewRepresentable {
     context.coordinator.activeRadiusOverlay = circle
   }
   
+  /// 좌표 기준으로 원하는 거리 까지 영역 계산
   private func bounds(
     center: Coordinates,
     radiusMeters: Double

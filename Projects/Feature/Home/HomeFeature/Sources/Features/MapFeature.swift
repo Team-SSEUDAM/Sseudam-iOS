@@ -67,6 +67,8 @@ public struct MapFeature {
     /// 활성화 되어있는 마커 삭제
     case deleteActiveMarker
     
+    case focusTrashItem(Int)
+    
     case delegate(Delegate)
     case mixPanel(MixPanel)
   }
@@ -167,6 +169,8 @@ public struct MapFeature {
         state.isNeedDeleteMarker = true
         return .none
         
+      case let .focusTrashItem(id):
+        return .none
       default:
         return .none
       }

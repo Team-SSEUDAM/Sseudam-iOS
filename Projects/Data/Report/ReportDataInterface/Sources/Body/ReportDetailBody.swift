@@ -10,9 +10,9 @@ import Foundation
 import ReportDomainInterface
 
 public struct ReportDetailBody: Encodable {
-  public let userId: Int
+  public let user: Int
   
   public init(userId: Int) {
-    self.userId = userId
+    self.user = userId
   }
 }

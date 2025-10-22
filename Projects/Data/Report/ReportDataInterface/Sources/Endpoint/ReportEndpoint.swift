@@ -39,9 +39,9 @@ public enum ReportEndpoint: Sendable {
   public static func getReportDetail(reportId: Int, body: ReportDetailBody) -> Endpoint<ReportDetailDTO> {
     return Endpoint(
       headers: .authorization(UserDefaultsKeys.accessToken),
-      method: .post,
+      method: .get,
       path: "/reports/\(reportId)",
-      parameters: .body(body)
+      parameters: .query(body)
     )
   }
 }

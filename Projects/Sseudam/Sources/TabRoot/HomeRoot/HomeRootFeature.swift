@@ -135,7 +135,7 @@ struct HomeRootFeature {
         
       case let .moveTrashSpot(spotId, point):
         print(spotId, point)
-        return .none
+        return .send(.home(.showFocusTrashSpot(id: spotId, point: point)))
         
         // MARK: - Receive VisitComplete Delegate Action
       case let .modal(.presented(.visitedComplete(action))):

@@ -48,6 +48,7 @@ public struct ReportFeature {
     var nextButtonText: String = "시작하기"
     var isNavigationBarHidden = false
     var isLoading: Bool = false
+    var isPhotoPage: Bool = false /// 현재 페이지가 사진 선택 페이지인지 여부
     
     /// 선택된 정보 관련 `State`
     var selectedReportInfoType: String = "" /// 선택된 제보 정보 타입
@@ -194,16 +195,21 @@ public struct ReportFeature {
       case .didAppearSelectKind:
         if state.selectedReportInfoType != "KIND" { return .none }
         state.nextButtonText = "완료"
+        state.isPhotoPage = false
         return .send(.nextButtonIsEnabled(state.child.selectKind.isEnabled))
         
       case .didAppearSelectPhoto:
         if state.selectedReportInfoType != "PHOTO" { return .none }
-        state.nextButtonText = "완료"
-        return .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
+        // 사진이 이미 선택되어 있는지 확인하여 버튼 텍스트 설정
+        state.nextButtonText = state.selectedPhoto != nil ? "완료" : "사진이 없어요"
+        state.isPhotoPage = true
+        // 사진 선택 페이지에서는 항상 다음으로 진행 가능 (사진 없이도 가능)
+        return .send(.nextButtonIsEnabled(true))
         
       case .didAppearComplete:
         state.nextButtonText = "확인"
         state.isNavigationBarHidden = true
+        state.isPhotoPage = false
         return .merge([
           .send(.child(.writeName(.focusChanged(false)))),
           .send(.nextButtonIsEnabled(true)),
@@ -401,10 +407,11 @@ private extension ReportFeature {
     action: SelectSpotImageFeature.Action.Delegate
   ) -> Effect<Action> {
     guard state.currentPage == 2 else { return .none }
-    
+
     switch action {
     case let .photoSelected(photo):
       state.selectedPhoto = photo
+      state.nextButtonText = "완료"  // 사진이 선택되면 버튼 텍스트를 "완료"로 변경
       return .send(.nextButtonIsEnabled(true))
     }
   }
@@ -432,9 +439,12 @@ public extension ReportFeature {
   ) -> Effect<Action> {
     .run { send in
       do {
+        // 사진이 선택되지 않은 경우 isPhotoSelected를 true로 설정
+        let isPhotoSelected = state.selectedPhoto == nil
         let entity = try await useCase.execute(
           state.selectedReportInfoType,
-          state.reportSpotDetail
+          state.reportSpotDetail,
+          isPhotoSelected
         )
         await send(.spotReportResult(.success(entity)))
       } catch is CancellationError {
@@ -452,10 +462,10 @@ public extension ReportFeature {
   ) -> Effect<Action> {
     .run { send in
       do {
-        guard let image = state.selectedPhoto else {
-          throw NetworkError.customError(message: "이미지를 선택해주세요.")
+        // 사진이 있을 때만 업로드, 없으면 성공으로 처리
+        if let image = state.selectedPhoto {
+          try await useCase.execute(image, url)
         }
-        try await useCase.execute(image, url)
         await send(.uploadReportSpotImageResult(.success("성공"))) /// 임시 메시지
       } catch is CancellationError {
         await send(.uploadReportSpotImageResult(.failure(.taskCancelled)))

@@ -18,12 +18,14 @@ public struct SpotSuggestionInput: Codable, Equatable {
   public let city: String?
   public let site: String?
   public let trashType: String
-  
+  public let isPhotoSelected: Bool
+
   public init(
     spotName: String,
     centerPoint: Coordinates?,
     nmReverseGeoCode: NMGeoCodeReverseEntity?,
-    trashType: String
+    trashType: String,
+    isPhotoSelected: Bool = false
   ) {
     self.spotName = spotName
     self.latitude = centerPoint?.latitude
@@ -32,5 +34,6 @@ public struct SpotSuggestionInput: Codable, Equatable {
     self.city = nmReverseGeoCode?.city
     self.site = nmReverseGeoCode?.site
     self.trashType = trashType
+    self.isPhotoSelected = isPhotoSelected
   }
 }

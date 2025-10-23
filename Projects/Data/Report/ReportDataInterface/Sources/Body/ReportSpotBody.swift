@@ -18,9 +18,11 @@ public struct ReportSpotBody: Encodable, Equatable {
   public let city: String?
   public let site: String?
   public let trashType: String?
-  
+  public let isPhotoSelected: Bool?  // 서버 미구현 대응을 위해 옵셔널로 변경
+
   public init(
-    _ input: ReportSpotInput
+    _ input: ReportSpotInput,
+    isPhotoSelected: Bool? = nil
   ) {
     self.reportType = input.reportType
     self.spotName = input.spotName
@@ -30,5 +32,6 @@ public struct ReportSpotBody: Encodable, Equatable {
     self.city = input.city
     self.site = input.site
     self.trashType = input.trashType
+    self.isPhotoSelected = isPhotoSelected
   }
 }

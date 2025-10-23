@@ -12,10 +12,11 @@ import NMReverseGeocodingDomainInterface
 
 extension ReportSpotUseCase {
   public static func live(repository: ReportRepository) -> ReportSpotUseCase {
-    .init { reportType, spotDetail in
+    .init { reportType, spotDetail, isPhotoSelected in
       let input = ReportSpotInput(
         reportType: reportType,
-        spotDetail: spotDetail
+        spotDetail: spotDetail,
+        isPhotoSelected: isPhotoSelected
       )
       let entity = try await repository.postReportSpot(input)
       return entity.imageUploadURL

@@ -176,20 +176,39 @@ public struct ReportView: View {
   
   @ViewBuilder
   private var nextButton: some View {
-    PrimaryButton(
-      loadingView: {
-        DotLottieAnimation(
-          fileName: LottieSet.loading.name,
-          config: AnimationConfig(autoplay: true, loop: true)
-        ).view()
-      },
-      isLoading: $store.isLoading,
-      title: $store.nextButtonText,
-      size: .large,
-      state: $store.nextButtonState
-    ) {
-      if store.currentPage == 2 { store.send(.reportButtonTapped) }
-      else { store.send(.nextButtonTapped) }
+    if store.isPhotoPage && !store.child.selectPhoto.isEnabled {
+      // 사진 선택 페이지에서 사진이 선택되지 않았을 때 SecondaryButton 사용
+      SecondaryButton(
+        loadingView: {
+          DotLottieAnimation(
+            fileName: LottieSet.loading.name,
+            config: AnimationConfig(autoplay: true, loop: true)
+          ).view()
+        },
+        isLoading: $store.isLoading,
+        title: $store.nextButtonText,
+        size: .large,
+        state: .constant(.normal)
+      ) {
+        store.send(.reportButtonTapped)
+      }
+    } else {
+      // 그 외의 경우 PrimaryButton 사용
+      PrimaryButton(
+        loadingView: {
+          DotLottieAnimation(
+            fileName: LottieSet.loading.name,
+            config: AnimationConfig(autoplay: true, loop: true)
+          ).view()
+        },
+        isLoading: $store.isLoading,
+        title: $store.nextButtonText,
+        size: .large,
+        state: $store.nextButtonState
+      ) {
+        if store.currentPage == 2 { store.send(.reportButtonTapped) }
+        else { store.send(.nextButtonTapped) }
+      }
     }
   }
 }

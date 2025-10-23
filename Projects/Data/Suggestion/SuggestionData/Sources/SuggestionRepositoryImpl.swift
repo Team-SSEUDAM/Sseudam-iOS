@@ -15,7 +15,7 @@ public extension SpotSuggestionRepository {
   static var live: SpotSuggestionRepository {
     return .init(
       postSpotSuggestion: { input in
-        let body = SpotSuggestionBody(input)
+        let body = SpotSuggestionBody(input, isPhotoSelected: input.isPhotoSelected)
         let endpoint = SuggestionEndpoint.postSpotSuggestion(body: body)
         return try await NetworkKit().execute(with: endpoint).toEntity()
       }, putSpotImage: { input in

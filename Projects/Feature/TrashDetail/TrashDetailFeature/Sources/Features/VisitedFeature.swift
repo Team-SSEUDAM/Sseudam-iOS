@@ -417,7 +417,7 @@ extension VisitedFeature {
       if let user = user,
          let target = target {
         let distance = user.distance(to: target)
-        let isWithin5m = distance <= 30
+        let isWithin5m = distance <= Double(CGFloat.visitPossibleRadius)
         await send(.storedWithinDistance(isWithin5m))
         await send(.storeDistanceWithUser(distance))
       } else {

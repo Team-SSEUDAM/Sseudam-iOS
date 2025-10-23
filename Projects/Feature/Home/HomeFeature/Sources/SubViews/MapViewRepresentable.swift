@@ -12,6 +12,7 @@ import TrashSpotDomainInterface
 import Utility
 import NMapsMap
 import CoreGraphics
+import DesignKit
 
 struct MapViewRepresentable: UIViewRepresentable {
   
@@ -126,10 +127,13 @@ extension MapViewRepresentable {
     }
   }
   
-  private func markerTapEvent(to marker: NMFMarker, data: TrashSpot, context: Context) {
+  private func markerTapEvent(_ view: NMFNaverMapView, to marker: NMFMarker, data: TrashSpot, context: Context) {
     if marker == context.coordinator.activeMarker { return }
+    marker.zIndex = 100
     marker.iconImage = data.trashType.activePinImage
     context.coordinator.markerTapEvent(marker: marker, data: data)
+    
+    activeRadiusCircle(view, to: data.location, radius: .visitPossibleRadius, context: context)
     if let onMarkerTapped = onMarkerTapped {
       onMarkerTapped(data.id)
     }
@@ -173,7 +177,7 @@ extension MapViewRepresentable {
       
       marker.touchHandler = { (overlay: NMFOverlay) -> Bool in
         guard let marker = overlay as? NMFMarker else { return true }
-        markerTapEvent(to: marker, data: item, context: context)
+        markerTapEvent(view, to: marker, data: item, context: context)
         moveCamera(view, to: item.location)
         return true
       }
@@ -205,6 +209,34 @@ extension MapViewRepresentable {
       context.coordinator.deleteAllMarkers()
       
     }
+  }
+  
+  private func activeRadiusCircle(_ view: NMFNaverMapView, to location: Coordinates, radius: CGFloat, context: Context) {
+    guard context.coordinator.activeRadiusOverlay == nil else { return }
+    
+    // 테두리
+    let circle = NMFCircleOverlay(NMGLatLng(lat: location.latitude, lng: location.longitude), radius: radius)
+    circle.fillColor = UIColor(ColorSet.Mint._100.opacity(0.1))
+    circle.outlineColor = UIColor(ColorSet.Border.Accent.opacity(0.5))
+    circle.outlineWidth = 1
+    circle.zIndex = 100
+    circle.mapView = view.mapView
+    
+    context.coordinator.activeRadiusOverlay = circle
+  }
+  
+  /// 좌표 기준으로 원하는 거리 까지 영역 계산
+  private func bounds(
+    center: Coordinates,
+    radiusMeters: Double
+  ) -> NMGLatLngBounds {
+    let lat = center.latitude * .pi / 180
+    let dLat = (radiusMeters / 6_378_137.0) * (180 / .pi)
+    let dLng = dLat / cos(lat)
+    
+    let sw = NMGLatLng(lat: center.latitude - dLat, lng: center.longitude - dLng)
+    let ne = NMGLatLng(lat: center.latitude + dLat, lng: center.longitude + dLng)
+    return NMGLatLngBounds(southWest: sw, northEast: ne)
   }
 }
 

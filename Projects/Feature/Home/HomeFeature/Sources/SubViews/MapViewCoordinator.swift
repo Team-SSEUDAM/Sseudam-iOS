@@ -124,6 +124,11 @@ extension MapViewRepresentable {
         self.focusMarker = nil
         
       }
+      if let circle = self.activeRadiusOverlay {
+        circle.mapView = nil
+        self.activeRadiusOverlay = nil
+      }
+      
     }
   }
 }

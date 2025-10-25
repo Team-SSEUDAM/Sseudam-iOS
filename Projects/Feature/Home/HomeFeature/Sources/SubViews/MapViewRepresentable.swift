@@ -172,6 +172,7 @@ extension MapViewRepresentable {
   ) {
     let coord: NMGLatLng = .init(lat: point.latitude, lng: point.longitude)
     let marker = drawMarker(view, to: coord, icon: type.activePinImage)
+    activeRadiusCircle(view, to: point, radius: .visitPossibleRadius, context: context)
     context.coordinator.focusMarker = marker
     moveCamera(view, to: point)
     marker.mapView = view.mapView

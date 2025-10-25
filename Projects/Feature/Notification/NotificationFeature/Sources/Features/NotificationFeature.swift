@@ -11,6 +11,7 @@ import ComposableArchitecture
 import NotificationDomainInterface
 import SuggestionDomainInterface
 import ReportDomainInterface
+import TrashSpotDomainInterface
 import UserDefaults
 import Utility
 
@@ -57,7 +58,7 @@ public struct NotificationFeature {
   
   public enum Delegate: Equatable {
     case requestLogin(Bool)
-    case showThrowTrash(id: Int, point: Coordinates)
+    case showThrowTrash(data: TrashSpotDetail)
     case moveAcceptList
     case showRefuseAlert(reason: String)
   }
@@ -66,6 +67,7 @@ public struct NotificationFeature {
   @Dependency(\.ReadNotificationUseCase) private var readNotificationUseCase
   @Dependency(\.SuggestionDetailUseCase) private var suggestionDetailUseCase
   @Dependency(\.ReportDetailUseCase) private var reportdetailUseCase
+  @Dependency(\.FetchTrashSpotDetailUseCase) private var trashSpotDetailUseCase
 
   public var body: some ReducerOf<Self> {
     BindingReducer()
@@ -165,8 +167,9 @@ public struct NotificationFeature {
   private func handleTappedItem(_ entity: NotificationEntity) -> Effect<Action> {
     switch entity.type {
     case .visitedSpot:
-      let point: Coordinates = .init(latitude: 126.9206861, longitude: 37.6407397)
-      return .send(.delegate(.showThrowTrash(id: 12261, point: point)))
+      let point: Coordinates = .init(latitude: 37.6407397, longitude: 126.9206861)
+      let data: TrashSpotDetail = .init(id: 12261, suggestionerId: nil, suggestionerName: nil, name: "", address: "", point: point, trashType: .general, visitedCount: 1, imageUrl: nil)
+      return .send(.delegate(.showThrowTrash(data: data)))
     case .approveSuggestion, .approveReport:
       return .send(.delegate(.moveAcceptList))
     case .rejectSuggestion:

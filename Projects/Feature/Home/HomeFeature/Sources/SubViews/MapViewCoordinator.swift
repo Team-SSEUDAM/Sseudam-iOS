@@ -29,6 +29,7 @@ extension MapViewRepresentable {
     
     var activeRadiusOverlay: NMFCircleOverlay?
     
+    var focusMarker: NMFMarker? = nil
     
     init(_ parent: MapViewRepresentable) {
       self.parent = parent
@@ -96,6 +97,7 @@ extension MapViewRepresentable {
         self.activeRadiusOverlay = nil
       }
       
+      deleteFocusMarker()
     }
     
     /// 지도에 나타나는 마커 리스트 저장
@@ -112,7 +114,16 @@ extension MapViewRepresentable {
         }
         self.markers.removeAll()
       }
-      
+      deleteFocusMarker()
+    }
+    
+    /// 외부에서 요청받은 마커 삭제
+    func deleteFocusMarker() {
+      if let _ = focusMarker {
+        self.focusMarker?.mapView = nil
+        self.focusMarker = nil
+        
+      }
     }
   }
 }

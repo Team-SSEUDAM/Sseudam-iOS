@@ -32,7 +32,8 @@ public struct MapFeature {
     public var isExpandedRetry: Bool = false
     /// 확장 검색 시도 시 필요한 이전 탐색 범위
     public var lastSearchedBounds: [Coordinates]? = nil
-    
+    /// 알림 등 외부 이벤트로 인해 마커를 활성화 시키기 위한 좌표 값
+    public var focusData: MapMarkerEntity? = nil
     
     
     public var isTrashDataFirstLoad: Bool = true
@@ -67,7 +68,7 @@ public struct MapFeature {
     /// 활성화 되어있는 마커 삭제
     case deleteActiveMarker
     
-    case focusTrashItem(Int)
+    case focusTrashItem(TrashSpotDetail?)
     
     case delegate(Delegate)
     case mixPanel(MixPanel)
@@ -93,7 +94,7 @@ public struct MapFeature {
       case let .requestMapBounds(isRequest):
         state.requestMapBounds = isRequest
         state.researchButtonEnable = false
-        return .none
+        return .send(.focusTrashItem(nil))
         
       case let .fetchTrashItems(bounds):
         state.lastSearchedBounds = bounds
@@ -163,14 +164,24 @@ public struct MapFeature {
         
      
       case let .markerTapped(id):
+        if id == .none,
+          state.focusData != .none {
+          state.focusData = nil
+        }
         return .send(.delegate(.presentDetailView(id != .none, id: id)))
         
       case .deleteActiveMarker:
         state.isNeedDeleteMarker = true
         return .none
         
-      case let .focusTrashItem(id):
+      case let .focusTrashItem(data):
+        if let data = data {
+          state.focusData = MapMarkerEntity(point: data.point, type: data.trashType)
+        } else {
+          state.focusData = nil
+        }
         return .none
+        
       default:
         return .none
       }

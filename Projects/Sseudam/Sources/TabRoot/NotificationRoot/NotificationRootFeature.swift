@@ -11,6 +11,7 @@ import ComposableArchitecture
 
 import NotificationFeature
 import AuthFeature
+import TrashSpotDomainInterface
 import Utility
 
 @Reducer
@@ -32,7 +33,7 @@ struct NotificationRootFeature {
   
   enum Delegate: Equatable {
     case requestLogin(Bool, AuthEntryPoint)
-    case showThrowTrash(id: Int, point: Coordinates)
+    case showThrowTrash(data: TrashSpotDetail)
     case moveAcceptList
     case showRefuseAlert(reason: String)
   }
@@ -57,8 +58,8 @@ struct NotificationRootFeature {
         case let .requestLogin(isPresent):
           return .send(.delegate(.requestLogin(isPresent, .notification)))
           
-        case let .showThrowTrash(id, point):
-          return .send(.delegate(.showThrowTrash(id: id, point: point)))
+        case let .showThrowTrash(data):
+          return .send(.delegate(.showThrowTrash(data: data)))
           
         case .moveAcceptList:
           return .send(.delegate(.moveAcceptList))

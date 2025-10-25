@@ -44,7 +44,7 @@ struct HomeRootFeature {
     case presentAlert(AlertType)
     
     /// 특정 위치로 이동
-    case moveTrashSpot(spotId: Int, point: Coordinates)
+    case moveTrashSpot(data: TrashSpotDetail)
     
     /// 로그인 후 상태 변경하기 위한 action
     case checkLoggedin
@@ -133,9 +133,8 @@ struct HomeRootFeature {
           }
         }
         
-      case let .moveTrashSpot(spotId, point):
-        print(spotId, point)
-        return .send(.home(.showFocusTrashSpot(id: spotId, point: point)))
+      case let .moveTrashSpot(data):
+        return .send(.home(.showFocusTrashSpot(data: data)))
         
         // MARK: - Receive VisitComplete Delegate Action
       case let .modal(.presented(.visitedComplete(action))):

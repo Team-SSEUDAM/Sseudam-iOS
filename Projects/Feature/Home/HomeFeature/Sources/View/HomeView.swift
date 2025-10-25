@@ -73,7 +73,8 @@ public struct HomeView: View {
       trashItems: $store.map.trashItems,
       isMapMove: $store.map.researchButtonEnable,
       isNeedDeleteMarker: $store.map.isNeedDeleteMarker,
-      isTrashDataFirstLoad: $store.map.isTrashDataFirstLoad
+      isTrashDataFirstLoad: $store.map.isTrashDataFirstLoad,
+      focusData: $store.map.focusData
     )
     .onReceiveMapBounds {
       store.send(.map(.fetchTrashItems($0)))

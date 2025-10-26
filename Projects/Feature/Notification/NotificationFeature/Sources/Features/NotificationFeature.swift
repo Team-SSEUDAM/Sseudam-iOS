@@ -9,8 +9,6 @@
 import Foundation
 import ComposableArchitecture
 import NotificationDomainInterface
-import SuggestionDomainInterface
-import ReportDomainInterface
 import TrashSpotDomainInterface
 import UserDefaults
 import Utility
@@ -28,6 +26,8 @@ public struct NotificationFeature {
     public var toastMessage: String? = nil
     public var isFirstLoad: Bool = true
     public var isLoading: Bool = false
+    
+    public var notificationDetail: NotificationDetailFeature.State = .init()
     public init() {}
   }
 
@@ -42,20 +42,12 @@ public struct NotificationFeature {
     case fetchNotificationResult(Result<NotificationListEntity, NetworkError>)
     case refreshNotificationItems
     
-    case fetchSuggestionRejectReason(id: Int)
-    case fetchSuggestionRejectReasonResult(Result<String, NetworkError>)
-    
-    case fetchReportRejectReason(id: Int)
-    case fetchReportRejectReasonResult(Result<String, NetworkError>)
-    
-    case fetchTrashSpotDetail(id: Int)
-    case fetchTrashSpotDetailResult(Result<TrashSpotDetail, NetworkError>)
-    
     case readNotification(id: Int)
     case readNotificationResult(Result<Int, NetworkError>)
     
     case showToastMessage(String?)
     
+    case notificationDetail(NotificationDetailFeature.Action)
     case delegate(Delegate)
   }
   
@@ -68,11 +60,12 @@ public struct NotificationFeature {
   
   @Dependency(\.FetchNotificationUseCase) private var fetchNotificationUseCase
   @Dependency(\.ReadNotificationUseCase) private var readNotificationUseCase
-  @Dependency(\.SuggestionDetailUseCase) private var suggestionDetailUseCase
-  @Dependency(\.ReportDetailUseCase) private var reportdetailUseCase
-  @Dependency(\.FetchTrashSpotDetailUseCase) private var trashSpotDetailUseCase
 
   public var body: some ReducerOf<Self> {
+    Scope(state: \.notificationDetail, action: \.notificationDetail) {
+      NotificationDetailFeature()
+    }
+    
     BindingReducer()
     Reduce { state, action in
       switch action {
@@ -90,45 +83,17 @@ public struct NotificationFeature {
         
       case let .itemTapped(data):
         if data.readStatus {
-          return handleTappedItem(data)
+          return .send(.notificationDetail(.handleTappedItem(data)))
         } else {
           return .concatenate([
             .send(.readNotification(id: data.id)),
-            handleTappedItem(data)
+            .send(.notificationDetail(.handleTappedItem(data)))
           ])
         }
-        
-      case let .fetchSuggestionRejectReason(suggestionId):
-        return fetchSuggestionRejectReason(suggestionId: suggestionId)
-        
-      case let .fetchSuggestionRejectReasonResult(.success(reason)):
-        return .send(.delegate(.showRefuseAlert(reason: reason)))
-      
-      case let .fetchSuggestionRejectReasonResult(.failure(error)):
-        return .send(.showToastMessage(error.localizedDescription))
-        
-      case let .fetchReportRejectReason(reportId):
-        return fetchReportRejectReason(reportId: reportId)
-        
-      case let .fetchReportRejectReasonResult(.success(reason)):
-        return .send(.delegate(.showRefuseAlert(reason: reason)))
-        
-      case let .fetchReportRejectReasonResult(.failure(error)):
-        return .send(.showToastMessage(error.localizedDescription))
-        
-      case let .fetchTrashSpotDetail(id):
-        return fetchTrashSpotDetail(id: id)
-        
-      case let .fetchTrashSpotDetailResult(.success(data)):
-        return .send(.delegate(.showThrowTrash(data: data)))
-        
-      case let .fetchTrashSpotDetailResult(.failure(error)):
-        return .send(.showToastMessage(error.localizedDescription))
         
       case let .fetchNotificationItems(isFirst):
         guard !state.isLoading else { return .none }
         if isFirst {
-          // Mark first load handled to avoid repeated initial fetches on subsequent onAppear events
           state.isFirstLoad = false
           state.isLoading = true
           return fetchNotificationItems(lastId: state.lastId)
@@ -155,7 +120,6 @@ public struct NotificationFeature {
         state.isLoading = false
         return .send(.showToastMessage(error.localizedDescription))
         
-        
       case .refreshNotificationItems:
         guard !state.isLoading else { return .none }
         state.lastId = nil
@@ -179,25 +143,14 @@ public struct NotificationFeature {
         state.toastMessage = message
         return .none
         
+      case let .notificationDetail(.delegate(action)):
+        return handleNotificationDetail(action)
+        
         default: return .none
       }
     }
   }
   
-  private func handleTappedItem(_ entity: NotificationEntity) -> Effect<Action> {
-    switch entity.type {
-    case .visitedSpot:
-      return .send(.fetchTrashSpotDetail(id: entity.parameterValue))
-    case .approveSuggestion, .approveReport:
-      return .send(.delegate(.moveAcceptList))
-    case .rejectSuggestion:
-      return .send(.fetchSuggestionRejectReason(id: entity.parameterValue))
-    case .rejectReport:
-      return .send(.fetchReportRejectReason(id: entity.parameterValue))
-    default:
-      return .none
-    }
-  }
   
   private func fetchNotificationItems(lastId: Int?) -> Effect<Action> {
     guard let userId = UserDefaultsKeys.userId else { return .none }
@@ -230,44 +183,16 @@ public struct NotificationFeature {
     }
   }
   
-  private func fetchSuggestionRejectReason(suggestionId: Int) -> Effect<Action> {
-    guard let userId = UserDefaultsKeys.userId else { return .none }
-    return .run { send in
-      do {
-        let data = try await suggestionDetailUseCase.execute(userId, suggestionId)
-        await send(.fetchSuggestionRejectReasonResult(.success(data.rejectReason)))
-      } catch let error as NetworkError {
-        await send(.fetchSuggestionRejectReasonResult(.failure(error)))
-      } catch {
-        await send(.fetchSuggestionRejectReasonResult(.failure(.customError(message: error.localizedDescription))))
-      }
-    }
-  }
-  
-  private func fetchReportRejectReason(reportId: Int) -> Effect<Action> {
-    guard let userId = UserDefaultsKeys.userId else { return .none }
-    return .run { send in
-      do {
-        let data = try await reportdetailUseCase.execute(userId, reportId)
-        await send(.fetchReportRejectReasonResult(.success(data.rejectReason)))
-      } catch let error as NetworkError {
-        await send(.fetchReportRejectReasonResult(.failure(error)))
-      } catch {
-        await send(.fetchReportRejectReasonResult(.failure(.customError(message: error.localizedDescription))))
-      }
-    }
-  }
-  
-  private func fetchTrashSpotDetail(id: Int) -> Effect<Action> {
-    return .run { send in
-      do {
-        let data = try await trashSpotDetailUseCase.execute(id)
-        await send(.fetchTrashSpotDetailResult(.success(data)))
-      } catch let error as NetworkError {
-        await send(.fetchTrashSpotDetailResult(.failure(error)))
-      } catch {
-        await send(.fetchTrashSpotDetailResult(.failure(.customError(message: error.localizedDescription))))
-      }
+  private func handleNotificationDetail(_ action: NotificationDetailFeature.Delegate) -> Effect<Action> {
+    switch action {
+    case let .showThrowTrash(data):
+      return .send(.delegate(.showThrowTrash(data: data)))
+    case .moveAcceptList:
+      return .send(.delegate(.moveAcceptList))
+    case let .showRefuseAlert(reason):
+      return .send(.delegate(.showRefuseAlert(reason: reason)))
+    case let .showToastMessage(message):
+      return .send(.showToastMessage(message))
     }
   }
 }

@@ -69,7 +69,7 @@ struct MapViewRepresentable: UIViewRepresentable {
     if requestMapBounds, !context.coordinator.isInitialBounds {
       currentVisibleBounds(on: uiView.mapView)
       requestMapBounds = false
-//      context.coordinator.deleteFocusMarker()
+      context.coordinator.deleteFocusMarker()
     }
     
     // 새로운 trash data(nil 포함)
@@ -172,6 +172,9 @@ extension MapViewRepresentable {
   ) {
     let coord: NMGLatLng = .init(lat: point.latitude, lng: point.longitude)
     let marker = drawMarker(view, to: coord, icon: type.activePinImage)
+    marker.isHideCollidedMarkers = true
+    marker.zIndex = 100
+    
     activeRadiusCircle(view, to: point, radius: .visitPossibleRadius, context: context)
     context.coordinator.focusMarker = marker
     moveCamera(view, to: point)
@@ -223,7 +226,6 @@ extension MapViewRepresentable {
     marker.isHideCollidedSymbols = true
     marker.anchor = anchor
     marker.iconImage = icon
-    marker.mapView = view.mapView
     
     return marker
   }

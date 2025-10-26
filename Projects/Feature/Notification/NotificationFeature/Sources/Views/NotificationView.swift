@@ -52,7 +52,10 @@ public struct NotificationView: View {
         if store.data.isEmpty {
           if !store.isLoading {
             EmptyView
+          } else {
+            Spacer()
           }
+          
         } else {
           NotificationItems
           Spacer()

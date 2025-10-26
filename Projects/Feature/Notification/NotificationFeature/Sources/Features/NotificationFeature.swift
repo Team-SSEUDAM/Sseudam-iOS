@@ -48,6 +48,9 @@ public struct NotificationFeature {
     case fetchReportRejectReason(id: Int)
     case fetchReportRejectReasonResult(Result<String, NetworkError>)
     
+    case fetchTrashSpotDetail(id: Int)
+    case fetchTrashSpotDetailResult(Result<TrashSpotDetail, NetworkError>)
+    
     case readNotification(id: Int)
     case readNotificationResult(Result<Int, NetworkError>)
     
@@ -113,6 +116,15 @@ public struct NotificationFeature {
       case let .fetchReportRejectReasonResult(.failure(error)):
         return .send(.showToastMessage(error.localizedDescription))
         
+      case let .fetchTrashSpotDetail(id):
+        return fetchTrashSpotDetail(id: id)
+        
+      case let .fetchTrashSpotDetailResult(.success(data)):
+        return .send(.delegate(.showThrowTrash(data: data)))
+        
+      case let .fetchTrashSpotDetailResult(.failure(error)):
+        return .send(.showToastMessage(error.localizedDescription))
+        
       case let .fetchNotificationItems(isFirst):
         guard !state.isLoading else { return .none }
         if isFirst {
@@ -175,9 +187,7 @@ public struct NotificationFeature {
   private func handleTappedItem(_ entity: NotificationEntity) -> Effect<Action> {
     switch entity.type {
     case .visitedSpot:
-      let point: Coordinates = .init(latitude: 37.6407397, longitude: 126.9206861)
-      let data: TrashSpotDetail = .init(id: 12261, suggestionerId: nil, suggestionerName: nil, name: "", address: "", point: point, trashType: .general, visitedCount: 1, imageUrl: nil)
-      return .send(.delegate(.showThrowTrash(data: data)))
+      return .send(.fetchTrashSpotDetail(id: entity.parameterValue))
     case .approveSuggestion, .approveReport:
       return .send(.delegate(.moveAcceptList))
     case .rejectSuggestion:
@@ -244,6 +254,19 @@ public struct NotificationFeature {
         await send(.fetchReportRejectReasonResult(.failure(error)))
       } catch {
         await send(.fetchReportRejectReasonResult(.failure(.customError(message: error.localizedDescription))))
+      }
+    }
+  }
+  
+  private func fetchTrashSpotDetail(id: Int) -> Effect<Action> {
+    return .run { send in
+      do {
+        let data = try await trashSpotDetailUseCase.execute(id)
+        await send(.fetchTrashSpotDetailResult(.success(data)))
+      } catch let error as NetworkError {
+        await send(.fetchTrashSpotDetailResult(.failure(error)))
+      } catch {
+        await send(.fetchTrashSpotDetailResult(.failure(.customError(message: error.localizedDescription))))
       }
     }
   }

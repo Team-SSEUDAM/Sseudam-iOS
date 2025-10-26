@@ -116,6 +116,8 @@ public struct NotificationFeature {
       case let .fetchNotificationItems(isFirst):
         guard !state.isLoading else { return .none }
         if isFirst {
+          // Mark first load handled to avoid repeated initial fetches on subsequent onAppear events
+          state.isFirstLoad = false
           state.isLoading = true
           return fetchNotificationItems(lastId: state.lastId)
         } else {
@@ -126,7 +128,13 @@ public struct NotificationFeature {
         
       case let .fetchNotificationResult(.success(data)):
         state.isLoading = false
-        state.data.append(contentsOf: data.items)
+        if state.lastId == nil || state.data.isEmpty {
+          state.data = data.items
+        } else {
+          let existingIDs = Set(state.data.map { $0.id })
+          let newItems = data.items.filter { !existingIDs.contains($0.id) }
+          state.data.append(contentsOf: newItems)
+        }
         state.lastId = data.nextCursor
         return .none
         

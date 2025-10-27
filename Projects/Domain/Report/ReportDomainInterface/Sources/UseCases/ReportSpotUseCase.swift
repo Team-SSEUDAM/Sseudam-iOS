@@ -13,15 +13,13 @@ import TrashSpotDomainInterface
 public struct ReportSpotUseCase {
   public var execute: @Sendable (
     _ reportType: String,
-    _ trashSpotDetail: TrashSpotFlattenDetailEntity?,
-    _ isPhotoSelected: Bool
+    _ trashSpotDetail: TrashSpotFlattenDetailEntity?
   ) async throws -> String?
 
   public init(
     execute: @Sendable @escaping (
       _ reportType: String,
-      _ trashSpotDetail: TrashSpotFlattenDetailEntity?,
-      _ isPhotoSelected: Bool
+      _ trashSpotDetail: TrashSpotFlattenDetailEntity?
     ) async throws -> String?
   ) {
     self.execute = execute

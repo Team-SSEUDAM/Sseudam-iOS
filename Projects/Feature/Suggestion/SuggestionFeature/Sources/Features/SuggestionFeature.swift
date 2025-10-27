@@ -68,7 +68,7 @@ public struct SuggestionFeature {
     
     case spotSuggestionResult(Result<SpotSuggestionEntity, NetworkError>)
     case uploadSpotImageResult(Result<String, NetworkError>)
-    case postSpotImage(String)
+    case postSpotImage(String?)
     
     case setIsLoading(Bool)
     case errorOccured(message: String)
@@ -464,16 +464,16 @@ public extension SuggestionFeature {
   
   func uploadSpotImageEffect(
     _ state: Self.State,
-    _ url: String,
+    _ url: String?,
     _ useCase: UploadSpotImageUseCase
   ) -> Effect<Action> {
     .run { send in
       do {
-        // 사진이 있을 때만 업로드, 없으면 성공으로 처리
-        if let image = state.selectedPhoto {
+        // 사진이 있고, url이 유효한 경우에만 업로드 시도
+        if let image = state.selectedPhoto, let url = url {
           try await useCase.execute(image, url)
         }
-        await send(.uploadSpotImageResult(.success("성공"))) /// 임시 메시지
+        await send(.uploadSpotImageResult(.success("성공"))) /// 임시 메시지ㅋ
       } catch is CancellationError {
         await send(.uploadSpotImageResult(.failure(.taskCancelled)))
       } catch {

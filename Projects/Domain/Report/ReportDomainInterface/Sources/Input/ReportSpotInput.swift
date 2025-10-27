@@ -20,12 +20,10 @@ public struct ReportSpotInput: Codable, Equatable {
   public let city: String?
   public let site: String?
   public let trashType: String?
-  public let isPhotoSelected: Bool
 
   public init(
     reportType: String,
-    spotDetail: TrashSpotFlattenDetailEntity?,
-    isPhotoSelected: Bool = false
+    spotDetail: TrashSpotFlattenDetailEntity?
   ) {
     self.reportType = reportType
     self.spotId = spotDetail?.id ?? 0
@@ -36,6 +34,5 @@ public struct ReportSpotInput: Codable, Equatable {
     self.city = spotDetail?.city
     self.site = spotDetail?.site
     self.trashType = spotDetail?.trashType
-    self.isPhotoSelected = isPhotoSelected
   }
 }

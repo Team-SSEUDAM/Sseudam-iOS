@@ -200,11 +200,9 @@ public struct ReportFeature {
         
       case .didAppearSelectPhoto:
         if state.selectedReportInfoType != "PHOTO" { return .none }
-        // 사진이 이미 선택되어 있는지 확인하여 버튼 텍스트 설정
-        state.nextButtonText = state.selectedPhoto != nil ? "완료" : "사진이 없어요"
-        state.isPhotoPage = true
-        // 사진 선택 페이지에서는 항상 다음으로 진행 가능 (사진 없이도 가능)
-        return .send(.nextButtonIsEnabled(true))
+        state.nextButtonText = "완료"
+        state.isPhotoPage = false  // 신고하기는 사진 필수이므로 false
+        return .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
         
       case .didAppearComplete:
         state.nextButtonText = "확인"
@@ -411,7 +409,6 @@ private extension ReportFeature {
     switch action {
     case let .photoSelected(photo):
       state.selectedPhoto = photo
-      state.nextButtonText = "완료"  // 사진이 선택되면 버튼 텍스트를 "완료"로 변경
       return .send(.nextButtonIsEnabled(true))
     }
   }
@@ -439,12 +436,9 @@ public extension ReportFeature {
   ) -> Effect<Action> {
     .run { send in
       do {
-        // 사진이 선택되지 않은 경우 isPhotoSelected를 true로 설정
-        let isPhotoSelected = state.selectedPhoto == nil
         let entity = try await useCase.execute(
           state.selectedReportInfoType,
-          state.reportSpotDetail,
-          isPhotoSelected
+          state.reportSpotDetail
         )
         await send(.spotReportResult(.success(entity)))
       } catch is CancellationError {
@@ -462,10 +456,10 @@ public extension ReportFeature {
   ) -> Effect<Action> {
     .run { send in
       do {
-        // 사진이 있을 때만 업로드, 없으면 성공으로 처리
-        if let image = state.selectedPhoto {
-          try await useCase.execute(image, url)
+        guard let image = state.selectedPhoto else {
+          throw NetworkError.customError(message: "이미지를 선택해주세요.")
         }
+        try await useCase.execute(image, url)
         await send(.uploadReportSpotImageResult(.success("성공"))) /// 임시 메시지
       } catch is CancellationError {
         await send(.uploadReportSpotImageResult(.failure(.taskCancelled)))

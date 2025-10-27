@@ -89,14 +89,17 @@ public struct SecondaryButton<Icon: View, LoadingView: View>: View {
   private var content: some View {
     HStack(spacing: .Number6) {
       icon()
-      if isLoading {
-        loadingView()
-          .frame(width: size.lottie, height: size.lottie)
-      } else {
-        Text(title)
-          .foregroundColor(state.textColor)
-          .font(size.font)
+      Group {
+        if isLoading {
+          loadingView()
+            .frame(width: size.lottie, height: size.lottie)
+        } else {
+          Text(title)
+            .foregroundColor(state.textColor)
+            .font(size.font)
+        }
       }
+      .animation(.easeInOut(duration: 0.2), value: isLoading)
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, size.padding.vertical)

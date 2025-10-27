@@ -82,7 +82,7 @@ public struct SecondaryButton<Icon: View, LoadingView: View>: View {
             action()
           }
       )
-      .disabled(state == .disabled)
+      .disabled(state == .disabled || state == .isLoading)
   }
   
   @ViewBuilder
@@ -102,7 +102,7 @@ public struct SecondaryButton<Icon: View, LoadingView: View>: View {
       .animation(.easeInOut(duration: 0.2), value: isLoading)
     }
     .frame(maxWidth: .infinity)
-    .padding(.vertical, size.padding.vertical)
+    .padding(.vertical, isLoading ? .Number4 : size.padding.vertical)
     .padding(.horizontal, size.padding.horizontal)
     .contentShape(Rectangle()) // 버튼의 패딩 영역도 터치 가능하게 설정
     .overlay(

@@ -23,6 +23,8 @@ public struct SpotSuggestionRepository {
   
   public var getSuggestionList: @Sendable () async throws -> [SuggestionListEntity]
   
+  public var getSuggestionDetail: @Sendable (_ input: SuggestionDetailInput) async throws -> SuggestionDetailEntity
+  
   public init(
     postSpotSuggestion: @Sendable @escaping (
       _ input: SpotSuggestionInput
@@ -33,11 +35,13 @@ public struct SpotSuggestionRepository {
     getSpotValidation: @Sendable @escaping (
       _ input: SpotNameValidateInput
     ) async throws -> Bool,
-    getSuggestionList: @Sendable @escaping () async throws -> [SuggestionListEntity]
+    getSuggestionList: @Sendable @escaping () async throws -> [SuggestionListEntity],
+    getSuggestionDetail: @Sendable @escaping (_ input: SuggestionDetailInput) async throws -> SuggestionDetailEntity
   ) {
     self.postSpotSuggestion = postSpotSuggestion
     self.putSpotImage = putSpotImage
     self.getSpotValidation = getSpotValidation
     self.getSuggestionList = getSuggestionList
+    self.getSuggestionDetail = getSuggestionDetail
   }
 }

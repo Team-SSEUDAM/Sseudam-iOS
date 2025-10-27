@@ -25,6 +25,11 @@ public extension ReportRepository {
         let body = ReportSpotNameValidateBody(input)
         let endpoint = ReportEndpoint.getReportSpotNameValidation(body: body)
         return try await networker.execute(with: endpoint).toEntity()
+      },
+      getReportDetail: { input in
+        let body = ReportDetailBody(userId: input.userId)
+        let endpint = ReportEndpoint.getReportDetail(reportId: input.reportId, body: body)
+        return try await networker.execute(with: endpint).toEntity()
       }
     )
   }

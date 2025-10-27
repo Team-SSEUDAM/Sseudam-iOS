@@ -29,6 +29,10 @@ public extension SpotSuggestionRepository {
       getSuggestionList: {
         let endpoint = SuggestionEndpoint.getSuggestionList()
         return try await NetworkKit().execute(with: endpoint).toEntity()
+      },
+      getSuggestionDetail: { input in
+        let endpint = SuggestionEndpoint.getSuggestionDetail(suggestionID: input.suggestionId, body: .init(userId: input.userId))
+        return try await NetworkKit().execute(with: endpint).toEntity()
       }
     )
   }

@@ -112,6 +112,10 @@ struct DependencyRegister {
       }
     )
     
+    SuggestionDetailUseCaseRegister {
+      SuggestionDetailUseCase.live(repository: suggestionRepository)
+    }
+    
     // MARK: - Report
     ReportSpotUseCaseRegister {
       ReportSpotUseCase.live(repository: reportRepository)
@@ -123,6 +127,10 @@ struct DependencyRegister {
     
     ReportSpotNameValidateUseCaseRegister {
       ReportSpotNameValidateUseCase.live(repository: reportRepository)
+    }
+    
+    ReportDetailUseCaseRegister {
+      ReportDetailUseCase.live(repository: reportRepository)
     }
     
     // MARK: - Auth

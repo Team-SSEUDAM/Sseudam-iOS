@@ -21,6 +21,14 @@ struct NotificationRootView: View {
   
   var body: some View {
     NotificationView(store: store.scope(state: \.notifications, action: \.notification))
+      .fullScreenCover(
+        item: $store.scope(
+          state: \.modal?.trashThrowConfirm,
+          action: \.modal.trashThrowConfirm
+        )
+      ) { store in
+        TrashThrowConfirmView(store: store)
+      }
   }
 }
 

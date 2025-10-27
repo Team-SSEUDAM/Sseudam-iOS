@@ -9,6 +9,7 @@
 import Foundation
 import ComposableArchitecture
 import NotificationDomainInterface
+import TrashSpotDomainInterface
 import UserDefaults
 import Utility
 
@@ -25,6 +26,8 @@ public struct NotificationFeature {
     public var toastMessage: String? = nil
     public var isFirstLoad: Bool = true
     public var isLoading: Bool = false
+    
+    public var notificationDetail: NotificationDetailFeature.State = .init()
     public init() {}
   }
 
@@ -44,12 +47,13 @@ public struct NotificationFeature {
     
     case showToastMessage(String?)
     
+    case notificationDetail(NotificationDetailFeature.Action)
     case delegate(Delegate)
   }
   
   public enum Delegate: Equatable {
     case requestLogin(Bool)
-    case showThrowTrash(id: Int)
+    case showThrowTrash(data: TrashSpotDetail)
     case moveAcceptList
     case showRefuseAlert(reason: String)
   }
@@ -58,6 +62,10 @@ public struct NotificationFeature {
   @Dependency(\.ReadNotificationUseCase) private var readNotificationUseCase
 
   public var body: some ReducerOf<Self> {
+    Scope(state: \.notificationDetail, action: \.notificationDetail) {
+      NotificationDetailFeature()
+    }
+    
     BindingReducer()
     Reduce { state, action in
       switch action {
@@ -75,17 +83,18 @@ public struct NotificationFeature {
         
       case let .itemTapped(data):
         if data.readStatus {
-          return handleTappedItem(type: data.type)
+          return .send(.notificationDetail(.handleTappedItem(data)))
         } else {
           return .concatenate([
             .send(.readNotification(id: data.id)),
-            handleTappedItem(type: data.type)
+            .send(.notificationDetail(.handleTappedItem(data)))
           ])
         }
         
       case let .fetchNotificationItems(isFirst):
         guard !state.isLoading else { return .none }
         if isFirst {
+          state.isFirstLoad = false
           state.isLoading = true
           return fetchNotificationItems(lastId: state.lastId)
         } else {
@@ -96,7 +105,13 @@ public struct NotificationFeature {
         
       case let .fetchNotificationResult(.success(data)):
         state.isLoading = false
-        state.data.append(contentsOf: data.items)
+        if state.lastId == nil || state.data.isEmpty {
+          state.data = data.items
+        } else {
+          let existingIDs = Set(state.data.map { $0.id })
+          let newItems = data.items.filter { !existingIDs.contains($0.id) }
+          state.data.append(contentsOf: newItems)
+        }
         state.lastId = data.nextCursor
         return .none
         
@@ -104,7 +119,6 @@ public struct NotificationFeature {
         print(error)
         state.isLoading = false
         return .send(.showToastMessage(error.localizedDescription))
-        
         
       case .refreshNotificationItems:
         guard !state.isLoading else { return .none }
@@ -129,23 +143,14 @@ public struct NotificationFeature {
         state.toastMessage = message
         return .none
         
+      case let .notificationDetail(.delegate(action)):
+        return handleNotificationDetail(action)
+        
         default: return .none
       }
     }
   }
   
-  private func handleTappedItem(type: NotificationType) -> Effect<Action> {
-    switch type {
-    case .visitedSpot:
-      return .send(.delegate(.showThrowTrash(id: 30)))
-    case .approveSuggestion, .approveReport:
-      return .send(.delegate(.moveAcceptList))
-    case .rejectSuggestion, .rejectReport:
-      return .send(.delegate(.showRefuseAlert(reason: "쓰레기통이 없어요")))
-    default:
-      return .none
-    }
-  }
   
   private func fetchNotificationItems(lastId: Int?) -> Effect<Action> {
     guard let userId = UserDefaultsKeys.userId else { return .none }
@@ -175,6 +180,19 @@ public struct NotificationFeature {
       } catch {
         await send(.readNotificationResult(.failure(.customError(message: error.localizedDescription))))
       }
+    }
+  }
+  
+  private func handleNotificationDetail(_ action: NotificationDetailFeature.Delegate) -> Effect<Action> {
+    switch action {
+    case let .showThrowTrash(data):
+      return .send(.delegate(.showThrowTrash(data: data)))
+    case .moveAcceptList:
+      return .send(.delegate(.moveAcceptList))
+    case let .showRefuseAlert(reason):
+      return .send(.delegate(.showRefuseAlert(reason: reason)))
+    case let .showToastMessage(message):
+      return .send(.showToastMessage(message))
     }
   }
 }

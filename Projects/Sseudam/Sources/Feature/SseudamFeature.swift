@@ -20,6 +20,7 @@ import AuthFeature
 import AttendanceFeature
 
 import UserDomainInterface
+import TrashSpotDomainInterface
 
 @Reducer
 struct SseudamFeature {
@@ -67,7 +68,7 @@ struct SseudamFeature {
     case requestLogin(isPresent: Bool)
     case open(URL)
     
-    case showThrowTrash(id: Int)
+    case showThrowTrash(data: TrashSpotDetail)
     
     case closeAlertAction
     case acceptAlertAction
@@ -217,8 +218,11 @@ struct SseudamFeature {
         return .send(.authFlow(.presentLogin(isPresent)))
         
         
-      case .showThrowTrash:
-        return .send(.selectTab(.home))
+      case let .showThrowTrash(data):
+        return .concatenate([
+          .send(.selectTab(.home)),
+          .send(.homeRoot(.moveTrashSpot(data: data)))
+        ])
         
         // MARK: - Alert
         
@@ -326,8 +330,8 @@ extension SseudamFeature {
     case let .requestLogin(isPresent, _):
       return .send(.requestLogin(isPresent: isPresent))
       
-    case let .showThrowTrash(id):
-      return .send(.showThrowTrash(id: id))
+    case let .showThrowTrash(data):
+      return .send(.showThrowTrash(data: data))
       
     case .moveAcceptList:
       return .send(.selectTab(.myPage))

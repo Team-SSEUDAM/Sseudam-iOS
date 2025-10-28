@@ -27,7 +27,10 @@ public struct DetailMessageAlert: View {
         .ignoresSafeArea()
       VStack(spacing: .Number20) {
         content
-        SecondaryButton(title: type.accept) {
+        SecondaryButton(
+          title: .constant(type.accept),
+          state: .constant(.normal)
+        ) {
           acceptAction()
         }
       }

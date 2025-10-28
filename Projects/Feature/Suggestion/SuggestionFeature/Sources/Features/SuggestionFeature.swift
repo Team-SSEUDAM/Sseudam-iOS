@@ -444,14 +444,12 @@ public extension SuggestionFeature {
     .run { send in
       do {
         await send(.setIsLoading(true))
-        // 사진이 선택되지 않은 경우 isPhotoSelected를 true로 설정
-        let isPhotoSelected = state.selectedPhoto == nil
         let entity = try await useCase.execute(
           state.spotName,
           state.centerPoint,
           state.nmReverseGeoCodeEntity,
           state.trashType,
-          isPhotoSelected
+          state.selectedPhoto != nil
         )
         await send(.spotSuggestionResult(.success(entity)))
       } catch is CancellationError {

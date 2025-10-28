@@ -25,7 +25,7 @@ public struct SpotSuggestionInput: Codable, Equatable {
     centerPoint: Coordinates?,
     nmReverseGeoCode: NMGeoCodeReverseEntity?,
     trashType: String,
-    isPhotoSelected: Bool = false
+    isPhotoSelected: Bool
   ) {
     self.spotName = spotName
     self.latitude = centerPoint?.latitude

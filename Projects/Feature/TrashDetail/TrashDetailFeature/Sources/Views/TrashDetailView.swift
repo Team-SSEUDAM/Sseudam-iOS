@@ -64,6 +64,11 @@ public struct TrashDetailView: View {
         VStack {
           if data.isPublicData {
             publicDataImageView
+          } else if data.imageUrl == nil {
+            Rectangle()
+              .fill(ColorSet.Background.Secondary)
+              .clipShape(RoundedRectangle(cornerRadius: .Number8))
+              .frame(width: .Number80, height: .Number80)
           } else {
             trashImageView
           }

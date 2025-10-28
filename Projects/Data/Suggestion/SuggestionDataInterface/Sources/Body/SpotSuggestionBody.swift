@@ -17,11 +17,11 @@ public struct SpotSuggestionBody: Encodable, Equatable {
   public let city: String?
   public let site: String?
   public let trashType: String
-  public let isPhotoSelected: Bool?  // 서버 미구현 대응을 위해 옵셔널로 변경
+  public let isPhotoSelected: Bool
 
   public init(
     _ input: SpotSuggestionInput,
-    isPhotoSelected: Bool? = nil
+    isPhotoSelected: Bool
   ) {
     self.spotName = input.spotName
     self.latitude = input.latitude

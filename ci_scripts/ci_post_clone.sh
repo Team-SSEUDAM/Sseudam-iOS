@@ -36,11 +36,11 @@ tuist clean
 
 # Install dependencies
 echo "📦 Installing dependencies..."
-tuist install
+mise exec -- tuist install
 
 # Generate Xcode workspace
 echo "🔨 Generating Xcode workspace..."
-tuist generate --no-open
+mise exec -- tuist generate --no-open
 
 # Verify workspace generation
 if [ -f "Sseudam.xcworkspace/contents.xcworkspacedata" ]; then

@@ -17,25 +17,24 @@ struct SecondaryButtonDemo: View {
     List {
       Section("일반 텍스트 버튼") {
         SecondaryButton(
-          title: "Label",
-          size: .large,
-          state: buttonState
+          title: .constant("Label"),
+          state: .constant(buttonState)
         ) {
           print("Button Clicked")
         }
         
         SecondaryButton(
-          title: "Label",
+          title: .constant("Label"),
           size: .medium,
-          state: buttonState
+          state: .constant(buttonState)
         ) {
           print("Button Clicked")
         }
         
         SecondaryButton(
-          title: "Action",
+          title: .constant("Action"),
           size: .medium,
-          state: buttonState
+          state: .constant(buttonState)
         ) {
           print("Action Clicked")
         }
@@ -47,9 +46,8 @@ struct SecondaryButtonDemo: View {
             Icon(image: .addSpot, size: .Number20)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
-          title: "Label",
-          size: .large,
-          state: buttonState
+          title: .constant("Label"),
+          state: .constant(buttonState)
         ) {
           print("Button Clicked")
         }
@@ -59,9 +57,9 @@ struct SecondaryButtonDemo: View {
             Icon(image: .addSpot, size: .Number16)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
-          title: "Label",
+          title: .constant("Label"),
           size: .medium,
-          state: buttonState
+          state: .constant(buttonState)
         ) {
           print("Button Clicked")
         }
@@ -69,9 +67,8 @@ struct SecondaryButtonDemo: View {
       
       Section("비활성화 버튼") {
         SecondaryButton(
-          title: "Label",
-          size: .large,
-          state: disabledState
+          title: .constant("Label"),
+          state: .constant(disabledState)
         ) {
           disabledState = .disabled
         }
@@ -81,9 +78,8 @@ struct SecondaryButtonDemo: View {
             Icon(image: .addSpot, size: .Number20)
               .foregroundColor(ColorSet.Icon.Inverse)
           },
-          title: "Label",
-          size: .large,
-          state:  .disabled
+          title: .constant("Label"),
+          state: .constant(.disabled)
         ) {
           print("Button Clicked")
         }

@@ -77,8 +77,8 @@ public struct Alert: View {
     HStack(spacing: .Number12) {
       if !isSingleButton {
         SecondaryButton(
-          title: type.cancel,
-          size: .large
+          title: .constant(type.cancel),
+          state: .constant(.normal)
         ) { closeAction() }
       }
       

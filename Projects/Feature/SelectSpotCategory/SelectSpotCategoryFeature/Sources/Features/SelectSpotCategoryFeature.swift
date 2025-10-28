@@ -27,7 +27,7 @@ public struct SelectSpotCategoryFeature {
   public struct State: Equatable {
     public var selectedNormal: CheckBoxButtonState = .normal
     public var selectedRecycle: CheckBoxButtonState = .normal
-    public var isEnabled: Bool = false
+    public var isEnabled: Bool = true
     public init() {
     }
   }

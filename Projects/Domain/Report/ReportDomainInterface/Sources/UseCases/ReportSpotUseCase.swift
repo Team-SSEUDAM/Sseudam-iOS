@@ -15,7 +15,7 @@ public struct ReportSpotUseCase {
     _ reportType: String,
     _ trashSpotDetail: TrashSpotFlattenDetailEntity?
   ) async throws -> String?
-  
+
   public init(
     execute: @Sendable @escaping (
       _ reportType: String,

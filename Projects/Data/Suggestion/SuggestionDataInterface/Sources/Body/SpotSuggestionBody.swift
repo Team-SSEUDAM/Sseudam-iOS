@@ -17,9 +17,11 @@ public struct SpotSuggestionBody: Encodable, Equatable {
   public let city: String?
   public let site: String?
   public let trashType: String
-  
+  public let isPhotoSelected: Bool
+
   public init(
-    _ input: SpotSuggestionInput
+    _ input: SpotSuggestionInput,
+    isPhotoSelected: Bool
   ) {
     self.spotName = input.spotName
     self.latitude = input.latitude
@@ -28,5 +30,6 @@ public struct SpotSuggestionBody: Encodable, Equatable {
     self.city = input.city
     self.site = input.site
     self.trashType = input.trashType
+    self.isPhotoSelected = isPhotoSelected
   }
 }

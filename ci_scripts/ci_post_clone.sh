@@ -32,7 +32,7 @@ mise install
 
 # Clean any existing artifacts
 echo "🧹 Cleaning existing artifacts..."
-tuist clean
+mise exec -- tuist clean
 
 # Install dependencies
 echo "📦 Installing dependencies..."

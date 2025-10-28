@@ -35,4 +35,13 @@ public enum ReportEndpoint: Sendable {
       parameters: .body(body)
     )
   }
+  
+  public static func getReportDetail(reportId: Int, body: ReportDetailBody) -> Endpoint<ReportDetailDTO> {
+    return Endpoint(
+      headers: .authorization(UserDefaultsKeys.accessToken),
+      method: .get,
+      path: "/reports/\(reportId)",
+      parameters: .query(body)
+    )
+  }
 }

@@ -20,7 +20,7 @@ public struct ReportSpotInput: Codable, Equatable {
   public let city: String?
   public let site: String?
   public let trashType: String?
-  
+
   public init(
     reportType: String,
     spotDetail: TrashSpotFlattenDetailEntity?

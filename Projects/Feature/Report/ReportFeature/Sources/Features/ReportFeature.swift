@@ -48,6 +48,7 @@ public struct ReportFeature {
     var nextButtonText: String = "시작하기"
     var isNavigationBarHidden = false
     var isLoading: Bool = false
+    var isPhotoPage: Bool = false /// 현재 페이지가 사진 선택 페이지인지 여부
     
     /// 선택된 정보 관련 `State`
     var selectedReportInfoType: String = "" /// 선택된 제보 정보 타입
@@ -194,16 +195,19 @@ public struct ReportFeature {
       case .didAppearSelectKind:
         if state.selectedReportInfoType != "KIND" { return .none }
         state.nextButtonText = "완료"
+        state.isPhotoPage = false
         return .send(.nextButtonIsEnabled(state.child.selectKind.isEnabled))
         
       case .didAppearSelectPhoto:
         if state.selectedReportInfoType != "PHOTO" { return .none }
         state.nextButtonText = "완료"
+        state.isPhotoPage = false  // 신고하기는 사진 필수이므로 false
         return .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
         
       case .didAppearComplete:
         state.nextButtonText = "확인"
         state.isNavigationBarHidden = true
+        state.isPhotoPage = false
         return .merge([
           .send(.child(.writeName(.focusChanged(false)))),
           .send(.nextButtonIsEnabled(true)),
@@ -401,7 +405,7 @@ private extension ReportFeature {
     action: SelectSpotImageFeature.Action.Delegate
   ) -> Effect<Action> {
     guard state.currentPage == 2 else { return .none }
-    
+
     switch action {
     case let .photoSelected(photo):
       state.selectedPhoto = photo

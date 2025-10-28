@@ -16,6 +16,7 @@ public enum AlertType: Equatable {
   case login
   case forceAppUpdate(URL)
   case optionalAppUpdate(URL)
+  case refuseSuggestion(String)
   
   var title: String {
     switch self {
@@ -26,6 +27,7 @@ public enum AlertType: Equatable {
     case .login: "로그인이\n필요한 기능입니다"
     case .forceAppUpdate: "최신 버전 앱을 이용해주세요"
     case .optionalAppUpdate: "새로운 버전이 출시되었습니다"
+    case .refuseSuggestion: "아래와 같은 이유로,\n제보가 승인되지 않았어요"
     }
   }
   
@@ -36,7 +38,15 @@ public enum AlertType: Equatable {
     case .withdrawal: "탈퇴하면 되돌릴 수 없어요."
     case .forceAppUpdate: "보다 안정적인 서비스 제공을 위해 앱을\n최신 버전으로 업데이트 해야 합니다"
     case .optionalAppUpdate: "앱을 업데이트 하여 새로운 기능을 만나보세요."
+    case .refuseSuggestion(let message): message
     default: .none
+    }
+  }
+  
+  var subTitle: String? {
+    switch self {
+    case .refuseSuggestion: "반려 사유"
+    default: nil
     }
   }
   
@@ -63,6 +73,7 @@ public enum AlertType: Equatable {
     case .withdrawal: "탈퇴하기"
     case .login: "로그인하러 가기"
     case .forceAppUpdate, .optionalAppUpdate: "업데이트하러 가기"
+    case .refuseSuggestion: "확인"
     }
   }
   

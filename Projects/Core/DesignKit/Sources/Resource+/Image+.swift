@@ -21,6 +21,7 @@ public enum ImageSet: String {
   case homeFilled = "home__filled"
   case info = "info"
   case interests = "interests"
+  case interestsFilled = "interests_filled"
   case leftChevron = "left_chevron"
   case lock = "lock"
   case myLocation = "my_location"
@@ -42,6 +43,7 @@ public enum ImageSet: String {
   case check = "check"
   case feedback = "feedback"
   case notification = "notification"
+  case notificationFilled = "notification_filled"
   case attendanceSuccess = "attendance_success"
   case attendanceFail = "attendance_fail"
   case attendanceEmpty = "attendance_empty"
@@ -51,5 +53,6 @@ public enum ImageSet: String {
   case petDescriptionImage = "PetDescriptionImage"
   case suggestTrash = "suggestTrash"
   case reportTrash = "reportTrash"
+  case throwTrash = "throw_trash"
   public var swiftUIImage: DesignKitImages { DesignKitImages(name: self.rawValue) }
 }

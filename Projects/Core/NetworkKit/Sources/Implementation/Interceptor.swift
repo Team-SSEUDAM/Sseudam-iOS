@@ -14,6 +14,13 @@ import Utility
 public struct Interceptor: TokenRefresher {
   
   public static func refreshToken() async throws -> String? {
+    guard let isLoggedIn = UserDefaultsKeys.isLoggedIn else {
+      UserDefaultsKeys.isLoggedIn = false
+      KeyChainService.delete(forKey: .refreshToken)
+      UserDefaultsKeys.accessToken = nil
+      throw TokenError.invalidToken
+    }
+      
     if let refreshToken: String = KeyChainService.read(forKey: .refreshToken) {
       let refreshEndpoint = Endpoint<TokenRefreshDTO>(
         method: .post,

@@ -18,7 +18,7 @@ public struct ReportSpotBody: Encodable, Equatable {
   public let city: String?
   public let site: String?
   public let trashType: String?
-  
+
   public init(
     _ input: ReportSpotInput
   ) {

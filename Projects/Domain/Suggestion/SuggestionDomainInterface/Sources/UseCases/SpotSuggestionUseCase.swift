@@ -15,15 +15,17 @@ public struct SpotSuggestionUseCase {
     _ spotName: String,
     _ centerPoint: Coordinates?,
     _ nmReverseGeoCode: NMGeoCodeReverseEntity?,
-    _ trashType: String
+    _ trashType: String,
+    _ isPhotoSelected: Bool
   ) async throws -> SpotSuggestionEntity
-  
+
   public init(
     execute: @Sendable @escaping (
       _ spotName: String,
       _ centerPoint: Coordinates?,
       _ nmReverseGeoCode: NMGeoCodeReverseEntity?,
-      _ trashType: String
+      _ trashType: String,
+      _ isPhotoSelected: Bool
     ) async throws -> SpotSuggestionEntity
   ) {
     self.execute = execute

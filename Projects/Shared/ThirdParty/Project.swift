@@ -26,7 +26,9 @@ let project = Project(
         .SPM.TCA,
         .SPM.NMapsMap,
         .SPM.DotLottie,
-        .SPM.Mixpanel
+        .SPM.Mixpanel,
+        .SPM.FirebaseCrashlytics,
+        .SPM.FirebaseMessaging,
       ]
     )
   ]

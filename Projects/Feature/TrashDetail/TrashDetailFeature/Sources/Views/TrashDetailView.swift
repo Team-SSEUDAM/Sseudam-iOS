@@ -64,6 +64,11 @@ public struct TrashDetailView: View {
         VStack {
           if data.isPublicData {
             publicDataImageView
+          } else if data.imageUrl == nil {
+            Rectangle()
+              .fill(ColorSet.Background.Secondary)
+              .clipShape(RoundedRectangle(cornerRadius: .Number8))
+              .frame(width: .Number80, height: .Number80)
           } else {
             trashImageView
           }
@@ -230,7 +235,10 @@ public struct TrashDetailView: View {
   private var ButtonsView: some View {
     GeometryReader { geo in
       HStack(spacing: .Number8) {
-        SecondaryButton(title: "수정 제안하기", size: .large) {
+        SecondaryButton(
+          title: .constant("수정 제안하기"),
+          state: .constant(.normal)
+        ) {
           store.send(.reportButtonTapped)
         }
         PrimaryButton(

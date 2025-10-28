@@ -14,7 +14,7 @@ public struct SpotSuggestionDTO: DTO {
   public typealias Entity = SpotSuggestionEntity
   
   public let suggestionId: UInt16
-  public let presignedUrl: String
+  public let presignedUrl: String?
 }
 
 public extension SpotSuggestionDTO {

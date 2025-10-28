@@ -178,7 +178,7 @@ public struct MyPetView: View {
       asset: CatImageSet.imgae(
         level: store.myPetInfo?.levelType,
         interaction: store.isMyPetInteracted,
-        type: ._2025_07
+        type: store.petGrowthList.season
       )
     )
     .resizable()
@@ -258,7 +258,7 @@ public struct MyPetView: View {
       ) {
         store.send(.requestLogin)
       }
-      .frame(width: 129)
+      .frame(width: .loginButtonWidth)
       
       Spacer()
     }

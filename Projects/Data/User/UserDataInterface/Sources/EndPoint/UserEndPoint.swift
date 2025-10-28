@@ -49,5 +49,15 @@ public struct UserEndPoint: Sendable {
       path: "/users/me"
     )
   }
+  
+  public static func putFCMToken(body: FCMTokenBody) -> Endpoint<EmptyResponse> {
+    let accessToken = UserDefaultsKeys.accessToken
+    return Endpoint(
+      headers: .authorization(accessToken),
+      method: .put,
+      path: "/users/fcm-token",
+      parameters: .body(body)
+    )
+  }
 }
 

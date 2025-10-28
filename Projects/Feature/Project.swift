@@ -23,7 +23,8 @@ let project = Project.makeStaticLibraryProject(
     .Features.MyPage,
     .Features.Visited,
     .Features.Attendance,
-    .Features.LevelUp
+    .Features.LevelUp,
+    .Features.Notification
   ]
 )
 

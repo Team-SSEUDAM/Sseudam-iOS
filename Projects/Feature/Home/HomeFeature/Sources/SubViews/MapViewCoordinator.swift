@@ -27,6 +27,10 @@ extension MapViewRepresentable {
     
     var activeData: TrashSpot?
     
+    var activeRadiusOverlay: NMFCircleOverlay?
+    
+    var focusMarker: NMFMarker? = nil
+    
     init(_ parent: MapViewRepresentable) {
       self.parent = parent
     }
@@ -88,6 +92,12 @@ extension MapViewRepresentable {
         self.activeMarker = nil
         self.activeData = nil
       }
+      if let circle = self.activeRadiusOverlay {
+        circle.mapView = nil
+        self.activeRadiusOverlay = nil
+      }
+      
+      deleteFocusMarker()
     }
     
     /// 지도에 나타나는 마커 리스트 저장
@@ -98,12 +108,25 @@ extension MapViewRepresentable {
     
     /// 지도에 올라와있는 마커 삭제
     func deleteAllMarkers() {
-      print(markers.count)
       if !markers.isEmpty {
         markers.forEach {
           $0.mapView = nil
         }
         self.markers.removeAll()
+      }
+      deleteFocusMarker()
+    }
+    
+    /// 외부에서 요청받은 마커 삭제
+    func deleteFocusMarker() {
+      if let _ = focusMarker {
+        self.focusMarker?.mapView = nil
+        self.focusMarker = nil
+        
+      }
+      if let circle = self.activeRadiusOverlay {
+        circle.mapView = nil
+        self.activeRadiusOverlay = nil
       }
       
     }

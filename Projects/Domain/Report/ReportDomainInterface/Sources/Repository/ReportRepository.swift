@@ -21,6 +21,10 @@ public struct ReportRepository {
     _ input: ReportSpotNameValidateInput
   ) async throws -> Bool
   
+  public var getReportDetail: @Sendable (
+    _ input: ReportDetailInput
+  ) async throws -> ReportDetailEntity
+  
   public init(
     postReportSpot: @Sendable @escaping (
       _ input: ReportSpotInput
@@ -30,10 +34,14 @@ public struct ReportRepository {
     ) async throws -> Void ,
     getReportSpotValidation: @Sendable @escaping (
       _ input: ReportSpotNameValidateInput
-    ) async throws -> Bool
+    ) async throws -> Bool,
+    getReportDetail: @Sendable @escaping (
+      _ input: ReportDetailInput
+    ) async throws -> ReportDetailEntity
   ) {
     self.postReportSpot = postReportSpot
     self.putReportSpotImage = putReportSpotImage
     self.getReportSpotValidation = getReportSpotValidation
+    self.getReportDetail = getReportDetail
   }
 }

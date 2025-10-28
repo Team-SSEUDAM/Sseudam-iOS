@@ -54,6 +54,10 @@ import AppVersionDomainInterface
 import AppVersionDomain
 import AppVersionData
 
+import NotificationDomainInterface
+import NotificationDomain
+import NotificationData
+
 import NetworkKit
 
 /// 비즈니스 로직의 의존성을 주입하기 위한 구조체
@@ -73,7 +77,8 @@ struct DependencyRegister {
     let imageDownloadRepoaitory = ImageDownloadRepository.live
     let historyRepository = HistoryRepository.live(networker: networker)
     let appVersionRepository = AppVersionRepository.live(networker: networker)
-
+    let notificaionRepository = NotificationRepository.live(networker: networker)
+    
     // MARK: - Home
       
     NMReverseGeoCodeUseCaseRegister(
@@ -107,6 +112,10 @@ struct DependencyRegister {
       }
     )
     
+    SuggestionDetailUseCaseRegister {
+      SuggestionDetailUseCase.live(repository: suggestionRepository)
+    }
+    
     // MARK: - Report
     ReportSpotUseCaseRegister {
       ReportSpotUseCase.live(repository: reportRepository)
@@ -118,6 +127,10 @@ struct DependencyRegister {
     
     ReportSpotNameValidateUseCaseRegister {
       ReportSpotNameValidateUseCase.live(repository: reportRepository)
+    }
+    
+    ReportDetailUseCaseRegister {
+      ReportDetailUseCase.live(repository: reportRepository)
     }
     
     // MARK: - Auth
@@ -170,6 +183,10 @@ struct DependencyRegister {
     
     FetchUserInfoUseCaseRegister {
       FetchUserInfoUseCase.live(repository: userReoository)
+    }
+    
+    UpdateFCMTokenUseCaseRegister {
+      UpdateFCMTokenUseCase.live(repository: userReoository)
     }
     
     // MARK: - Trash Spot
@@ -234,6 +251,15 @@ struct DependencyRegister {
     // MARK: - AppVersion
     CheckAppVersionUseCaseRegister {
       CheckAppVersionUseCase.live(repository: appVersionRepository)
+    }
+    
+    // MARK: - Notification
+    FetchNotificationUseCaseRegister {
+      FetchNotificationUseCase.live(repository: notificaionRepository)
+    }
+    
+    ReadNotificationUseCaseRegister {
+      ReadNotificationUseCase.live(repository: notificaionRepository)
     }
   }
 }

@@ -88,13 +88,19 @@ public struct PetDescriptionView: View {
     HStack(spacing: .Number8) {
       switch page {
       case 1:
-        SecondaryButton(title: "다음") {
+        SecondaryButton(
+          title: .constant("다음"),
+          state: .constant(.normal)
+        ) {
           page = 2
           descriptionText = "마지막 단계에 도달하면,\n스페셜 펫을 만날 수 있어요"
           descriptionDetailText = "매달 새롭게 등장하는 스페셜 캐릭터를 키워보세요."
         }.frame(maxWidth: .infinity)
       case 2:
-        SecondaryButton(title: "이전") {
+        SecondaryButton(
+          title: .constant("이전"),
+          state: .constant(.normal)
+        ) {
           page = 1
           descriptionText = "쓰담을 모으면,\n펫을 성장시킬 수 있어요"
           descriptionDetailText = "쓰레기통 제보, 인증, 수정 제안을 통해 쓰담을 획득하세요."

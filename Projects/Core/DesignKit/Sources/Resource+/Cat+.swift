@@ -10,11 +10,19 @@ import SwiftUI
 
 // MARK: - Enum Types
 public enum CatType: String, Sendable, CaseIterable {
-  case _2025_07 = "2025_07"
+  case _2025_07 = "2025-07"
+  case _2025_08 = "2025-08"
+  case _2025_09 = "2025-09"
+  case _2025_10 = "2025-10"
+  case _2025_11 = "2025-11"
   
   public var rawString: String {
     switch self {
     case ._2025_07: return "basic"
+    case ._2025_08: return "aug"
+    case ._2025_09: return "sep"
+    case ._2025_10: return "nov"
+    case ._2025_11: return "nov"
     }
   }
 }

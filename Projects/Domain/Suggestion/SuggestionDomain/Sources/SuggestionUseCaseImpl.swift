@@ -12,12 +12,13 @@ import NMReverseGeocodingDomainInterface
 
 extension SpotSuggestionUseCase {
   public static func live(repository: SpotSuggestionRepository) -> SpotSuggestionUseCase {
-    .init { spotname, centerPoint, nmReverseGeoCode, trashType in
+    .init { spotname, centerPoint, nmReverseGeoCode, trashType, isPhotoSelected in
       let input = SpotSuggestionInput(
         spotName: spotname,
         centerPoint: centerPoint,
         nmReverseGeoCode: nmReverseGeoCode,
-        trashType: trashType
+        trashType: trashType,
+        isPhotoSelected: isPhotoSelected
       )
       return try await repository.postSpotSuggestion(input)
     }

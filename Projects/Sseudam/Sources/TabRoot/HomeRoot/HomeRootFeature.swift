@@ -43,6 +43,9 @@ struct HomeRootFeature {
     case hiddenTabBar(Bool)
     case presentAlert(AlertType)
     
+    /// 특정 위치로 이동
+    case moveTrashSpot(data: TrashSpotDetail)
+    
     /// 로그인 후 상태 변경하기 위한 action
     case checkLoggedin
     case modal(PresentationAction<ModalDestination.Action>)
@@ -129,6 +132,9 @@ struct HomeRootFeature {
             await send(.trashDetail(.checkLoggedin))
           }
         }
+        
+      case let .moveTrashSpot(data):
+        return .send(.home(.showFocusTrashSpot(data: data)))
         
         // MARK: - Receive VisitComplete Delegate Action
       case let .modal(.presented(.visitedComplete(action))):

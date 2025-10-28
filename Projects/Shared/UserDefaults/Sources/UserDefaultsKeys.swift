@@ -15,7 +15,7 @@ public struct UserDefaultsKeys {
   @UserDefault("accessToken", default: nil)
   public static var accessToken: String?
   
-  @UserDefault("isLoggedIn", default: false)
+  @UserDefault("isLoggedIn", default: nil)
   public static var isLoggedIn: Bool?
   
   @UserDefault("username", default: nil)

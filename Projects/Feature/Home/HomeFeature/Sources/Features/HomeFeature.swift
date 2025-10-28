@@ -55,6 +55,8 @@ public struct HomeFeature {
     
     case removeSuggestionCoachMark
     
+    case showFocusTrashSpot(data: TrashSpotDetail)
+    
     case showReportView(detail: TrashSpotDetail?)
     case moveToSetting
     case moveToSuggestionFromDetail
@@ -115,6 +117,12 @@ public struct HomeFeature {
       case let .showToastMessage(message):
         state.toastMessage = message
         return .none
+        
+      case let .showFocusTrashSpot(data):
+        return .merge(
+          .send(.map(.focusTrashItem(data))),
+          .send(.presentDetailView(true, id: data.id))
+        )
         
         // MARK: - Receive LocationFeature delegate action
         

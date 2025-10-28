@@ -43,4 +43,15 @@ public enum SuggestionEndpoint: Sendable {
       parameters: nil
     )
   }
+  
+  public static func getSuggestionDetail(suggestionID: Int, body: SuggestionDetailBody) -> Endpoint<SuggestionDetailDTO> {
+    return Endpoint(
+      headers: .authorization(UserDefaultsKeys.accessToken),
+      method: .get,
+      path: "/suggestions/\(suggestionID)",
+      parameters: .query(body)
+    )
+  }
+  
+  
 }

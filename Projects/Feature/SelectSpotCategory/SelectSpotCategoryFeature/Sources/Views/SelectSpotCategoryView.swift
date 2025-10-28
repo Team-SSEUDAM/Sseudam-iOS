@@ -25,18 +25,18 @@ public struct SelectSpotCategoryView: View {
         .padding(.top, .Number8)
       VStack(spacing: .Number12) {
         CheckBoxButton(
-          text: "일반쓰레기",
-          state: $store.selectedNormal,
-          icon: .delete
-        ) {
-          store.send(.selectedKind(.normal))
-        }
-        CheckBoxButton(
-          text: "재활용쓰레기",
+          text: "일반, 재활용쓰레기통 모두 있어요",
           state: $store.selectedRecycle,
           icon: .recycle
         ) {
           store.send(.selectedKind(.recycle))
+        }
+        CheckBoxButton(
+          text: "일반쓰레기통만 있어요",
+          state: $store.selectedNormal,
+          icon: .delete
+        ) {
+          store.send(.selectedKind(.normal))
         }
         Spacer()
       }

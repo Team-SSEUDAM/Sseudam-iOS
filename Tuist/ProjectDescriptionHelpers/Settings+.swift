@@ -11,6 +11,7 @@ import ProjectDescription
 extension Settings {
   public static let release = Self.settings(
     base: [
+      "OTHER_LDFLAGS": ["-ObjC"],
       "DEVELOPMENT_TEAM": "6NXQDZ68FD",
       "CODE_SIGN_STYLE": "Manual",
       "PROVISIONING_PROFILE_SPECIFIER": "match Development Sseudam.a2bo.ios.Release",
@@ -24,6 +25,7 @@ extension Settings {
   
   public static let dev = Self.settings(
     base: [
+      "OTHER_LDFLAGS": ["-ObjC"],
       "DEVELOPMENT_TEAM": "6NXQDZ68FD",
       "CODE_SIGN_STYLE": "Manual",
       "PROVISIONING_PROFILE_SPECIFIER": "match Development Sseudam.a2bo.ios.Debug",
@@ -35,7 +37,11 @@ extension Settings {
     ]
   )
   
-  public static let `default` = Self.settings(configurations: [
+  public static let `default` = Self.settings(
+    base: [
+      "OTHER_LDFLAGS": ["-ObjC"]
+    ],
+    configurations: [
     .debug(name: "Debug", xcconfig: .relativeToRoot("Config/Debug.xcconfig")),
     .release(name: "Release", xcconfig: .relativeToRoot("Config/Release.xcconfig")),
   ])

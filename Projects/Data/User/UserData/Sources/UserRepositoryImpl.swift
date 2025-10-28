@@ -36,6 +36,9 @@ public extension UserRepository {
       }, fetchUserInfo: {
         let endpoint = UserEndPoint.fetchUserInfo()
         return try await networker.execute(with: endpoint, timeout: 30).toEntity()
+      }, putFCMToken: { fcmToken in
+        let endpoint = UserEndPoint.putFCMToken(body: .init(fcmToken: fcmToken))
+        let _ = try await networker.execute(with: endpoint, timeout: 30)
       }
     )
   }

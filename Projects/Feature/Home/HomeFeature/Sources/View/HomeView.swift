@@ -22,7 +22,6 @@ public struct HomeView: View {
     self.store = store
   }
   
-  private let tabbarHeight: CGFloat = 83
   private let bottomPadding: CGFloat = 13
   
   public var body: some View {
@@ -36,10 +35,10 @@ public struct HomeView: View {
           VStack {
             TopButtonView
             Spacer()
+            SnackBarView
+              .padding(.bottom, bottomPadding)
             BottomButtonView
           }
-          SnackBarView
-            .padding(.bottom, (store.isPresentDetail ? store.bottomSheetHeight : tabbarHeight) + bottomPadding )
         }
       }
       .ignoresSafeArea(edges: .bottom)
@@ -74,7 +73,8 @@ public struct HomeView: View {
       trashItems: $store.map.trashItems,
       isMapMove: $store.map.researchButtonEnable,
       isNeedDeleteMarker: $store.map.isNeedDeleteMarker,
-      isTrashDataFirstLoad: $store.map.isTrashDataFirstLoad
+      isTrashDataFirstLoad: $store.map.isTrashDataFirstLoad,
+      focusData: $store.map.focusData
     )
     .onReceiveMapBounds {
       store.send(.map(.fetchTrashItems($0)))
@@ -141,7 +141,7 @@ public struct HomeView: View {
     .padding(.horizontal, .Number16)
     .padding(
       .bottom,
-      (store.isPresentDetail ? store.bottomSheetHeight : tabbarHeight)+bottomPadding
+      (store.isPresentDetail ? store.bottomSheetHeight : .tabbarHeight)+bottomPadding
     )
     .animation(
       .easeInOut(duration: store.isPresentDetail ? 0.3 : 0.13),

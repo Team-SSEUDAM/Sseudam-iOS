@@ -1,0 +1,20 @@
+//
+//  SuggestionPointDTO.swift
+//  SuggestionDataInterface
+//
+//  Created by Jiyeon on 10/18/25.
+//  Copyright © 2025 Sseudam.a2bo.ios. All rights reserved.
+//
+
+import Foundation
+import NetworkKit
+import Utility
+
+public struct SuggestionPointDTO: DTO {
+  public let type: String
+  public let coordinates: [Double] // [longitude, latitude]
+  
+  public func toEntity() throws -> Coordinates {
+    return .init(latitude: coordinates[1], longitude: coordinates[0])
+  }
+}

@@ -22,6 +22,7 @@ public struct MyPetGrowthListFeature {
   public struct State: Equatable {
     public var catCards: [CatCard] = []
     public var growthRecords: [GrowthRecord] = []
+    public var season: CatType = ._2025_07
     
     public init() {}
   }
@@ -32,7 +33,7 @@ public struct MyPetGrowthListFeature {
     case fetchPetSeasonInfo
     case fetchPetSeasonInfoResult(Result<PetSeasonInfoEntity, NetworkError>)
     
-    case fetchCatCards([CatCard])
+    case fetchCatCards([CatCard], CatType)
     case fetchGrowthRecords([GrowthRecord])
     
     public enum Delegate: Equatable {
@@ -50,8 +51,9 @@ public struct MyPetGrowthListFeature {
       case .fetchPetSeasonInfo:
         return fetchGrowthList()
         
-      case let .fetchCatCards(catCards):
+      case let .fetchCatCards(catCards, catType):
         state.catCards = catCards
+        state.season = catType
         return .none
         
       case let .fetchGrowthRecords(growthRecords):
@@ -90,8 +92,8 @@ extension MyPetGrowthListFeature {
         let imageURL = CatImageSet.imageURL(level: pet.levelType, type: pet.season)
         return CatCard(isLocked: pet.isLocked, imageURL: imageURL)
       }
-    
-    return .fetchCatCards(catCards)
+    let catType = seasonData.seasonPetInfo.first?.season ?? ._2025_07
+    return .fetchCatCards(catCards, catType)
   }
   
   fileprivate func fetchGrowthRecordsAction(with seasonData: PetSeasonInfoEntity) -> Action {

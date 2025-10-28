@@ -39,6 +39,7 @@ public struct SuggestionFeature {
     var nextButtonState: PrimaryButtonState = .normal
     var nextButtonText: String = "시작하기"
     var isLoading: Bool = false /// 다음 버튼의 로딩 상태
+    var isPhotoPage: Bool = false /// 현재 페이지가 선택 페이지면, PrimaryButton의 상태를 커스텀 상태로 변경해야함,,,
     
     /// 제보하기에 담길 데이터
     var spotName: String = ""
@@ -67,7 +68,7 @@ public struct SuggestionFeature {
     
     case spotSuggestionResult(Result<SpotSuggestionEntity, NetworkError>)
     case uploadSpotImageResult(Result<String, NetworkError>)
-    case postSpotImage(String)
+    case postSpotImage(String?)
     
     case setIsLoading(Bool)
     case errorOccured(message: String)
@@ -185,19 +186,22 @@ public struct SuggestionFeature {
         
       case .didAppearSelectKind:
         state.nextButtonText = "다음"
+        state.isPhotoPage = false
         return .merge([
           .send(.child(.writeName(.focusChanged(false)))),
           .send(.nextButtonIsEnabled(state.child.selectKind.isEnabled))
         ])
         
       case .didAppearSelectPhoto:
-        state.nextButtonText = "완료"
-        return .merge([
-          .send(.nextButtonIsEnabled(state.child.selectPhoto.isEnabled))
-        ])
+        // 사진이 이미 선택되어 있는지 확인하여 버튼 텍스트 설정
+        state.nextButtonText = state.selectedPhoto != nil ? "다음" : "사진이 없어요"
+        state.isPhotoPage = true
+        // 사진 선택 페이지에서는 항상 다음으로 진행 가능 (사진 없이도 가능)
+        return .send(.nextButtonIsEnabled(true))
         
       case .didAppearComplete:
         state.isNavigationBarHidden = true
+        state.isPhotoPage = false
         state.nextButtonText = "확인"
         return .run { send in
           await send(.nextButtonIsEnabled(true))
@@ -412,6 +416,7 @@ private extension SuggestionFeature {
     switch action {
     case let .photoSelected(photo):
       state.selectedPhoto = photo
+      state.nextButtonText = "다음"  // 사진이 선택되면 버튼 텍스트를 "다음"으로 변경
       return .send(.nextButtonIsEnabled(true))
     }
   }
@@ -443,7 +448,8 @@ public extension SuggestionFeature {
           state.spotName,
           state.centerPoint,
           state.nmReverseGeoCodeEntity,
-          state.trashType
+          state.trashType,
+          state.selectedPhoto != nil
         )
         await send(.spotSuggestionResult(.success(entity)))
       } catch is CancellationError {
@@ -456,16 +462,16 @@ public extension SuggestionFeature {
   
   func uploadSpotImageEffect(
     _ state: Self.State,
-    _ url: String,
+    _ url: String?,
     _ useCase: UploadSpotImageUseCase
   ) -> Effect<Action> {
     .run { send in
       do {
-        guard let image = state.selectedPhoto else {
-          throw NetworkError.customError(message: "이미지를 선택해주세요.")
+        // 사진이 있고, url이 유효한 경우에만 업로드 시도
+        if let image = state.selectedPhoto, let url = url {
+          try await useCase.execute(image, url)
         }
-        try await useCase.execute(image, url)
-        await send(.uploadSpotImageResult(.success("성공"))) /// 임시 메시지
+        await send(.uploadSpotImageResult(.success("성공"))) /// 임시 메시지ㅋ
       } catch is CancellationError {
         await send(.uploadSpotImageResult(.failure(.taskCancelled)))
       } catch {

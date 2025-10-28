@@ -77,7 +77,7 @@ public extension PetRepository {
       },
       putPetNickname: { nickname in
         let endpoint = PetEndpoint.putPetNickname(nickname)
-        let result = try await networker.execute(with: endpoint)
+        let _ = try await networker.execute(with: endpoint)
       }
     )
   }

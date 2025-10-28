@@ -12,6 +12,7 @@ import TrashSpotDomainInterface
 import Utility
 import NMapsMap
 import CoreGraphics
+import DesignKit
 
 struct MapViewRepresentable: UIViewRepresentable {
   
@@ -28,6 +29,8 @@ struct MapViewRepresentable: UIViewRepresentable {
   @Binding var isNeedDeleteMarker: Bool
   
   @Binding var isTrashDataFirstLoad: Bool
+  
+  @Binding var focusData: MapMarkerEntity?
   
   /// 지도 범위 전달 클로저
   var mapBounds: (([Coordinates]) -> Void)? = nil
@@ -66,6 +69,7 @@ struct MapViewRepresentable: UIViewRepresentable {
     if requestMapBounds, !context.coordinator.isInitialBounds {
       currentVisibleBounds(on: uiView.mapView)
       requestMapBounds = false
+      context.coordinator.deleteFocusMarker()
     }
     
     // 새로운 trash data(nil 포함)
@@ -81,6 +85,12 @@ struct MapViewRepresentable: UIViewRepresentable {
        context.coordinator.activeMarker != nil {
       context.coordinator.resetActiveMarker()
       isNeedDeleteMarker = false
+    }
+    
+    if let focus = focusData,
+       context.coordinator.focusMarker == nil
+    {
+      presentFocusMarker(uiView, point: focus.point, type: focus.type, context: context)
     }
   }
   
@@ -126,10 +136,13 @@ extension MapViewRepresentable {
     }
   }
   
-  private func markerTapEvent(to marker: NMFMarker, data: TrashSpot, context: Context) {
+  private func markerTapEvent(_ view: NMFNaverMapView, to marker: NMFMarker, data: TrashSpot, context: Context) {
     if marker == context.coordinator.activeMarker { return }
+    marker.zIndex = 100
     marker.iconImage = data.trashType.activePinImage
     context.coordinator.markerTapEvent(marker: marker, data: data)
+    
+    activeRadiusCircle(view, to: data.location, radius: .visitPossibleRadius, context: context)
     if let onMarkerTapped = onMarkerTapped {
       onMarkerTapped(data.id)
     }
@@ -149,6 +162,24 @@ extension MapViewRepresentable {
       longitude: total.lon / count
     )
   }
+  
+  /// 알림 등 외부에서 요청에 의한 마커 그리기
+  private func presentFocusMarker(
+    _ view: NMFNaverMapView,
+    point: Coordinates,
+    type: TrashType,
+    context: Context
+  ) {
+    let coord: NMGLatLng = .init(lat: point.latitude, lng: point.longitude)
+    let marker = drawMarker(view, to: coord, icon: type.activePinImage)
+    marker.isHideCollidedMarkers = true
+    marker.zIndex = 100
+    
+    activeRadiusCircle(view, to: point, radius: .visitPossibleRadius, context: context)
+    context.coordinator.focusMarker = marker
+    moveCamera(view, to: point)
+    marker.mapView = view.mapView
+  }
 }
 
 // MARK: - Marker
@@ -160,6 +191,7 @@ extension MapViewRepresentable {
     if context.coordinator.trashItems != items {
       deleteDrawMarker(context: context)
     }
+    context.coordinator.deleteFocusMarker()
     
     // 카메라 이동
     moveCameraForShowMarker(view, items: items, context: context)
@@ -173,7 +205,7 @@ extension MapViewRepresentable {
       
       marker.touchHandler = { (overlay: NMFOverlay) -> Bool in
         guard let marker = overlay as? NMFMarker else { return true }
-        markerTapEvent(to: marker, data: item, context: context)
+        markerTapEvent(view, to: marker, data: item, context: context)
         moveCamera(view, to: item.location)
         return true
       }
@@ -194,7 +226,6 @@ extension MapViewRepresentable {
     marker.isHideCollidedSymbols = true
     marker.anchor = anchor
     marker.iconImage = icon
-    marker.mapView = view.mapView
     
     return marker
   }
@@ -205,6 +236,34 @@ extension MapViewRepresentable {
       context.coordinator.deleteAllMarkers()
       
     }
+  }
+  
+  private func activeRadiusCircle(_ view: NMFNaverMapView, to location: Coordinates, radius: CGFloat, context: Context) {
+    guard context.coordinator.activeRadiusOverlay == nil else { return }
+    
+    // 테두리
+    let circle = NMFCircleOverlay(NMGLatLng(lat: location.latitude, lng: location.longitude), radius: radius)
+    circle.fillColor = UIColor(ColorSet.Mint._100.opacity(0.1))
+    circle.outlineColor = UIColor(ColorSet.Border.Accent.opacity(0.5))
+    circle.outlineWidth = 1
+    circle.zIndex = 100
+    circle.mapView = view.mapView
+    
+    context.coordinator.activeRadiusOverlay = circle
+  }
+  
+  /// 좌표 기준으로 원하는 거리 까지 영역 계산
+  private func bounds(
+    center: Coordinates,
+    radiusMeters: Double
+  ) -> NMGLatLngBounds {
+    let lat = center.latitude * .pi / 180
+    let dLat = (radiusMeters / 6_378_137.0) * (180 / .pi)
+    let dLng = dLat / cos(lat)
+    
+    let sw = NMGLatLng(lat: center.latitude - dLat, lng: center.longitude - dLng)
+    let ne = NMGLatLng(lat: center.latitude + dLat, lng: center.longitude + dLng)
+    return NMGLatLngBounds(southWest: sw, northEast: ne)
   }
 }
 

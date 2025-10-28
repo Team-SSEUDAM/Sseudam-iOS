@@ -11,12 +11,13 @@ import Foundation
 import SwiftUI
 
 public enum SecondaryButtonState {
-  case normal, disabled
+  case normal, disabled, isLoading
   
   public var backgroundColor: Color {
     switch self {
     case .normal: return ColorSet.Background.Primary
     case .disabled: return ColorSet.Component.Disabled
+    case .isLoading: return ColorSet.Background.Primary
     }
   }
   
@@ -24,6 +25,7 @@ public enum SecondaryButtonState {
     switch self {
     case .normal: return ColorSet.Text.Primary
     case .disabled: return ColorSet.Text.Disabled
+    case .isLoading: return ColorSet.Text.Primary
     }
   }
 }

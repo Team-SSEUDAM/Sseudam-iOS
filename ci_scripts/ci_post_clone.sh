@@ -30,6 +30,10 @@ mise --version
 echo "📦 Installing Tuist from .mise.toml..."
 mise install
 
+# Move to project root
+cd ..
+echo "📍 Moved to project root: $(pwd)"
+
 # Clean any existing artifacts
 echo "🧹 Cleaning existing artifacts..."
 mise exec -- tuist clean

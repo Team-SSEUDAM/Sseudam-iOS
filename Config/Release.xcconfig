@@ -1,0 +1,11 @@
+EXCLUDE_RESOURCE = Resources/Dev/**
+OTHER_SWIFT_FLAGS[config=RELEASE][sdk=*] = $(inherited) -DRELEASE
+SWIFT_OPTIMIZATION_LEVEL = -Owholemodule
+BASE_URL = https:/$()/live-api.sseudam.me/api/v1
+
+#include? "Release-Secrets.xcconfig"
+
+NM_CLIENT_ID = ${NM_CLIENT_ID}
+MIXPANEL_TOKEN = ${MIXPANEL_TOKEN}
+NM_CLIENT_SECRET = ${NM_CLIENT_SECRET}
+APP_STORE_URL = ${APP_STORE_URL}

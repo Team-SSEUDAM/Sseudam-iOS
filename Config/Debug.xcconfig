@@ -1,0 +1,12 @@
+BUNDLE_ID_SUFFIX = .dev
+EXCLUDE_RESOURCE = Resources/Release/**
+OTHER_SWIFT_FLAGS[config=DEBUG][sdk=*] = $(inherited) -DDEBUG
+SWIFT_OPTIMIZATION_LEVEL = -Onone
+BASE_URL = https:/$()/dev-api.sseudam.me/api/v1
+
+#include? "Debug-Secrets.xcconfig"
+
+NM_CLIENT_ID = ${NM_CLIENT_ID}
+MIXPANEL_TOKEN = ${MIXPANEL_TOKEN}
+NM_CLIENT_SECRET = ${NM_CLIENT_SECRET}
+APP_STORE_URL = ${APP_STORE_URL}

@@ -11,7 +11,7 @@ import ProjectDescriptionHelpers
 let project = Project.makeApp(
   infoPlist: [
     "CFBundleDevelopmentRegion": "ko_KR",
-    "CFBundleShortVersionString": "1.0.0",
+	"CFBundleShortVersionString": "1.0.0",
     "CFBundleVersion": "1",
     "CFBundleDisplayName": "쓰담",
     "CFBundleIconName": "AppIcon",
@@ -31,7 +31,8 @@ let project = Project.makeApp(
     "BASE_URL": "$(BASE_URL)",
     "APP_STORE_URL": "$(APP_STORE_URL)",
     "FirebaseAppDelegateProxyEnabled": false,
-    "MIXPANEL_TOKEN": "$(MIXPANEL_TOKEN)"
+    "MIXPANEL_TOKEN": "$(MIXPANEL_TOKEN)",
+    "ITSAppUsesNonExemptEncryption": false
   ],
   dependencies: [
     .Features.Umbrella,

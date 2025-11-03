@@ -15,16 +15,19 @@ public struct PetInfoEntity: Sendable, Equatable {
   public let currentPoint: Int
   public let goalPoint: Int
   public let levelType: CatLevel
+  public let season: CatType
   
   public init(
     nickname: String,
     point: Int,
     levelType: String,
-    maxLevelStandard: Int
+    maxLevelStandard: Int,
+    season: String
   ) {
     self.nickname = nickname
     self.currentPoint = point
     self.levelType = CatLevel(rawValue: levelType) ?? .level1
+    self.season = CatType(rawValue: season) ?? ._2025_07
     
     if CatLevel(rawValue: levelType) == .level5 { self.goalPoint = point }
     else { self.goalPoint = maxLevelStandard }
@@ -38,7 +41,8 @@ public struct PetInfoEntity: Sendable, Equatable {
       nickname: cacheModel.nickname,
       point: cacheModel.currentPoint,
       levelType: cacheModel.levelType,
-      maxLevelStandard: cacheModel.goalPoint
+      maxLevelStandard: cacheModel.goalPoint,
+      season: cacheModel.season
     )
   }
   
@@ -47,7 +51,8 @@ public struct PetInfoEntity: Sendable, Equatable {
       nickname: self.nickname,
       point: self.currentPoint,
       levelType: self.levelType.rawValue,
-      maxLevelStandard: self.goalPoint
+      maxLevelStandard: self.goalPoint,
+      season: self.season.rawValue
     )
   }
 }

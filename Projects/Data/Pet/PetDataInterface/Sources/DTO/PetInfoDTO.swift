@@ -19,6 +19,7 @@ public struct PetInfoDTO: DTO {
   public let point: Int
   public let levelType: String
   public let maxLevelStandard: Int
+  public let season: String
   public let createdAt: String
 }
 
@@ -28,7 +29,8 @@ public extension PetInfoDTO {
       nickname: nickname,
       point: point,
       levelType: levelType,
-      maxLevelStandard: maxLevelStandard
+      maxLevelStandard: maxLevelStandard,
+      season: season
     )
   }
 }

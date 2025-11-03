@@ -36,7 +36,7 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-composable-architecture.git", exact: "1.20.1"),
     .package(url: "https://github.com/pointfreeco/swift-navigation.git", exact: "2.3.1"), /// swift-navigation 명시적 버전 지정
-    .package(url: "https://github.com/navermaps/SPM-NMapsMap.git", exact: "3.21.0"),
+    .package(url: "https://github.com/navermaps/SPM-NMapsMap.git", exact: "3.23.0"),
     .package(url: "https://github.com/LottieFiles/dotlottie-ios", exact: "0.8.3"),
     .package(url: "https://github.com/mixpanel/mixpanel-swift", exact: "5.1.1"),
     .package(url: "https://github.com/firebase/firebase-ios-sdk", exact: "12.3.0"),

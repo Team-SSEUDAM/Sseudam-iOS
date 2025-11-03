@@ -98,7 +98,6 @@ public enum Shared: String, ModuleRepresentable {
 
 public enum SPM: String, ModuleRepresentable {
   case TCA = "ComposableArchitecture"
-  case NMapsMap = "NMapsMap"
   case DotLottie = "DotLottie"
   case Mixpanel = "Mixpanel"
   case FirebaseCrashlytics = "FirebaseCrashlytics"
@@ -313,11 +312,16 @@ extension TargetDependency {
   
   public struct SPM: TargetDependencyDelegate {
     public static let TCA = Self.project(.spm(.TCA))
-    public static let NMapsMap = Self.project(.spm(.NMapsMap))
     public static let DotLottie = Self.project(.spm(.DotLottie))
     public static let Mixpanel = Self.project(.spm(.Mixpanel))
     public static let FirebaseCrashlytics = Self.project(.spm(.FirebaseCrashlytics))
     public static let FirebaseMessaging = Self.project(.spm(.FirebaseMessaging))
+  }
+  
+  // ✅ XCFramework 지원을 위한 새로운 struct 추가
+  public struct XCFrameworks {
+    public static let NMapsMap: TargetDependency = .xcframework(path: .relativeToRoot("Frameworks/NMapsMap.xcframework"))
+    public static let NMapsGeometry: TargetDependency = .xcframework(path: .relativeToRoot("Frameworks/NMapsGeometry.xcframework"))
   }
 }
 

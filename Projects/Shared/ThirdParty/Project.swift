@@ -24,11 +24,13 @@ let project = Project(
       sources: ["Sources/**"],
       dependencies: [
         .SPM.TCA,
-        .SPM.NMapsMap,
         .SPM.DotLottie,
         .SPM.Mixpanel,
         .SPM.FirebaseCrashlytics,
         .SPM.FirebaseMessaging,
+        
+        .XCFrameworks.NMapsMap,
+        .XCFrameworks.NMapsGeometry,
       ]
     )
   ]

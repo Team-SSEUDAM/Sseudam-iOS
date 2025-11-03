@@ -43,7 +43,7 @@ public struct LevelUpView: View {
           asset: CatImageSet.imgae(
             level: store.catLevel,
             interaction: false,
-            type: ._2025_07
+            type: store.petInfo.season
           )
         )
         .resizable()

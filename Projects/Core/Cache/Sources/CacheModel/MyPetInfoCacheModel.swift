@@ -13,16 +13,19 @@ public struct MyPetInfoCacheModel: Sendable, Equatable, Codable {
   public let currentPoint: Int
   public let goalPoint: Int
   public let levelType: String
+  public let season: String
   
   public init(
     nickname: String,
     point: Int,
     levelType: String,
-    maxLevelStandard: Int
+    maxLevelStandard: Int,
+    season: String
   ) {
     self.nickname = nickname
     self.currentPoint = point
     self.goalPoint = maxLevelStandard
     self.levelType = levelType
+    self.season = season
   }
 }

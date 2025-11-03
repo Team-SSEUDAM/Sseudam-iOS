@@ -46,6 +46,7 @@ public struct NotificationFeature {
     case readNotificationResult(Result<Int, NetworkError>)
     
     case showToastMessage(String?)
+    case showLoadingView(Bool)
     
     case notificationDetail(NotificationDetailFeature.Action)
     case delegate(Delegate)
@@ -95,16 +96,19 @@ public struct NotificationFeature {
         guard !state.isLoading else { return .none }
         if isFirst {
           state.isFirstLoad = false
-          state.isLoading = true
-          return fetchNotificationItems(lastId: state.lastId)
+          return .concatenate([
+            .send(.showLoadingView(true)),
+            fetchNotificationItems(lastId: state.lastId)
+          ])
         } else {
           guard let id = state.lastId else { return .none }
-          state.isLoading = true
-          return fetchNotificationItems(lastId: id)
+          return .concatenate([
+            .send(.showLoadingView(true)),
+            fetchNotificationItems(lastId: id)
+          ])
         }
         
       case let .fetchNotificationResult(.success(data)):
-        state.isLoading = false
         if state.lastId == nil || state.data.isEmpty {
           state.data = data.items
         } else {
@@ -113,12 +117,14 @@ public struct NotificationFeature {
           state.data.append(contentsOf: newItems)
         }
         state.lastId = data.nextCursor
-        return .none
+        return .send(.showLoadingView(false))
         
       case let .fetchNotificationResult(.failure(error)):
         print(error)
-        state.isLoading = false
-        return .send(.showToastMessage(error.localizedDescription))
+        return .concatenate([
+          .send(.showLoadingView(false)),
+          .send(.showToastMessage(error.localizedDescription))
+        ])
         
       case .refreshNotificationItems:
         guard !state.isLoading else { return .none }
@@ -143,6 +149,10 @@ public struct NotificationFeature {
         state.toastMessage = message
         return .none
         
+      case let .showLoadingView(isLoading):
+        state.isLoading = isLoading
+        return .none
+        
       case let .notificationDetail(.delegate(action)):
         return handleNotificationDetail(action)
         
@@ -153,12 +163,14 @@ public struct NotificationFeature {
   
   
   private func fetchNotificationItems(lastId: Int?) -> Effect<Action> {
-    guard let userId = UserDefaultsKeys.userId else { return .none }
+    guard let userId = UserDefaultsKeys.userId else { return .send(.showLoadingView(false)) }
     return .run { send in
       let parameter: FetchNotificationParameter = .init(userId: userId, size: 20, lastId: lastId)
       do {
         if let data = try await fetchNotificationUseCase.execute(parameter) {
           await send(.fetchNotificationResult(.success(data)))
+        } else {
+          await send(.showLoadingView(false))
         }
         
       } catch let error as NetworkError {

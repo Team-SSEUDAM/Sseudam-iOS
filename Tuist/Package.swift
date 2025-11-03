@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 5.9
 import PackageDescription
 
 /// Tuist 환경에서만 적용되는 SPM 패키지 링크 타입 설정

@@ -44,7 +44,7 @@ mise exec -- tuist install
 
 # Generate Xcode workspace
 echo "🔨 Generating Xcode workspace..."
-mise exec -- tuist generate --no-open
+mise exec -- tuist generate --verbose --no-open
 
 # Verify workspace generation
 if [ -f "Sseudam.xcworkspace/contents.xcworkspacedata" ]; then

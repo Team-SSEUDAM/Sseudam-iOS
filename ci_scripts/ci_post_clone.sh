@@ -14,7 +14,7 @@ set -x
 
 # Environment Information
 echo "📍 Current Directory: $(pwd)"
-echo "📦 Tuist Version Required: 4.43.2"
+echo "📦 Tuist Version Required: 4.97.2"
 echo "🔧 Xcode Scheme: ${CI_XCODE_SCHEME:-Not Set}"
 echo "🏗️ Build Action: ${CI_XCODEBUILD_ACTION:-Not Set}"
 

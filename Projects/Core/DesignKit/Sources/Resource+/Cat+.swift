@@ -21,7 +21,7 @@ public enum CatType: String, Sendable, CaseIterable {
     case ._2025_07: return "basic"
     case ._2025_08: return "basic"
     case ._2025_09: return "basic"
-    case ._2025_10: return "nov"
+    case ._2025_10: return "basic"
     case ._2025_11: return "nov"
     }
   }

@@ -58,7 +58,7 @@ public struct CatHistoryCardCell: View {
   private var CatCardInfo: some View {
     VStack(alignment: .center, spacing: .Number6) {
       Badge(
-        text: .constant("Lv.\(record.levelType.rawInt)"),
+        text: .constant(record.levelType.levelText),
         state: .primary
       )
       CatNicknameView(nickname: record.nickname)

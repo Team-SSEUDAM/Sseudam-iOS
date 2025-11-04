@@ -28,7 +28,7 @@ public struct BigBottomSheetContentView: View {
   
   public var body: some View {
     VStack(alignment: .center) {
-      if store.catCards.isEmpty == false { 
+      if store.historyCards.isEmpty == false {  // catCards 대신 historyCards 사용
         SavedCatsView
         BorderView(size: .long).padding(.horizontal, .Number16)
       }
@@ -60,7 +60,7 @@ public struct BigBottomSheetContentView: View {
       
       ScrollView(.horizontal, showsIndicators: false) {
         HStack(spacing: .Number12) {
-          ForEach(store.catCards) { CatCardCell(card: $0) }
+          ForEach(store.historyCards) { CatCardCell(card: $0) }
         }
         .padding(.horizontal, .Number16)
         .padding(.vertical, .Number12)
